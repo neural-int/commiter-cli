@@ -219,6 +219,7 @@ Ollama endpoint は loopback HTTP URL である必要があります。verificat
 
 - コミット計画の確認は既定で有効です。
 - verification definition はリポジトリ単位で管理し、承認済み定義はリポジトリと definition hash の組み合わせで trust されます。
+- verification trust が承認するのは command definition のみであり、その command が実行する repository code、依存関係、lockfile、その他のコードの安全性を保証するものではありません。
 - verification 後、コミット作成前に解析済みの Git 状態を再検証します。
 - Git hook は通常どおり実行され、`--no-verify` で回避しません。
 - recovery のために reset、stash、amend、force push、automatic rollback を利用しません。
