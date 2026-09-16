@@ -219,6 +219,7 @@ This boundary does not mean every child process is offline: user-approved Git pu
 
 - Commit-plan confirmation is enabled by default.
 - Verification definitions are repository-scoped; approved definitions are trusted by repository and definition hash.
+- Verification trust approves the command definition only; it does not establish the safety of repository code, dependencies, lockfiles, or other code executed by those commands.
 - After verification, `commiter` revalidates the analyzed Git state before commit creation.
 - Git hooks are respected; `commiter` does not bypass them with `--no-verify`.
 - `commiter` does not use reset, stash, amend, force push, or automatic rollback as recovery shortcuts.
