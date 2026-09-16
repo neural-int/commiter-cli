@@ -5,67 +5,67 @@
 [![CI](https://github.com/neural-int/commiter-cli/actions/workflows/go.yml/badge.svg)](https://github.com/neural-int/commiter-cli/actions/workflows/go.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-`commiter` は、ローカル実行を前提とした Git コミット計画 CLI です。リポジトリの変更を機械的に解析し、ローカルの Ollama モデルに複数コミットの Conventional Commits 計画を生成させ、その計画と現在の Git 状態を検証したうえで、コミット作成と必要に応じた push を実行します。
+`commiter` は、ローカル環境での実行に特化した Git コミット計画支援 CLI です。リポジトリ内の変更を機械的に解析し、ローカルで動作する Ollama モデルを用いて Conventional Commits 準拠の複数コミット計画を作成します。その計画を現在の Git の状態と照合して安全性を検証した上で、実際のコミット作成や必要に応じた push を行います。
 
-> **プレリリース状態:** 現時点ではパッケージ化された GitHub Release は公開されていません。現在利用できる導入方法はソースからのビルドです。
+> **プレリリース情報:** 現時点ではパッケージ化された GitHub Releases は公開されていません。現在の導入方法はソースコードからのビルドのみとなります。
 
 ## 概要
 
-一般的な AI ベースのコミット支援ツールでは、生の diff をモデルへ渡し、その解釈からメッセージ生成までを任せることがあります。`commiter` は、機械的に決定できる処理と、モデルによる判断が必要な処理を明確に分離します。
+一般的な AI コミット支援ツールの多くは、生の diff をそのままモデルに渡し、差分の解釈からメッセージ生成までを一括して委ねています。それに対し `commiter` では、機械的に処理可能な決定論的タスクと、モデルによる判断が必要なタスクを明確に分離しています。
 
-Git 状態の確認、対象ファイルの選定、機密ファイルの分類、構文を考慮した前処理、計画の検証、verification、コミット実行、push の安全確認は CLI 側で機械的に行います。ローカル LLM が担当するのは、変更の意味・目的の判断と、ファイルをどのコミットへまとめるかという判断です。
+Git の状態把握、対象ファイルの選定、機密ファイルの判別、構文木を活用した前処理、計画の検証、各種検証処理（verification）、コミットの実行、そして push 時の安全性確認は、すべて CLI 側で機械的・決定論的に処理されます。ローカル LLM が担うのは「変更の背景や意図の理解」と「コミット単位へのファイルのグループ化」という、人間に近い判断が求められる部分のみです。
 
-この構成により、リポジトリ内容をローカルに保ち、小規模なローカルモデルへ任せる処理量を抑えながら、Git の変更操作を明示的かつ fail-closed に扱うことを目的としています。
+この設計により、リポジトリのソースコードや差分情報をローカル環境内に完全に留め、小規模なローカルモデルへの負荷を最小限に抑えつつ、Git の変更処理を透明かつ安全重視（fail-closed：疑わしい場合は処理を停止）で実行できるようにしています。
 
 ## 主な機能
 
-- **複数コミットの計画生成** — ファイル単位の変更を目的別にまとめ、Conventional Commits 形式のメッセージを生成します。
-- **ローカル LLM 推論** — LLM リクエスト先を loopback 上の Ollama に限定し、`commiter` 自身がリポジトリ内容をクラウド LLM へ送信しません。
-- **構文を考慮した前処理** — 対応言語では Tree-sitter を利用し、生テキストの構文認識までモデルへ任せる構成を避けます。
-- **適応的なコンテキスト処理** — 8K、16K、32K のコンテキストを段階的に使用し、必要な場合は階層要約を行います。
-- **機密ファイル保護** — 明らかに機密性の高いファイルは常に除外し、判断が必要な候補は内容を読む前に確認します。
-- **計画検証と承認** — モデル出力を検証し、既定ではコミット作成前にユーザー承認を求めます。
-- **リポジトリ単位の verification** — 明示的な verification command と package script の自動検出に対応し、信頼情報はリポジトリ単位で管理します。
-- **Git 状態の保護** — 解析済みの状態を Git 変更前に再検証し、未解析の状態をそのままコミットしません。
-- **dry-run と機械可読出力** — Git を変更せずに計画を確認できます。JSON 出力は dry-run と読み取り専用操作に限定されます。
-- **英語・日本語のコミットメッセージ** — 設定または `--language en|ja` で選択できます。
+- **複数コミットの計画立案** — ファイル単位の変更を目的ごとにグループ化し、Conventional Commits 形式のメッセージを作成します。
+- **完全ローカルでの LLM 推論** — LLM へのリクエストはローカルホスト（loopback）上の Ollama エンドポイントのみに限定され、リポジトリの内容がクラウド上の外部 LLM に送信されることはありません。
+- **構文を意識した前処理** — 対応言語では Tree-sitter を利用して構文解析を行い、生のテキスト差分のみから構文をモデルに推測させる負担を軽減します。
+- **適応型コンテキスト管理** — 変更規模に応じて 8K、16K、32K のコンテキスト長を段階的に使い分け、必要に応じて階層的な要約を行います。
+- **機密情報の保護** — 明らかな機密ファイルは自動的に対象から除外されます。機密情報を含む可能性があるファイルについても、内容を読み込む前にユーザーの承認を求めます。
+- **計画の検証と承認フロー** — モデルの出力を検証し、デフォルトでは実際のコミット作成前に必ずユーザーの承認を要求します。
+- **リポジトリ単位の検証機能** — 明示的に指定した検証コマンドや、package.json のスクリプト自動検出に対応しています。検証コマンドの信頼設定（trust）はリポジトリごとに安全に管理されます。
+- **Git 状態の整合性保護** — Git の変更直前に解析時点の状態を再検証し、解析されていない未確認の変更が混入したままコミットされるのを防ぎます。
+- **dry-run と機械可読出力** — Git の状態を変更することなく計画のみを確認できます。JSON 出力は dry-run または読み取り専用コマンドでのみ利用可能です。
+- **多言語コミットメッセージ対応** — 設定ファイルまたは `--language en|ja` オプションで、英語および日本語のメッセージ出力を切り替えられます。
 
 ## 処理の流れ
 
-通常の実行では、次の順序で処理します。
+通常の実行フローは以下のとおりです。
 
-1. リポジトリ、branch、HEAD、index、conflict、進行中の Git 操作を検証します。
-2. staged / unstaged / untracked の状態を収集し、対象ファイルをファイル単位で決定します。
-3. ファイル内容を読む前にパスだけで機密性を分類し、明らかに機密なファイルは自動除外、機密候補は読み取り前に確認します。
-4. Git metadata と構文を考慮した structural evidence を生成します。未対応のテキスト形式は raw diff と Git metadata へフォールバックします。
-5. 必要に応じて入力を圧縮し、設定されたローカル Ollama モデルに制約付き JSON のコミット計画を生成させます。
-6. ファイル割り当てと安全条件を検証し、計画を表示して承認を求めます。
-7. 承認済みのリポジトリ単位 verification を実行し、コミット作成前に Git 状態を再検証します。
-8. 計画順にコミットを作成し、push が有効な場合はコミット列の完了後に 1 回だけ push します。
+1. リポジトリの状態、ブランチ、HEAD、インデックス（ステージングエリア）、コンフリクト、進行中の Git 操作（rebase、merge など）を検証します。
+2. staged / unstaged / untracked の状態を収集し、処理対象となるファイルをファイル単位で確定します。
+3. ファイル内容を読み取る前にパス情報から機密性を判定します。明らかな機密ファイルは自動で除外され、判断が分かれる候補ファイルについては読み取り前にユーザーへ確認を求めます。
+4. Git のメタデータと、Tree-sitter による構文構造エビデンス（structural evidence）を抽出します。構文解析に未対応のテキスト形式については、生の diff と Git メタデータへのフォールバックで対応します。
+5. コンテキスト上限に合わせて入力を適切に圧縮し、設定されたローカル Ollama モデルに対して制約付き JSON 形式でのコミット計画生成を要求します。
+6. ファイルの割り当て妥当性と安全規約を検証した上で、生成された計画を画面に表示してユーザーに承認を求めます。
+7. 承認済みのリポジトリ単位の検証処理（verification）を実行し、コミット作成直前に Git の状態を再検証します。
+8. 計画された順序に沿ってコミットを順次作成し、push が有効な場合はコミット列の完了後に一括で 1 回だけ push します。
 
-解析時に確認した状態と Git 変更直前の状態が一致しない場合、`commiter` は古い前提のまま続行せず、停止または再解析を提案します。
+解析時に把握した状態と、Git 変更直前の状態に食い違いが生じている場合、`commiter` は古い前提のまま処理を進めることなく、安全のために処理を停止するか再解析を提案します。
 
-## 必要環境
+## 動作要件
 
-v1 の対象環境は次のとおりです。
+v1 で対象とする環境は以下のとおりです。
 
 - macOS 14 以降
-- Apple Silicon
+- Apple Silicon（M シリーズ）
 - Git
 - Ollama 0.31.2 以降
 
-現在のソースビルドによる導入では、さらに次が必要です。
+現時点のソースビルドによる導入では、追加で以下が必要です。
 
 - Go 1.23 以降
-- Tree-sitter の CGo ビルドに必要な Xcode Command Line Tools、または利用可能な C コンパイラ
+- Xcode Command Line Tools または Tree-sitter の CGo ビルドが可能な C コンパイラ
 
-開発時の基準環境は M3 Mac / 16 GB メモリです。これは基準環境であり、最小メモリ要件として定義しているわけではありません。
+開発におけるリファレンス環境は M3 Mac（メモリ 16 GB）です。これはあくまで動作確認済みのリファレンス環境であり、必須の最小メモリ要件ではありません。
 
-既定モデルは `qwen3.5:4b-q4_K_M`、既定の Ollama endpoint は `http://127.0.0.1:11434` です。
+デフォルトのモデルは `qwen3.5:4b-q4_K_M`、デフォルトの Ollama エンドポイントは `http://127.0.0.1:11434` です。
 
 ## インストール
 
-パッケージ化されたバイナリおよび Homebrew 配布はまだ公開されていません。実際の Release が提供されるまでは、ソースからビルドします。
+現在、コンパイル済みバイナリの配布や Homebrew によるパッケージ提供は準備中です。正式リリースまでは、ソースコードからビルドしてご利用ください。
 
 ```sh
 git clone https://github.com/neural-int/commiter-cli.git
@@ -73,13 +73,13 @@ cd commiter-cli
 go install ./cmd/commiter
 ```
 
-`go install` は、`GOBIN` が設定されている場合はそのディレクトリへ、未設定の場合は `$(go env GOPATH)/bin` へバイナリを配置します。そのディレクトリが `PATH` に含まれていることを確認してください。
+`go install` は、環境変数 `GOBIN` が設定されている場合はそのパスへ、未設定の場合は `$(go env GOPATH)/bin` へバイナリを配置します。対象ディレクトリに `PATH` が通っていることを確認してください。
 
-Ollama のモデルはバイナリへ同梱されません。
+なお、Ollama のモデルデータはバイナリには含まれていません。
 
 ## クイックスタート
 
-処理対象の Git リポジトリ内で次を実行します。
+コミットをまとめたい Git リポジトリのディレクトリで、以下のコマンドを実行します。
 
 ```sh
 commiter setup
@@ -88,98 +88,94 @@ commiter --dry-run
 commiter
 ```
 
-`commiter setup` は、設定された Ollama 環境を確認します。Ollama が未導入で Homebrew が利用できる場合は、確認後に Ollama をインストールできます。また、Ollama の一時起動や設定モデルの pull も確認後に行います。
-
-`commiter doctor` は読み取り専用で、リポジトリ、設定、Git identity、Ollama 接続、設定モデル、structured output 対応などの前提条件を確認します。
-
-`commiter --dry-run` は解析と計画生成を実行しますが、index の変更、コミット作成、push は行いません。
-
-引数なしの `commiter` はコミット作成と push を行う可能性があります。表示される計画と確認プロンプトを確認したうえで承認してください。
+- `commiter setup`: 設定された Ollama 環境を確認します。Ollama が未インストールの場合は Homebrew 経由での導入（要確認）をサポートし、一時的なデーモン起動や指定モデルの pull も対話形式で案内します。
+- `commiter doctor`: 読み取り専用で環境診断を行います。リポジトリ状態、設定、Git の identity、Ollama との疎通、設定モデルの存在、structured output の対応状況などを一括チェックします。
+- `commiter --dry-run`: 差分の解析とコミット計画の生成を行いますが、インデックスの変更、コミット作成、push は一切実行しません。
+- `commiter`: 実際にコミット作成や push を行うメインコマンドです。画面に表示される計画内容や確認プロンプトを十分に確認してから承認を行ってください。
 
 ## 使い方
 
-### 基本形式
+### 基本構文
 
 ```text
 commiter [flags] [--] [pathspec...]
 ```
 
-pathspec を指定しない場合、`HEAD` から working tree までの tracked change と、安全性チェックを通過した untracked file が対象候補になります。Git pathspec を指定すると処理対象を限定できます。
+pathspec を指定しない場合、`commiter` は `HEAD` から作業ツリー（working tree）までの追跡対象の変更と、安全性チェックを通過した未追跡ファイル（untracked files）の両方を対象として扱います。特定のディレクトリやファイルのみを対象にしたい場合は、Git の pathspec で絞り込むことができます。
 
-tracked file は `HEAD` から最終的な working tree までをファイル単位で扱います。staged / unstaged の境界は対象範囲を制限しません。partially staged な tracked file がコミット対象に選ばれた場合、staged 部分だけではなく、そのファイルの変更全体を `commiter` がコミットします。
+追跡対象ファイル（tracked files）は、`HEAD` から最終的な作業ツリーまでの状態をファイル単位でまとめて処理します。staged / unstaged の境界によって対象範囲が制限されることはありません。たとえば、あるファイルの一部の変更のみがステージング（partially staged）されている状態でそのファイルがコミット対象に選ばれた場合、`commiter` はステージングされている差分だけでなく、そのファイル全体の変更を 1 つのコミットに含めます。
 
-例:
+使用例:
 
 ```sh
-# Git を変更せず計画を確認
+# Git の状態を変更せずに計画をプレビュー
 commiter --dry-run
 
-# この実行だけ日本語のコミットメッセージを生成
+# 今回の実行のみコミットメッセージを日本語で生成
 commiter --dry-run --language ja
 
-# 対象パスを限定
+# 特定のディレクトリのみを対象に限定
 commiter --dry-run -- src/ internal/
 
-# コミットは作成するが push しない
+# コミットは作成するが push は行わない
 commiter --no-push
 ```
 
-### コマンド
+### サブコマンド一覧
 
 | コマンド | 用途 |
 | --- | --- |
-| `commiter setup [--update-model]` | Ollama と設定されたローカルモデルを準備します。 |
-| `commiter doctor` | 環境・capability の読み取り専用チェックを実行します。 |
-| `commiter config init --global\|--repo` | global または repository 設定のテンプレートを作成します。 |
-| `commiter config show [--effective]` | 解決後の設定値とその参照元を表示します。 |
-| `commiter config path --global\|--repo` | 設定ファイルのパスを表示します。 |
-| `commiter trust list` | リポジトリ単位の verification trust を一覧表示します。 |
-| `commiter trust revoke <repo>` | verification trust を取り消します。 |
-| `commiter version` | CLI バージョンを表示します。 |
+| `commiter setup [--update-model]` | Ollama 環境および指定されたローカルモデルの準備 |
+| `commiter doctor` | 実行環境や機能要件の読み取り専用チェック |
+| `commiter config init --global\|--repo` | グローバル設定またはリポジトリ用設定ファイルのテンプレート生成 |
+| `commiter config show [--effective]` | 実際に適用されている設定値とその読み込み元の表示 |
+| `commiter config path --global\|--repo` | 設定ファイルの配置パスの表示 |
+| `commiter trust list` | リポジトリ単位で承認された検証コマンドの信頼設定（trust）一覧 |
+| `commiter trust revoke <repo>` | 指定したリポジトリの検証コマンド信頼設定を取り消し |
+| `commiter version` | CLI のバージョン情報を表示 |
 
 ### 主なフラグ
 
-| フラグ | 動作 |
+| フラグ | 効果 |
 | --- | --- |
-| `--dry-run` | Git を変更せず、解析と計画生成を実行します。 |
-| `--no-push` | この実行では push しません。 |
-| `--no-confirm-commit` | 通常のコミット計画確認を省略します。安全上必須の確認は省略されません。 |
-| `--no-confirm-push` | 通常の push 確認を省略します。安全上必須の確認は省略されません。 |
-| `--language en\|ja` | この実行のコミットメッセージ言語を上書きします。 |
-| `--model NAME` | この実行で使用する Ollama モデルを上書きします。 |
-| `--record-metrics` | この実行のローカル metrics を永続化します。 |
-| `--json` | `--dry-run` または対応する読み取り専用コマンドでのみ JSON を出力します。 |
+| `--dry-run` | Git の変更を行わずに解析と計画作成のみを実行 |
+| `--no-push` | 今回の実行における push 処理を無効化 |
+| `--no-confirm-commit` | 通常のコミット計画承認プロンプトをスキップ（安全上不可欠な確認はスキップされません） |
+| `--no-confirm-push` | 通常の push 承認プロンプトをスキップ（安全上不可欠な確認はスキップされません） |
+| `--language en\|ja` | 今回の実行で使用するコミットメッセージ言語を一時的に変更 |
+| `--model NAME` | 今回の実行で使用する Ollama モデルを一時的に変更 |
+| `--record-metrics` | 今回の実行のメトリクスログをローカルに保存 |
+| `--json` | `--dry-run` または対応する読み取り専用コマンドの出力を JSON 形式で表示 |
 
-簡易的なコマンド一覧は `commiter --help` で確認できます。
+より簡潔なヘルプ情報は `commiter --help` で確認できます。
 
 ## 設定
 
-設定の優先順位は次のとおりです。
+設定値の優先順位は以下のとおりです。
 
 ```text
-CLI > repository configuration > global configuration > built-in defaults
+CLI 引数・フラグ > リポジトリ設定 (.commiter.toml) > グローバル設定 > 組み込みのデフォルト値
 ```
 
-設定ファイルは次のコマンドで作成できます。
+設定ファイルのひな形は以下のコマンドで作成できます。
 
 ```sh
 commiter config init --global
 commiter config init --repo
 ```
 
-global 設定は `$XDG_CONFIG_HOME/commiter/config.toml`、`XDG_CONFIG_HOME` が未設定の場合は `~/.config/commiter/config.toml` に保存されます。
+- グローバル設定ファイル: `$XDG_CONFIG_HOME/commiter/config.toml`（`XDG_CONFIG_HOME` が未設定の場合は `~/.config/commiter/config.toml`）
+- リポジトリ個別設定ファイル: リポジトリルートの `.commiter.toml`
 
-repository 設定はリポジトリルートの `.commiter.toml` です。
-
-実際に適用される設定は次で確認できます。
+現在有効になっている設定値は以下のコマンドで確認できます。
 
 ```sh
 commiter config show --effective
 ```
 
-主な既定値は次のとおりです。
+主要なデフォルト設定値は以下のとおりです。
 
-| 設定 | 既定値 |
+| 設定項目 | デフォルト値 |
 | --- | --- |
 | `commit.language` | `"en"` |
 | `commit.confirm` | `true` |
@@ -193,60 +189,60 @@ commiter config show --effective
 | `verification.timeout_seconds` | `600` |
 | `metrics.persist` | `false` |
 
-Ollama endpoint は loopback HTTP URL である必要があります。verification 設定は repository scope のみで、global 設定には記述できません。
+Ollama のエンドポイントは、必ずローカルホストを指す loopback HTTP URL である必要があります。また、検証処理（verification）に関する設定はリポジトリ固有のスコープに限定されており、グローバル設定には記述できません。
 
-設定スキーマ全体と設定元ごとの制約は [ソフトウェア要求仕様書](SOFTWARE_REQUIREMENTS_SPECIFICATION.md) を参照してください。
+全設定項目のスキーマや詳細な制限事項については、[ソフトウェア要求仕様書](SOFTWARE_REQUIREMENTS_SPECIFICATION.md) を参照してください。
 
 ## プライバシーと安全性
 
-`commiter` では、ローカル解析と保守的な Git 変更を任意のモードではなく設計上の不変条件として扱います。
+`commiter` は、「完全ローカルでの解析」と「保守的で安全な Git 変更処理」を単なるオプションではなく、システムの中核的な不変条件（invariant）として位置づけています。
 
 ### ローカル LLM の境界
 
-`commiter` が扱うリポジトリの diff、prompt、LLM response、その他のリポジトリ内容は、LLM 推論・analytics・telemetry のために loopback 外へ送信されません。設定可能な LLM endpoint も loopback HTTP URL に制限されます。
+`commiter` が扱うリポジトリの diff、プロンプト、LLM からの応答、その他解析に使用されるリポジトリ内のデータは、推論・分析・テレメトリなどの目的でローカルホスト（loopback）の外へ送信されることは一切ありません。設定可能な LLM エンドポイントも、loopback の HTTP URL に制限されています。
 
-ただし、すべての子プロセスがオフラインになるという意味ではありません。ユーザーが承認した Git push、verification command、Git hook、署名処理、Ollama のモデルダウンロードは、それぞれ独自にネットワーク通信を行う可能性があります。これは `commiter` がリポジトリ内容をクラウド LLM に送信することとは別です。
+ただし、この境界は「すべてのサブプロセスが完全にオフラインである」という意味ではありません。ユーザー自身が承認した Git push、検証コマンドの実行、Git フック、コミット署名処理、Ollama のモデルダウンロードなどは、各機能独自のネットワーク通信を行う可能性があります。これらは、`commiter` がリポジトリの内容をクラウド LLM に送信しないこととは明確に区別されます。
 
-### 機密ファイル
+### 機密ファイルの保護
 
-- 一般的な環境ファイル、private key、credential / secret の保存場所など、明らかに機密性の高いパスは自動除外されます。
-- 明らかに機密なファイルを含めるための汎用 CLI / 設定 override はありません。
-- 判断が必要な機密候補はパスから判定され、内容を読む前に承認が必要です。
-- 機密候補を承認した場合でも、raw value と raw diff は `--dry-run` を含めて表示されません。
-- 現在の実行で承認・追加された機密候補を含む push は、通常の push 確認を無効化していても手動確認が必要です。
+- 一般的な環境変数ファイル（`.env` など）、秘密鍵（private key）、各種認証情報やシークレットの保存場所など、明らかに機密性の高いパスは自動的にコミット対象から除外されます。
+- 明らかな機密ファイルを強制的にコミット対象へ含めるような CLI オプションや設定のオーバーライド手段は存在しません。
+- パス名から機密情報を含む可能性が疑われる候補ファイル（sensitive candidates）は、ファイル内容を読み込む前にユーザーへ確認が求められます。
+- 機密候補ファイルの内容読み取りが承認された場合でも、その平文の値や生の diff は、`--dry-run` 時も含めてターミナル画面や JSON 出力に表示されません。
+- 今回の実行で新規に承認・追加された機密候補ファイルを含むコミットを push する際は、通常の push 確認を無効化（`--no-confirm-push`）していても、手動での確認プロンプトが必須となります。
 
-### 承認・verification・Git 状態確認
+### 承認・検証・Git 状態の確認
 
-- コミット計画の確認は既定で有効です。
-- verification definition はリポジトリ単位で管理し、承認済み定義はリポジトリと definition hash の組み合わせで trust されます。
-- verification trust が承認するのは command definition のみであり、その command が実行する repository code、依存関係、lockfile、その他のコードの安全性を保証するものではありません。
-- verification 後、コミット作成前に解析済みの Git 状態を再検証します。
-- Git hook は通常どおり実行され、`--no-verify` で回避しません。
-- recovery のために reset、stash、amend、force push、automatic rollback を利用しません。
-- 無効または安全条件を満たさないモデル出力から直接 Git を変更することはありません。
+- コミット計画の承認プロンプトは、デフォルトで有効になっています。
+- 検証定義（verification definition）はリポジトリ単位で管理され、承認された定義は「リポジトリ」と「定義のハッシュ値」の組み合わせによって信頼（trust）されます。
+- 検証 trust が承認するのは「実行するコマンドの定義」そのものに限られ、そのコマンドによって間接的に実行されるリポジトリのコード、外部依存パッケージ、ロックファイルなどの安全性を保証するものではありません。
+- 検証処理の完了後、コミットを作成する直前に、解析対象となった Git の状態が変化していないかを再検証します。
+- Git フックは通常の Git 操作と同様に尊重され、`--no-verify` でスキップすることはありません。
+- エラーからの復帰目的で、`git reset`、`stash`、`amend`、強制 push（force push）、自動ロールバックなどを安易にショートカットとして使用することはありません。
+- 不正な形式の出力や安全条件を満たさないモデル出力によって、Git の状態が直接変更されることはありません。
 
 ### push の挙動
 
-push は通常の Git semantics に従います。現在の branch に今回の `commiter` 実行より前から存在する outgoing commit がある場合、それらも同じ push に含まれる可能性があります。実行前から存在する outgoing commit は、今回の実行では再解析されず、機密ファイル分類の対象にもなりません。
+push 処理は通常の Git の仕様に従います。作業ブランチに今回の `commiter` 実行前から存在する未プッシュのコミット（outgoing commits）が含まれている場合、それらのコミットも同一の push でリモートへ送信される可能性があります。なお、実行前から存在していた既存の未プッシュコミットについては、今回の実行で再解析されたり機密ファイル判定が行われたりすることはありません。
 
-永続 metrics は既定で無効です。有効化した場合もローカル記録であり、リポジトリパス、メッセージ、diff、prompt、ユーザー feedback、機密値を記録することを意図していません。
+メトリクスの永続化はデフォルトで無効です。有効にした場合でもデータはローカルにのみ保存され、リポジトリのパス、コミットメッセージ、diff、プロンプト、ユーザーフィードバック、機密情報などの機微な内容が含まれないように設計されています。
 
-脆弱性の報告方法は [SECURITY.md](SECURITY.md)、規範的な安全要件は [ソフトウェア要求仕様書](SOFTWARE_REQUIREMENTS_SPECIFICATION.md) を参照してください。
+脆弱性の報告窓口については [SECURITY.md](SECURITY.md)、より厳密な安全要件の仕様については [ソフトウェア要求仕様書](SOFTWARE_REQUIREMENTS_SPECIFICATION.md) を参照してください。
 
 ## 対応言語
 
-### コミットメッセージ言語
+### コミットメッセージの言語
 
-`commiter` は次の言語に対応しています。
+`commiter` は以下の言語でのメッセージ生成に対応しています。
 
-- English (`en`) — 既定
-- 日本語 (`ja`)
+- 英語（`en`）— デフォルト
+- 日本語（`ja`）
 
-永続設定では `commit.language`、実行単位では `--language en|ja` を使用します。
+恒久的な設定には `commit.language` を使用し、実行ごとの一時的な切り替えには `--language en|ja` を指定します。
 
-### 構文を考慮した解析
+### 構文解析（Syntax-Aware Analysis）
 
-Tree-sitter ベースの structural analysis は次の言語に対応しています。
+Tree-sitter による構文構造解析は、以下の言語に対応しています。
 
 - Go
 - JavaScript / JSX
@@ -256,22 +252,22 @@ Tree-sitter ベースの structural analysis は次の言語に対応してい�
 - HTML
 - CSS
 
-未対応のテキスト言語、または構文解析に失敗したファイルは raw diff と Git metadata にフォールバックします。binary、large file など内容を扱わない opaque file は、内容ではなく metadata のみで表現されます。
+構文解析に未対応のテキスト言語や、パースに失敗したファイルについては、生の diff と Git メタデータを組み合わせたフォールバック処理が行われます。バイナリファイルや極端に巨大なファイルなど、中身を直接扱わない不透明なファイル（opaque files）は、ファイル内容ではなくメタデータのみで表現されます。
 
-## 制約
+## 現在の制約事項
 
-現在の v1 scope では、意図的に次を対象外としています。
+v1 の提供範囲において、以下の機能は意図的に対象外としています。
 
-- Windows、Linux、Intel Mac
-- cloud LLM backend、llama.cpp backend
-- hunk 単位のコミット分割。コミットへの割り当てはファイル単位です。
-- 型解決、cross-file symbol resolution、control-flow graph、data-flow analysis などの semantic static analysis
-- submodule の再帰解析。親リポジトリから見える submodule pointer の変更のみを扱います。
-- 現時点でのパッケージ化された GitHub Release / Homebrew インストール
+- Windows、Linux、Intel Mac 環境への対応
+- クラウド LLM バックエンドや llama.cpp バックエンドの利用
+- hunk（コード片）単位でのコミット分割（コミットへの割り当てはファイル単位となります）
+- 型解決、ファイル横断でのシンボル解決、制御フローグラフ、データフロー解析などの高度な意味論的静的解析（semantic static analysis）
+- サブモジュールの再帰的な解析（親リポジトリから見えるサブモジュールのコミットポインタ変更のみを扱います）
+- 現時点でのパッケージ化された GitHub Releases や Homebrew によるワンライナーインストール
 
-現在は loopback 上の Ollama と Apple Silicon macOS 環境を対象としています。
+現在のバージョンは、ローカルホスト上の Ollama と Apple Silicon 搭載の macOS 環境を主なターゲットとしています。
 
-## ドキュメント
+## ドキュメント一覧
 
 - [Software Requirements Specification — English](SOFTWARE_REQUIREMENTS_SPECIFICATION_en.md)
 - [ソフトウェア要求仕様書 — 日本語](SOFTWARE_REQUIREMENTS_SPECIFICATION.md)
@@ -283,12 +279,12 @@ Tree-sitter ベースの structural analysis は次の言語に対応してい�
 
 ## コントリビューション
 
-プロジェクトのローカル処理、再現可能な Git 状態管理、保守的な安全境界を維持する変更を歓迎します。
+ローカル環境での完結、再現性の高い Git 状態管理、そして保守的な安全境界というプロジェクトの基本方針を尊重していただけるコントリビューションを心より歓迎します。
 
-挙動を変更する前に SRS と [コントリビューションガイド](CONTRIBUTING_ja.md) を確認してください。Pull Request は対象を絞り、挙動を変更する場合は対応するドキュメントとテストも更新してください。
+動作仕様を変更する前に、SRS（ソフトウェア要求仕様書）および [コントリビューションガイド](CONTRIBUTING_ja.md) を必ずご一読ください。Pull Request は目的を明確に絞った構成とし、仕様の変更を伴う場合は対応するドキュメントやテストも合わせて更新してください。
 
-セキュリティ上の脆弱性は公開 Issue / Discussion ではなく、[SECURITY.md](SECURITY.md) に従って非公開で報告してください。
+セキュリティ脆弱性の報告は、公開の Issue や Discussion ではなく、[SECURITY.md](SECURITY.md) に記載された手順に従って非公開で行ってください。
 
 ## ライセンス
 
-`commiter-cli` は [MIT License](LICENSE) で公開されています。
+`commiter-cli` は [MIT License](LICENSE) の下で公開されています。
