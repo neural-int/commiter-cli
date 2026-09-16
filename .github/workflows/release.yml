@@ -25,13 +25,13 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Set up Go
-        uses: actions/setup-go@v7
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
         with:
           go-version-file: go.mod
 
@@ -257,7 +257,7 @@ jobs:
           )
           cat dist/checksums.txt
 
-      - name: Create draft GitHub Release
+      - name: Create or update draft GitHub Release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -265,13 +265,26 @@ jobs:
           ARCHIVE: ${{ steps.version.outputs.archive }}
         run: |
           set -euo pipefail
-          gh release create "$TAG" \
-            "dist/${ARCHIVE}" \
-            dist/checksums.txt \
-            --verify-tag \
-            --draft \
-            --generate-notes \
-            --title "$TAG"
+
+          if is_draft="$(gh release view "$TAG" --json isDraft --jq '.isDraft' 2>/dev/null)"; then
+            if [[ "$is_draft" != "true" ]]; then
+              echo "::error::Release $TAG already exists and is published"
+              exit 1
+            fi
+
+            gh release upload "$TAG" \
+              "dist/${ARCHIVE}" \
+              dist/checksums.txt \
+              --clobber
+          else
+            gh release create "$TAG" \
+              "dist/${ARCHIVE}" \
+              dist/checksums.txt \
+              --verify-tag \
+              --draft \
+              --generate-notes \
+              --title "$TAG"
+          fi
 
       - name: Publish GitHub Release
         shell: bash
