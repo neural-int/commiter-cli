@@ -27,6 +27,7 @@ jobs:
       tag: ${{ steps.version.outputs.tag }}
       version: ${{ steps.version.outputs.version }}
       archive: ${{ steps.version.outputs.archive }}
+      tag_sha: ${{ steps.release_tag.outputs.tag_sha }}
 
     steps:
       - name: Check out repository
@@ -59,11 +60,13 @@ jobs:
           echo "archive=$archive" >> "$GITHUB_OUTPUT"
 
       - name: Verify release tag belongs to main
+        id: release_tag
         shell: bash
         env:
           TAG: ${{ steps.version.outputs.tag }}
         run: |
           set -euo pipefail
+          tag_sha="$(git rev-parse "refs/tags/${TAG}")"
           release_commit="$(git rev-list -n 1 "$TAG")"
 
           if ! git show-ref --verify --quiet refs/remotes/origin/main; then
@@ -75,6 +78,8 @@ jobs:
             echo "::error::Release tag $TAG must point to a commit contained in main"
             exit 1
           fi
+
+          echo "tag_sha=$tag_sha" >> "$GITHUB_OUTPUT"
 
       - name: Run tests
         run: go test ./...
@@ -327,9 +332,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.validate.outputs.tag }}
+          VALIDATED_TAG_SHA: ${{ needs.validate.outputs.tag_sha }}
           ARCHIVE: ${{ needs.validate.outputs.archive }}
         run: |
           set -euo pipefail
+
+          current_tag_sha="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" --jq '.object.sha')"
+          if [[ "$current_tag_sha" != "$VALIDATED_TAG_SHA" ]]; then
+            echo "::error::Release tag $TAG moved after validation"
+            exit 1
+          fi
 
           if is_draft="$(gh release view "$TAG" --json isDraft --jq '.isDraft' 2>/dev/null)"; then
             if [[ "$is_draft" != "true" ]]; then
@@ -356,8 +368,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.validate.outputs.tag }}
+          VALIDATED_TAG_SHA: ${{ needs.validate.outputs.tag_sha }}
         run: |
           set -euo pipefail
+
+          current_tag_sha="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" --jq '.object.sha')"
+          if [[ "$current_tag_sha" != "$VALIDATED_TAG_SHA" ]]; then
+            echo "::error::Release tag $TAG moved after validation"
+            exit 1
+          fi
+
           gh release edit "$TAG" --draft=false --latest
 
       - name: Clean up signing keychain
