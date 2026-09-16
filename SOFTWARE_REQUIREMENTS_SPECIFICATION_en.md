@@ -212,12 +212,13 @@ When `llm.context = "auto"`, context tiers are selected in order from 8K to 16K 
 Before selecting a context tier, the CLI must treat the UTF-8 byte length of the final prompt as a conservative upper bound on input token count, then add a fixed 256 tokens for the chat template and output-reserve tokens calculated as `max(1024, 48 × target file count)`.
 The CLI selects the smallest allowed context tier that can contain the resulting total.
 
-If the allowed context maximum is exceeded, the CLI must perform hierarchical summarization in file, hunk, then chunk order and, for files supported by syntax parsing, preserve structural evidence in the final plan input.
-If the total still exceeds the allowed context maximum after summarization, or the complete set of target file IDs, change_hash values, and structural evidence cannot be preserved, the CLI must stop without calling the LLM or modifying Git.
+If the allowed context maximum is exceeded, the CLI must hierarchically summarize raw diffs in file, hunk, then chunk order. If the total still exceeds the limit, it must apply deterministic, language-agnostic canonicalization and budget-aware reduction to the common structural-evidence representation. Reduction must prioritize declarations, roles, enclosing declarations, and tag, attribute, selector, property, and rule structures while retaining representative points distributed across the file. It must not truncate to the first N items.
+
+When structural evidence is reduced, the planning input must include, per file, the before/after counts, JSON byte sizes, digests, coverage digests, and reduction level. Target file IDs, old/new paths, status, change_hash values, and Git identities must remain exact. Validation must ensure that retained evidence derives from original observed facts, declaration/role/enclosing-declaration/tag/attribute/selector/property/rule coverage remains present, and every structural file retains representative evidence. If the total still exceeds the allowed context maximum or these invariants cannot be preserved, the CLI must stop without calling the LLM or modifying Git.
 
 ### FR-007 Hierarchical Summarization
 
-Hierarchical summarization must preserve the complete set of target file IDs, old/new paths, statuses, and change_hash values so that missing file assignments remain detectable after summarization.
+Hierarchical summarization and structural-evidence reduction must preserve the complete sets of target file IDs, old/new paths, statuses, change_hash values, and Git identities so that missing file assignments remain detectable afterward. Byte-for-byte equality of structural evidence is not a pre/post reduction invariant; provenance and retained scope are instead validated through audit metadata and the coverage invariant.
 
 ### FR-008 Commit Plan Generation
 
@@ -624,7 +625,7 @@ Verify that sensitive candidates are confirmed before reading; when approved, th
 
 Prepare fixtures that fit within each 8K, 16K, and 32K tier and a fixture exceeding the limit. Verify that the smallest allowed context tier is selected using the final prompt UTF-8 byte count, the fixed 256-token chat-template allowance, and output-reserve tokens calculated as `max(1024, 48 × target file count)`.
 
-With `llm.context = "auto"`, verify selection proceeds from 8K to 16K to 32K within `llm.max_context_tokens`; with a fixed context tier, verify that the CLI never automatically promotes beyond that tier. When the limit is exceeded, verify hierarchical summarization occurs in file, hunk, then chunk order. If the summarized total still exceeds the limit or the complete file-ID, change_hash, and structural-evidence sets cannot be preserved, verify the CLI does not call the LLM and stops without modifying Git.
+With `llm.context = "auto"`, verify selection proceeds from 8K to 16K to 32K within `llm.max_context_tokens`; with a fixed context tier, verify that the CLI never automatically promotes beyond that tier. When the limit is exceeded, verify raw-diff summarization occurs in file, hunk, then chunk order and structural evidence is reduced budget-aware only if still necessary. Verify that before/after counts, sizes, digests, and coverage are auditable and deterministic. If the total still exceeds the limit, verify the CLI does not call the LLM and stops without modifying Git.
 
 ### AC-006 Structural Analysis and Plan Splitting
 

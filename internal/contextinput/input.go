@@ -19,27 +19,28 @@ type Repository struct {
 }
 
 type File struct {
-	ID               string            `json:"id"`
-	Status           string            `json:"status"`
-	OldPath          *string           `json:"old_path"`
-	NewPath          *string           `json:"new_path"`
-	OldMode          *string           `json:"old_mode"`
-	NewMode          *string           `json:"new_mode"`
-	HeadIdentity     *string           `json:"head_identity"`
-	WorktreeKind     string            `json:"worktree_kind"`
-	WorktreeIdentity *string           `json:"worktree_identity"`
-	Language         string            `json:"language"`
-	ChangeHash       string            `json:"change_hash"`
-	Size             int64             `json:"size"`
-	Binary           bool              `json:"binary"`
-	Vendor           bool              `json:"vendor"`
-	Opaque           bool              `json:"opaque"`
-	Staged           bool              `json:"staged"`
-	Unstaged         bool              `json:"unstaged"`
-	Mode             syntax.Mode       `json:"mode"`
-	Evidence         []syntax.Evidence `json:"evidence,omitempty"`
-	RawDiff          string            `json:"raw_diff,omitempty"`
-	Summary          string            `json:"summary,omitempty"`
+	ID                string             `json:"id"`
+	Status            string             `json:"status"`
+	OldPath           *string            `json:"old_path"`
+	NewPath           *string            `json:"new_path"`
+	OldMode           *string            `json:"old_mode"`
+	NewMode           *string            `json:"new_mode"`
+	HeadIdentity      *string            `json:"head_identity"`
+	WorktreeKind      string             `json:"worktree_kind"`
+	WorktreeIdentity  *string            `json:"worktree_identity"`
+	Language          string             `json:"language"`
+	ChangeHash        string             `json:"change_hash"`
+	Size              int64              `json:"size"`
+	Binary            bool               `json:"binary"`
+	Vendor            bool               `json:"vendor"`
+	Opaque            bool               `json:"opaque"`
+	Staged            bool               `json:"staged"`
+	Unstaged          bool               `json:"unstaged"`
+	Mode              syntax.Mode        `json:"mode"`
+	Evidence          []syntax.Evidence  `json:"evidence,omitempty"`
+	EvidenceReduction *EvidenceReduction `json:"evidence_reduction,omitempty"`
+	RawDiff           string             `json:"raw_diff,omitempty"`
+	Summary           string             `json:"summary,omitempty"`
 }
 
 type Document struct {
@@ -125,7 +126,8 @@ func JSONRenderer(document Document) ([]byte, error) {
 }
 
 // ValidatePreserved ensures summaries cannot remove, duplicate, or rewrite Git
-// identities or structural evidence. Only RawDiff and Summary may change.
+// identities. Structural evidence may only change through the audited reduction
+// contract; otherwise only RawDiff and Summary may change.
 func ValidatePreserved(original, summarized Document) error {
 	if original.SchemaVersion != summarized.SchemaVersion || original.Repository != summarized.Repository {
 		return errors.New("summary changed repository identity")
@@ -147,10 +149,18 @@ func ValidatePreserved(original, summarized Document) error {
 			return errors.New("summary changed the file ID set")
 		}
 		seen[file.ID] = true
+		originalEvidence := append([]syntax.Evidence(nil), base.Evidence...)
+		retainedEvidence := append([]syntax.Evidence(nil), file.Evidence...)
+		reduction := file.EvidenceReduction
 		base.RawDiff, base.Summary = "", ""
 		file.RawDiff, file.Summary = "", ""
+		base.Evidence, base.EvidenceReduction = nil, nil
+		file.Evidence, file.EvidenceReduction = nil, nil
 		if !reflect.DeepEqual(base, file) {
 			return fmt.Errorf("summary changed required data for file %s", file.ID)
+		}
+		if err := validateEvidencePreserved(originalEvidence, retainedEvidence, reduction); err != nil {
+			return fmt.Errorf("summary changed structural evidence for file %s: %w", file.ID, err)
 		}
 	}
 	return nil

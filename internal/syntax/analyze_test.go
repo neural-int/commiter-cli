@@ -98,6 +98,11 @@ func TestAnalyzeFocusedStructuralEvidence(t *testing.T) {
 	cssResult := Analyze(Input{Language: "CSS", Content: []byte(".changed { color: red; }\n"), Hunks: []Hunk{{StartLine: 1, EndLine: 1}}})
 	assertEvidence(t, cssResult, func(e Evidence) bool { return e.Kind == "class_selector" })
 	assertEvidence(t, cssResult, func(e Evidence) bool { return e.Kind == "property_name" || e.Kind == "property" })
+	for _, evidence := range cssResult.Evidence {
+		if evidence.Kind == "class_name" && evidence.EnclosingDeclaration != "" {
+			t.Fatalf("CSS selector was treated as a declaration: %#v", evidence)
+		}
+	}
 }
 
 func assertEvidence(t *testing.T, result Result, match func(Evidence) bool) {
