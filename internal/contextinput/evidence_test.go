@@ -151,6 +151,29 @@ func TestEvidenceSelectionIsNestedAndSizeMonotonic(t *testing.T) {
 	}
 }
 
+func TestEvidenceSelectionSpansFileWhenOptionalPrioritiesDiffer(t *testing.T) {
+	values := []syntax.Evidence{
+		{Kind: "call_expression", Role: "call", StartByte: 0, EndByte: 1},
+		{Kind: "identifier", EnclosingDeclaration: "front", StartByte: 10, EndByte: 11},
+		{Kind: "identifier", EnclosingDeclaration: "front", StartByte: 20, EndByte: 21},
+		{Kind: "identifier", EnclosingDeclaration: "front", StartByte: 30, EndByte: 31},
+		{Kind: "identifier", EnclosingDeclaration: "front", StartByte: 40, EndByte: 41},
+		{Kind: "identifier", EnclosingDeclaration: "front", StartByte: 50, EndByte: 51},
+		{Kind: "identifier", EnclosingDeclaration: "front", StartByte: 60, EndByte: 61},
+		{Kind: "identifier", StartByte: 70, EndByte: 71},
+		{Kind: "identifier", StartByte: 80, EndByte: 81},
+	}
+
+	minimum := requiredEvidenceCount(values)
+	retained := selectEvidence(values, minimum+3)
+	if !containsEvidence(retained, func(value syntax.Evidence) bool { return value == values[len(values)-1] }) {
+		t.Fatalf("far-end evidence was crowded out by higher-priority front evidence: %#v", retained)
+	}
+	if !containsEvidence(retained, func(value syntax.Evidence) bool { return value.EnclosingDeclaration == "front" }) {
+		t.Fatalf("higher-priority evidence was not retained within the spatial sample: %#v", retained)
+	}
+}
+
 func TestEvidenceReductionWorksForGoWithoutLanguageRules(t *testing.T) {
 	source := []byte("package p\nimport \"fmt\"\nfunc first() { fmt.Println(1) }\nfunc second() { fmt.Println(2) }\n")
 	analysis := syntax.Analyze(syntax.Input{Language: "go", Content: source, Hunks: []syntax.Hunk{{StartLine: 1, EndLine: 4}}})

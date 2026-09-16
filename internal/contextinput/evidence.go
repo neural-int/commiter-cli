@@ -120,6 +120,10 @@ func selectEvidence(values []syntax.Evidence, limit int) []syntax.Evidence {
 }
 
 func rankOptionalEvidence(values []syntax.Evidence, required map[int]bool) []int {
+	// Keep each prefix spatially representative while allowing semantic priority
+	// to choose among a small, fixed wave of distributed candidates.
+	const spatialPriorityWaveSize = 4
+
 	spatialRank := make([]int, len(values))
 	for rank, index := range spatialEvidenceOrder(len(values)) {
 		spatialRank[index] = rank
@@ -132,6 +136,11 @@ func rankOptionalEvidence(values []syntax.Evidence, required map[int]bool) []int
 	}
 	sort.SliceStable(optional, func(i, j int) bool {
 		left, right := optional[i], optional[j]
+		leftWave := spatialRank[left] / spatialPriorityWaveSize
+		rightWave := spatialRank[right] / spatialPriorityWaveSize
+		if leftWave != rightWave {
+			return leftWave < rightWave
+		}
 		leftPriority, rightPriority := evidencePriority(values[left]), evidencePriority(values[right])
 		if leftPriority != rightPriority {
 			return leftPriority > rightPriority
