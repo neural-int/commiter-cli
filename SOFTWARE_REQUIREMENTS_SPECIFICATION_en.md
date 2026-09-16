@@ -6,7 +6,7 @@
 | --- | --- |
 | Document status | Draft v0.1 |
 | Created | 2026-08-29 |
-| Scope | v1 for personal use |
+| Scope | v1 |
 | Target implementation | A single CLI binary primarily implemented in Go, including Tree-sitter CGo bindings |
 
 ## 1. Purpose and Background
@@ -26,9 +26,7 @@ This system mechanically performs Git operations and diff preprocessing, extract
 
 ## 3. Non-goals
 
-v1 does not target Windows or Linux, a GUI, cloud LLMs, a llama.cpp backend, a Homebrew Tap, hunk-level splitting, semantic static analysis such as type resolution, symbol resolution, control-flow graphs, or data-flow analysis, recursion into submodules, or distribution for multiple users.
-
-During the repository initialization phase, only the README and this specification are deliverables. Implementation code, a Go module, LICENSE, CI, release automation, and remote configuration are not created during that phase.
+v1 does not target Windows or Linux, a GUI, cloud LLMs, a llama.cpp backend, a Homebrew Tap, packaged distribution (such as GitHub Releases), hunk-level splitting, semantic static analysis such as type resolution, symbol resolution, control-flow graphs, or data-flow analysis, or recursion into submodules.
 
 ## 4. Users and Terminology
 
@@ -759,6 +757,6 @@ Using fixtures containing ANSI escape sequences, control characters, and newline
 
 ## 18. Future Candidates
 
-After v1 acceptance, consider a llama.cpp backend, additional languages, a Homebrew Tap, and empirically based performance gates.
+After v1 acceptance, consider a llama.cpp backend, additional languages, a Homebrew Tap and packaged distribution, and empirically based performance gates.
 
 Future candidates do not change v1 runtime dependencies, CLI, JSON plan schema, or the default behavior of safety confirmations.
