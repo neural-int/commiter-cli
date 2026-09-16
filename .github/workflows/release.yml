@@ -15,7 +15,7 @@ concurrency:
 jobs:
   validate:
     name: Validate release
-    runs-on: macos-14
+    runs-on: macos-15
     permissions:
       contents: read
     env:
@@ -126,7 +126,7 @@ jobs:
     name: Build, sign, notarize, and publish
     needs: validate
     environment: release
-    runs-on: macos-14
+    runs-on: macos-15
     permissions:
       contents: write
     env:
