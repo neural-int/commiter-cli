@@ -28,6 +28,61 @@ func TestCanonicalEvidenceCoalescesEquivalentFacts(t *testing.T) {
 	}
 }
 
+func TestCanonicalEvidenceKeepsSameNamedDeclarationsAtDifferentRanges(t *testing.T) {
+	input := []syntax.Evidence{
+		{Kind: "method_declaration", Name: "String", StartLine: 1, EndLine: 3, StartByte: 0, EndByte: 30},
+		{Kind: "method_declaration", Name: "String", StartLine: 10, EndLine: 12, StartByte: 100, EndByte: 130},
+	}
+
+	got := canonicalEvidence(input)
+	if len(got) != 2 {
+		t.Fatalf("same-named declarations collapsed: %#v", got)
+	}
+	reduction := newEvidenceReduction("strong", input, got[:1])
+	if err := validateEvidencePreserved(input, got[:1], reduction); err == nil {
+		t.Fatal("missing same-named declaration coverage was accepted")
+	}
+}
+
+func TestRequiredEvidenceIndicesCountsEachEvidenceOnce(t *testing.T) {
+	values := []syntax.Evidence{
+		{Kind: "call_expression", EnclosingDeclaration: "save", Role: "call", StartByte: 10, EndByte: 20},
+		{Kind: "identifier", StartByte: 30, EndByte: 40},
+	}
+	indices := requiredEvidenceIndices(values)
+	if !reflect.DeepEqual(indices, []int{0}) {
+		t.Fatalf("required indices = %v, want [0]", indices)
+	}
+	if got := selectEvidence(values, requiredEvidenceCount(values)); len(got) != 1 || got[0] != values[0] {
+		t.Fatalf("minimum selection retained optional evidence: %#v", got)
+	}
+}
+
+func TestWebStructureCoverageIsRequired(t *testing.T) {
+	values := []syntax.Evidence{
+		{Kind: "tag_name", Name: "main", StartLine: 1, EndLine: 1, StartByte: 1, EndByte: 5},
+		{Kind: "attribute_name", Name: "data-kind", StartLine: 1, EndLine: 1, StartByte: 6, EndByte: 15},
+		{Kind: "class_selector", Name: ".first", StartLine: 2, EndLine: 2, StartByte: 20, EndByte: 26},
+		{Kind: "class_selector", Name: ".second", StartLine: 20, EndLine: 20, StartByte: 200, EndByte: 207},
+		{Kind: "class_selector", Name: ".first", StartLine: 21, EndLine: 21, StartByte: 220, EndByte: 226},
+		{Kind: "property_name", Name: "color", StartLine: 20, EndLine: 20, StartByte: 208, EndByte: 213},
+		{Kind: "identifier", StartLine: 30, EndLine: 30, StartByte: 300, EndByte: 310},
+	}
+	retained := selectEvidence(values, requiredEvidenceCount(values))
+	for _, required := range values[:6] {
+		if !containsEvidence(retained, func(value syntax.Evidence) bool { return value == required }) {
+			t.Fatalf("required web structure was lost: %#v from %#v", required, retained)
+		}
+	}
+	if containsEvidence(retained, func(value syntax.Evidence) bool { return value == values[6] }) {
+		t.Fatalf("optional generic evidence was retained: %#v", retained)
+	}
+	reduction := newEvidenceReduction("strong", values, retained[1:])
+	if err := validateEvidencePreserved(values, retained[1:], reduction); err == nil {
+		t.Fatal("missing web-structure coverage was accepted")
+	}
+}
+
 func TestEvidenceSelectionPreservesCoverageAndSpansFile(t *testing.T) {
 	values := []syntax.Evidence{
 		{Kind: "function_declaration", Name: "first", StartLine: 1, EndLine: 10, StartByte: 0, EndByte: 100},
@@ -105,7 +160,11 @@ func TestPrepareReducesHTMLCSSAndJavaScriptEvidenceWithin32K(t *testing.T) {
 		minimumPrompt, _ := JSONRenderer(minimum)
 		counts := make([]string, 0, 3)
 		for _, file := range minimum.Files[:3] {
-			counts = append(counts, fmt.Sprintf("%s:%d->%d", file.ID, file.EvidenceReduction.OriginalCount, file.EvidenceReduction.RetainedCount))
+			kinds := map[string]int{}
+			for _, value := range file.Evidence {
+				kinds[value.Kind]++
+			}
+			counts = append(counts, fmt.Sprintf("%s:%d->%d:%v", file.ID, file.EvidenceReduction.OriginalCount, file.EvidenceReduction.RetainedCount, kinds))
 		}
 		t.Fatalf("%v; minimum prompt=%d counts=%v", err, len(minimumPrompt), counts)
 	}

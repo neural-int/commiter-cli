@@ -270,12 +270,12 @@ func isDeclaration(kind string) bool {
 	if kind == "variable_declarator" {
 		return true
 	}
-	for _, part := range []string{"function", "method", "class", "struct", "interface", "module", "declaration", "definition"} {
+	for _, part := range []string{"function", "method", "struct", "interface", "module"} {
 		if strings.Contains(kind, part) {
 			return true
 		}
 	}
-	return false
+	return strings.HasSuffix(kind, "_declaration") || strings.HasSuffix(kind, "_definition") || kind == "class"
 }
 
 func nodeName(node *treesitter.Node, source []byte) string {

@@ -143,11 +143,15 @@ func requiredEvidenceIndices(values []syntax.Evidence) []int {
 	seen := map[string]bool{}
 	indices := make([]int, 0)
 	for index, value := range values {
+		required := false
 		for _, key := range coverageKeys(value) {
 			if !seen[key] {
 				seen[key] = true
-				indices = append(indices, index)
+				required = true
 			}
+		}
+		if required {
+			indices = append(indices, index)
 		}
 	}
 	if len(indices) == 0 && len(values) > 0 {
@@ -170,11 +174,14 @@ func evidencePriority(value syntax.Evidence) int {
 	if isDeclarationKind(value.Kind) && value.Name != "" {
 		priority += 5
 	}
+	if isPlanningStructureKind(value.Kind) {
+		priority += 5
+	}
 	return priority
 }
 
 func coverageKeys(value syntax.Evidence) []string {
-	keys := make([]string, 0, 3)
+	keys := make([]string, 0, 4)
 	if value.Role != "" {
 		keys = append(keys, "role:"+value.Role)
 	}
@@ -182,9 +189,32 @@ func coverageKeys(value syntax.Evidence) []string {
 		keys = append(keys, "enclosing:"+value.EnclosingDeclaration)
 	}
 	if value.Name != "" && isDeclarationKind(value.Kind) {
-		keys = append(keys, "declaration:"+value.Kind+":"+value.Name)
+		keys = append(keys, "declaration:"+value.Kind+":"+value.Name+":"+evidenceRangeIdentity(value))
+	}
+	if isPlanningStructureKind(value.Kind) {
+		key := "structure:" + value.Kind
+		if value.Name != "" {
+			key += ":" + value.Name
+		}
+		if value.Name != "" && isSelectorKind(value.Kind) {
+			key += ":" + evidenceRangeIdentity(value)
+		}
+		keys = append(keys, key)
 	}
 	return keys
+}
+
+func isPlanningStructureKind(kind string) bool {
+	switch kind {
+	case "tag_name", "attribute", "attribute_name", "property", "property_name", "rule_set":
+		return true
+	default:
+		return isSelectorKind(kind) || strings.HasSuffix(kind, "_rule")
+	}
+}
+
+func isSelectorKind(kind string) bool {
+	return strings.Contains(kind, "selector")
 }
 
 func isDeclarationKind(kind string) bool {
@@ -200,7 +230,15 @@ func isDeclarationKind(kind string) bool {
 }
 
 func evidenceKey(value syntax.Evidence) string {
-	return value.Kind + "\x00" + value.Name + "\x00" + value.EnclosingDeclaration + "\x00" + value.Role
+	key := value.Kind + "\x00" + value.Name + "\x00" + value.EnclosingDeclaration + "\x00" + value.Role
+	if value.Name != "" && (isDeclarationKind(value.Kind) || isSelectorKind(value.Kind)) {
+		key += "\x00" + evidenceRangeIdentity(value)
+	}
+	return key
+}
+
+func evidenceRangeIdentity(value syntax.Evidence) string {
+	return fmt.Sprintf("%d:%d", value.StartByte, value.EndByte)
 }
 
 func newEvidenceReduction(level string, original, retained []syntax.Evidence) *EvidenceReduction {

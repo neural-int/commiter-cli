@@ -211,9 +211,9 @@ CLI は、構造エビデンスと必要な diff hunk を優先して LLM への
 
 コンテキスト段階の選択前に、最終プロンプトの UTF-8 バイト数を入力トークン数の保守的な上限見積もりとし、チャットテンプレート用の固定 256 トークンと、`max(1024, 48 × 対象ファイル数)` で算出した出力予約トークン数を加算しなければなりません。CLI は、この合計値が収まる最小の許可コンテキスト段階を選択します。
 
-許可されたコンテキスト上限を超える場合は、ファイル単位、hunk 単位、chunk 単位の順に raw diff を階層的に要約します。それでも上限を超える場合は、共通の構造エビデンス表現に対し、特定言語へ依存しない決定論的な canonicalization と budget-aware reduction を行わなければなりません。reduction は宣言、role、enclosing declaration を優先し、ファイル全体へ分散した代表点を保持します。単純な先頭 N 件の切り捨てを行ってはなりません。
+許可されたコンテキスト上限を超える場合は、ファイル単位、hunk 単位、chunk 単位の順に raw diff を階層的に要約します。それでも上限を超える場合は、共通の構造エビデンス表現に対し、特定言語へ依存しない決定論的な canonicalization と budget-aware reduction を行わなければなりません。reduction は宣言、role、enclosing declaration、および tag、attribute、selector、property、rule の構造を優先し、ファイル全体へ分散した代表点を保持します。単純な先頭 N 件の切り捨てを行ってはなりません。
 
-構造エビデンスを縮約した場合は、ファイルごとに縮約前後の件数、JSON バイト数、digest、coverage digest、および縮約レベルを計画入力へ含めなければなりません。対象 file ID、old/new path、status、change_hash、Git identity は完全保持し、構造エビデンスは元の観測事実に由来すること、宣言・role・enclosing declaration の coverage が維持されること、および各 structural file に代表 evidence が残ることを検証します。縮約後も合計値が許可されたコンテキスト上限を超える場合、またはこれらの invariant を維持できない場合は、LLM を呼び出すことなく、Git の状態を変更せずに停止しなければなりません。
+構造エビデンスを縮約した場合は、ファイルごとに縮約前後の件数、JSON バイト数、digest、coverage digest、および縮約レベルを計画入力へ含めなければなりません。対象 file ID、old/new path、status、change_hash、Git identity は完全保持し、構造エビデンスは元の観測事実に由来すること、宣言・role・enclosing declaration・tag・attribute・selector・property・rule の coverage が維持されること、および各 structural file に代表 evidence が残ることを検証します。縮約後も合計値が許可されたコンテキスト上限を超える場合、またはこれらの invariant を維持できない場合は、LLM を呼び出すことなく、Git の状態を変更せずに停止しなければなりません。
 
 ### FR-007 階層要約
 
