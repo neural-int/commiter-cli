@@ -80,9 +80,10 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 }
 
 func recordSummarization(recorder *runmetrics.Recorder, prepared contextinput.Prepared) {
-	if prepared.SummaryCount > 0 {
-		recorder.AddDuration(runmetrics.Summarization, prepared.SummaryDuration)
-		recorder.AddSummaries(prepared.SummaryCount)
+	count := prepared.SummaryCount + prepared.EvidenceReductionCount
+	if count > 0 {
+		recorder.AddDuration(runmetrics.Summarization, prepared.SummaryDuration+prepared.EvidenceReductionDuration)
+		recorder.AddSummaries(count)
 	}
 }
 

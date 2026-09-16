@@ -225,6 +225,13 @@ func TestRecordSummarizationKeepsFailedPrepareProgress(t *testing.T) {
 	if partial.Durations.Summarization == nil || *partial.Durations.Summarization != 40 || partial.Counts.Summaries != 3 {
 		t.Fatalf("executed summarization was discarded: durations=%+v counts=%+v", partial.Durations, partial.Counts)
 	}
+
+	recorder = runmetrics.New()
+	recordSummarization(recorder, contextinput.Prepared{SummaryCount: 3, SummaryDuration: 40, EvidenceReductionCount: 1, EvidenceReductionDuration: 20})
+	reduced := recorder.Finish("success")
+	if reduced.Durations.Summarization == nil || *reduced.Durations.Summarization != 60 || reduced.Counts.Summaries != 4 {
+		t.Fatalf("evidence reduction was not recorded: durations=%+v counts=%+v", reduced.Durations, reduced.Counts)
+	}
 }
 
 func TestFinishMetricsDoesNotPersistStaleExitWhenOutputFails(t *testing.T) {
