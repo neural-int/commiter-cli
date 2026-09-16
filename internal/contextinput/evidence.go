@@ -102,28 +102,12 @@ func selectEvidence(values []syntax.Evidence, limit int) []syntax.Evidence {
 	}
 	remaining := limit - len(selected)
 	if remaining > 0 {
-		candidates := make([]int, 0, len(values)-len(selected))
-		for index := range values {
-			if !selected[index] {
-				candidates = append(candidates, index)
-			}
-		}
-		// Divide the complete ordered range into equal buckets and retain the
-		// most meaningful fact from each bucket. This preserves spatial coverage
-		// instead of biasing the beginning of a file.
-		for bucket := 0; bucket < remaining && len(candidates) > 0; bucket++ {
-			start := bucket * len(candidates) / remaining
-			end := (bucket + 1) * len(candidates) / remaining
-			if end <= start {
-				end = start + 1
-			}
-			best := candidates[start]
-			for _, candidate := range candidates[start+1 : end] {
-				if evidencePriority(values[candidate]) > evidencePriority(values[best]) {
-					best = candidate
-				}
-			}
-			selected[best] = true
+		// Ranking is independent of the requested limit, so every larger limit
+		// is a strict superset. This monotonicity is required by Prepare's binary
+		// search while the spatial order avoids source-prefix bias.
+		optional := rankOptionalEvidence(values, selected)
+		for _, index := range optional[:remaining] {
+			selected[index] = true
 		}
 	}
 	result := make([]syntax.Evidence, 0, len(selected))
@@ -133,6 +117,56 @@ func selectEvidence(values []syntax.Evidence, limit int) []syntax.Evidence {
 		}
 	}
 	return result
+}
+
+func rankOptionalEvidence(values []syntax.Evidence, required map[int]bool) []int {
+	spatialRank := make([]int, len(values))
+	for rank, index := range spatialEvidenceOrder(len(values)) {
+		spatialRank[index] = rank
+	}
+	optional := make([]int, 0, len(values)-len(required))
+	for index := range values {
+		if !required[index] {
+			optional = append(optional, index)
+		}
+	}
+	sort.SliceStable(optional, func(i, j int) bool {
+		left, right := optional[i], optional[j]
+		leftPriority, rightPriority := evidencePriority(values[left]), evidencePriority(values[right])
+		if leftPriority != rightPriority {
+			return leftPriority > rightPriority
+		}
+		return spatialRank[left] < spatialRank[right]
+	})
+	return optional
+}
+
+func spatialEvidenceOrder(count int) []int {
+	if count <= 0 {
+		return nil
+	}
+	order := make([]int, 0, count)
+	order = append(order, 0)
+	if count == 1 {
+		return order
+	}
+	order = append(order, count-1)
+	type interval struct{ start, end int }
+	queue := []interval{{start: 1, end: count - 2}}
+	for len(queue) > 0 {
+		current := queue[0]
+		queue = queue[1:]
+		if current.start > current.end {
+			continue
+		}
+		middle := current.start + (current.end-current.start)/2
+		order = append(order, middle)
+		queue = append(queue,
+			interval{start: current.start, end: middle - 1},
+			interval{start: middle + 1, end: current.end},
+		)
+	}
+	return order
 }
 
 func requiredEvidenceCount(values []syntax.Evidence) int {

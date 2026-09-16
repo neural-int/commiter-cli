@@ -103,6 +103,54 @@ func TestEvidenceSelectionPreservesCoverageAndSpansFile(t *testing.T) {
 	}
 }
 
+func TestEvidenceSelectionIsNestedAndSizeMonotonic(t *testing.T) {
+	values := []syntax.Evidence{{Kind: "call_expression", Role: "call", StartByte: 0, EndByte: 1}}
+	for index := 1; index <= 8; index++ {
+		name := fmt.Sprintf("v%d", index)
+		if index == 5 {
+			name = strings.Repeat("long", 500)
+		}
+		values = append(values, syntax.Evidence{Kind: "identifier", Name: name, StartByte: uint(index * 10), EndByte: uint(index*10 + 1)})
+	}
+
+	minimum := requiredEvidenceCount(values)
+	previous := map[syntax.Evidence]bool{}
+	previousBytes := 0
+	for limit := minimum; limit <= len(values); limit++ {
+		selected := selectEvidence(values, limit)
+		current := make(map[syntax.Evidence]bool, len(selected))
+		for _, value := range selected {
+			current[value] = true
+		}
+		for value := range previous {
+			if !current[value] {
+				t.Fatalf("selection is not nested at limit %d: lost %#v", limit, value)
+			}
+		}
+		serializedBytes, _ := evidenceIdentity(selected)
+		if serializedBytes < previousBytes {
+			t.Fatalf("serialized size decreased at limit %d: %d < %d", limit, serializedBytes, previousBytes)
+		}
+		if limit == minimum+1 && !current[values[len(values)-1]] {
+			t.Fatalf("first optional evidence did not cover the far end: %#v", selected)
+		}
+		previous, previousBytes = current, serializedBytes
+	}
+
+	document := Document{Files: []File{{ID: "F001", Mode: syntax.ModeStructural, Evidence: values}}}
+	previousPromptBytes := 0
+	for density := 0; density <= 1000; density++ {
+		prompt, err := JSONRenderer(reduceEvidence(document, density))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(prompt) < previousPromptBytes {
+			t.Fatalf("rendered prompt size decreased at density %d: %d < %d", density, len(prompt), previousPromptBytes)
+		}
+		previousPromptBytes = len(prompt)
+	}
+}
+
 func TestEvidenceReductionWorksForGoWithoutLanguageRules(t *testing.T) {
 	source := []byte("package p\nimport \"fmt\"\nfunc first() { fmt.Println(1) }\nfunc second() { fmt.Println(2) }\n")
 	analysis := syntax.Analyze(syntax.Input{Language: "go", Content: source, Hunks: []syntax.Hunk{{StartLine: 1, EndLine: 4}}})
