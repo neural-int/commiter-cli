@@ -22,13 +22,13 @@ jobs:
       CGO_ENABLED: "1"
       GOOS: darwin
       GOARCH: arm64
-      GH_TOKEN: ${{ github.token }}
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Go
         uses: actions/setup-go@v7
@@ -52,6 +52,24 @@ jobs:
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "archive=$archive" >> "$GITHUB_OUTPUT"
+
+      - name: Verify release tag belongs to main
+        shell: bash
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          release_commit="$(git rev-list -n 1 "$TAG")"
+
+          if ! git show-ref --verify --quiet refs/remotes/origin/main; then
+            echo "::error::origin/main is unavailable after checkout"
+            exit 1
+          fi
+
+          if ! git merge-base --is-ancestor "$release_commit" origin/main; then
+            echo "::error::Release tag $TAG must point to a commit contained in main"
+            exit 1
+          fi
 
       - name: Verify release credentials are configured
         shell: bash
@@ -204,10 +222,28 @@ jobs:
           ARCHIVE: ${{ steps.version.outputs.archive }}
         run: |
           set -euo pipefail
+
+          result_path="$RUNNER_TEMP/notary-result.json"
           xcrun notarytool submit "dist/${ARCHIVE}" \
             --keychain-profile "commiter-notary" \
             --keychain "$COMMITER_KEYCHAIN_PATH" \
-            --wait
+            --wait \
+            --output-format json > "$result_path"
+
+          status="$(plutil -extract status raw -o - "$result_path")"
+          submission_id="$(plutil -extract id raw -o - "$result_path" 2>/dev/null || true)"
+
+          cat "$result_path"
+
+          if [[ "$status" != "Accepted" ]]; then
+            echo "::error::Notarization failed with status: $status"
+            if [[ -n "$submission_id" ]]; then
+              xcrun notarytool log "$submission_id" \
+                --keychain-profile "commiter-notary" \
+                --keychain "$COMMITER_KEYCHAIN_PATH" || true
+            fi
+            exit 1
+          fi
 
       - name: Generate checksum
         shell: bash
@@ -224,6 +260,7 @@ jobs:
       - name: Create draft GitHub Release
         shell: bash
         env:
+          GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.version.outputs.tag }}
           ARCHIVE: ${{ steps.version.outputs.archive }}
         run: |
@@ -239,6 +276,7 @@ jobs:
       - name: Publish GitHub Release
         shell: bash
         env:
+          GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.version.outputs.tag }}
         run: |
           set -euo pipefail
