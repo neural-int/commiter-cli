@@ -129,6 +129,11 @@ jobs:
     runs-on: macos-15
     permissions:
       contents: write
+    outputs:
+      tag: ${{ needs.validate.outputs.tag }}
+      version: ${{ needs.validate.outputs.version }}
+      archive: ${{ needs.validate.outputs.archive }}
+      sha256: ${{ steps.checksum.outputs.sha256 }}
     env:
       MACOSX_DEPLOYMENT_TARGET: "14.0"
       CGO_ENABLED: "1"
@@ -156,6 +161,7 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
         run: |
           set -euo pipefail
           missing=0
@@ -165,7 +171,8 @@ jobs:
             APPLE_SIGNING_IDENTITY \
             APPLE_ID \
             APPLE_TEAM_ID \
-            APPLE_APP_SPECIFIC_PASSWORD; do
+            APPLE_APP_SPECIFIC_PASSWORD \
+            HOMEBREW_TAP_TOKEN; do
             if [[ -z "${!name:-}" ]]; then
               echo "::error::Missing required secret: $name"
               missing=1
@@ -316,6 +323,7 @@ jobs:
           fi
 
       - name: Generate checksum
+        id: checksum
         shell: bash
         env:
           ARCHIVE: ${{ needs.validate.outputs.archive }}
@@ -326,6 +334,12 @@ jobs:
             shasum -a 256 "$ARCHIVE" > checksums.txt
           )
           cat dist/checksums.txt
+          sha256="$(awk '{print $1}' dist/checksums.txt)"
+          if [[ ! "$sha256" =~ ^[a-fA-F0-9]{64}$ ]]; then
+            echo "::error::Failed to parse SHA-256 from checksums.txt"
+            exit 1
+          fi
+          echo "sha256=$sha256" >> "$GITHUB_OUTPUT"
 
       - name: Create or update draft GitHub Release
         shell: bash
@@ -386,3 +400,56 @@ jobs:
         run: |
           security delete-keychain "$RUNNER_TEMP/commiter-signing.keychain-db" 2>/dev/null || true
           rm -f "$RUNNER_TEMP/developer-id-application.p12"
+
+  # HOMEBREW_TAP_TOKEN is a fine-grained PAT for neural-int/homebrew-devtools
+  # with Contents: Read and write. It is used only to send repository_dispatch.
+  notify-homebrew-tap:
+    name: Notify Homebrew tap
+    needs: release
+    if: github.repository == 'neural-int/commiter-cli'
+    runs-on: ubuntu-latest
+    environment: release
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    env:
+      VERSION: ${{ needs.release.outputs.version }}
+      TAG: ${{ needs.release.outputs.tag }}
+      ARCHIVE: ${{ needs.release.outputs.archive }}
+      SHA256: ${{ needs.release.outputs.sha256 }}
+      TAP_REPO: neural-int/homebrew-devtools
+    steps:
+      - name: Verify tap token
+        shell: bash
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${HOMEBREW_TAP_TOKEN:-}" ]]; then
+            echo "::error::Missing required secret: HOMEBREW_TAP_TOKEN"
+            exit 1
+          fi
+
+      - name: Dispatch commiter-release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/${ARCHIVE}"
+          jq -n \
+            --arg event_type "commiter-release" \
+            --arg version "$VERSION" \
+            --arg tag "$TAG" \
+            --arg url "$url" \
+            --arg sha256 "$SHA256" \
+            '{
+              event_type: $event_type,
+              client_payload: {
+                version: $version,
+                tag: $tag,
+                url: $url,
+                sha256: $sha256
+              }
+            }' | gh api --method POST --input - "repos/${TAP_REPO}/dispatches"
