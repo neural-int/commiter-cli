@@ -6,22 +6,28 @@ on:
       - "v*.*.*"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  release:
-    name: Build, sign, notarize, and publish
-    environment: release
+  validate:
+    name: Validate release
     runs-on: macos-14
+    permissions:
+      contents: read
     env:
       MACOSX_DEPLOYMENT_TARGET: "14.0"
       CGO_ENABLED: "1"
       GOOS: darwin
       GOARCH: arm64
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      version: ${{ steps.version.outputs.version }}
+      archive: ${{ steps.version.outputs.archive }}
+      tag_sha: ${{ steps.release_tag.outputs.tag_sha }}
 
     steps:
       - name: Check out repository
@@ -54,11 +60,13 @@ jobs:
           echo "archive=$archive" >> "$GITHUB_OUTPUT"
 
       - name: Verify release tag belongs to main
+        id: release_tag
         shell: bash
         env:
           TAG: ${{ steps.version.outputs.tag }}
         run: |
           set -euo pipefail
+          tag_sha="$(git rev-parse "refs/tags/${TAG}")"
           release_commit="$(git rev-list -n 1 "$TAG")"
 
           if ! git show-ref --verify --quiet refs/remotes/origin/main; then
@@ -70,6 +78,74 @@ jobs:
             echo "::error::Release tag $TAG must point to a commit contained in main"
             exit 1
           fi
+
+          echo "tag_sha=$tag_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Run tests
+        run: go test ./...
+
+      - name: Run go vet
+        run: go vet ./...
+
+      - name: Build release binary
+        shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          go build \
+            -trimpath \
+            -ldflags "-s -w -X github.com/natsuki0413/commiter-cli/internal/cli.Version=${VERSION}" \
+            -o dist/commiter \
+            ./cmd/commiter
+
+      - name: Verify binary
+        shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          actual_version="$(dist/commiter version)"
+          expected_version="commiter ${VERSION}"
+          if [[ "$actual_version" != "$expected_version" ]]; then
+            echo "::error::Version mismatch: expected '$expected_version', got '$actual_version'"
+            exit 1
+          fi
+
+          archs="$(lipo -archs dist/commiter)"
+          if [[ "$archs" != "arm64" ]]; then
+            echo "::error::Expected arm64 Mach-O, got: $archs"
+            exit 1
+          fi
+
+          file dist/commiter
+
+  release:
+    name: Build, sign, notarize, and publish
+    needs: validate
+    environment: release
+    runs-on: macos-14
+    permissions:
+      contents: write
+    env:
+      MACOSX_DEPLOYMENT_TARGET: "14.0"
+      CGO_ENABLED: "1"
+      GOOS: darwin
+      GOARCH: arm64
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+        with:
+          go-version-file: go.mod
 
       - name: Verify release credentials are configured
         shell: bash
@@ -97,16 +173,10 @@ jobs:
           done
           exit "$missing"
 
-      - name: Run tests
-        run: go test ./...
-
-      - name: Run go vet
-        run: go vet ./...
-
       - name: Build release binary
         shell: bash
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          VERSION: ${{ needs.validate.outputs.version }}
         run: |
           set -euo pipefail
           mkdir -p dist
@@ -119,7 +189,7 @@ jobs:
       - name: Verify binary
         shell: bash
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          VERSION: ${{ needs.validate.outputs.version }}
         run: |
           set -euo pipefail
 
@@ -190,7 +260,7 @@ jobs:
       - name: Create release archive
         shell: bash
         env:
-          ARCHIVE: ${{ steps.version.outputs.archive }}
+          ARCHIVE: ${{ needs.validate.outputs.archive }}
         run: |
           set -euo pipefail
           package_dir="dist/package"
@@ -219,7 +289,7 @@ jobs:
       - name: Notarize release archive
         shell: bash
         env:
-          ARCHIVE: ${{ steps.version.outputs.archive }}
+          ARCHIVE: ${{ needs.validate.outputs.archive }}
         run: |
           set -euo pipefail
 
@@ -248,7 +318,7 @@ jobs:
       - name: Generate checksum
         shell: bash
         env:
-          ARCHIVE: ${{ steps.version.outputs.archive }}
+          ARCHIVE: ${{ needs.validate.outputs.archive }}
         run: |
           set -euo pipefail
           (
@@ -261,10 +331,17 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ steps.version.outputs.tag }}
-          ARCHIVE: ${{ steps.version.outputs.archive }}
+          TAG: ${{ needs.validate.outputs.tag }}
+          VALIDATED_TAG_SHA: ${{ needs.validate.outputs.tag_sha }}
+          ARCHIVE: ${{ needs.validate.outputs.archive }}
         run: |
           set -euo pipefail
+
+          current_tag_sha="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" --jq '.object.sha')"
+          if [[ "$current_tag_sha" != "$VALIDATED_TAG_SHA" ]]; then
+            echo "::error::Release tag $TAG moved after validation"
+            exit 1
+          fi
 
           if is_draft="$(gh release view "$TAG" --json isDraft --jq '.isDraft' 2>/dev/null)"; then
             if [[ "$is_draft" != "true" ]]; then
@@ -290,9 +367,17 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ steps.version.outputs.tag }}
+          TAG: ${{ needs.validate.outputs.tag }}
+          VALIDATED_TAG_SHA: ${{ needs.validate.outputs.tag_sha }}
         run: |
           set -euo pipefail
+
+          current_tag_sha="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" --jq '.object.sha')"
+          if [[ "$current_tag_sha" != "$VALIDATED_TAG_SHA" ]]; then
+            echo "::error::Release tag $TAG moved after validation"
+            exit 1
+          fi
+
           gh release edit "$TAG" --draft=false --latest
 
       - name: Clean up signing keychain
