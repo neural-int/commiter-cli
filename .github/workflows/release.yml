@@ -150,7 +150,7 @@ jobs:
           security list-keychains -d user -s "$keychain_path"
           security find-identity -v -p codesigning "$keychain_path"
 
-          echo "COMMlTER_KEYCHAIN_PATH=$keychain_path" >> "$GITHUB_ENV"
+          echo "COMMITER_KEYCHAIN_PATH=$keychain_path" >> "$GITHUB_ENV"
 
       - name: Sign binary
         shell: bash
@@ -163,7 +163,7 @@ jobs:
             --options runtime \
             --timestamp \
             --sign "$APPLE_SIGNING_IDENTITY" \
-            --keychain "$COMMlTER_KEYCHAIN_PATH" \
+            --keychain "$COMMITER_KEYCHAIN_PATH" \
             dist/commiter
           codesign --verify --strict --verbose=2 dist/commiter
           codesign --display --verbose=4 dist/commiter
@@ -195,7 +195,7 @@ jobs:
             --apple-id "$APPLE_ID" \
             --team-id "$APPLE_TEAM_ID" \
             --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-            --keychain "$COMMlTER_KEYCHAIN_PATH"
+            --keychain "$COMMITER_KEYCHAIN_PATH"
 
       - name: Notarize release archive
         shell: bash
@@ -205,7 +205,7 @@ jobs:
           set -euo pipefail
           xcrun notarytool submit "dist/${ARCHIVE}" \
             --keychain-profile "commiter-notary" \
-            --keychain "$COMMlTER_KEYCHAIN_PATH" \
+            --keychain "$COMMITER_KEYCHAIN_PATH" \
             --wait
 
       - name: Generate checksum
