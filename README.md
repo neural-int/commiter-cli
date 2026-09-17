@@ -22,7 +22,7 @@ This design is intended to keep repository content local, reduce the amount of w
 - **Multi-commit planning** — groups file-level changes by purpose and generates Conventional Commits messages.
 - **Local LLM inference** — LLM requests are restricted to a loopback Ollama endpoint; repository content is not sent to a cloud LLM by `commiter`.
 - **Syntax-aware preprocessing** — uses Tree-sitter where supported instead of asking the model to infer syntax from raw text alone.
-- **Adaptive context handling** — uses 8K, 16K, and 32K context levels and hierarchical summarization when required.
+- **Adaptive context handling** — normally stays within 32K, expanding to 64K only when light compression still does not fit so stronger compression can be avoided.
 - **Sensitive-file protection** — clearly sensitive files are always excluded; ambiguous candidates require approval before their contents are read.
 - **Plan validation and approval** — validates model output and, by default, requires approval before commits are created.
 - **Repository-scoped verification** — supports explicit verification commands and package-script autodetection with repository-scoped trust.
@@ -188,7 +188,7 @@ Important defaults include:
 | `llm.model` | `"qwen3.5:4b-q4_K_M"` |
 | `llm.endpoint` | `"http://127.0.0.1:11434"` |
 | `llm.context` | `"auto"` |
-| `llm.max_context_tokens` | `32768` |
+| `llm.max_context_tokens` | `65536` |
 | `verification.autodetect` | `true` |
 | `verification.timeout_seconds` | `600` |
 | `metrics.persist` | `false` |

@@ -57,10 +57,11 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 		standard := NewHierarchicalSummarizer()
 		summarizer = standard
 	}
+	baseConfig := normalBudgetConfig(config)
 	progress := func(stage SummaryStage, profile CompressionProfile, count int) Prepared {
 		return Prepared{SummaryStage: stage, CompressionProfile: profile, SummaryCount: count, SummaryDuration: summaryDuration, OriginalPromptBytes: originalPromptBytes}
 	}
-	renderCurrent := func(stage SummaryStage, profile CompressionProfile, count int) (Prepared, error) {
+	renderCurrent := func(stage SummaryStage, profile CompressionProfile, count int, budgetConfig BudgetConfig) (Prepared, error) {
 		prompt, err := render(cloneDocument(current))
 		if err != nil {
 			return progress(stage, profile, count), fmt.Errorf("cannot render planning input: %w", err)
@@ -68,7 +69,7 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 		if originalPromptBytes == 0 {
 			originalPromptBytes = len(prompt) + config.PromptOverheadBytes
 		}
-		budget, err := SelectContext(prompt, len(original.Files), config)
+		budget, err := SelectContext(prompt, len(original.Files), budgetConfig)
 		if err != nil {
 			return progress(stage, profile, count), err
 		}
@@ -78,7 +79,7 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 			SummaryDuration: summaryDuration, OriginalPromptBytes: originalPromptBytes,
 		}, nil
 	}
-	prepared, err := renderCurrent(SummaryNone, CompressionNone, 0)
+	prepared, err := renderCurrent(SummaryNone, CompressionNone, 0, baseConfig)
 	if err == nil {
 		return prepared, nil
 	}
@@ -99,7 +100,7 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 			return progress(stage, CompressionNone, summaryCount), fmt.Errorf("%s summary is incomplete: %w", stage, preserveErr)
 		}
 		current = cloneDocument(next)
-		prepared, err = renderCurrent(stage, CompressionNone, summaryCount)
+		prepared, err = renderCurrent(stage, CompressionNone, summaryCount, baseConfig)
 		if err == nil {
 			return prepared, nil
 		}
@@ -124,12 +125,25 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 			}
 			current = cloneDocument(next)
 			compressionProfile = candidate.name
-			prepared, err = renderCurrent(SummaryChunk, compressionProfile, summaryCount)
+			candidateConfig := config
+			if candidate.name == CompressionLight {
+				candidateConfig = baseConfig
+			}
+			prepared, err = renderCurrent(SummaryChunk, compressionProfile, summaryCount, candidateConfig)
 			if err == nil {
 				return prepared, nil
 			}
 			if !errors.Is(err, ErrTooLarge) {
 				return prepared, err
+			}
+			if candidate.name == CompressionLight && supportsExpandedBudget(config) {
+				prepared, err = renderCurrent(SummaryChunk, compressionProfile, summaryCount, config)
+				if err == nil {
+					return prepared, nil
+				}
+				if !errors.Is(err, ErrTooLarge) {
+					return prepared, err
+				}
 			}
 		}
 	} else {
@@ -144,7 +158,7 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 			return progress(SummaryChunk, CompressionNone, summaryCount), fmt.Errorf("%s summary is incomplete: %w", SummaryChunk, preserveErr)
 		}
 		current = cloneDocument(next)
-		prepared, err = renderCurrent(SummaryChunk, CompressionNone, summaryCount)
+		prepared, err = renderCurrent(SummaryChunk, CompressionNone, summaryCount, config)
 		if err == nil {
 			return prepared, nil
 		}
@@ -206,6 +220,19 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 		high = mid - 1
 	}
 	return evidencePrepared(bestDocument, bestPrompt, bestBudget, SummaryChunk, compressionProfile, summaryCount, summaryDuration, time.Since(started), originalPromptBytes), nil
+}
+
+func normalBudgetConfig(config BudgetConfig) BudgetConfig {
+	if !supportsExpandedBudget(config) {
+		return config
+	}
+	config.Context = "auto"
+	config.MaxContextTokens = Context32K
+	return config
+}
+
+func supportsExpandedBudget(config BudgetConfig) bool {
+	return config.Context == "64k" || config.Context == "auto" && config.MaxContextTokens == Context64K
 }
 
 func evidencePrepared(document Document, prompt []byte, budget Budget, stage SummaryStage, profile CompressionProfile, summaryCount int, summaryDuration, reductionDuration time.Duration, originalPromptBytes int) Prepared {

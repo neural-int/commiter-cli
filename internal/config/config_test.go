@@ -111,6 +111,9 @@ func TestResolveRejectsInvalidValuesBeforeHigherPriorityOverride(t *testing.T) {
 
 func TestDefaultsCoverEverySchemaKey(t *testing.T) {
 	effective := Defaults()
+	if effective.Values.Context != "auto" || effective.Values.MaxTokens != 65536 {
+		t.Fatalf("adaptive context defaults = %q/%d", effective.Values.Context, effective.Values.MaxTokens)
+	}
 	entries := effective.Entries()
 	if len(entries) != len(schema) {
 		t.Fatalf("entries = %d, schema = %d", len(entries), len(schema))
@@ -128,6 +131,20 @@ func TestDefaultsCoverEverySchemaKey(t *testing.T) {
 		if entry.Source != wantSource {
 			t.Errorf("%s source = %s, want %s", key, entry.Source, wantSource)
 		}
+	}
+}
+
+func TestResolveAccepts64KContextCeiling(t *testing.T) {
+	root := t.TempDir()
+	global := filepath.Join(t.TempDir(), "config.toml")
+	repo := filepath.Join(root, ".commiter.toml")
+	writeTestFile(t, repo, "schema_version = 1\n[llm]\ncontext = \"64k\"\nmax_context_tokens = 65536\n")
+	effective, err := Resolve(global, repo, root, CLIOverrides{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if effective.Values.Context != "64k" || effective.Values.MaxTokens != 65536 {
+		t.Fatalf("context = %q/%d", effective.Values.Context, effective.Values.MaxTokens)
 	}
 }
 

@@ -122,7 +122,7 @@ func Defaults() Effective {
 			Model:             "qwen3.5:4b-q4_K_M",
 			Endpoint:          "http://127.0.0.1:11434",
 			Context:           "auto",
-			MaxTokens:         32768,
+			MaxTokens:         65536,
 			Untracked:         "auto-safe",
 			Include:           []string{},
 			Exclude:           []string{},
@@ -345,10 +345,10 @@ func validateValues(v Values, repoRoot string) error {
 	if v.Language != "en" && v.Language != "ja" {
 		return fmt.Errorf("commit.language must be en or ja")
 	}
-	if v.Context != "auto" && v.Context != "8k" && v.Context != "16k" && v.Context != "32k" {
+	if v.Context != "auto" && v.Context != "8k" && v.Context != "16k" && v.Context != "32k" && v.Context != "64k" {
 		return fmt.Errorf("llm.context is not supported")
 	}
-	if v.MaxTokens != 8192 && v.MaxTokens != 16384 && v.MaxTokens != 32768 {
+	if v.MaxTokens != 8192 && v.MaxTokens != 16384 && v.MaxTokens != 32768 && v.MaxTokens != 65536 {
 		return fmt.Errorf("llm.max_context_tokens is not supported")
 	}
 	if v.Timeout <= 0 {

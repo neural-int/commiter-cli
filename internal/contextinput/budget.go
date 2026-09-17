@@ -10,6 +10,7 @@ const (
 	Context8K          = 8192
 	Context16K         = 16384
 	Context32K         = 32768
+	Context64K         = 65536
 	TemplateReserve    = 256
 	MinimumOutputSpace = 1024
 	OutputPerFile      = 48
@@ -66,8 +67,10 @@ func allowedContexts(config BudgetConfig) ([]int, error) {
 		return []int{Context8K, Context16K}, nil
 	case "32k":
 		return []int{Context8K, Context16K, Context32K}, nil
+	case "64k":
+		return []int{Context8K, Context16K, Context32K, Context64K}, nil
 	case "auto":
-		if config.MaxContextTokens != Context8K && config.MaxContextTokens != Context16K && config.MaxContextTokens != Context32K {
+		if config.MaxContextTokens != Context8K && config.MaxContextTokens != Context16K && config.MaxContextTokens != Context32K && config.MaxContextTokens != Context64K {
 			return nil, fmt.Errorf("unsupported maximum context %d", config.MaxContextTokens)
 		}
 		limits := []int{Context8K}
@@ -76,6 +79,9 @@ func allowedContexts(config BudgetConfig) ([]int, error) {
 		}
 		if config.MaxContextTokens >= Context32K {
 			limits = append(limits, Context32K)
+		}
+		if config.MaxContextTokens >= Context64K {
+			limits = append(limits, Context64K)
 		}
 		return limits, nil
 	default:

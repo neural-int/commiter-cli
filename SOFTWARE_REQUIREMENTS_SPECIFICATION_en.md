@@ -69,7 +69,7 @@ The default model is `qwen3.5:4b-q4_K_M`; its size is treated as approximately 3
 3. The CLI applies pathspec, excludes ignored files, and targets tracked files at file granularity from HEAD through the final working-tree state. A file containing both staged and unstaged changes, including a partially staged file, is targeted as a whole file. A rename is represented as one change with an old path and new path and receives one file ID. A symlink is handled as Git-tracked link information without following the link target, and a submodule is handled only as the parent repository's pointer update.
 4. The CLI performs sensitive classification using paths only and always automatically excludes clearly sensitive files. No override is provided to target clearly sensitive files. Sensitive candidates are confirmed before their contents are read, and only approved candidates are passed to local analysis.
 5. For target changes remaining after sensitive classification, the CLI generates Git metadata and Tree-sitter structural evidence. v1 parses Go, JavaScript, JSX, TypeScript, TSX, Python, Rust, HTML, and CSS. A text file in an unsupported language or one for which syntax parsing fails falls back to raw diff plus Git metadata. Opaque files are passed to plan generation as metadata only, without their contents. The mechanical layer must not generate semantic relationships or grouping recommendations such as source/test, docs/source, or same-feature relationships.
-6. The CLI assigns a file ID and change_hash to every target change, constructs LLM input at 8K, 16K, then 32K context levels, and performs hierarchical summarization if the allowed limit is exceeded.
+6. The CLI assigns a file ID and change_hash to every target change and constructs LLM input using the smallest context tier allowed by configuration. When the normal budget is exceeded, it applies hierarchical summarization and permitted context expansion in order of least information loss.
 7. Ollama returns a constrained JSON commit plan. Before any Git mutation, the CLI validates the schema, file assignment, and safety conditions.
 8. The CLI displays the full plan and exclusion list and prompts exactly once with `Create these N commits? [y/r/N]`.
 9. Only after user approval, the CLI runs verification once against the entire working tree based on an approved verification definition.
@@ -134,7 +134,7 @@ Configuration files use TOML and the following v1 schema:
 | `llm.model` | string | `"qwen3.5:4b-q4_K_M"` | global, repo, CLI |
 | `llm.endpoint` | string | `"http://127.0.0.1:11434"` | global |
 | `llm.context` | string | `"auto"` | global, repo |
-| `llm.max_context_tokens` | integer | `32768` | global, repo |
+| `llm.max_context_tokens` | integer | `65536` | global, repo |
 | `analysis.untracked` | string | `"auto-safe"` | global |
 | `analysis.include` | string array | `[]` | global, repo |
 | `analysis.exclude` | string array | `[]` | global, repo |
@@ -148,9 +148,9 @@ Each `verification.commands` element requires `name`, `argv` (string array), and
 
 If `verification.commands` is explicitly present in repository configuration, that command list is used. Only when it is absent is `verification.autodetect` evaluated; when true, commands are autodetected from the repository-root `package.json`, and when false the result is `Verification: none`.
 
-Allowed values for `llm.context` are `"auto"`, `"8k"`, `"16k"`, and `"32k"`.
+Allowed values for `llm.context` are `"auto"` and the fixed context tiers supported by the implementation.
 
-Allowed values for `llm.max_context_tokens` are 8192, 16384, and 32768. With `"auto"`, the CLI selects progressively from 8K, 16K, and 32K up to the configured maximum.
+`llm.max_context_tokens` is set to a context tier supported by the implementation and specifies the largest tier that automatic selection may use. Supported values and the default are fixed by configuration validation and release tests.
 
 `analysis.include` and `analysis.exclude` use doublestar globs and are restricted to repository-root-relative paths.
 
@@ -207,7 +207,7 @@ The mechanical layer must not generate semantic relationships or grouping recomm
 
 The CLI must prioritize structural evidence and required diff hunks when constructing LLM input.
 
-When `llm.context = "auto"`, context tiers are selected in order from 8K to 16K to 32K, bounded by `llm.max_context_tokens`. When `llm.context` is fixed to `"8k"`, `"16k"`, or `"32k"`, that tier is the maximum, and the CLI must not automatically promote to a larger context tier.
+When `llm.context = "auto"`, the CLI selects the smallest context tier up to the normal budget. Only when the weakest acceptable chunk-compression profile does not fit within the normal budget and `llm.max_context_tokens` permits a larger tier does the CLI remeasure the same profile's final prompt against the expanded budget. Only if it still does not fit may the CLI proceed to stronger profiles under the expanded budget. With a fixed `llm.context`, the CLI must not automatically promote beyond that tier.
 
 Before selecting a context tier, the CLI must treat the UTF-8 byte length of the final prompt as a conservative upper bound on input token count, then add a fixed 256 tokens for the chat template and output-reserve tokens calculated as `max(1024, 48 × target file count)`.
 The CLI selects the smallest allowed context tier that can contain the resulting total.
@@ -216,7 +216,7 @@ If the allowed context maximum is exceeded, the CLI must hierarchically summariz
 
 Chunk-level raw-diff summarization processes the output of file- and hunk-level summarization using boundaries shared by every compression profile. Additions and deletions receive independent quotas in each chunk. Hunks and changed lines are ranked deterministically by their positions in the original diff: first, last, then farthest from positions already selected. Each changed line is identified by its chunk number and original diff line number. The lines selected by strong must be a subset of medium, and those selected by medium must be a subset of light. Selected lines are restored to original diff order, and each contiguous omission reports its addition and deletion counts. Long lines retain their head and tail without breaking UTF-8, with the omission marker included in the limit. Each chunk digest is calculated from the same pre-sampling input and must remain identical across profiles.
 
-After applying each chunk compression profile, the CLI must rerender the final prompt and recalculate its conservative bound, stopping at the first profile that fits. Strengthening the profile must not increase the selected-line set, final-prompt UTF-8 byte count, or conservative bound.
+After each chunk-compression profile or context-budget transition, the CLI must rerender the final prompt and recalculate its conservative bound, stopping at the least-lossy combination that fits within supported resources. Strengthening the profile must not increase the selected-line set, final-prompt UTF-8 byte count, or conservative bound.
 
 When structural evidence is reduced, the planning input must include, per file, the before/after counts, JSON byte sizes, digests, coverage digests, and reduction level. Target file IDs, old/new paths, status, change_hash values, and Git identities must remain exact. Validation must ensure that retained evidence derives from original observed facts, declaration/role/enclosing-declaration/tag/attribute/selector/property/rule coverage remains present, and every structural file retains representative evidence. If the total still exceeds the allowed context maximum or these invariants cannot be preserved, the CLI must stop without calling the LLM or modifying Git.
 
@@ -524,7 +524,7 @@ With the default `keep_alive: 0`, the model is unloaded after inference; the sys
 
 ### NFR-003 Large Diffs
 
-Even when input exceeds 32K, hierarchical summarization must allow plan generation to continue while preserving the complete target-file set.
+When input exceeds the normal budget, adaptive expansion up to the configured maximum and hierarchical summarization must allow plan generation to continue while preserving the complete target-file set.
 
 ### NFR-004 Operational Visibility
 
@@ -627,9 +627,9 @@ Verify that sensitive candidates are confirmed before reading; when approved, th
 
 ### AC-005 Large Diffs
 
-Prepare fixtures that fit within each 8K, 16K, and 32K tier and a fixture exceeding the limit. Verify that the smallest allowed context tier is selected using the final prompt UTF-8 byte count, the fixed 256-token chat-template allowance, and output-reserve tokens calculated as `max(1024, 48 × target file count)`.
+Prepare fixtures that fit within each implementation-supported context tier and a fixture exceeding the maximum. Verify that the smallest allowed context tier is selected using the final prompt UTF-8 byte count, the fixed 256-token chat-template allowance, and output-reserve tokens calculated as `max(1024, 48 × target file count)`.
 
-With `llm.context = "auto"`, verify selection proceeds from 8K to 16K to 32K within `llm.max_context_tokens`; with a fixed context tier, verify that the CLI never automatically promotes beyond that tier. When the limit is exceeded, verify raw-diff summarization occurs in file, hunk, then chunk order and structural evidence is reduced budget-aware only if still necessary. Verify that before/after counts, sizes, digests, and coverage are auditable and deterministic. If the total still exceeds the limit, verify the CLI does not call the LLM and stops without modifying Git.
+With `llm.context = "auto"`, verify evaluation proceeds from the normal budget with the weakest profile, to the expanded budget with the same profile, and only then to stronger profiles under the expanded budget. With a fixed context tier, verify that the CLI never automatically promotes beyond that tier. Verify that every transition rerenders and remeasures the final prompt and that identical input and profile produce deterministic output independent of the selection path. If the strongest profile still exceeds the maximum budget, verify that the CLI does not call the LLM and stops without modifying Git.
 
 For chunk compression, verify independent addition and deletion quotas, positional coverage across hunks, profile-set inclusion by original diff line identity, equal pre-sampling chunk digests, omission counts, UTF-8 and excerpt bounds, and non-increasing final-prompt bytes and conservative estimates as profiles strengthen. Verify that the final prompt is remeasured after each profile and that the first fitting profile is recorded.
 

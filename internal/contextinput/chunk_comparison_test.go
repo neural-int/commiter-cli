@@ -1,11 +1,13 @@
 package contextinput
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 	"testing"
 	"unicode/utf8"
@@ -197,6 +199,63 @@ func TestPrepareUsesAdoptedCompressionProfiles(t *testing.T) {
 		if !fixture.tooLarge {
 			t.Logf("lines=%d profile=%s prompt_bytes=%d estimated_tokens=%d context=%d", fixture.lines, prepared.CompressionProfile, prepared.Budget.PromptBytes, prepared.Budget.EstimatedTokens, prepared.Budget.ContextTokens)
 		}
+	}
+}
+
+func TestPrepareExpandsTo64KBeforeStrongerCompression(t *testing.T) {
+	for _, fixture := range []struct {
+		name     string
+		lines    int
+		context  int
+		profile  CompressionProfile
+		renders  int
+		tooLarge bool
+	}{
+		{name: "32k light", lines: 700, context: Context32K, profile: CompressionLight, renders: 4},
+		{name: "64k light", lines: 1000, context: Context64K, profile: CompressionLight, renders: 5},
+		{name: "64k medium", lines: 2000, context: Context64K, profile: CompressionMedium, renders: 6},
+		{name: "64k strong", lines: 3000, context: Context64K, profile: CompressionStrong, renders: 7},
+		{name: "64k overflow", lines: 6000, context: Context64K, profile: CompressionStrong, tooLarge: true},
+	} {
+		t.Run(fixture.name, func(t *testing.T) {
+			document := rawDocument(sizedComparisonFixture(fixture.lines))
+			renders := 0
+			render := func(document Document) ([]byte, error) {
+				renders++
+				return JSONRenderer(document)
+			}
+			prepared, err := Prepare(
+				context.Background(), document,
+				BudgetConfig{Context: "auto", MaxContextTokens: Context64K}, render, nil,
+			)
+			if fixture.tooLarge {
+				if !errors.Is(err, ErrTooLarge) {
+					t.Fatalf("error=%v, want ErrTooLarge", err)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			if prepared.Budget.ContextTokens != fixture.context || prepared.CompressionProfile != fixture.profile {
+				t.Fatalf("context=%d profile=%s, want %d/%s", prepared.Budget.ContextTokens, prepared.CompressionProfile, fixture.context, fixture.profile)
+			}
+			if renders != fixture.renders {
+				t.Fatalf("render count=%d, want %d", renders, fixture.renders)
+			}
+			t.Logf("prompt_bytes=%d estimated_tokens=%d context=%d profile=%s", prepared.Budget.PromptBytes, prepared.Budget.EstimatedTokens, prepared.Budget.ContextTokens, prepared.CompressionProfile)
+
+			repeated, err := Prepare(
+				context.Background(), document,
+				BudgetConfig{Context: "auto", MaxContextTokens: Context64K}, JSONRenderer, nil,
+			)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !bytes.Equal(prepared.Prompt, repeated.Prompt) || !reflect.DeepEqual(prepared.Document, repeated.Document) {
+				t.Fatal("adaptive budget selection changed deterministic output")
+			}
+		})
 	}
 }
 
