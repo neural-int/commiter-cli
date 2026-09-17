@@ -161,7 +161,7 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          HOMEBREW_DEVTOOLS_TOKEN: ${{ secrets.HOMEBREW_DEVTOOLS_TOKEN }}
         run: |
           set -euo pipefail
           missing=0
@@ -172,7 +172,7 @@ jobs:
             APPLE_ID \
             APPLE_TEAM_ID \
             APPLE_APP_SPECIFIC_PASSWORD \
-            HOMEBREW_TAP_TOKEN; do
+            HOMEBREW_DEVTOOLS_TOKEN; do
             if [[ -z "${!name:-}" ]]; then
               echo "::error::Missing required secret: $name"
               missing=1
@@ -401,7 +401,7 @@ jobs:
           security delete-keychain "$RUNNER_TEMP/commiter-signing.keychain-db" 2>/dev/null || true
           rm -f "$RUNNER_TEMP/developer-id-application.p12"
 
-  # HOMEBREW_TAP_TOKEN is a fine-grained PAT for neural-int/homebrew-devtools
+  # HOMEBREW_DEVTOOLS_TOKEN is a fine-grained PAT for neural-int/homebrew-devtools
   # with Contents: Read and write. It is used only to send repository_dispatch.
   notify-homebrew-tap:
     name: Notify Homebrew tap
@@ -422,18 +422,18 @@ jobs:
       - name: Verify tap token
         shell: bash
         env:
-          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          HOMEBREW_DEVTOOLS_TOKEN: ${{ secrets.HOMEBREW_DEVTOOLS_TOKEN }}
         run: |
           set -euo pipefail
-          if [[ -z "${HOMEBREW_TAP_TOKEN:-}" ]]; then
-            echo "::error::Missing required secret: HOMEBREW_TAP_TOKEN"
+          if [[ -z "${HOMEBREW_DEVTOOLS_TOKEN:-}" ]]; then
+            echo "::error::Missing required secret: HOMEBREW_DEVTOOLS_TOKEN"
             exit 1
           fi
 
       - name: Dispatch commiter-release
         shell: bash
         env:
-          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          GH_TOKEN: ${{ secrets.HOMEBREW_DEVTOOLS_TOKEN }}
         run: |
           set -euo pipefail
 
