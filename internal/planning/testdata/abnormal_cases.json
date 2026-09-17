@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "file_ids": ["F001", "F002"],
+  "cases": [
+    {
+      "name": "initial-timeout-then-success",
+      "steps": [
+        {"error": "timeout"},
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"recover plan\",\"file_ids\":[\"F001\",\"F002\"]}]}"}
+      ],
+      "want": {"success": true, "calls": 2, "repaired": false, "exit_code": 0}
+    },
+    {
+      "name": "initial-transport-then-success",
+      "steps": [
+        {"error": "transport"},
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"recover plan\",\"file_ids\":[\"F001\",\"F002\"]}]}"}
+      ],
+      "want": {"success": true, "calls": 2, "repaired": false, "exit_code": 0}
+    },
+    {
+      "name": "repair-timeout-then-success",
+      "steps": [
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"needs repair\",\"file_ids\":[\"F001\"]}]}"},
+        {"error": "timeout"},
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"repair plan\",\"file_ids\":[\"F001\",\"F002\"]}]}"}
+      ],
+      "want": {"success": true, "calls": 3, "repaired": true, "repair": true, "exit_code": 0, "repair_violations": ["invalid_assignment"]}
+    },
+    {
+      "name": "repair-transport-then-success",
+      "steps": [
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"needs repair\",\"file_ids\":[\"F001\"]}]}"},
+        {"error": "transport"},
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"repair plan\",\"file_ids\":[\"F001\",\"F002\"]}]}"}
+      ],
+      "want": {"success": true, "calls": 3, "repaired": true, "repair": true, "exit_code": 0, "repair_violations": ["invalid_assignment"]}
+    },
+    {
+      "name": "initial-retry-budget-exhausted",
+      "steps": [
+        {"error": "timeout"},
+        {"error": "transport"}
+      ],
+      "want": {"success": false, "calls": 2, "repaired": false, "exit_code": 5}
+    },
+    {
+      "name": "repair-retry-budget-exhausted",
+      "steps": [
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"needs repair\",\"file_ids\":[\"F001\"]}]}"},
+        {"error": "timeout"},
+        {"error": "transport"}
+      ],
+      "want": {"success": false, "calls": 3, "repaired": false, "repair": true, "exit_code": 5, "repair_violations": ["invalid_assignment"]}
+    },
+    {
+      "name": "invalid-json-repaired",
+      "steps": [
+        {"content": "not-json"},
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"repair invalid JSON\",\"file_ids\":[\"F001\",\"F002\"]}]}"}
+      ],
+      "want": {"success": true, "calls": 2, "repaired": true, "repair": true, "exit_code": 0, "repair_violations": ["invalid_json"]}
+    },
+    {
+      "name": "schema-violation-repaired",
+      "steps": [
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"repair schema\",\"file_ids\":[\"F001\",\"F002\"]}],\"body\":\"unexpected\"}"},
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"repair schema\",\"file_ids\":[\"F001\",\"F002\"]}]}"}
+      ],
+      "want": {"success": true, "calls": 2, "repaired": true, "repair": true, "exit_code": 0, "repair_violations": ["invalid_schema"]}
+    },
+    {
+      "name": "missing-file-id-repaired",
+      "steps": [
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"repair missing file\",\"file_ids\":[\"F001\"]}]}"},
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"repair missing file\",\"file_ids\":[\"F001\",\"F002\"]}]}"}
+      ],
+      "want": {"success": true, "calls": 2, "repaired": true, "repair": true, "exit_code": 0, "repair_violations": ["invalid_assignment"]}
+    },
+    {
+      "name": "duplicate-file-id-repaired",
+      "steps": [
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"first duplicate\",\"file_ids\":[\"F001\"]},{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"second duplicate\",\"file_ids\":[\"F001\"]}]}"},
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"repair duplicate file\",\"file_ids\":[\"F001\",\"F002\"]}]}"}
+      ],
+      "want": {"success": true, "calls": 2, "repaired": true, "repair": true, "exit_code": 0, "repair_violations": ["invalid_assignment"]}
+    },
+    {
+      "name": "out-of-range-file-id-repaired",
+      "steps": [
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"repair range\",\"file_ids\":[\"F001\",\"F999\"]}]}"},
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"repair range\",\"file_ids\":[\"F001\",\"F002\"]}]}"}
+      ],
+      "want": {"success": true, "calls": 2, "repaired": true, "repair": true, "exit_code": 0, "repair_violations": ["invalid_assignment"]}
+    },
+    {
+      "name": "sensitive-summary-repaired",
+      "secret": "fixture-sensitive-value",
+      "steps": [
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"fixture-sensitive-value\",\"file_ids\":[\"F001\",\"F002\"]}]}"},
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"remove sensitive output\",\"file_ids\":[\"F001\",\"F002\"]}]}"}
+      ],
+      "want": {"success": true, "calls": 2, "repaired": true, "repair": true, "exit_code": 0, "repair_violations": ["sensitive_output"]}
+    },
+    {
+      "name": "multiple-violations-repaired",
+      "secret": "fixture-sensitive-value",
+      "steps": [
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"unknown\",\"scope\":\"\",\"breaking\":false,\"summary\":\"fixture-sensitive-value\\nextra\",\"file_ids\":[\"F001\",\"F999\"]}]}"},
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"repair multiple violations\",\"file_ids\":[\"F001\",\"F002\"]}]}"}
+      ],
+      "want": {"success": true, "calls": 2, "repaired": true, "repair": true, "exit_code": 0, "repair_violations": ["sensitive_output", "invalid_type", "invalid_scope", "invalid_summary", "invalid_assignment"]}
+    },
+    {
+      "name": "repair-remains-invalid",
+      "steps": [
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"needs repair\",\"file_ids\":[\"F001\"]}]}"},
+        {"content": "{\"schema_version\":1,\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"still invalid\",\"file_ids\":[\"F001\"]}]}"}
+      ],
+      "want": {"success": false, "calls": 2, "repaired": false, "repair": true, "exit_code": 5, "repair_violations": ["invalid_assignment"], "final_violations": ["invalid_assignment"]}
+    }
+  ]
+}
