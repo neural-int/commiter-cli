@@ -21,7 +21,7 @@ confirm = true
 model = "qwen3.5:4b-q4_K_M"
 endpoint = "http://127.0.0.1:11434"
 context = "auto"
-max_context_tokens = 32768
+max_context_tokens = 65536
 
 [analysis]
 untracked = "auto-safe"
@@ -43,7 +43,7 @@ language = "en"
 [llm]
 model = "qwen3.5:4b-q4_K_M"
 context = "auto"
-max_context_tokens = 32768
+max_context_tokens = 65536
 
 [analysis]
 include = []

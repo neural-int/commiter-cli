@@ -28,6 +28,14 @@ func TestSelectContextAutoBoundaries(t *testing.T) {
 	}
 }
 
+func TestSelectContextAutoSupports64KCeiling(t *testing.T) {
+	prompt := make([]byte, Context32K-TemplateReserve-MinimumOutputSpace+1)
+	budget, err := SelectContext(prompt, 1, BudgetConfig{Context: "auto", MaxContextTokens: Context64K})
+	if err != nil || budget.ContextTokens != Context64K {
+		t.Fatalf("budget=%#v error=%v", budget, err)
+	}
+}
+
 func TestSelectContextHonorsAutoMaximumAndFixedContext(t *testing.T) {
 	prompt := make([]byte, Context8K-TemplateReserve-MinimumOutputSpace+1)
 	if budget, err := SelectContext(prompt, 1, BudgetConfig{Context: "auto", MaxContextTokens: Context8K}); !errors.Is(err, ErrTooLarge) || budget.ContextTokens != Context8K {
@@ -54,7 +62,7 @@ func TestSelectContextUsesUTF8BytesAndPerFileOutputReserve(t *testing.T) {
 }
 
 func TestSelectContextRejectsInvalidConfiguration(t *testing.T) {
-	for _, config := range []BudgetConfig{{Context: "auto", MaxContextTokens: 10000}, {Context: "64k", MaxContextTokens: Context32K}, {Context: "auto", MaxContextTokens: Context32K, PromptOverheadBytes: -1}} {
+	for _, config := range []BudgetConfig{{Context: "auto", MaxContextTokens: 10000}, {Context: "128k", MaxContextTokens: Context64K}, {Context: "auto", MaxContextTokens: Context32K, PromptOverheadBytes: -1}} {
 		if _, err := SelectContext(nil, 0, config); err == nil {
 			t.Fatalf("config %#v was accepted", config)
 		}

@@ -107,7 +107,7 @@ func TestChatFixesSafetyFieldsAndReturnsContent(t *testing.T) {
 }
 
 func TestChatWithOptionsSendsSelectedContextAndOutputLimit(t *testing.T) {
-	for _, contextTokens := range []int{8192, 16384, 32768} {
+	for _, contextTokens := range []int{8192, 16384, 32768, 65536} {
 		t.Run(fmt.Sprint(contextTokens), func(t *testing.T) {
 			var received map[string]any
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
