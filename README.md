@@ -90,11 +90,11 @@ commiter
 
 `commiter setup` checks the configured Ollama environment. If Ollama is missing and Homebrew is available, it can install Ollama after confirmation. It can also start Ollama temporarily and pull the configured model after confirmation.
 
-`commiter doctor` is read-only and checks the repository, configuration, Git identity, Ollama connectivity, configured model, structured-output support, and related prerequisites.
+`commiter doctor` is read-only and checks the repository, configuration, Git identity, Ollama connectivity, configured model, structured-output support, and related prerequisites. It does not start or stop Ollama. If the daemon is stopped, start Ollama manually (for example, with `ollama serve`) and rerun `commiter doctor` for a complete capability diagnosis. If Ollama is not installed, run `commiter setup` first.
 
-`commiter --dry-run` performs analysis and plan generation without modifying the index, creating commits, or pushing.
+`commiter --dry-run` performs analysis and plan generation without modifying the index, creating commits, or pushing. Like a plain run, it temporarily starts Ollama when the daemon is stopped and stops only the daemon it started.
 
-A plain `commiter` run can create commits and push. Review the displayed plan and prompts before approving mutation.
+A plain `commiter` run can create commits and push. It temporarily starts Ollama when needed and stops only the daemon it started. Review the displayed plan and prompts before approving mutation.
 
 ## Usage
 
@@ -129,7 +129,7 @@ commiter --no-push
 | Command | Purpose |
 | --- | --- |
 | `commiter setup [--update-model]` | Prepare Ollama and the configured local model. |
-| `commiter doctor` | Run read-only environment and capability checks. |
+| `commiter doctor` | Run read-only environment and capability checks without starting Ollama. |
 | `commiter config init --global\|--repo` | Create a global or repository configuration template. |
 | `commiter config show [--effective]` | Show resolved configuration and its sources. |
 | `commiter config path --global\|--repo` | Show a configuration path. |
@@ -141,7 +141,7 @@ commiter --no-push
 
 | Flag | Effect |
 | --- | --- |
-| `--dry-run` | Analyze and plan without modifying Git. |
+| `--dry-run` | Analyze and plan without modifying Git; temporarily start Ollama when needed. |
 | `--no-push` | Disable push for the current run. |
 | `--no-confirm-commit` | Skip the ordinary commit-plan confirmation. Safety-required confirmations still apply. |
 | `--no-confirm-push` | Skip the ordinary push confirmation. Safety-required confirmations still apply. |

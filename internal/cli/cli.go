@@ -232,7 +232,7 @@ func runDoctor(args []string, printer *output.Printer) int {
 			checks["config"] = check(resolveErr == nil, message(resolveErr, "configuration valid"))
 			checks["trust"] = checkTrust(paths.StateDir, root)
 			if resolveErr == nil {
-				ollamaChecks := doctorOllama(effective.Values)
+				ollamaChecks := doctorOllama(effective.Values, ollamaExecutable != "")
 				checks["ollama"] = ollamaChecks["ollama"]
 				checks["structured_output"] = ollamaChecks["structured_output"]
 				checks["thinking"] = ollamaChecks["thinking"]
@@ -305,19 +305,19 @@ func message(err error, success string) string {
 	}
 	return err.Error()
 }
-func doctorOllama(values config.Values) map[string]map[string]any {
+func doctorOllama(values config.Values, executableAvailable bool) map[string]map[string]any {
 	client, err := ollama.New(values)
 	if err != nil {
-		return doctorOllamaFailure(err.Error())
+		return doctorOllamaFailure(err, executableAvailable)
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), doctorCapabilityTimeout)
 	defer cancel()
 	if err := client.Compatibility(ctx); err != nil {
-		return doctorOllamaFailure(err.Error())
+		return doctorOllamaFailure(err, executableAvailable)
 	}
 	present, err := client.HasModel(ctx)
 	if err != nil {
-		return doctorOllamaFailure(err.Error())
+		return doctorOllamaFailure(err, executableAvailable)
 	}
 	if !present {
 		return map[string]map[string]any{
@@ -328,7 +328,7 @@ func doctorOllama(values config.Values) map[string]map[string]any {
 	}
 	capabilities, err := client.ProbeCapabilities(ctx)
 	if err != nil {
-		return doctorOllamaFailure(err.Error())
+		return doctorOllamaFailure(err, executableAvailable)
 	}
 	return map[string]map[string]any{
 		"ollama":            check(true, "loopback API and configured model are ready"),
@@ -344,9 +344,23 @@ func capabilityMessage(ok bool, success, failure string) string {
 	return failure
 }
 
-func doctorOllamaFailure(message string) map[string]map[string]any {
+func doctorOllamaFailure(err error, executableAvailable bool) map[string]map[string]any {
+	if ollama.IsConnectionRefused(err) {
+		if executableAvailable {
+			return map[string]map[string]any{
+				"ollama":            check(false, "Ollama daemon is stopped; normal runs and --dry-run start it temporarily when needed; start Ollama manually and rerun commiter doctor for a complete diagnosis"),
+				"structured_output": check(false, "not verified because the Ollama daemon is stopped; start Ollama and rerun commiter doctor"),
+				"thinking":          check(false, "not verified because the Ollama daemon is stopped; start Ollama and rerun commiter doctor"),
+			}
+		}
+		return map[string]map[string]any{
+			"ollama":            check(false, "Ollama daemon is stopped and the Ollama executable is unavailable; run commiter setup to prepare Ollama"),
+			"structured_output": check(false, "not verified because Ollama is unavailable; run commiter setup, start Ollama, and rerun commiter doctor"),
+			"thinking":          check(false, "not verified because Ollama is unavailable; run commiter setup, start Ollama, and rerun commiter doctor"),
+		}
+	}
 	return map[string]map[string]any{
-		"ollama":            check(false, message),
+		"ollama":            check(false, err.Error()),
 		"structured_output": check(false, "Ollama compatibility could not be verified"),
 		"thinking":          check(false, "Ollama compatibility could not be verified"),
 	}

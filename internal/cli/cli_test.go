@@ -387,6 +387,101 @@ func TestDoctorProbesStructuredOutputAndThinking(t *testing.T) {
 	}
 }
 
+func TestDoctorExplainsStoppedOllamaWithExecutable(t *testing.T) {
+	writeOllamaConfig(t, closedLoopbackEndpoint(t), "qwen3.5:4b-q4_K_M")
+	oldLookPath, oldStat, oldCommand := lookPath, statPath, commandFactory
+	t.Cleanup(func() { lookPath, statPath, commandFactory = oldLookPath, oldStat, oldCommand })
+	lookPath = func(name string) (string, error) {
+		if name == "ollama" {
+			return "/usr/local/bin/ollama", nil
+		}
+		return oldLookPath(name)
+	}
+	statPath = func(string) (os.FileInfo, error) { return nil, os.ErrNotExist }
+	commandFactory = func(string, ...string) *exec.Cmd {
+		t.Fatal("doctor must not start Ollama")
+		return nil
+	}
+
+	code, doctor := runJSONDoctor(t)
+	if code != exitcode.LLM {
+		t.Fatalf("code=%d doctor=%#v", code, doctor)
+	}
+	ollamaMessage := doctor["ollama"].Message
+	if !strings.Contains(ollamaMessage, "normal runs and --dry-run start it temporarily") ||
+		!strings.Contains(ollamaMessage, "start Ollama manually and rerun commiter doctor") {
+		t.Fatalf("ollama message=%q", ollamaMessage)
+	}
+	for _, name := range []string{"structured_output", "thinking"} {
+		if doctor[name].OK || !strings.Contains(doctor[name].Message, "not verified because the Ollama daemon is stopped") {
+			t.Fatalf("%s=%#v", name, doctor[name])
+		}
+	}
+}
+
+func TestDoctorExplainsStoppedOllamaWithoutExecutable(t *testing.T) {
+	writeOllamaConfig(t, closedLoopbackEndpoint(t), "qwen3.5:4b-q4_K_M")
+	oldLookPath, oldStat := lookPath, statPath
+	t.Cleanup(func() { lookPath, statPath = oldLookPath, oldStat })
+	lookPath = func(string) (string, error) { return "", exec.ErrNotFound }
+	statPath = func(string) (os.FileInfo, error) { return nil, os.ErrNotExist }
+
+	code, doctor := runJSONDoctor(t)
+	if code != exitcode.LLM {
+		t.Fatalf("code=%d doctor=%#v", code, doctor)
+	}
+	ollamaMessage := doctor["ollama"].Message
+	if !strings.Contains(ollamaMessage, "run commiter setup") || strings.Contains(ollamaMessage, "start it temporarily") {
+		t.Fatalf("ollama message=%q", ollamaMessage)
+	}
+}
+
+func TestDoctorDoesNotMisclassifyAPIErrorAsStoppedDaemon(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		http.Error(w, "unavailable", http.StatusServiceUnavailable)
+	}))
+	defer server.Close()
+	writeOllamaConfig(t, server.URL, "qwen3.5:4b-q4_K_M")
+	oldLookPath, oldStat := lookPath, statPath
+	t.Cleanup(func() { lookPath, statPath = oldLookPath, oldStat })
+	lookPath = func(name string) (string, error) {
+		if name == "ollama" {
+			return "/usr/local/bin/ollama", nil
+		}
+		return oldLookPath(name)
+	}
+	statPath = func(string) (os.FileInfo, error) { return nil, os.ErrNotExist }
+
+	code, doctor := runJSONDoctor(t)
+	if code != exitcode.LLM {
+		t.Fatalf("code=%d doctor=%#v", code, doctor)
+	}
+	if message := doctor["ollama"].Message; strings.Contains(message, "daemon is stopped") || strings.Contains(message, "start it temporarily") {
+		t.Fatalf("ollama message=%q", message)
+	}
+}
+
+type doctorCheck struct {
+	OK      bool   `json:"ok"`
+	Message string `json:"message"`
+}
+
+func runJSONDoctor(t *testing.T) (int, map[string]doctorCheck) {
+	t.Helper()
+	var stdout, stderr bytes.Buffer
+	code := Run([]string{"--json", "doctor"}, &stdout, &stderr)
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr=%q", stderr.String())
+	}
+	var result struct {
+		Doctor map[string]doctorCheck `json:"doctor"`
+	}
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("JSON=%q error=%v", stdout.String(), err)
+	}
+	return code, result.Doctor
+}
+
 func writeOllamaConfig(t *testing.T, endpoint, model string) {
 	t.Helper()
 	configHome := t.TempDir()
