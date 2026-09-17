@@ -92,6 +92,9 @@ func TestPrepareReducesStructuralEvidenceAcrossAllSupportedLanguages(t *testing.
 		if reduction.OriginalCount < reduction.RetainedCount || reduction.OriginalBytes < reduction.RetainedBytes {
 			t.Fatalf("%s reduction grew evidence: %#v", fixture.language, reduction)
 		}
+		if reduction.OriginalCount == reduction.RetainedCount && reduction.OriginalBytes == reduction.RetainedBytes {
+			t.Fatalf("%s evidence was not reduced: %#v", fixture.language, reduction)
+		}
 		if reduction.OriginalCoverageDigest != reduction.RetainedCoverageDigest {
 			t.Fatalf("%s lost required coverage: %#v", fixture.language, reduction)
 		}
@@ -116,6 +119,50 @@ func TestPrepareReducesStructuralEvidenceAcrossAllSupportedLanguages(t *testing.
 	repeated, err := Prepare(context.Background(), document, config, JSONRenderer, nil)
 	if err != nil || !bytes.Equal(prepared.Prompt, repeated.Prompt) || !reflect.DeepEqual(prepared.Document, repeated.Document) {
 		t.Fatalf("cross-language reduction is not deterministic: error=%v", err)
+	}
+}
+
+func TestPreparePreservesEvidenceAcrossSeparatedHunks(t *testing.T) {
+	source, hunks := separatedGoFixture()
+	analysis := syntax.Analyze(syntax.Input{Language: "go", Content: []byte(source), Hunks: hunks})
+	if len(hunks) != 3 || analysis.Mode != syntax.ModeStructural || len(analysis.Evidence) == 0 {
+		t.Fatalf("hunks=%d mode=%s evidence=%d", len(hunks), analysis.Mode, len(analysis.Evidence))
+	}
+
+	path := "separated.go"
+	document := Document{
+		SchemaVersion: SchemaVersion,
+		Repository:    Repository{Head: "head", Branch: "main", IndexIdentity: "index"},
+		Files: []File{{
+			ID: "F001", Status: "A", NewPath: &path, Language: "go", ChangeHash: "separated-hunks",
+			Mode: syntax.ModeStructural, Evidence: analysis.Evidence,
+		}},
+	}
+	originalPrompt, err := JSONRenderer(document)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(originalPrompt)+TemplateReserve+MinimumOutputSpace <= Context32K {
+		t.Fatalf("separated-hunk fixture no longer reproduces overflow: prompt bytes=%d", len(originalPrompt))
+	}
+
+	prepared, err := Prepare(context.Background(), document, BudgetConfig{Context: "32k", MaxContextTokens: Context32K}, JSONRenderer, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	reduction := prepared.Document.Files[0].EvidenceReduction
+	if reduction == nil || reduction.OriginalCount == reduction.RetainedCount && reduction.OriginalBytes == reduction.RetainedBytes {
+		t.Fatalf("separated-hunk evidence was not reduced: %#v", reduction)
+	}
+	if reduction.OriginalCoverageDigest != reduction.RetainedCoverageDigest {
+		t.Fatalf("separated-hunk coverage changed: %#v", reduction)
+	}
+	for _, name := range []string{"FirstHunk", "MiddleHunk", "LastHunk"} {
+		if !containsEvidence(prepared.Document.Files[0].Evidence, func(value syntax.Evidence) bool {
+			return value.Kind == "function_declaration" && value.Name == name
+		}) {
+			t.Fatalf("%s declaration was not retained: %#v", name, prepared.Document.Files[0].Evidence)
+		}
 	}
 }
 
@@ -301,6 +348,23 @@ func crossLanguageFixtures() []crossLanguageFixture {
 			},
 		},
 	}
+}
+
+func separatedGoFixture() (string, []syntax.Hunk) {
+	var source strings.Builder
+	source.WriteString("package fixture\n\nimport \"fmt\"\n\n")
+	hunks := make([]syntax.Hunk, 0, 3)
+	for block, name := range []string{"FirstHunk", "MiddleHunk", "LastHunk"} {
+		startLine := strings.Count(source.String(), "\n") + 1
+		fmt.Fprintf(&source, "func %s(value string) string { return fmt.Sprintf(\"%%s-anchor\", value) }\n", name)
+		for filler := 0; filler < 24; filler++ {
+			fmt.Fprintf(&source, "func filler_%d_%02d(value string) string { return fmt.Sprintf(\"%%s-%%d%s\", value, %d) }\n", block, filler, optionalMarkers("hunk", block, 18), filler)
+		}
+		endLine := strings.Count(source.String(), "\n")
+		hunks = append(hunks, syntax.Hunk{StartLine: startLine, EndLine: endLine})
+		source.WriteString("\n")
+	}
+	return source.String(), hunks
 }
 
 func optionalMarkers(language string, index, count int) string {
