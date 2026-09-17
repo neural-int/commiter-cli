@@ -49,13 +49,14 @@ type Counts struct {
 }
 
 type Record struct {
-	SchemaVersion int       `json:"schema_version"`
-	RecordedAt    time.Time `json:"recorded_at"`
-	Durations     Durations `json:"durations_ns"`
-	Counts        Counts    `json:"counts"`
-	Model         string    `json:"model,omitempty"`
-	Context       string    `json:"context,omitempty"`
-	Exit          string    `json:"exit"`
+	SchemaVersion      int       `json:"schema_version"`
+	RecordedAt         time.Time `json:"recorded_at"`
+	Durations          Durations `json:"durations_ns"`
+	Counts             Counts    `json:"counts"`
+	Model              string    `json:"model,omitempty"`
+	Context            string    `json:"context,omitempty"`
+	CompressionProfile string    `json:"compression_profile,omitempty"`
+	Exit               string    `json:"exit"`
 }
 
 type Recorder struct {
@@ -122,6 +123,15 @@ func (r *Recorder) SetContext(model, contextStage string) {
 		r.record.Model = model
 	}
 	r.record.Context = contextStage
+}
+
+func (r *Recorder) SetCompressionProfile(profile string) {
+	if r == nil {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.record.CompressionProfile = profile
 }
 
 func (r *Recorder) AddSummaries(count int) {

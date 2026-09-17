@@ -70,7 +70,7 @@ func TestPrepareReducesStructuralEvidenceAcrossAllSupportedLanguages(t *testing.
 	if err != nil {
 		t.Fatalf("cross-language reduction failed: %v", err)
 	}
-	if prepared.SummaryStage != SummaryChunk || prepared.SummaryCount != 3 {
+	if prepared.SummaryStage != SummaryChunk || prepared.CompressionProfile != CompressionStrong || prepared.SummaryCount != 5 {
 		t.Fatalf("raw-diff summary stages were not exhausted before reduction: %#v", prepared)
 	}
 	if prepared.EvidenceReductionCount != 1 || prepared.Budget.EstimatedTokens > Context32K {

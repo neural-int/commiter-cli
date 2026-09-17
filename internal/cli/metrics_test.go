@@ -219,11 +219,14 @@ func TestRecordSummarizationKeepsFailedPrepareProgress(t *testing.T) {
 	}
 
 	recorder = runmetrics.New()
-	recordSummarization(recorder, contextinput.Prepared{SummaryCount: 3, SummaryDuration: 40})
+	recordSummarization(recorder, contextinput.Prepared{SummaryCount: 3, SummaryDuration: 40, CompressionProfile: contextinput.CompressionMedium})
 	recorder.SetContext("model:tag", "32k")
 	partial := recorder.Finish("llm_error")
 	if partial.Durations.Summarization == nil || *partial.Durations.Summarization != 40 || partial.Counts.Summaries != 3 {
 		t.Fatalf("executed summarization was discarded: durations=%+v counts=%+v", partial.Durations, partial.Counts)
+	}
+	if partial.CompressionProfile != "medium" {
+		t.Fatalf("compression profile was discarded: %+v", partial)
 	}
 
 	recorder = runmetrics.New()

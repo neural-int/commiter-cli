@@ -213,11 +213,15 @@ CLI は、構造エビデンスと必要な diff hunk を優先して LLM への
 
 許可されたコンテキスト上限を超える場合は、ファイル単位、hunk 単位、chunk 単位の順に raw diff を階層的に要約します。それでも上限を超える場合は、共通の構造エビデンス表現に対し、特定言語へ依存しない決定論的な canonicalization と budget-aware reduction を行わなければなりません。reduction は宣言、role、enclosing declaration、および tag、attribute、selector、property、rule の構造を優先し、ファイル全体へ分散した代表点を保持します。単純な先頭 N 件の切り捨てを行ってはなりません。
 
+chunk 単位の raw diff 要約は、file 単位と hunk 単位の要約後の入力を、全圧縮 profile で共通の境界に分割して処理します。追加行と削除行には chunk ごとに独立した quota を与え、hunk と changed line を元 diff 上の位置に基づく先頭、末尾、既選択位置から最遠の順で決定論的に順位付けします。各 changed line は chunk 番号と元 diff 行番号の組で識別し、strong で選択する行の集合は medium の部分集合、medium は light の部分集合でなければなりません。選択後は元 diff 順に復元し、連続した省略区間には追加行数と削除行数を明示します。長い行は UTF-8 を壊さず、省略記号を上限に含めて先頭と末尾を保持します。chunk の digest は sampling 前の同一入力から算出し、profile 間で変更してはなりません。
+
+CLI は各 chunk 圧縮 profile の適用後に最終プロンプトを再生成して上限見積もりを再計算し、収まった最初の profile で停止します。profile を強めても選択行、最終プロンプトの UTF-8 バイト数、および上限見積もりは増加してはなりません。
+
 構造エビデンスを縮約した場合は、ファイルごとに縮約前後の件数、JSON バイト数、digest、coverage digest、および縮約レベルを計画入力へ含めなければなりません。対象 file ID、old/new path、status、change_hash、Git identity は完全保持し、構造エビデンスは元の観測事実に由来すること、宣言・role・enclosing declaration・tag・attribute・selector・property・rule の coverage が維持されること、および各 structural file に代表 evidence が残ることを検証します。縮約後も合計値が許可されたコンテキスト上限を超える場合、またはこれらの invariant を維持できない場合は、LLM を呼び出すことなく、Git の状態を変更せずに停止しなければなりません。
 
 ### FR-007 階層要約
 
-階層要約および構造エビデンス縮約は、対象 file ID、変更前後のパス（old/new path）、ステータス、change_hash、Git identity の完全な集合を維持し、処理後であっても対象ファイルの割り当て漏れを検出できなければなりません。構造エビデンスの byte-for-byte 完全一致は縮約前後の invariant とせず、監査 metadata と coverage invariant により由来と保持範囲を検証します。
+階層要約および構造エビデンス縮約は、対象 file ID、変更前後のパス（old/new path）、ステータス、change_hash、Git identity の完全な集合を維持し、処理後であっても対象ファイルの割り当て漏れを検出できなければなりません。raw diff の要約では、保持する changed line が元 diff に由来することを元 diff 行番号で検証します。構造エビデンスの byte-for-byte 完全一致は縮約前後の invariant とせず、監査 metadata と coverage invariant により由来と保持範囲を検証します。
 
 ### FR-008 コミット計画の生成
 
@@ -304,7 +308,7 @@ CLI は全コミットが正常に完了した後に一度だけプッシュを�
 
 ### FR-018 metrics
 
-CLI は、Git の前処理、構文解析、モデルのロード、プロンプト評価、計画生成、要約、検証、Git 操作、プッシュの各所要時間と、モデルのタグまたはダイジェスト、コンテキスト段階、ファイル数、行数、バイト数、Tree-sitter 解析の成功／フォールバックファイル数、要約回数、および終了分類を表示しなければなりません。
+CLI は、Git の前処理、構文解析、モデルのロード、プロンプト評価、計画生成、要約、検証、Git 操作、プッシュの各所要時間と、モデルのタグまたはダイジェスト、コンテキスト段階、選択した chunk 圧縮 profile、ファイル数、行数、バイト数、Tree-sitter 解析の成功／フォールバックファイル数、要約回数、および終了分類を表示しなければなりません。chunk 圧縮を適用しなかった場合は、圧縮 profile を省略します。
 
 ### FR-019 daemon lifecycle
 
@@ -624,6 +628,8 @@ Unicode パス、ASCII 大文字小文字、ディレクトリコンポーネン
 8K、16K、32K の各コンテキスト段階に収まるケースと上限を超えるケースを用意し、最終プロンプトの UTF-8 バイト数、チャットテンプレート用の 256 トークン、および `max(1024, 48 × 対象ファイル数)` の出力予約トークンに基づいて、許可された最小のコンテキスト段階が選択されることを確認します。
 
 `llm.context = "auto"` の場合は `llm.max_context_tokens` の範囲内で 8K、16K、32K の順に段階選択され、固定コンテキスト設定では指定された段階を超えて自動昇格しないことを確認します。上限超過時はファイル単位、hunk 単位、chunk 単位の順に raw diff の階層要約が行われ、その後に必要な場合のみ構造エビデンスが budget-aware に縮約されることを確認します。縮約前後の件数、サイズ、digest と coverage を検証でき、同一入力では同一表現となり、それでも上限を超える場合は LLM を呼び出すことなく Git を変更せずに停止することを確認します。
+
+chunk 圧縮について、追加行と削除行の独立 quota、hunk 間の位置的な coverage、元 diff 行番号による profile 間の選択集合の包含、sampling 前 chunk digest の一致、省略行数、UTF-8 と excerpt 上限、profile を強めた際の最終プロンプト bytes と上限見積もりの単調非増加を確認します。各 profile 後に最終プロンプトが再計測され、上限内となる最初の profile が記録されることを確認します。
 
 ### AC-006 構造解析と計画分割
 

@@ -214,11 +214,15 @@ The CLI selects the smallest allowed context tier that can contain the resulting
 
 If the allowed context maximum is exceeded, the CLI must hierarchically summarize raw diffs in file, hunk, then chunk order. If the total still exceeds the limit, it must apply deterministic, language-agnostic canonicalization and budget-aware reduction to the common structural-evidence representation. Reduction must prioritize declarations, roles, enclosing declarations, and tag, attribute, selector, property, and rule structures while retaining representative points distributed across the file. It must not truncate to the first N items.
 
+Chunk-level raw-diff summarization processes the output of file- and hunk-level summarization using boundaries shared by every compression profile. Additions and deletions receive independent quotas in each chunk. Hunks and changed lines are ranked deterministically by their positions in the original diff: first, last, then farthest from positions already selected. Each changed line is identified by its chunk number and original diff line number. The lines selected by strong must be a subset of medium, and those selected by medium must be a subset of light. Selected lines are restored to original diff order, and each contiguous omission reports its addition and deletion counts. Long lines retain their head and tail without breaking UTF-8, with the omission marker included in the limit. Each chunk digest is calculated from the same pre-sampling input and must remain identical across profiles.
+
+After applying each chunk compression profile, the CLI must rerender the final prompt and recalculate its conservative bound, stopping at the first profile that fits. Strengthening the profile must not increase the selected-line set, final-prompt UTF-8 byte count, or conservative bound.
+
 When structural evidence is reduced, the planning input must include, per file, the before/after counts, JSON byte sizes, digests, coverage digests, and reduction level. Target file IDs, old/new paths, status, change_hash values, and Git identities must remain exact. Validation must ensure that retained evidence derives from original observed facts, declaration/role/enclosing-declaration/tag/attribute/selector/property/rule coverage remains present, and every structural file retains representative evidence. If the total still exceeds the allowed context maximum or these invariants cannot be preserved, the CLI must stop without calling the LLM or modifying Git.
 
 ### FR-007 Hierarchical Summarization
 
-Hierarchical summarization and structural-evidence reduction must preserve the complete sets of target file IDs, old/new paths, statuses, change_hash values, and Git identities so that missing file assignments remain detectable afterward. Byte-for-byte equality of structural evidence is not a pre/post reduction invariant; provenance and retained scope are instead validated through audit metadata and the coverage invariant.
+Hierarchical summarization and structural-evidence reduction must preserve the complete sets of target file IDs, old/new paths, statuses, change_hash values, and Git identities so that missing file assignments remain detectable afterward. For raw-diff summarization, retained changed lines must be validated as deriving from the original diff by original diff line number. Byte-for-byte equality of structural evidence is not a pre/post reduction invariant; provenance and retained scope are instead validated through audit metadata and the coverage invariant.
 
 ### FR-008 Commit Plan Generation
 
@@ -306,7 +310,7 @@ Language handling must have an extension boundary that allows additional languag
 
 ### FR-018 Metrics
 
-The CLI must display timing for Git preprocessing, syntax analysis, model load, prompt evaluation, generation, summarization, verification, Git, and push, as well as model tag or digest, context tier, file/line/byte counts, counts of Tree-sitter parse success/fallback files, summarization count, and exit classification.
+The CLI must display timing for Git preprocessing, syntax analysis, model load, prompt evaluation, generation, summarization, verification, Git, and push, as well as model tag or digest, context tier, selected chunk-compression profile, file/line/byte counts, counts of Tree-sitter parse success/fallback files, summarization count, and exit classification. The compression profile is omitted when chunk compression was not applied.
 
 ### FR-019 Daemon Lifecycle
 
@@ -626,6 +630,8 @@ Verify that sensitive candidates are confirmed before reading; when approved, th
 Prepare fixtures that fit within each 8K, 16K, and 32K tier and a fixture exceeding the limit. Verify that the smallest allowed context tier is selected using the final prompt UTF-8 byte count, the fixed 256-token chat-template allowance, and output-reserve tokens calculated as `max(1024, 48 × target file count)`.
 
 With `llm.context = "auto"`, verify selection proceeds from 8K to 16K to 32K within `llm.max_context_tokens`; with a fixed context tier, verify that the CLI never automatically promotes beyond that tier. When the limit is exceeded, verify raw-diff summarization occurs in file, hunk, then chunk order and structural evidence is reduced budget-aware only if still necessary. Verify that before/after counts, sizes, digests, and coverage are auditable and deterministic. If the total still exceeds the limit, verify the CLI does not call the LLM and stops without modifying Git.
+
+For chunk compression, verify independent addition and deletion quotas, positional coverage across hunks, profile-set inclusion by original diff line identity, equal pre-sampling chunk digests, omission counts, UTF-8 and excerpt bounds, and non-increasing final-prompt bytes and conservative estimates as profiles strengthen. Verify that the final prompt is remeasured after each profile and that the first fitting profile is recorded.
 
 ### AC-006 Structural Analysis and Plan Splitting
 

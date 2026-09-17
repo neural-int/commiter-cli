@@ -688,6 +688,9 @@ func reportMetrics(printer *output.Printer, record runmetrics.Record) error {
 	if record.Context != "" {
 		lines = append(lines, "context: "+record.Context)
 	}
+	if record.CompressionProfile != "" {
+		lines = append(lines, "compression profile: "+record.CompressionProfile)
+	}
 	lines = append(lines,
 		fmt.Sprintf("counts: files=%d lines=%d bytes=%d syntax_success=%d syntax_fallback=%d summaries=%d",
 			record.Counts.Files, record.Counts.Lines, record.Counts.Bytes, record.Counts.SyntaxSuccess,
