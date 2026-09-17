@@ -242,7 +242,7 @@ func TestPrepareReducesHTMLCSSAndJavaScriptEvidenceWithin32K(t *testing.T) {
 	if prepared.Budget.EstimatedTokens > Context32K || prepared.EvidenceReductionCount != 1 {
 		t.Fatalf("prepared = %#v", prepared)
 	}
-	if prepared.SummaryStage != SummaryChunk || prepared.SummaryCount != 3 {
+	if prepared.SummaryStage != SummaryChunk || prepared.CompressionProfile != CompressionStrong || prepared.SummaryCount != 5 {
 		t.Fatalf("raw diff stages were not exhausted before evidence reduction: %#v", prepared)
 	}
 	if prepared.EvidenceBeforeBytes <= prepared.EvidenceAfterBytes || prepared.OriginalPromptBytes != len(originalPrompt) {

@@ -41,6 +41,7 @@ type File struct {
 	EvidenceReduction *EvidenceReduction `json:"evidence_reduction,omitempty"`
 	RawDiff           string             `json:"raw_diff,omitempty"`
 	Summary           string             `json:"summary,omitempty"`
+	summaryLines      []summaryLine
 }
 
 type Document struct {
@@ -152,8 +153,12 @@ func ValidatePreserved(original, summarized Document) error {
 		originalEvidence := append([]syntax.Evidence(nil), base.Evidence...)
 		retainedEvidence := append([]syntax.Evidence(nil), file.Evidence...)
 		reduction := file.EvidenceReduction
+		if err := validateSummaryLines(base.RawDiff, file.summaryLines); err != nil {
+			return fmt.Errorf("summary changed raw diff provenance for file %s: %w", file.ID, err)
+		}
 		base.RawDiff, base.Summary = "", ""
 		file.RawDiff, file.Summary = "", ""
+		base.summaryLines, file.summaryLines = nil, nil
 		base.Evidence, base.EvidenceReduction = nil, nil
 		file.Evidence, file.EvidenceReduction = nil, nil
 		if !reflect.DeepEqual(base, file) {
@@ -162,6 +167,28 @@ func ValidatePreserved(original, summarized Document) error {
 		if err := validateEvidencePreserved(originalEvidence, retainedEvidence, reduction); err != nil {
 			return fmt.Errorf("summary changed structural evidence for file %s: %w", file.ID, err)
 		}
+	}
+	return nil
+}
+
+func validateSummaryLines(rawDiff string, retained []summaryLine) error {
+	if len(retained) == 0 {
+		return nil
+	}
+	if rawDiff == "" {
+		return errors.New("summary line provenance has no raw diff source")
+	}
+	original := indexSummaryLines(rawDiff)
+	previous := 0
+	for _, line := range retained {
+		if line.originalIndex <= previous || line.originalIndex > len(original) {
+			return errors.New("summary line provenance is out of order or out of range")
+		}
+		source := original[line.originalIndex-1]
+		if line.text != source.text || line.hunk != source.hunk {
+			return errors.New("summary line provenance does not match the raw diff")
+		}
+		previous = line.originalIndex
 	}
 	return nil
 }

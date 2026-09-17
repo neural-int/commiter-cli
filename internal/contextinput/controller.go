@@ -22,18 +22,23 @@ type Summarizer interface {
 	Summarize(context.Context, SummaryStage, Document) (Document, error)
 }
 
+type profiledSummarizer interface {
+	SummarizeProfile(context.Context, CompressionProfile, Document) (Document, error)
+}
+
 type Prepared struct {
-	Document                  Document      `json:"document"`
-	Prompt                    []byte        `json:"-"`
-	Budget                    Budget        `json:"budget"`
-	SummaryStage              SummaryStage  `json:"summary_stage"`
-	SummaryCount              int           `json:"summary_count"`
-	SummaryDuration           time.Duration `json:"-"`
-	OriginalPromptBytes       int           `json:"original_prompt_bytes"`
-	EvidenceReductionCount    int           `json:"evidence_reduction_count"`
-	EvidenceReductionDuration time.Duration `json:"-"`
-	EvidenceBeforeBytes       int           `json:"evidence_before_bytes"`
-	EvidenceAfterBytes        int           `json:"evidence_after_bytes"`
+	Document                  Document           `json:"document"`
+	Prompt                    []byte             `json:"-"`
+	Budget                    Budget             `json:"budget"`
+	SummaryStage              SummaryStage       `json:"summary_stage"`
+	CompressionProfile        CompressionProfile `json:"compression_profile,omitempty"`
+	SummaryCount              int                `json:"summary_count"`
+	SummaryDuration           time.Duration      `json:"-"`
+	OriginalPromptBytes       int                `json:"original_prompt_bytes"`
+	EvidenceReductionCount    int                `json:"evidence_reduction_count"`
+	EvidenceReductionDuration time.Duration      `json:"-"`
+	EvidenceBeforeBytes       int                `json:"evidence_before_bytes"`
+	EvidenceAfterBytes        int                `json:"evidence_after_bytes"`
 }
 
 // Prepare renders and measures the exact final prompt. Oversized input is
@@ -52,39 +57,99 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 		standard := NewHierarchicalSummarizer()
 		summarizer = standard
 	}
-	progress := func(stage SummaryStage, count int) Prepared {
-		return Prepared{SummaryStage: stage, SummaryCount: count, SummaryDuration: summaryDuration, OriginalPromptBytes: originalPromptBytes}
+	progress := func(stage SummaryStage, profile CompressionProfile, count int) Prepared {
+		return Prepared{SummaryStage: stage, CompressionProfile: profile, SummaryCount: count, SummaryDuration: summaryDuration, OriginalPromptBytes: originalPromptBytes}
 	}
-	for attempt, stage := range []SummaryStage{SummaryNone, SummaryFile, SummaryHunk, SummaryChunk} {
-		if stage != SummaryNone {
-			started := time.Now()
-			next, err := summarizer.Summarize(ctx, stage, cloneDocument(current))
-			summaryDuration += time.Since(started)
-			if err != nil {
-				return progress(stage, attempt), fmt.Errorf("%s summary failed: %w", stage, err)
-			}
-			if err := ValidatePreserved(original, next); err != nil {
-				return progress(stage, attempt), fmt.Errorf("%s summary is incomplete: %w", stage, err)
-			}
-			current = cloneDocument(next)
-		}
+	renderCurrent := func(stage SummaryStage, profile CompressionProfile, count int) (Prepared, error) {
 		prompt, err := render(cloneDocument(current))
 		if err != nil {
-			return progress(stage, attempt), fmt.Errorf("cannot render planning input: %w", err)
+			return progress(stage, profile, count), fmt.Errorf("cannot render planning input: %w", err)
 		}
 		if originalPromptBytes == 0 {
 			originalPromptBytes = len(prompt) + config.PromptOverheadBytes
 		}
 		budget, err := SelectContext(prompt, len(original.Files), config)
+		if err != nil {
+			return progress(stage, profile, count), err
+		}
+		return Prepared{
+			Document: cloneDocument(current), Prompt: append([]byte(nil), prompt...), Budget: budget,
+			SummaryStage: stage, CompressionProfile: profile, SummaryCount: count,
+			SummaryDuration: summaryDuration, OriginalPromptBytes: originalPromptBytes,
+		}, nil
+	}
+	prepared, err := renderCurrent(SummaryNone, CompressionNone, 0)
+	if err == nil {
+		return prepared, nil
+	}
+	if !errors.Is(err, ErrTooLarge) {
+		return prepared, err
+	}
+
+	summaryCount := 0
+	for _, stage := range []SummaryStage{SummaryFile, SummaryHunk} {
+		summaryCount++
+		started := time.Now()
+		next, summarizeErr := summarizer.Summarize(ctx, stage, cloneDocument(current))
+		summaryDuration += time.Since(started)
+		if summarizeErr != nil {
+			return progress(stage, CompressionNone, summaryCount), fmt.Errorf("%s summary failed: %w", stage, summarizeErr)
+		}
+		if preserveErr := ValidatePreserved(original, next); preserveErr != nil {
+			return progress(stage, CompressionNone, summaryCount), fmt.Errorf("%s summary is incomplete: %w", stage, preserveErr)
+		}
+		current = cloneDocument(next)
+		prepared, err = renderCurrent(stage, CompressionNone, summaryCount)
 		if err == nil {
-			return Prepared{
-				Document: cloneDocument(current), Prompt: append([]byte(nil), prompt...), Budget: budget,
-				SummaryStage: stage, SummaryCount: attempt,
-				SummaryDuration: summaryDuration, OriginalPromptBytes: originalPromptBytes,
-			}, nil
+			return prepared, nil
 		}
 		if !errors.Is(err, ErrTooLarge) {
-			return progress(stage, attempt), err
+			return prepared, err
+		}
+	}
+
+	compressionProfile := CompressionNone
+	if profiles, ok := summarizer.(profiledSummarizer); ok {
+		hunkDocument := cloneDocument(current)
+		for _, candidate := range compressionProfiles {
+			summaryCount++
+			started := time.Now()
+			next, summarizeErr := profiles.SummarizeProfile(ctx, candidate.name, cloneDocument(hunkDocument))
+			summaryDuration += time.Since(started)
+			if summarizeErr != nil {
+				return progress(SummaryChunk, candidate.name, summaryCount), fmt.Errorf("%s summary failed: %w", SummaryChunk, summarizeErr)
+			}
+			if preserveErr := ValidatePreserved(original, next); preserveErr != nil {
+				return progress(SummaryChunk, candidate.name, summaryCount), fmt.Errorf("%s summary is incomplete: %w", SummaryChunk, preserveErr)
+			}
+			current = cloneDocument(next)
+			compressionProfile = candidate.name
+			prepared, err = renderCurrent(SummaryChunk, compressionProfile, summaryCount)
+			if err == nil {
+				return prepared, nil
+			}
+			if !errors.Is(err, ErrTooLarge) {
+				return prepared, err
+			}
+		}
+	} else {
+		summaryCount++
+		started := time.Now()
+		next, summarizeErr := summarizer.Summarize(ctx, SummaryChunk, cloneDocument(current))
+		summaryDuration += time.Since(started)
+		if summarizeErr != nil {
+			return progress(SummaryChunk, CompressionNone, summaryCount), fmt.Errorf("%s summary failed: %w", SummaryChunk, summarizeErr)
+		}
+		if preserveErr := ValidatePreserved(original, next); preserveErr != nil {
+			return progress(SummaryChunk, CompressionNone, summaryCount), fmt.Errorf("%s summary is incomplete: %w", SummaryChunk, preserveErr)
+		}
+		current = cloneDocument(next)
+		prepared, err = renderCurrent(SummaryChunk, CompressionNone, summaryCount)
+		if err == nil {
+			return prepared, nil
+		}
+		if !errors.Is(err, ErrTooLarge) {
+			return prepared, err
 		}
 	}
 
@@ -107,14 +172,14 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 
 	canonical, canonicalPrompt, canonicalBudget, err := makeCandidate(1000)
 	if err == nil {
-		return evidencePrepared(canonical, canonicalPrompt, canonicalBudget, SummaryChunk, 3, summaryDuration, time.Since(started), originalPromptBytes), nil
+		return evidencePrepared(canonical, canonicalPrompt, canonicalBudget, SummaryChunk, compressionProfile, summaryCount, summaryDuration, time.Since(started), originalPromptBytes), nil
 	}
 	if !errors.Is(err, ErrTooLarge) {
-		return progress(SummaryChunk, 3), fmt.Errorf("evidence canonicalization failed: %w", err)
+		return progress(SummaryChunk, compressionProfile, summaryCount), fmt.Errorf("evidence canonicalization failed: %w", err)
 	}
 	minimum, minimumPrompt, minimumBudget, err := makeCandidate(0)
 	if err != nil {
-		result := progress(SummaryChunk, 3)
+		result := progress(SummaryChunk, compressionProfile, summaryCount)
 		result.EvidenceReductionDuration = time.Since(started)
 		if errors.Is(err, ErrTooLarge) {
 			return result, ErrTooLarge
@@ -126,7 +191,7 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 	low, high := 0, 999
 	for low <= high {
 		if err := ctx.Err(); err != nil {
-			return progress(SummaryChunk, 3), err
+			return progress(SummaryChunk, compressionProfile, summaryCount), err
 		}
 		mid := low + (high-low)/2
 		candidate, prompt, budget, candidateErr := makeCandidate(mid)
@@ -136,17 +201,17 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 			continue
 		}
 		if !errors.Is(candidateErr, ErrTooLarge) {
-			return progress(SummaryChunk, 3), fmt.Errorf("evidence reduction failed: %w", candidateErr)
+			return progress(SummaryChunk, compressionProfile, summaryCount), fmt.Errorf("evidence reduction failed: %w", candidateErr)
 		}
 		high = mid - 1
 	}
-	return evidencePrepared(bestDocument, bestPrompt, bestBudget, SummaryChunk, 3, summaryDuration, time.Since(started), originalPromptBytes), nil
+	return evidencePrepared(bestDocument, bestPrompt, bestBudget, SummaryChunk, compressionProfile, summaryCount, summaryDuration, time.Since(started), originalPromptBytes), nil
 }
 
-func evidencePrepared(document Document, prompt []byte, budget Budget, stage SummaryStage, summaryCount int, summaryDuration, reductionDuration time.Duration, originalPromptBytes int) Prepared {
+func evidencePrepared(document Document, prompt []byte, budget Budget, stage SummaryStage, profile CompressionProfile, summaryCount int, summaryDuration, reductionDuration time.Duration, originalPromptBytes int) Prepared {
 	prepared := Prepared{
 		Document: cloneDocument(document), Prompt: append([]byte(nil), prompt...), Budget: budget,
-		SummaryStage: stage, SummaryCount: summaryCount, SummaryDuration: summaryDuration,
+		SummaryStage: stage, CompressionProfile: profile, SummaryCount: summaryCount, SummaryDuration: summaryDuration,
 		OriginalPromptBytes: originalPromptBytes, EvidenceReductionCount: 1, EvidenceReductionDuration: reductionDuration,
 	}
 	for _, file := range document.Files {
@@ -170,6 +235,7 @@ func cloneDocument(document Document) Document {
 		clone.Files[i].HeadIdentity = cloneString(file.HeadIdentity)
 		clone.Files[i].WorktreeIdentity = cloneString(file.WorktreeIdentity)
 		clone.Files[i].Evidence = append([]syntax.Evidence(nil), file.Evidence...)
+		clone.Files[i].summaryLines = append([]summaryLine(nil), file.summaryLines...)
 		if file.EvidenceReduction != nil {
 			reduction := *file.EvidenceReduction
 			clone.Files[i].EvidenceReduction = &reduction

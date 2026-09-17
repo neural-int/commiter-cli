@@ -13,6 +13,7 @@ func TestRecordHasFixedNonContentSchema(t *testing.T) {
 	recorder := New()
 	recorder.AddDuration(GitPreprocessing, time.Nanosecond)
 	recorder.SetPlanning("model:tag", "8k", 2, 3, 4, 1, 1, 0)
+	recorder.SetCompressionProfile("light")
 	record := recorder.Finish("success")
 	encoded, err := json.Marshal(record)
 	if err != nil {
@@ -26,6 +27,9 @@ func TestRecordHasFixedNonContentSchema(t *testing.T) {
 	}
 	if record.Durations.GitPreprocessing == nil || record.Durations.Push != nil {
 		t.Fatalf("executed and omitted phases were not distinguished: %+v", record.Durations)
+	}
+	if record.CompressionProfile != "light" {
+		t.Fatalf("compression profile=%q", record.CompressionProfile)
 	}
 }
 

@@ -7,15 +7,14 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"unicode/utf8"
 
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
 )
 
 const (
-	defaultChunkLines   = 64
-	defaultExcerptLines = 2
-	defaultExcerptBytes = 160
+	defaultChunkLines   = canonicalChunkLines
+	defaultExcerptLines = 7
+	defaultExcerptBytes = 224
 )
 
 // HierarchicalSummarizer performs deterministic, local-only diff compression.
@@ -38,6 +37,20 @@ func (s HierarchicalSummarizer) Summarize(ctx context.Context, stage SummaryStag
 	if err := s.validate(); err != nil {
 		return Document{}, err
 	}
+	return s.summarize(ctx, stage, document, compressionLimits{
+		chunkLines: s.ChunkLines, excerptLines: s.ExcerptLines, excerptBytes: s.ExcerptBytes,
+	})
+}
+
+func (s HierarchicalSummarizer) SummarizeProfile(ctx context.Context, profile CompressionProfile, document Document) (Document, error) {
+	limits, ok := compressionLimitsFor(profile)
+	if !ok {
+		return Document{}, fmt.Errorf("unsupported compression profile %q", profile)
+	}
+	return s.summarize(ctx, SummaryChunk, document, limits)
+}
+
+func (s HierarchicalSummarizer) summarize(ctx context.Context, stage SummaryStage, document Document, limits compressionLimits) (Document, error) {
 	for i := range document.Files {
 		if err := ctx.Err(); err != nil {
 			return Document{}, err
@@ -53,19 +66,28 @@ func (s HierarchicalSummarizer) Summarize(ctx context.Context, stage SummaryStag
 		if source == "" {
 			return Document{}, fmt.Errorf("file %s has no raw diff to summarize", file.ID)
 		}
+		lines := file.summaryLines
+		if len(lines) == 0 {
+			lines = indexSummaryLines(source)
+		}
 		var summary string
 		switch stage {
 		case SummaryFile:
-			summary = summarizeFile(source)
+			lines = summarizeFileLines(lines)
+			summary = joinSummary(splitLines(summaryLinesText(lines)), source)
 		case SummaryHunk:
-			summary = summarizeHunks(source)
+			lines = summarizeHunkLines(lines)
+			summary = joinSummary(splitLines(summaryLinesText(lines)), source)
 		case SummaryChunk:
-			summary = s.summarizeChunks(source)
+			compressed := compressSummaryLines(lines, limits)
+			summary = joinSummary(splitLines(compressed.summary), source)
+			lines = selectedSummaryLines(lines, compressed.selected, limits.chunkLines)
 		default:
 			return Document{}, fmt.Errorf("unsupported summary stage %q", stage)
 		}
 		file.RawDiff = ""
 		file.Summary = summary
+		file.summaryLines = append([]summaryLine(nil), lines...)
 	}
 	return document, nil
 }
@@ -78,91 +100,18 @@ func (s HierarchicalSummarizer) validate() error {
 }
 
 func summarizeFile(source string) string {
-	lines := splitLines(source)
-	kept := make([]string, 0, len(lines))
-	inHeader := true
-	for _, line := range lines {
-		if strings.HasPrefix(line, "@@") {
-			inHeader = false
-		}
-		if inHeader && redundantFileHeader(line) {
-			continue
-		}
-		kept = append(kept, line)
-	}
-	return joinSummary(kept, source)
+	return joinSummary(splitLines(summaryLinesText(summarizeFileLines(indexSummaryLines(source)))), source)
 }
 
 func summarizeHunks(source string) string {
-	lines := splitLines(source)
-	kept := make([]string, 0, len(lines))
-	for _, line := range lines {
-		if strings.HasPrefix(line, " ") {
-			continue
-		}
-		kept = append(kept, line)
-	}
-	return joinSummary(kept, source)
+	return joinSummary(splitLines(summaryLinesText(summarizeHunkLines(indexSummaryLines(source)))), source)
 }
 
 func (s HierarchicalSummarizer) summarizeChunks(source string) string {
-	lines := splitLines(source)
-	var output []string
-	activeHunk := ""
-	for offset, number := 0, 1; offset < len(lines); offset, number = offset+s.ChunkLines, number+1 {
-		end := offset + s.ChunkLines
-		if end > len(lines) {
-			end = len(lines)
-		}
-		chunk := lines[offset:end]
-		hunks := make([]string, 0, 2)
-		if activeHunk != "" {
-			hunks = append(hunks, activeHunk)
-		}
-		for _, line := range chunk {
-			if strings.HasPrefix(line, "@@") {
-				activeHunk = line
-				if len(hunks) == 0 || hunks[len(hunks)-1] != line {
-					hunks = append(hunks, line)
-				}
-			}
-		}
-		for _, hunk := range hunks {
-			output = append(output, "hunk: "+truncateUTF8(hunk, s.ExcerptBytes))
-		}
-		output = append(output, s.chunkSummary(number, chunk)...)
-	}
-	return joinSummary(output, source)
-}
-
-func (s HierarchicalSummarizer) chunkSummary(number int, lines []string) []string {
-	additions, deletions, contextLines := 0, 0, 0
-	excerpts := make([]string, 0, s.ExcerptLines*2)
-	addedExcerpts, deletedExcerpts := 0, 0
-	for _, line := range lines {
-		switch {
-		case strings.HasPrefix(line, "+"):
-			additions++
-			if addedExcerpts < s.ExcerptLines {
-				excerpts = append(excerpts, "added: "+truncateUTF8(strings.TrimPrefix(line, "+"), s.ExcerptBytes))
-				addedExcerpts++
-			}
-		case strings.HasPrefix(line, "-"):
-			deletions++
-			if deletedExcerpts < s.ExcerptLines {
-				excerpts = append(excerpts, "removed: "+truncateUTF8(strings.TrimPrefix(line, "-"), s.ExcerptBytes))
-				deletedExcerpts++
-			}
-		case strings.HasPrefix(line, " "):
-			contextLines++
-		}
-	}
-	digest := sha256.Sum256([]byte(strings.Join(lines, "\n")))
-	header := fmt.Sprintf(
-		"chunk %d: lines=%d additions=%d deletions=%d context=%d sha256=%s",
-		number, len(lines), additions, deletions, contextLines, hex.EncodeToString(digest[:]),
-	)
-	return append([]string{header}, excerpts...)
+	summary := compressSummaryLines(indexSummaryLines(source), compressionLimits{
+		chunkLines: s.ChunkLines, excerptLines: s.ExcerptLines, excerptBytes: s.ExcerptBytes,
+	}).summary
+	return joinSummary(splitLines(summary), source)
 }
 
 func redundantFileHeader(line string) bool {
@@ -181,15 +130,4 @@ func joinSummary(lines []string, fallback string) string {
 		return "diff metadata only sha256=" + hex.EncodeToString(digest[:])
 	}
 	return summary
-}
-
-func truncateUTF8(value string, limit int) string {
-	if len(value) <= limit {
-		return value
-	}
-	value = value[:limit]
-	for !utf8.ValidString(value) {
-		value = value[:len(value)-1]
-	}
-	return value + "..."
 }

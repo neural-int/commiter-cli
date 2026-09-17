@@ -100,6 +100,18 @@ func TestHierarchicalSummarizerUsesBoundedUTF8Excerpts(t *testing.T) {
 	}
 }
 
+func TestValidatePreservedRejectsChangedSummaryLineProvenance(t *testing.T) {
+	original := rawDocument("@@ -1 +1 @@\n-old\n+new\n")
+	summarized, err := NewHierarchicalSummarizer().Summarize(context.Background(), SummaryFile, cloneDocument(original))
+	if err != nil {
+		t.Fatal(err)
+	}
+	summarized.Files[0].summaryLines[1].originalIndex = 3
+	if err := ValidatePreserved(original, summarized); err == nil || !strings.Contains(err.Error(), "provenance") {
+		t.Fatalf("tampered provenance was accepted: %v", err)
+	}
+}
+
 func TestPrepareUsesStandardSummarizerWhenOversized(t *testing.T) {
 	var raw strings.Builder
 	raw.WriteString("diff --git a/main.txt b/main.txt\n--- a/main.txt\n+++ b/main.txt\n@@ -1,3000 +1,2 @@\n")
@@ -134,8 +146,8 @@ func TestPrepareStandardSummarizerFallsThroughToChunkStage(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if prepared.SummaryStage != SummaryChunk || prepared.SummaryCount != 3 || !strings.Contains(prepared.Document.Files[0].Summary, "chunk 1:") {
-		t.Fatalf("stage=%s count=%d summary_bytes=%d", prepared.SummaryStage, prepared.SummaryCount, len(prepared.Document.Files[0].Summary))
+	if prepared.SummaryStage != SummaryChunk || prepared.CompressionProfile != CompressionStrong || prepared.SummaryCount != 5 || !strings.Contains(prepared.Document.Files[0].Summary, "chunk 1:") {
+		t.Fatalf("stage=%s profile=%s count=%d summary_bytes=%d", prepared.SummaryStage, prepared.CompressionProfile, prepared.SummaryCount, len(prepared.Document.Files[0].Summary))
 	}
 }
 
