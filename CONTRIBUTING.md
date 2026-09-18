@@ -38,11 +38,21 @@ If the primary type is unclear, do not force a label. Create new labels or make 
 
 ### Issue templates
 
-- Feature / Enhancement: propose a new feature or improvement
-- Bug report: report a defect
-- Documentation: add or fix documentation
+Contributor-facing issue forms are intentionally limited to a small set of clear entry points.
 
-Implementation issues generated from the SRS should include the related requirements, dependencies, success and failure conditions, implementation approach, and verification conditions in the body. Decision, Design, and Verification issues should include content that matches their purpose and expected outcome. For ordinary issue reports, fill in the template fields as specifically as you can.
+- Bug report: report a reproducible defect or regression
+- Feature / Enhancement: propose a new feature or improvement based on a concrete problem and use case
+- Documentation: report missing, incorrect, outdated, unclear, or mismatched documentation
+- Design / RFC: discuss a significant behavior, architecture, compatibility, or specification change before implementation
+- Maintainer task: internal Implementation, Decision, Verification, release, CI, or other maintenance work that does not fit a public contributor template
+
+Use Design / RFC when a proposal may substantially affect the SRS, CLI or configuration compatibility, Git-state behavior, security boundaries, model-backend architecture, or another cross-cutting contract.
+
+The GitHub issue chooser does not offer a blank issue (`blank_issues_enabled: false`). External contributors should use Bug report, Feature / Enhancement, Documentation, or Design / RFC. Maintainers should use the Maintainer task form for internal work. If a template is still a poor fit, create the issue with `gh issue create` instead of expecting a blank-issue button in the web UI.
+
+Implementation issues generated from the SRS should include the related requirements, dependencies, success and failure conditions, implementation approach, and verification conditions in the body. Maintainer-created Decision and Verification issues should include content that matches their purpose and expected outcome. For ordinary contributor reports, fill in the selected template fields as specifically as you can.
+
+Security vulnerabilities must not be reported through public issue forms. Follow [SECURITY.md](SECURITY.md) and use GitHub Private Vulnerability Reporting instead.
 
 ## Development Setup
 
