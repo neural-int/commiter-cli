@@ -1,44 +1,156 @@
 name: Bug report
-description: 不具合を報告する
+description: 再現可能な不具合や回帰を報告する
+title: "[Bug]: "
 labels:
   - bug
 body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: 影響範囲
+      description: 問題が最も近い領域を選択してください。
+      options:
+        - Git / staging
+        - Planning / LLM
+        - Model backend / runtime
+        - Verification
+        - Configuration / setup / doctor
+        - CLI / terminal output
+        - Installation / update
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: commiter のバージョン
+      description: 利用しているリリースバージョンまたは commit SHA を記載してください。
+      placeholder: 例: v1.1.0 / abc1234
+    validations:
+      required: true
+
+  - type: dropdown
+    id: installation
+    attributes:
+      label: インストール方法
+      options:
+        - Homebrew
+        - GitHub Release のバイナリ
+        - Source build
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: macos
+    attributes:
+      label: macOS のバージョン
+      placeholder: 例: macOS 15.7
+    validations:
+      required: true
+
+  - type: dropdown
+    id: architecture
+    attributes:
+      label: アーキテクチャ
+      options:
+        - Apple Silicon
+        - Intel Mac
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: backend
+    attributes:
+      label: Model backend / runtime
+      description: 問題に関係する場合のみ記載してください。
+      placeholder: 例: Ollama 0.x / MLX runtime / not applicable
+    validations:
+      required: false
+
+  - type: input
+    id: model
+    attributes:
+      label: Model
+      description: 問題に関係する場合のみ、モデル名やタグを記載してください。
+      placeholder: 例: model-name:tag
+    validations:
+      required: false
+
   - type: textarea
     id: expected
     attributes:
       label: 期待した動作
-      description: 本来どう動くべきだったかを記載してください。
+      description: 本来どう動くべきだったかを具体的に記載してください。
     validations:
       required: true
+
   - type: textarea
     id: actual
     attributes:
       label: 実際の動作
-      description: 何が起きたかを記載してください。機密情報は含めないでください。
+      description: 何が起きたかを記載してください。
     validations:
       required: true
+
   - type: textarea
     id: reproduction
     attributes:
       label: 再現手順
-      description: 再現に必要な最小の手順や入力を記載してください。
+      description: 可能な限り最小の手順で記載してください。機密情報や private repository の内容は含めないでください。
       placeholder: |-
         1. ...
         2. ...
         3. ...
     validations:
       required: true
-  - type: input
-    id: environment
+
+  - type: textarea
+    id: configuration
     attributes:
-      label: 実行環境
-      description: macOSのバージョン、Apple Silicon、commiter-cliのバージョンなどを記載してください。
+      label: 関連する設定
+      description: 再現に必要な設定だけを記載してください。token、credential、private path、.env の内容は削除してください。
+      render: toml
     validations:
       required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: エラー・ログ出力
+      description: 関連する出力があれば貼り付けてください。secret や機密情報は必ず除去してください。
+      render: shell
+    validations:
+      required: false
+
+  - type: dropdown
+    id: regression
+    attributes:
+      label: 回帰ですか？
+      description: 以前のバージョンでは正常に動作していたかを選択してください。
+      options:
+        - 以前は動作していた
+        - これまで動作したことがない
+        - 不明
+    validations:
+      required: false
+
   - type: textarea
     id: additional
     attributes:
       label: 補足
-      description: エラーメッセージや最小構成など、追加情報があれば記載してください。
+      description: 最小再現リポジトリ、関連 Issue、スクリーンショットなどがあれば記載してください。
     validations:
       required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 確認事項
+      options:
+        - label: 既存 Issue を検索し、同じ問題が未報告であることを確認しました。
+          required: true
+        - label: 公開してはいけない credential、token、private key、機密情報を含めていません。
+          required: true
