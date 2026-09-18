@@ -44,10 +44,11 @@ FR、SR、NFR、AC のいずれかで定義された挙動を変更する場合�
 - Feature / Enhancement: 具体的な問題とユースケースに基づく新機能・改善の提案
 - Documentation: 不足、誤り、古い内容、不明瞭さ、翻訳差分などの報告
 - Design / RFC: 大きな挙動、アーキテクチャ、互換性、仕様変更を実装前に議論するための提案
+- Maintainer task: 公開テンプレートに当てはまらない Implementation、Decision、Verification、release、CI、その他の内部作業
 
 SRS、CLI や設定の互換性、Git state の挙動、security boundary、model backend architecture、その他の横断的な契約へ大きく影響する可能性がある場合は、Design / RFC を使用してください。
 
-通常のコントリビューター向け Issue 作成では blank issue を無効にしています。公開テンプレートが適さない場合、maintainer は内部の Implementation、Decision、Verification、release、CI、その他の maintenance task に blank issue を使用できます。
+GitHub の Issue 作成画面では blank issue を選べません（`blank_issues_enabled: false`）。外部コントリビューターは Bug report、Feature / Enhancement、Documentation、Design / RFC を使ってください。メンテナーの内部作業には Maintainer task フォームを使ってください。どのテンプレートにも合わない場合は、Web UI の blank issue ボタンは使わず `gh issue create` で作成してください。
 
 SRS から生成する Implementation Issue は、対応する要件、依存、成功・失敗条件、実装方針、検証条件を本文に記載します。maintainer が作成する Decision と Verification Issue は、それぞれの目的と成果に応じた内容を記載します。一般のコントリビューターは、選択したテンプレートの項目を可能な範囲で具体的に記載してください。
 

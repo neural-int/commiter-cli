@@ -7,7 +7,7 @@ body:
   - type: textarea
     id: background
     attributes:
-      label: Problem / Background
+      label: 背景・課題
       description: どの問題を解決したいのか、現在の制約や背景を記載してください。
     validations:
       required: true
@@ -15,7 +15,7 @@ body:
   - type: textarea
     id: goals
     attributes:
-      label: Goals
+      label: 達成したいこと
       description: この設計で達成したいことを具体的に記載してください。
     validations:
       required: true
@@ -23,7 +23,7 @@ body:
   - type: textarea
     id: non_goals
     attributes:
-      label: Non-goals
+      label: 扱わないこと
       description: この提案では扱わないことを明示してください。
     validations:
       required: true
@@ -31,7 +31,7 @@ body:
   - type: textarea
     id: design
     attributes:
-      label: Proposed design
+      label: 提案する設計
       description: 想定する設計、責務分割、データフロー、CLI / config 変更などを記載してください。
     validations:
       required: true
@@ -39,7 +39,7 @@ body:
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternatives considered
+      label: 検討した代替案
       description: 検討した代替案と、採用しなかった理由があれば記載してください。
     validations:
       required: false
@@ -47,7 +47,7 @@ body:
   - type: checkboxes
     id: impact
     attributes:
-      label: Compatibility / specification impact
+      label: 互換性・仕様への影響
       description: 影響する可能性がある領域を選択してください。
       options:
         - label: CLI / command behavior
@@ -65,7 +65,7 @@ body:
   - type: textarea
     id: migration
     attributes:
-      label: Migration / backward compatibility
+      label: 移行・後方互換
       description: 既存利用者、config、CLI、保存データ等への移行や互換性対応が必要なら記載してください。
     validations:
       required: false
@@ -73,7 +73,7 @@ body:
   - type: textarea
     id: open_questions
     attributes:
-      label: Open questions
+      label: 未決事項
       description: 実装前に決める必要がある未確定事項を記載してください。
     validations:
       required: false
@@ -81,7 +81,7 @@ body:
   - type: textarea
     id: related
     attributes:
-      label: Related requirements / issues
+      label: 関連要件・Issue
       description: 関連する SRS requirement、Issue、PR、外部資料などを記載してください。
     validations:
       required: false

@@ -26,7 +26,7 @@ body:
     attributes:
       label: commiter のバージョン
       description: 利用しているリリースバージョンまたは commit SHA を記載してください。
-      placeholder: 例: v1.1.0 / abc1234
+      placeholder: "例: v1.1.0 / abc1234"
     validations:
       required: true
 
@@ -43,10 +43,11 @@ body:
       required: true
 
   - type: input
-    id: macos
+    id: os
     attributes:
-      label: macOS のバージョン
-      placeholder: 例: macOS 15.7
+      label: OS / バージョン
+      description: v1 の主対象は macOS 14 以降の Apple Silicon です。それ以外の環境から報告する場合も、実際の OS とバージョンを記載してください。
+      placeholder: "例: macOS 15.7 / Ubuntu 24.04"
     validations:
       required: true
 
@@ -66,7 +67,7 @@ body:
     attributes:
       label: Model backend / runtime
       description: 問題に関係する場合のみ記載してください。
-      placeholder: 例: Ollama 0.x / MLX runtime / not applicable
+      placeholder: "例: Ollama 0.x / MLX runtime / not applicable"
     validations:
       required: false
 
@@ -75,7 +76,7 @@ body:
     attributes:
       label: Model
       description: 問題に関係する場合のみ、モデル名やタグを記載してください。
-      placeholder: 例: model-name:tag
+      placeholder: "例: model-name:tag"
     validations:
       required: false
 

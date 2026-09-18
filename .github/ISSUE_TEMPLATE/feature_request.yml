@@ -7,34 +7,34 @@ body:
   - type: textarea
     id: problem
     attributes:
-      label: Problem / Motivation
+      label: 背景・動機
       description: 現在どのような問題・制約・不便がありますか。実装方法ではなく、まず背景を記載してください。
-      placeholder: 例: 大規模 diff では planning input が上限に達し、必要な情報が過度に圧縮されることがある。
+      placeholder: "例: 大規模 diff では planning input が上限に達し、必要な情報が過度に圧縮されることがある。"
     validations:
       required: true
 
   - type: textarea
     id: use_case
     attributes:
-      label: Use case
+      label: 利用場面
       description: どのような利用場面で必要になるかを具体的に記載してください。
-      placeholder: 例: 数千行規模の変更を複数ファイルにまたがってコミット計画へ分割する場合。
+      placeholder: "例: 数千行規模の変更を複数ファイルにまたがってコミット計画へ分割する場合。"
     validations:
       required: true
 
   - type: textarea
     id: behavior
     attributes:
-      label: Proposed behavior
+      label: 期待する動作
       description: commiter がどのように動くことを期待するかを記載してください。内部実装の提案は必須ではありません。
-      placeholder: 例: 入力規模に応じて context budget を拡張し、過度な圧縮を避ける。
+      placeholder: "例: 入力規模に応じて context budget を拡張し、過度な圧縮を避ける。"
     validations:
       required: true
 
   - type: textarea
     id: workaround
     attributes:
-      label: Current workaround
+      label: 現在の回避策
       description: 現在利用している回避策や代替手段があれば記載してください。
     validations:
       required: false
@@ -42,7 +42,7 @@ body:
   - type: textarea
     id: scope
     attributes:
-      label: Scope
+      label: 対象範囲
       description: この提案に含めたい範囲が明確であれば記載してください。
     validations:
       required: false
@@ -50,7 +50,7 @@ body:
   - type: textarea
     id: out_of_scope
     attributes:
-      label: Out of scope
+      label: 対象外
       description: 明示的に対象外としたいものがあれば記載してください。
     validations:
       required: false
@@ -76,15 +76,15 @@ body:
   - type: textarea
     id: compatibility
     attributes:
-      label: Safety / compatibility considerations
-      description: Git state、機密情報、既存 config、既存 CLI、model backend などへの互換性・安全性上の懸念があれば記載してください。
+      label: 安全性・互換性
+      description: Git state、機密情報、既存 config、既存 CLI、model backend などへの互換性・安全性上の憂慮があれば記載してください。
     validations:
       required: false
 
   - type: textarea
     id: additional
     attributes:
-      label: Additional context
+      label: 補足
       description: 関連 Issue、参考実装、仕様、資料などがあれば記載してください。
     validations:
       required: false

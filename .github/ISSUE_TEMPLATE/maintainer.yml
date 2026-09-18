@@ -1,0 +1,53 @@
+name: Maintainer task
+description: Implementation / Decision / Verification / release / CI など、公開テンプレートに当てはまらない内部作業
+title: "[Maintainer]: "
+body:
+  - type: markdown
+    attributes:
+      value: このフォームはメンテナー向けです。不具合、機能提案、ドキュメント、設計議論はそれぞれ対応する公開テンプレートを使ってください。
+
+  - type: dropdown
+    id: task_type
+    attributes:
+      label: 作業種別
+      options:
+        - Implementation
+        - Decision
+        - Verification
+        - Release
+        - CI
+        - Other maintenance
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: 概要
+      description: 何を決める、実装する、または確認するかを記載してください。
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: 背景
+      description: 関連する SRS requirement、依存、前提決定、関連 Issue / PR があれば記載してください。
+    validations:
+      required: false
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: 成功条件 / 失敗条件
+      description: 完了と判断する条件を記載してください。Implementation や Verification では特に具体的に記載してください。
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 確認事項
+      options:
+        - label: これはメンテナー向けの内部作業で、公開テンプレートで起票できないことを確認しました。
+          required: true
