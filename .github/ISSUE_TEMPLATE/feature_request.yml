@@ -1,28 +1,98 @@
 name: Feature / Enhancement
-description: 新機能や改善を提案する
+description: 新機能や既存機能の改善を提案する
+title: "[Feature]: "
 labels:
   - enhancement
 body:
   - type: textarea
-    id: goal
+    id: problem
     attributes:
-      label: 目的
-      description: 何を実現したいか、なぜ必要かを記載してください。
-      placeholder: 例：変更を安全に分類してからコミットできるようにしたい。
+      label: Problem / Motivation
+      description: 現在どのような問題・制約・不便がありますか。実装方法ではなく、まず背景を記載してください。
+      placeholder: 例: 大規模 diff では planning input が上限に達し、必要な情報が過度に圧縮されることがある。
     validations:
       required: true
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use case
+      description: どのような利用場面で必要になるかを具体的に記載してください。
+      placeholder: 例: 数千行規模の変更を複数ファイルにまたがってコミット計画へ分割する場合。
+    validations:
+      required: true
+
   - type: textarea
     id: behavior
     attributes:
-      label: 期待する動作
-      description: 想定する動作や利用例を記載してください。
-      placeholder: 例：CLI実行時に対象ファイルと分類結果を表示する。
+      label: Proposed behavior
+      description: commiter がどのように動くことを期待するかを記載してください。内部実装の提案は必須ではありません。
+      placeholder: 例: 入力規模に応じて context budget を拡張し、過度な圧縮を避ける。
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Current workaround
+      description: 現在利用している回避策や代替手段があれば記載してください。
     validations:
       required: false
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: この提案に含めたい範囲が明確であれば記載してください。
+    validations:
+      required: false
+
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Out of scope
+      description: 明示的に対象外としたいものがあれば記載してください。
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: 影響しそうな領域
+      description: 分かる範囲で選択してください。複数選択できます。
+      options:
+        - label: CLI / command behavior
+        - label: Configuration
+        - label: Git / staging behavior
+        - label: Model backend / runtime
+        - label: Planning / LLM output
+        - label: Verification
+        - label: Security / privacy
+        - label: Documentation / SRS
+        - label: Installation / release
+    validations:
+      required: false
+
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Safety / compatibility considerations
+      description: Git state、機密情報、既存 config、既存 CLI、model backend などへの互換性・安全性上の懸念があれば記載してください。
+    validations:
+      required: false
+
   - type: textarea
     id: additional
     attributes:
-      label: 補足
-      description: 関連Issue、参考資料、その他の情報があれば記載してください。
+      label: Additional context
+      description: 関連 Issue、参考実装、仕様、資料などがあれば記載してください。
     validations:
       required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 確認事項
+      options:
+        - label: 既存 Issue を検索し、同じ提案が未登録であることを確認しました。
+          required: true
