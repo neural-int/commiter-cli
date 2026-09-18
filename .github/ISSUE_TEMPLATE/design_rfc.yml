@@ -1,0 +1,95 @@
+name: Design / RFC
+description: 大きな挙動・アーキテクチャ・仕様変更を実装前に議論する
+title: "[Design]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: background
+    attributes:
+      label: Problem / Background
+      description: どの問題を解決したいのか、現在の制約や背景を記載してください。
+    validations:
+      required: true
+
+  - type: textarea
+    id: goals
+    attributes:
+      label: Goals
+      description: この設計で達成したいことを具体的に記載してください。
+    validations:
+      required: true
+
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: この提案では扱わないことを明示してください。
+    validations:
+      required: true
+
+  - type: textarea
+    id: design
+    attributes:
+      label: Proposed design
+      description: 想定する設計、責務分割、データフロー、CLI / config 変更などを記載してください。
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: 検討した代替案と、採用しなかった理由があれば記載してください。
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Compatibility / specification impact
+      description: 影響する可能性がある領域を選択してください。
+      options:
+        - label: CLI / command behavior
+        - label: Configuration schema
+        - label: Git / staging behavior
+        - label: Model backend / runtime
+        - label: Planning / LLM contract
+        - label: Verification behavior
+        - label: Security / privacy boundary
+        - label: SRS / acceptance criteria
+        - label: Installation / release
+    validations:
+      required: false
+
+  - type: textarea
+    id: migration
+    attributes:
+      label: Migration / backward compatibility
+      description: 既存利用者、config、CLI、保存データ等への移行や互換性対応が必要なら記載してください。
+    validations:
+      required: false
+
+  - type: textarea
+    id: open_questions
+    attributes:
+      label: Open questions
+      description: 実装前に決める必要がある未確定事項を記載してください。
+    validations:
+      required: false
+
+  - type: textarea
+    id: related
+    attributes:
+      label: Related requirements / issues
+      description: 関連する SRS requirement、Issue、PR、外部資料などを記載してください。
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 確認事項
+      options:
+        - label: 既存 Issue と SRS を確認し、重複または既決定事項がないか確認しました。
+          required: true
