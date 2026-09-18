@@ -1,26 +1,94 @@
 name: Documentation
 description: ドキュメントの追加・修正を提案する
+title: "[Docs]: "
 labels:
   - documentation
 body:
-  - type: input
-    id: target
+  - type: dropdown
+    id: document
     attributes:
       label: 対象文書
-      description: README、SRS、その他の対象文書を記載してください。
+      options:
+        - README
+        - CONTRIBUTING
+        - SECURITY
+        - SRS
+        - CLI help / command documentation
+        - Other
     validations:
       required: true
+
+  - type: dropdown
+    id: language
+    attributes:
+      label: 対象言語
+      options:
+        - English
+        - 日本語
+        - Both
+        - Not applicable
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: 対象箇所
+      description: 見出し、章、ファイルパスなど、該当箇所が分かる情報を記載してください。
+      placeholder: 例: README.md > Installation
+    validations:
+      required: false
+
+  - type: dropdown
+    id: problem_type
+    attributes:
+      label: 問題の種類
+      options:
+        - Incorrect
+        - Missing
+        - Outdated
+        - Unclear
+        - Translation mismatch
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 現在の問題
+      description: 何が不足・誤り・不明瞭なのかを具体的に記載してください。
+    validations:
+      required: true
+
   - type: textarea
     id: change
     attributes:
       label: 必要な変更
-      description: 不足・誤り・改善内容を記載してください。
+      description: どのように直すとよいか、期待する状態を記載してください。
     validations:
       required: true
+
+  - type: textarea
+    id: source
+    attributes:
+      label: Source / reference
+      description: 正しい仕様を確認できる Issue、SRS requirement、コード、外部資料などがあれば記載してください。
+    validations:
+      required: false
+
   - type: textarea
     id: additional
     attributes:
       label: 補足
-      description: 想定読者や参考資料があれば記載してください。
+      description: 想定読者、関連 Issue、その他の情報があれば記載してください。
     validations:
       required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 確認事項
+      options:
+        - label: 既存 Issue を検索し、同じドキュメント問題が未報告であることを確認しました。
+          required: true
