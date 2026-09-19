@@ -136,21 +136,49 @@ When changing requirements, commands, configuration, safety behavior, or contrib
 
 ## Pull Requests
 
-A pull request should:
+Pull requests use one repository-wide contract. The pull request template and the `PR Policy / validate` check enforce the machine-verifiable parts of that contract once a pull request is ready for review.
 
-- explain the problem and the chosen approach;
-- keep the diff focused on the stated purpose;
-- include relevant tests and documentation updates;
-- state the validation commands that were run;
-- call out security or Git-state implications when applicable;
-- reference the related issue when one exists;
-- confirm that the issue and SRS remain consistent if review changes the specification.
+### Title
 
-When the pull request fully resolves an issue, include an automatic-closing keyword such as:
+Pull request titles must:
+
+- be written in English using ASCII characters;
+- follow Conventional Commits in the form `<type>(<optional-scope>): <summary>`;
+- use one of: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `build`, `ci`, or `chore`;
+- use `!` before the colon when the pull request introduces a breaking change, when applicable.
+
+Examples:
 
 ```text
-Closes #123
+feat(cli): add JSON output
+fix(git): preserve staged selection
+ci: validate pull request metadata
 ```
+
+### Required body sections
+
+Keep all required template sections and complete them before marking the pull request ready for review:
+
+- `Summary`: explain the problem and the chosen approach.
+- `Related issue`: normally use `Closes #123`, `Fixes #123`, or `Resolves #123`. In the limited cases where an issue is not appropriate, write `N/A: <reason>`.
+- `Changes`: list the concrete changes in the pull request.
+- `Verification`: mark the standard checks that were run. Explain every unchecked standard check under `Skipped / not applicable`.
+- `Requirements and documentation`: select exactly one SRS-impact option. When requirements change, list the affected FR / SR / NFR / AC IDs. Confirm documentation and English/Japanese SRS alignment.
+- `Safety impact`: describe effects on Git-state handling, local-only LLM processing, sensitive-file handling, verification, hooks, or output safety. Write `None.` when there is no safety impact.
+
+The policy check validates structure and explicit confirmations. It does not judge whether the technical explanation is sufficient; reviewers make that determination.
+
+Draft pull requests may be incomplete. The PR policy is enforced when the pull request becomes ready for review.
+
+Pull requests created by explicitly allowlisted automation, currently `dependabot[bot]` and `github-actions[bot]`, are exempt from the human-oriented body checks. Their titles must still satisfy the title policy. Dependabot is configured to generate compatible Conventional Commit prefixes.
+
+### Scope, labels, and merge method
+
+Keep each pull request limited to one coherent purpose. In principle, one pull request should correspond to one primary issue.
+
+Pull request labels are not required. There is no hard changed-line or file-count limit; scope quality is evaluated by responsibility and purpose rather than raw size.
+
+The repository uses squash merge for pull requests. The validated pull request title is therefore the basis of the commit title added to `main`.
 
 Review feedback should be addressed with the same focus: fix the identified issue without expanding the scope unless the broader change is required for correctness or safety.
 
