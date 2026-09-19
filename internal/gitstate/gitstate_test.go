@@ -144,6 +144,27 @@ func TestCollectApprovesCandidateOnlyAfterPathReview(t *testing.T) {
 	}
 }
 
+func TestCollectPreapprovesOnlyListedSensitiveCandidates(t *testing.T) {
+	repo := committedRepository(t)
+	write(t, repo, "auth.json", "approved fixture\n", 0o600)
+	write(t, repo, "credentials.json", "unapproved fixture\n", 0o600)
+
+	files := &recordingFiles{blockedSuffixes: []string{"credentials.json"}}
+	snapshot, err := Collect(repo, Options{
+		Files:                  files,
+		ApprovedSensitivePaths: []string{"auth.json"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(snapshot.Changes) != 1 || snapshot.Changes[0].NewPath == nil || *snapshot.Changes[0].NewPath != "auth.json" || !snapshot.Changes[0].Sensitive {
+		t.Fatalf("changes = %#v", snapshot.Changes)
+	}
+	if got := excludedPaths(snapshot.Excluded); !reflect.DeepEqual(got, []string{"credentials.json"}) {
+		t.Fatalf("excluded = %#v", snapshot.Excluded)
+	}
+}
+
 func TestCollectPathspecGlobsLargeFileAndSymlink(t *testing.T) {
 	repo := newRepository(t)
 	write(t, repo, "src/keep.go", "package keep\n", 0o644)

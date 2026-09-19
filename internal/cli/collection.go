@@ -261,7 +261,16 @@ approved:
 
 	var hookOutput bytes.Buffer
 	started = time.Now()
-	result, commitErr := commitFlow(commitexec.Options{Context: ctx, Root: root, Changes: snapshot.Changes, Plan: plan, Writer: &hookOutput})
+	result, commitErr := commitFlow(commitexec.Options{
+		Context:                       ctx,
+		Root:                          root,
+		Changes:                       snapshot.Changes,
+		Plan:                          plan,
+		Writer:                        &hookOutput,
+		ApprovedSensitivePaths:        statePolicy.ApprovedSensitive,
+		KnownUnapprovedSensitivePaths: knownUnapprovedSensitivePaths(snapshot),
+		AdditionalSensitiveGlobs:      statePolicy.AdditionalSensitiveGlobs,
+	})
 	recorder.AddDuration(runmetrics.Git, time.Since(started))
 	if hookOutput.Len() > 0 {
 		if err := printer.Lines("Git hook output: " + hookOutput.String()); err != nil {
@@ -389,22 +398,30 @@ func readYes(reader *bufio.Reader) bool {
 }
 
 func revalidateSnapshot(ctx context.Context, root string, values config.Values, pathspecs []string, original gitstate.Snapshot) (gitstate.Snapshot, error) {
-	approved := map[string]bool{}
+	approved := []string{}
 	for _, change := range original.Changes {
 		if change.Sensitive {
-			for _, path := range snapshotChangePaths(change) {
-				approved[path] = true
-			}
+			approved = append(approved, snapshotChangePaths(change)...)
 		}
 	}
-	return collectSnapshot(ctx, root, values, pathspecs, func(candidates []gitstate.Candidate) (bool, error) {
-		for _, candidate := range candidates {
-			if !approved[candidate.Path] {
-				return false, nil
-			}
-		}
-		return true, nil
+	return gitstate.Collect(root, gitstate.Options{
+		Context:                  ctx,
+		Pathspecs:                pathspecs,
+		Include:                  values.Include,
+		Exclude:                  values.Exclude,
+		AdditionalSensitiveGlobs: values.SensitivePatterns,
+		ApprovedSensitivePaths:   uniqueStrings(approved),
 	})
+}
+
+func knownUnapprovedSensitivePaths(snapshot gitstate.Snapshot) []string {
+	paths := []string{}
+	for _, excluded := range snapshot.Excluded {
+		if excluded.Reason == gitstate.SensitiveCandidateNotApprovedReason {
+			paths = append(paths, excluded.Path)
+		}
+	}
+	return uniqueStrings(paths)
 }
 
 func verificationStatePolicy(snapshot gitstate.Snapshot, values config.Values) verification.StatePolicy {

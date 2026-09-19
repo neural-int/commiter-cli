@@ -39,11 +39,14 @@ func (e *Error) Error() string { return e.Message }
 // was used to validate the plan; IDs are resolved again immediately before each
 // stage operation.
 type Options struct {
-	Context context.Context
-	Root    string
-	Changes []gitstate.Change
-	Plan    planning.Plan
-	Writer  io.Writer
+	Context                       context.Context
+	Root                          string
+	Changes                       []gitstate.Change
+	Plan                          planning.Plan
+	Writer                        io.Writer
+	ApprovedSensitivePaths        []string
+	KnownUnapprovedSensitivePaths []string
+	AdditionalSensitiveGlobs      []string
 }
 
 type Result struct {
@@ -128,7 +131,7 @@ func Execute(options Options) (result Result, returnErr error) {
 			assigned[id] = true
 			paths = append(paths, stagePaths(change)...)
 		}
-		if err := verifyHashes(root, options.Changes, remainingFileIDs(options.Plan.Commits[commitIndex:])); err != nil {
+		if err := verifyHashes(root, options.Changes, remainingFileIDs(options.Plan.Commits[commitIndex:]), options); err != nil {
 			return result, err
 		}
 		if err := stageAssignment(root, original, allPlannedPaths(options.Changes), paths); err != nil {
@@ -221,10 +224,19 @@ func interruption(ctx context.Context) error {
 	return nil
 }
 
-func verifyHashes(root string, changes []gitstate.Change, ids []string) error {
-	current, err := gitstate.Collect(root, gitstate.Options{})
+func verifyHashes(root string, changes []gitstate.Change, ids []string, options Options) error {
+	current, err := gitstate.Collect(root, gitstate.Options{
+		ApprovedSensitivePaths:   options.ApprovedSensitivePaths,
+		AdditionalSensitiveGlobs: options.AdditionalSensitiveGlobs,
+	})
 	if err != nil {
 		return &Error{Code: ExitSafety, Message: "cannot revalidate changes before staging"}
+	}
+	knownUnapproved := pathSet(options.KnownUnapprovedSensitivePaths)
+	for _, excluded := range current.Excluded {
+		if excluded.Reason == gitstate.SensitiveCandidateNotApprovedReason && !knownUnapproved[excluded.Path] {
+			return &Error{Code: ExitSafety, Message: "change hash changed before staging"}
+		}
 	}
 	for _, id := range ids {
 		var expected gitstate.Change
