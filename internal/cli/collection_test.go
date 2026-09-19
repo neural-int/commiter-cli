@@ -378,6 +378,39 @@ func TestMainForcesPushConfirmationForSensitiveCandidate(t *testing.T) {
 	}
 }
 
+func TestMainCarriesApprovedSensitivePathsToCommitExecution(t *testing.T) {
+	repo := cliRepository(t)
+	cliWrite(t, repo, "base.txt", "base\n", 0o644)
+	cliGit(t, repo, "add", "base.txt")
+	cliGit(t, repo, "commit", "-m", "base")
+	cliWrite(t, repo, "auth.json", "approved fixture\n", 0o600)
+	chdir(t, repo)
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+	t.Setenv("XDG_STATE_HOME", t.TempDir())
+	stubPlanFlow(t, nil)
+	oldInput := mainInput
+	mainInput = strings.NewReader("y\ny\n")
+	t.Cleanup(func() { mainInput = oldInput })
+	var commitOptions commitexec.Options
+	stubPostApprovalFlows(t,
+		func(context.Context, string, *verification.Definition, time.Duration, verification.StatePolicy) (verification.RunResult, error) {
+			return verification.RunResult{}, nil
+		},
+		func(options commitexec.Options) (commitexec.Result, error) {
+			commitOptions = options
+			return commitexec.Result{Hashes: []string{"fixture-hash"}}, nil
+		},
+	)
+
+	var stdout, stderr bytes.Buffer
+	if code := Run([]string{"--no-push"}, &stdout, &stderr); code != 0 || stderr.Len() != 0 {
+		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
+	}
+	if !reflect.DeepEqual(commitOptions.ApprovedSensitivePaths, []string{"auth.json"}) {
+		t.Fatalf("approved sensitive paths = %#v", commitOptions.ApprovedSensitivePaths)
+	}
+}
+
 func TestMainClassifiesPushFailuresAndKeepsCommits(t *testing.T) {
 	for _, test := range []struct {
 		name       string
@@ -796,6 +829,16 @@ func TestVerificationStatePolicyCarriesOnlyApprovedSensitiveChanges(t *testing.T
 	}
 	if !reflect.DeepEqual(policy.AdditionalSensitiveGlobs, []string{"private.cfg"}) {
 		t.Fatalf("additional sensitive globs = %#v", policy.AdditionalSensitiveGlobs)
+	}
+}
+
+func TestKnownUnapprovedSensitivePathsIncludesOnlyRejectedCandidates(t *testing.T) {
+	snapshot := gitstate.Snapshot{Excluded: []gitstate.Excluded{
+		{Path: "auth.json", Reason: gitstate.SensitiveCandidateNotApprovedReason},
+		{Path: ".env", Reason: "known credential-bearing configuration path"},
+	}}
+	if got := knownUnapprovedSensitivePaths(snapshot); !reflect.DeepEqual(got, []string{"auth.json"}) {
+		t.Fatalf("known unapproved sensitive paths = %#v", got)
 	}
 }
 

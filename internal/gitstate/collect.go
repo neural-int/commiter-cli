@@ -68,22 +68,37 @@ func Collect(root string, options Options) (snapshot Snapshot, err error) {
 		}
 	}
 
+	preapproved := make(map[string]bool, len(options.ApprovedSensitivePaths))
+	for _, path := range options.ApprovedSensitivePaths {
+		preapproved[path] = true
+	}
+	approvedIndexes := make(map[int]bool, len(candidateIndexes))
+	pendingIndexes := make([]int, 0, len(candidateIndexes))
+	pendingCandidates := make([]Candidate, 0, len(candidates))
+	for candidateOffset, selectedIndex := range candidateIndexes {
+		if preapproved[candidates[candidateOffset].Path] {
+			approvedIndexes[selectedIndex] = true
+			continue
+		}
+		pendingIndexes = append(pendingIndexes, selectedIndex)
+		pendingCandidates = append(pendingCandidates, candidates[candidateOffset])
+	}
+
 	approved := false
-	if len(candidates) > 0 && options.ApproveSensitiveCandidates != nil {
-		approved, err = options.ApproveSensitiveCandidates(candidates)
+	if len(pendingCandidates) > 0 && options.ApproveSensitiveCandidates != nil {
+		approved, err = options.ApproveSensitiveCandidates(pendingCandidates)
 		if err != nil {
 			return Snapshot{}, internal("cannot obtain sensitive file approval")
 		}
 	}
-	approvedIndexes := make(map[int]bool, len(candidateIndexes))
-	for candidateOffset, selectedIndex := range candidateIndexes {
+	for candidateOffset, selectedIndex := range pendingIndexes {
 		if err := ctx.Err(); err != nil {
 			return Snapshot{}, err
 		}
 		if approved {
 			approvedIndexes[selectedIndex] = true
 		} else {
-			excluded = append(excluded, Excluded{Path: candidates[candidateOffset].Path, Reason: "sensitive candidate was not approved"})
+			excluded = append(excluded, Excluded{Path: pendingCandidates[candidateOffset].Path, Reason: SensitiveCandidateNotApprovedReason})
 		}
 	}
 

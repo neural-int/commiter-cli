@@ -6,8 +6,9 @@ import (
 )
 
 const (
-	HashSchemaVersion  = 1
-	LargeUntrackedSize = 64 * 1024
+	HashSchemaVersion                   = 1
+	LargeUntrackedSize                  = 64 * 1024
+	SensitiveCandidateNotApprovedReason = "sensitive candidate was not approved"
 )
 
 type ErrorKind int
@@ -77,6 +78,7 @@ type Options struct {
 	Include                    []string
 	Exclude                    []string
 	AdditionalSensitiveGlobs   []string
+	ApprovedSensitivePaths     []string
 	ApproveSensitiveCandidates func([]Candidate) (bool, error)
 	Files                      FileReader
 }
