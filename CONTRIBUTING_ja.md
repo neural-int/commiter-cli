@@ -136,21 +136,49 @@ repository 内のドキュメントへのリンクには相対リンクを使用
 
 ## Pull Request
 
-Pull Request には以下を含めてください。
+Pull Request はリポジトリ全体で1つの契約を使用します。Pull Request template と `PR Policy / validate` check により、Ready for review になった時点で機械判定可能な項目を検証します。
 
-- 問題と採用したアプローチの説明
-- 目的に限定された差分
-- 必要な test と documentation update
-- 実行した validation command
-- 該当する場合は security または Git state への影響
-- 対応する Issue がある場合はその参照
-- review で仕様が変わる場合は、Issue と SRS の整合確認
+### Title
 
-Pull Request で Issue を完全に解決する場合は、次のような自動 close keyword を含めてください。
+Pull Request title は以下を必須とします。
+
+- 英語かつ ASCII 文字で記載する。
+- `<type>(<optional-scope>): <summary>` の Conventional Commits 形式にする。
+- type は `feat`、`fix`、`docs`、`test`、`refactor`、`perf`、`build`、`ci`、`chore` のいずれかを使用する。
+- breaking change の場合は、該当するとき `!` を colon の前に付ける。
+
+例:
 
 ```text
-Closes #123
+feat(cli): add JSON output
+fix(git): preserve staged selection
+ci: validate pull request metadata
 ```
+
+### 必須 body section
+
+Ready for review にする前に、template の必須 section を残したまま記入してください。
+
+- `Summary`: 問題と採用したアプローチを説明する。
+- `Related issue`: 原則として `Closes #123`、`Fixes #123`、`Resolves #123` のいずれかを使用する。Issue が適切でない限定的な例外では `N/A: <reason>` と理由を明示する。
+- `Changes`: PR に含まれる具体的な変更を列挙する。
+- `Verification`: 実行した標準 check を選択する。未選択の標準 check はすべて `Skipped / not applicable` に理由を記載する。
+- `Requirements and documentation`: SRS 影響について必ず1つだけ選択する。要件を変更する場合は対象の FR / SR / NFR / AC ID を記載し、documentation と英語版 / 日本語版 SRS の整合を確認する。
+- `Safety impact`: Git-state handling、local-only LLM processing、sensitive-file handling、verification、hook、output safety への影響を記載する。影響がない場合は `None.` と記載する。
+
+Policy check は構造と明示的な確認事項だけを検証します。技術的な説明が十分かどうかは CI では判定せず、review で判断します。
+
+Draft Pull Request は未完成でも構いません。PR policy は Ready for review になった時点から強制します。
+
+明示的に allowlist された automation（現在は `dependabot[bot]` と `github-actions[bot]`）は、人間向け body check の対象外です。ただし title policy は適用します。Dependabot は Conventional Commit に適合する prefix を生成するよう設定します。
+
+### Scope、label、merge method
+
+1つの Pull Request は1つの一貫した目的に限定してください。原則として、1つの Pull Request は1つの primary Issue に対応させます。
+
+Pull Request label は必須にしません。changed lines や file 数による hard limit も設けません。scope の良し悪しは行数ではなく、責務と目的の一貫性で判断します。
+
+Pull Request の merge method は squash merge を使用します。検証済みの Pull Request title が、`main` に追加される commit title の基礎になります。
 
 review 指摘への対応も同じく焦点を維持し、正確性や安全性のために必要でない限り、指摘範囲を超えて変更を拡大しないでください。
 
