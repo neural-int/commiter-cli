@@ -159,6 +159,8 @@ ci: validate pull request metadata
 
 Keep all required template sections and complete them before marking the pull request ready for review:
 
+Free-form explanations in the body may be written in English or Japanese. Keep the section headings, issue-closing keywords, verification check labels, and requirements-impact checkbox labels exactly as shown because the policy check validates those machine-readable parts.
+
 - `Summary`: explain the problem and the chosen approach.
 - `Related issue`: normally use `Closes #123`, `Fixes #123`, or `Resolves #123`. In the limited cases where an issue is not appropriate, write `N/A: <reason>`.
 - `Changes`: list the concrete changes in the pull request.

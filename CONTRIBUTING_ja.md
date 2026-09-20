@@ -159,6 +159,8 @@ ci: validate pull request metadata
 
 Ready for review にする前に、template の必須 section を残したまま記入してください。
 
+本文の自由記述は英語または日本語で記載できます。ただし、policy check が機械的に検証するため、section の見出し、Issue の close keyword、verification の check label、Requirements impact の checkbox label は template の表記を変更しないでください。
+
 - `Summary`: 問題と採用したアプローチを説明する。
 - `Related issue`: 原則として `Closes #123`、`Fixes #123`、`Resolves #123` のいずれかを使用する。Issue が適切でない限定的な例外では `N/A: <reason>` と理由を明示する。
 - `Changes`: PR に含まれる具体的な変更を列挙する。
