@@ -1,7 +1,7 @@
 ## Summary
 
 <!-- Required. Briefly describe the problem and the approach taken. -->
-<!-- Free-form explanations may be written in English or Japanese. Keep the section headings and required labels unchanged because PR Policy validates them. -->
+<!-- Language rules: use an English Conventional Commits format for the PR title. Keep these section headings and required labels unchanged because PR Policy validates them. Explanatory text in the PR body may be written in Japanese or English. -->
 
 ## Related issue
 
