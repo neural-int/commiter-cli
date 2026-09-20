@@ -35,7 +35,7 @@ type RepositoryState struct {
 
 type StatePolicy struct {
 	TargetUntracked          []string
-	ApprovedSensitive        []string
+	ApprovedSensitive        []gitstate.ChangeIdentity
 	AdditionalSensitiveGlobs []string
 }
 
@@ -116,7 +116,10 @@ func statusFileStates(root string, status []byte, policy StatePolicy) (map[strin
 	records := bytes.Split(bytes.TrimSuffix(status, []byte{0}), []byte{0})
 	result := map[string]fileState{}
 	targetUntracked := stringSet(policy.TargetUntracked)
-	approvedSensitive := stringSet(policy.ApprovedSensitive)
+	approvedSensitive := make(map[gitstate.ChangeIdentity]bool, len(policy.ApprovedSensitive))
+	for _, identity := range policy.ApprovedSensitive {
+		approvedSensitive[identity] = true
+	}
 	for index := 0; index < len(records); index++ {
 		record := string(records[index])
 		if record == "" {
@@ -124,6 +127,7 @@ func statusFileStates(root string, status []byte, policy StatePolicy) (map[strin
 		}
 		path := ""
 		oldPath := ""
+		identity := gitstate.ChangeIdentity{}
 		switch record[0] {
 		case '?':
 			if len(record) < 3 {
@@ -133,12 +137,19 @@ func statusFileStates(root string, status []byte, policy StatePolicy) (map[strin
 			if !targetUntracked[path] {
 				continue
 			}
+			identity = gitstate.ChangeIdentity{Status: "added", NewPath: path}
 		case '1':
 			fields := strings.SplitN(record, " ", 9)
 			if len(fields) != 9 {
 				return nil, fmt.Errorf("cannot parse Git-visible state")
 			}
 			path = fields[8]
+			identity = gitstate.ChangeIdentity{Status: gitstate.StatusName(fields[1], fields[3], fields[4]), OldPath: path, NewPath: path}
+			if identity.Status == "added" {
+				identity.OldPath = ""
+			} else if identity.Status == "deleted" {
+				identity.NewPath = ""
+			}
 		case '2':
 			fields := strings.SplitN(record, " ", 10)
 			if len(fields) != 10 || index+1 >= len(records) {
@@ -147,6 +158,7 @@ func statusFileStates(root string, status []byte, policy StatePolicy) (map[strin
 			path = fields[9]
 			index++
 			oldPath = string(records[index])
+			identity = gitstate.ChangeIdentity{Status: "renamed", OldPath: oldPath, NewPath: path}
 		case 'u':
 			return nil, fmt.Errorf("repository has unresolved conflicts")
 		default:
@@ -156,12 +168,12 @@ func statusFileStates(root string, status []byte, policy StatePolicy) (map[strin
 		if oldPath != "" {
 			paths = append(paths, oldPath)
 		}
-		hashContent, err := contentHashAllowed(paths, policy.AdditionalSensitiveGlobs, approvedSensitive)
+		hashContent, err := contentHashAllowed(paths, policy.AdditionalSensitiveGlobs, approvedSensitive[identity])
 		if err != nil {
 			return nil, err
 		}
 		if oldPath != "" {
-			state, err := fileMetadata(root, oldPath, record+"\x00"+oldPath, hashContent)
+			state, err := fileMetadata(root, oldPath, record+"\x00"+oldPath, false)
 			if err != nil {
 				return nil, err
 			}
@@ -199,9 +211,9 @@ func fileMetadata(root, path, record string, hashContent bool) (fileState, error
 	return state, nil
 }
 
-func contentHashAllowed(paths []string, additional []string, approved map[string]bool) (bool, error) {
+func contentHashAllowed(paths []string, additional []string, approved bool) (bool, error) {
 	for _, path := range paths {
-		allowed, err := gitstate.ContentReadAllowed(path, additional, approved[path])
+		allowed, err := gitstate.ContentReadAllowed(path, additional, approved)
 		if err != nil {
 			return false, err
 		}

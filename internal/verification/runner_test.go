@@ -10,6 +10,8 @@ import (
 	"runtime"
 	"testing"
 	"time"
+
+	"github.com/natsuki0413/commiter-cli/internal/gitstate"
 )
 
 func TestRunExecutesArgvSequentiallyWithoutShell(t *testing.T) {
@@ -206,7 +208,7 @@ func TestRepositoryStateDoesNotOpenExcludedOrUnapprovedSensitiveContent(t *testi
 	t.Cleanup(func() { openContent = previousOpen })
 
 	state, err := CaptureRepositoryState(repo, StatePolicy{
-		ApprovedSensitive:        []string{".env", "private.cfg"},
+		ApprovedSensitive:        []gitstate.ChangeIdentity{{Status: "modified", OldPath: ".env", NewPath: ".env"}, {Status: "modified", OldPath: "private.cfg", NewPath: "private.cfg"}},
 		AdditionalSensitiveGlobs: []string{"private.cfg"},
 	})
 	if err != nil {
@@ -233,7 +235,7 @@ func TestRepositoryStateHashesApprovedSensitiveCandidate(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	policy := StatePolicy{ApprovedSensitive: []string{"credentials.json"}}
+	policy := StatePolicy{ApprovedSensitive: []gitstate.ChangeIdentity{{Status: "modified", OldPath: "credentials.json", NewPath: "credentials.json"}}}
 	before, err := CaptureRepositoryState(repo, policy)
 	if err != nil {
 		t.Fatal(err)
@@ -252,6 +254,35 @@ func TestRepositoryStateHashesApprovedSensitiveCandidate(t *testing.T) {
 	}
 }
 
+func TestRepositoryStateDoesNotReadRecreatedRenameSource(t *testing.T) {
+	repo := verificationRepository(t)
+	writeVerificationFile(t, repo, "auth.json", "original\n")
+	gitVerification(t, repo, "add", "auth.json")
+	gitVerification(t, repo, "commit", "-m", "base")
+	gitVerification(t, repo, "mv", "auth.json", "config.json")
+	policy := StatePolicy{ApprovedSensitive: []gitstate.ChangeIdentity{{Status: "renamed", OldPath: "auth.json", NewPath: "config.json"}}}
+	before, err := CaptureRepositoryState(repo, policy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	writeVerificationFile(t, repo, "auth.json", "new secret\n")
+	previousOpen := openContent
+	openContent = func(path string) (*os.File, error) {
+		if filepath.Base(path) == "auth.json" {
+			t.Fatal("recreated source was read")
+		}
+		return os.Open(path)
+	}
+	t.Cleanup(func() { openContent = previousOpen })
+	after, err := CaptureRepositoryState(repo, policy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := ChangedPaths(before, after); !reflect.DeepEqual(got, []string{"auth.json"}) {
+		t.Fatalf("changed paths = %#v", got)
+	}
+}
+
 func TestRepositoryStateAppliesSensitivePolicyToWholeRename(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -260,9 +291,9 @@ func TestRepositoryStateAppliesSensitivePolicyToWholeRename(t *testing.T) {
 		wantOpened []string
 	}{
 		{name: "unapproved candidate", oldPath: "credentials.json"},
-		{name: "automatic exclusion", oldPath: ".env", policy: StatePolicy{ApprovedSensitive: []string{".env", "safe.txt"}}},
-		{name: "additional exclusion", oldPath: "private.cfg", policy: StatePolicy{ApprovedSensitive: []string{"private.cfg", "safe.txt"}, AdditionalSensitiveGlobs: []string{"private.cfg"}}},
-		{name: "approved candidate", oldPath: "credentials.json", policy: StatePolicy{ApprovedSensitive: []string{"credentials.json", "safe.txt"}}, wantOpened: []string{"safe.txt"}},
+		{name: "automatic exclusion", oldPath: ".env", policy: StatePolicy{ApprovedSensitive: []gitstate.ChangeIdentity{{Status: "renamed", OldPath: ".env", NewPath: "safe.txt"}}}},
+		{name: "additional exclusion", oldPath: "private.cfg", policy: StatePolicy{ApprovedSensitive: []gitstate.ChangeIdentity{{Status: "renamed", OldPath: "private.cfg", NewPath: "safe.txt"}}, AdditionalSensitiveGlobs: []string{"private.cfg"}}},
+		{name: "approved candidate", oldPath: "credentials.json", policy: StatePolicy{ApprovedSensitive: []gitstate.ChangeIdentity{{Status: "renamed", OldPath: "credentials.json", NewPath: "safe.txt"}}}, wantOpened: []string{"safe.txt"}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

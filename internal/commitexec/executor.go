@@ -39,14 +39,14 @@ func (e *Error) Error() string { return e.Message }
 // was used to validate the plan; IDs are resolved again immediately before each
 // stage operation.
 type Options struct {
-	Context                       context.Context
-	Root                          string
-	Changes                       []gitstate.Change
-	Plan                          planning.Plan
-	Writer                        io.Writer
-	ApprovedSensitivePaths        []string
-	KnownUnapprovedSensitivePaths []string
-	AdditionalSensitiveGlobs      []string
+	Context                         context.Context
+	Root                            string
+	Changes                         []gitstate.Change
+	Plan                            planning.Plan
+	Writer                          io.Writer
+	ApprovedSensitiveChanges        []gitstate.ChangeIdentity
+	KnownUnapprovedSensitiveChanges []gitstate.ChangeIdentity
+	AdditionalSensitiveGlobs        []string
 }
 
 type Result struct {
@@ -227,15 +227,18 @@ func interruption(ctx context.Context) error {
 func verifyHashes(root string, changes []gitstate.Change, ids []string, options Options) error {
 	current, err := gitstate.Collect(root, gitstate.Options{
 		Pathspecs:                allPlannedPaths(changes),
-		ApprovedSensitivePaths:   options.ApprovedSensitivePaths,
+		ApprovedSensitiveChanges: options.ApprovedSensitiveChanges,
 		AdditionalSensitiveGlobs: options.AdditionalSensitiveGlobs,
 	})
 	if err != nil {
 		return &Error{Code: ExitSafety, Message: "cannot revalidate changes before staging"}
 	}
-	knownUnapproved := pathSet(options.KnownUnapprovedSensitivePaths)
+	knownUnapproved := make(map[gitstate.ChangeIdentity]bool, len(options.KnownUnapprovedSensitiveChanges))
+	for _, identity := range options.KnownUnapprovedSensitiveChanges {
+		knownUnapproved[identity] = true
+	}
 	for _, excluded := range current.Excluded {
-		if excluded.Reason == gitstate.SensitiveCandidateNotApprovedReason && !knownUnapproved[excluded.Path] {
+		if excluded.Reason == gitstate.SensitiveCandidateNotApprovedReason && (excluded.Identity == nil || !knownUnapproved[*excluded.Identity]) {
 			return &Error{Code: ExitSafety, Message: "change hash changed before staging"}
 		}
 	}

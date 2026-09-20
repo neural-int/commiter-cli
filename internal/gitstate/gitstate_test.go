@@ -151,8 +151,8 @@ func TestCollectPreapprovesOnlyListedSensitiveCandidates(t *testing.T) {
 
 	files := &recordingFiles{blockedSuffixes: []string{"credentials.json"}}
 	snapshot, err := Collect(repo, Options{
-		Files:                  files,
-		ApprovedSensitivePaths: []string{"auth.json"},
+		Files:                    files,
+		ApprovedSensitiveChanges: []ChangeIdentity{{Status: "added", NewPath: "auth.json"}},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -162,6 +162,37 @@ func TestCollectPreapprovesOnlyListedSensitiveCandidates(t *testing.T) {
 	}
 	if got := excludedPaths(snapshot.Excluded); !reflect.DeepEqual(got, []string{"credentials.json"}) {
 		t.Fatalf("excluded = %#v", snapshot.Excluded)
+	}
+}
+
+func TestCollectDoesNotReuseRenameApprovalForRecreatedOldPath(t *testing.T) {
+	repo := committedRepository(t)
+	write(t, repo, "auth.json", "original\n", 0o600)
+	git(t, repo, "add", "auth.json")
+	git(t, repo, "commit", "-m", "add auth")
+	git(t, repo, "mv", "auth.json", "config.json")
+
+	first, err := Collect(repo, Options{ApproveSensitiveCandidates: func([]Candidate) (bool, error) { return true, nil }})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(first.Changes) != 1 || first.Changes[0].Status != "renamed" {
+		t.Fatalf("initial changes = %#v", first.Changes)
+	}
+	write(t, repo, "auth.json", "new secret\n", 0o600)
+	files := &recordingFiles{blockedSuffixes: []string{"auth.json"}}
+	current, err := Collect(repo, Options{
+		Files:                    files,
+		ApprovedSensitiveChanges: ApprovedSensitiveChanges(first.Changes),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(current.Changes) != 1 || current.Changes[0].Status != "renamed" {
+		t.Fatalf("current changes = %#v", current.Changes)
+	}
+	if got := excludedPaths(current.Excluded); !reflect.DeepEqual(got, []string{"auth.json"}) {
+		t.Fatalf("excluded = %#v", current.Excluded)
 	}
 }
 

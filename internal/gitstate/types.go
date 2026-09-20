@@ -37,8 +37,9 @@ type Candidate struct {
 }
 
 type Excluded struct {
-	Path   string `json:"path"`
-	Reason string `json:"reason"`
+	Path     string          `json:"path"`
+	Reason   string          `json:"reason"`
+	Identity *ChangeIdentity `json:"change_identity,omitempty"`
 }
 
 type Change struct {
@@ -62,6 +63,27 @@ type Change struct {
 	ChangeHash   string  `json:"change_hash"`
 }
 
+// ChangeIdentity identifies the Git change whose sensitive content was approved.
+type ChangeIdentity struct {
+	Status  string
+	OldPath string
+	NewPath string
+}
+
+func Identity(change Change) ChangeIdentity {
+	return ChangeIdentity{Status: change.Status, OldPath: pointerValue(change.OldPath), NewPath: pointerValue(change.NewPath)}
+}
+
+func ApprovedSensitiveChanges(changes []Change) []ChangeIdentity {
+	approved := []ChangeIdentity{}
+	for _, change := range changes {
+		if change.Sensitive {
+			approved = append(approved, Identity(change))
+		}
+	}
+	return approved
+}
+
 type Snapshot struct {
 	Root          string     `json:"root"`
 	Head          string     `json:"head"`
@@ -78,7 +100,7 @@ type Options struct {
 	Include                    []string
 	Exclude                    []string
 	AdditionalSensitiveGlobs   []string
-	ApprovedSensitivePaths     []string
+	ApprovedSensitiveChanges   []ChangeIdentity
 	ApproveSensitiveCandidates func([]Candidate) (bool, error)
 	Files                      FileReader
 }
