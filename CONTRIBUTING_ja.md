@@ -17,7 +17,7 @@ Issue や Pull Request を作成する前に、既存の Issue と SRS を確認
 
 v1 の主対象は macOS 14 以降の Apple Silicon です。CLI は主に Go で実装し、実行時には system Git と Ollama を使用します。
 
-FR、SR、NFR、AC のいずれかで定義された挙動を変更する場合は、同じ Pull Request で該当する仕様本文と受入条件も更新してください。英語版と日本語版の SRS は内容を一致させてください。
+SRS で定義された挙動へ影響すると分かっている場合は、可能な範囲で関連する仕様やドキュメントを更新し、不確かな点は Pull Request に明記してください。Pull Request を提出するために、コントリビューターが正確な FR / SR / NFR / AC ID を特定したり、英語版 / 日本語版 SRS の整合性を保証したりすることは必須ではありません。最終判断は merge 前に Maintainer が行います。
 
 ## Issue
 
@@ -132,11 +132,11 @@ Git mutation、verification、hook、機密ファイル処理、LLM plan validat
 
 repository 内のドキュメントへのリンクには相対リンクを使用してください。
 
-要件、command、configuration、安全挙動、contributor workflow を変更する場合は、同じ Pull Request で関連ドキュメントも更新してください。翻訳ドキュメントは意味を一致させ、元仕様が変更されない限り code block、configuration key、requirement ID、command name、file name、数値 threshold は翻訳間で同一にしてください。
+要件、command、configuration、安全挙動、contributor workflow を変更すると分かっている場合は、可能な範囲で関連ドキュメントを更新し、不確かな点は Pull Request に明記してください。documentation の十分性と英語版 / 日本語版 SRS の意味上の整合性については、merge 前に Maintainer が最終判断します。元仕様が変更されない限り code block、configuration key、requirement ID、command name、file name、数値 threshold は翻訳間で同一にしてください。
 
 ## Pull Request
 
-Pull Request はリポジトリ全体で1つの契約を使用します。Pull Request template と `PR Policy / validate` check により、Ready for review になった時点で機械判定可能な項目を検証します。
+Pull Request はリポジトリ全体で1つの契約を使用します。Pull Request template と `PR Policy / pr-policy` check により、Ready for review になった時点でコントリビューター向けの機械判定可能な項目を検証します。
 
 ### Title
 
@@ -163,10 +163,12 @@ Ready for review にする前に、template の必須 section を残したまま
 - `Related issue`: 原則として `Closes #123`、`Fixes #123`、`Resolves #123` のいずれかを使用する。Issue が適切でない限定的な例外では `N/A: <reason>` と理由を明示する。
 - `Changes`: PR に含まれる具体的な変更を列挙する。
 - `Verification`: 実行した標準 check を選択する。未選択の標準 check はすべて `Skipped / not applicable` に理由を記載する。
-- `Requirements and documentation`: SRS 影響について必ず1つだけ選択する。要件を変更する場合は対象の FR / SR / NFR / AC ID を記載し、documentation と英語版 / 日本語版 SRS の整合を確認する。
+- `Requirements impact`: 分かる範囲で「要件への影響はないと思う」「要件へ影響する可能性がある」「判断できないため Maintainer review が必要」のいずれか1つを選択する。正確な FR / SR / NFR / AC ID の特定や、英語版 / 日本語版 SRS の整合性保証はコントリビューターの必須要件ではない。
 - `Safety impact`: Git-state handling、local-only LLM processing、sensitive-file handling、verification、hook、output safety への影響を記載する。影響がない場合は `None.` と記載する。
 
 Policy check は構造と明示的な確認事項だけを検証します。技術的な説明が十分かどうかは CI では判定せず、review で判断します。
+
+merge 前に Maintainer は、SRS impact、該当する場合の Requirement ID、英語版 / 日本語版 SRS の意味上の整合性、release / breaking-change impact を最終確認します。Pull Request を merge することは、Maintainer がその変更についてこれらの確認を妥当と判断したことを意味します。
 
 Draft Pull Request は未完成でも構いません。PR policy は Ready for review になった時点から強制します。
 
