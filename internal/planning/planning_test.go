@@ -502,12 +502,23 @@ func TestGeneratorAggregatesOnlyNonContentTelemetry(t *testing.T) {
 	client := &scriptedChat{steps: []chatStep{{
 		content: validPlan(), model: "model:tag", loadDuration: 2,
 		promptEvalDuration: 3, evalDuration: 5, promptEvalCount: 7, evalCount: 11,
+		availability: llm.TelemetryAvailability{
+			LoadDuration: true, PromptEvalDuration: true, EvalDuration: true,
+			PromptEvalCount: true, EvalCount: true,
+		},
 	}}}
 	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if result.Telemetry != (Telemetry{Model: "model:tag", LoadDuration: 2, PromptEvalDuration: 3, EvalDuration: 5, PromptEvalCount: 7, EvalCount: 11}) {
+	if result.Telemetry != (Telemetry{
+		Model: "model:tag", LoadDuration: 2, PromptEvalDuration: 3, EvalDuration: 5,
+		PromptEvalCount: 7, EvalCount: 11,
+		Availability: llm.TelemetryAvailability{
+			LoadDuration: true, PromptEvalDuration: true, EvalDuration: true,
+			PromptEvalCount: true, EvalCount: true,
+		},
+	}) {
 		t.Fatalf("telemetry=%+v", result.Telemetry)
 	}
 }
@@ -518,6 +529,10 @@ func TestGeneratorKeepsTelemetryWhenRepairRequestFails(t *testing.T) {
 			content: `{"schema_version":1,"commits":[]}`, model: "model:tag",
 			loadDuration: 10, promptEvalDuration: 20, evalDuration: 30,
 			promptEvalCount: 4, evalCount: 5,
+			availability: llm.TelemetryAvailability{
+				LoadDuration: true, PromptEvalDuration: true, EvalDuration: true,
+				PromptEvalCount: true, EvalCount: true,
+			},
 		},
 		{err: errors.New("repair transport failed")},
 	}}
@@ -525,8 +540,57 @@ func TestGeneratorKeepsTelemetryWhenRepairRequestFails(t *testing.T) {
 	if exitcode.Code(err) != exitcode.LLM || result.Calls != 2 {
 		t.Fatalf("error=%v code=%d calls=%d", err, exitcode.Code(err), result.Calls)
 	}
-	if result.Telemetry != (Telemetry{Model: "model:tag", LoadDuration: 10, PromptEvalDuration: 20, EvalDuration: 30, PromptEvalCount: 4, EvalCount: 5}) {
+	if result.Telemetry != (Telemetry{
+		Model: "model:tag", LoadDuration: 10, PromptEvalDuration: 20, EvalDuration: 30,
+		PromptEvalCount: 4, EvalCount: 5,
+		Availability: llm.TelemetryAvailability{
+			LoadDuration: true, PromptEvalDuration: true, EvalDuration: true,
+			PromptEvalCount: true, EvalCount: true,
+		},
+	}) {
 		t.Fatalf("successful call telemetry was discarded: %+v", result.Telemetry)
+	}
+}
+
+func TestGeneratorPreservesTelemetryAvailabilityAcrossAggregation(t *testing.T) {
+	client := &scriptedChat{steps: []chatStep{{
+		content: validPlan(), model: "model:tag",
+		loadDuration: 0, evalDuration: 0,
+		availability: llm.TelemetryAvailability{LoadDuration: true, EvalDuration: true},
+	}}}
+	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Telemetry.LoadDuration != 0 || result.Telemetry.EvalDuration != 0 {
+		t.Fatalf("measured zero values changed: %+v", result.Telemetry)
+	}
+	if !result.Telemetry.Availability.LoadDuration || !result.Telemetry.Availability.EvalDuration {
+		t.Fatalf("measured zero availability was lost: %+v", result.Telemetry.Availability)
+	}
+	if result.Telemetry.Availability.PromptEvalDuration || result.Telemetry.Availability.EvalCount {
+		t.Fatalf("unavailable telemetry was aggregated: %+v", result.Telemetry.Availability)
+	}
+}
+
+func TestGeneratorMarksPartialRepairTelemetryUnavailable(t *testing.T) {
+	client := &scriptedChat{steps: []chatStep{
+		{
+			content:      `{"schema_version":1,"commits":[]}`,
+			loadDuration: 4,
+			availability: llm.TelemetryAvailability{LoadDuration: true},
+		},
+		{content: validPlan()},
+	}}
+	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	if err != nil || !result.Repaired {
+		t.Fatalf("result=%+v error=%v", result, err)
+	}
+	if result.Telemetry.LoadDuration != 4 {
+		t.Fatalf("available partial value was discarded: %+v", result.Telemetry)
+	}
+	if result.Telemetry.Availability.LoadDuration {
+		t.Fatalf("partial repair telemetry was reported as complete: %+v", result.Telemetry.Availability)
 	}
 }
 
@@ -539,6 +603,7 @@ type chatStep struct {
 	evalDuration       int64
 	promptEvalCount    int
 	evalCount          int
+	availability       llm.TelemetryAvailability
 }
 
 type scriptedChat struct {
@@ -569,6 +634,7 @@ func (client *scriptedChat) Chat(_ context.Context, messages []llm.Message, sche
 		Model: step.model, Content: step.content, LoadDuration: step.loadDuration,
 		PromptEvalDuration: step.promptEvalDuration, EvalDuration: step.evalDuration,
 		PromptEvalCount: step.promptEvalCount, EvalCount: step.evalCount,
+		Availability: step.availability,
 	}, step.err
 }
 

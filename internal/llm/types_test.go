@@ -32,6 +32,23 @@ func TestAliasesExposeTheRuntimeNeutralContract(t *testing.T) {
 	}
 }
 
+func TestResponseCarriesPerFieldTelemetryAvailability(t *testing.T) {
+	response := Response{
+		LoadDuration: 0,
+		EvalDuration: 0,
+		Availability: TelemetryAvailability{
+			LoadDuration: true,
+			EvalDuration: true,
+		},
+	}
+	if !response.Availability.LoadDuration || !response.Availability.EvalDuration {
+		t.Fatalf("measured zero values were not marked available: %+v", response.Availability)
+	}
+	if response.Availability.PromptEvalDuration || response.Availability.EvalCount {
+		t.Fatalf("unavailable fields were marked available: %+v", response.Availability)
+	}
+}
+
 type capabilityProbe struct{}
 
 func (capabilityProbe) Chat(context.Context, []Message, json.RawMessage) (Response, error) {

@@ -300,13 +300,13 @@ func (c *Client) ChatWithOptions(ctx context.Context, messages []Message, schema
 		Message struct {
 			Content string `json:"content"`
 		} `json:"message"`
-		Done               bool  `json:"done"`
-		TotalDuration      int64 `json:"total_duration"`
-		LoadDuration       int64 `json:"load_duration"`
-		PromptEvalCount    int   `json:"prompt_eval_count"`
-		PromptEvalDuration int64 `json:"prompt_eval_duration"`
-		EvalCount          int   `json:"eval_count"`
-		EvalDuration       int64 `json:"eval_duration"`
+		Done               bool   `json:"done"`
+		TotalDuration      *int64 `json:"total_duration"`
+		LoadDuration       *int64 `json:"load_duration"`
+		PromptEvalCount    *int   `json:"prompt_eval_count"`
+		PromptEvalDuration *int64 `json:"prompt_eval_duration"`
+		EvalCount          *int   `json:"eval_count"`
+		EvalDuration       *int64 `json:"eval_duration"`
 	}
 	if err := c.post(ctx, "/api/chat", payload, &response); err != nil {
 		return ChatResponse{}, err
@@ -314,12 +314,29 @@ func (c *Client) ChatWithOptions(ctx context.Context, messages []Message, schema
 	if !response.Done || strings.TrimSpace(response.Message.Content) == "" {
 		return ChatResponse{}, llmError("Ollama returned an incomplete chat response")
 	}
+	value := func(value *int64) int64 {
+		if value == nil {
+			return 0
+		}
+		return *value
+	}
+	count := func(value *int) int {
+		if value == nil {
+			return 0
+		}
+		return *value
+	}
 	return ChatResponse{
 		Backend: "ollama",
 		Model:   response.Model, Content: response.Message.Content,
-		TotalDuration: response.TotalDuration, LoadDuration: response.LoadDuration,
-		PromptEvalCount: response.PromptEvalCount, PromptEvalDuration: response.PromptEvalDuration,
-		EvalCount: response.EvalCount, EvalDuration: response.EvalDuration,
+		TotalDuration: value(response.TotalDuration), LoadDuration: value(response.LoadDuration),
+		PromptEvalCount: count(response.PromptEvalCount), PromptEvalDuration: value(response.PromptEvalDuration),
+		EvalCount: count(response.EvalCount), EvalDuration: value(response.EvalDuration),
+		Availability: llm.TelemetryAvailability{
+			TotalDuration: response.TotalDuration != nil, LoadDuration: response.LoadDuration != nil,
+			PromptEvalCount: response.PromptEvalCount != nil, PromptEvalDuration: response.PromptEvalDuration != nil,
+			EvalCount: response.EvalCount != nil, EvalDuration: response.EvalDuration != nil,
+		},
 	}, nil
 }
 

@@ -49,7 +49,7 @@ func (generator Generator) Generate(ctx context.Context, prepared contextinput.P
 	if err != nil {
 		return Result{}, err
 	}
-	calls, retryAvailable := 0, true
+	calls, successfulResponses, retryAvailable := 0, 0, true
 	telemetry := Telemetry{}
 	request := func(messages []llm.Message) (llm.Response, error) {
 		for {
@@ -65,7 +65,8 @@ func (generator Generator) Generate(ctx context.Context, prepared contextinput.P
 				response, callErr = generator.Client.Chat(ctx, messages, schema)
 			}
 			if callErr == nil {
-				telemetry.add(response)
+				telemetry.add(response, successfulResponses == 0)
+				successfulResponses++
 				return response, nil
 			}
 			if !retryAvailable || !llm.IsRetryable(callErr) || ctx.Err() != nil {
@@ -101,14 +102,38 @@ func (generator Generator) Generate(ctx context.Context, prepared contextinput.P
 	return Result{Plan: plan, Calls: calls, Repaired: true, Telemetry: telemetry}, nil
 }
 
-func (telemetry *Telemetry) add(response llm.Response) {
+func (telemetry *Telemetry) add(response llm.Response, first bool) {
 	telemetry.Backend = response.Backend
 	telemetry.Model = response.Model
-	telemetry.LoadDuration += response.LoadDuration
-	telemetry.PromptEvalDuration += response.PromptEvalDuration
-	telemetry.EvalDuration += response.EvalDuration
-	telemetry.PromptEvalCount += response.PromptEvalCount
-	telemetry.EvalCount += response.EvalCount
+	if first {
+		telemetry.Availability = response.Availability
+	} else {
+		telemetry.Availability.TotalDuration = telemetry.Availability.TotalDuration && response.Availability.TotalDuration
+		telemetry.Availability.LoadDuration = telemetry.Availability.LoadDuration && response.Availability.LoadDuration
+		telemetry.Availability.PromptEvalCount = telemetry.Availability.PromptEvalCount && response.Availability.PromptEvalCount
+		telemetry.Availability.PromptEvalDuration = telemetry.Availability.PromptEvalDuration && response.Availability.PromptEvalDuration
+		telemetry.Availability.EvalCount = telemetry.Availability.EvalCount && response.Availability.EvalCount
+		telemetry.Availability.EvalDuration = telemetry.Availability.EvalDuration && response.Availability.EvalDuration
+	}
+	availability := response.Availability
+	if availability.TotalDuration {
+		telemetry.TotalDuration += response.TotalDuration
+	}
+	if availability.LoadDuration {
+		telemetry.LoadDuration += response.LoadDuration
+	}
+	if availability.PromptEvalDuration {
+		telemetry.PromptEvalDuration += response.PromptEvalDuration
+	}
+	if availability.EvalDuration {
+		telemetry.EvalDuration += response.EvalDuration
+	}
+	if availability.PromptEvalCount {
+		telemetry.PromptEvalCount += response.PromptEvalCount
+	}
+	if availability.EvalCount {
+		telemetry.EvalCount += response.EvalCount
+	}
 }
 
 func repairMessages(original, candidate []byte, violations []Violation) ([]llm.Message, error) {

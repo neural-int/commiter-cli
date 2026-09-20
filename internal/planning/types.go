@@ -2,7 +2,11 @@
 // plans before any approval or Git mutation is possible.
 package planning
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/natsuki0413/commiter-cli/internal/llm"
+)
 
 const SchemaVersion = 1
 
@@ -47,11 +51,13 @@ type Result struct {
 type Telemetry struct {
 	Backend            string
 	Model              string
+	TotalDuration      int64
 	LoadDuration       int64
 	PromptEvalDuration int64
 	EvalDuration       int64
 	PromptEvalCount    int
 	EvalCount          int
+	Availability       llm.TelemetryAvailability
 }
 
 type Violation string

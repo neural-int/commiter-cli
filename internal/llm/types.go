@@ -15,6 +15,25 @@ type Message struct {
 	Content string `json:"content"`
 }
 
+// TelemetryAvailability distinguishes an omitted backend measurement from a
+// measurement whose value is zero. Backends must set a field when the
+// corresponding value was observed.
+type TelemetryAvailability struct {
+	TotalDuration      bool
+	LoadDuration       bool
+	PromptEvalCount    bool
+	PromptEvalDuration bool
+	EvalCount          bool
+	EvalDuration       bool
+}
+
+// Any reports whether at least one telemetry field was observed.
+func (availability TelemetryAvailability) Any() bool {
+	return availability.TotalDuration || availability.LoadDuration ||
+		availability.PromptEvalCount || availability.PromptEvalDuration ||
+		availability.EvalCount || availability.EvalDuration
+}
+
 // Response contains generated content and privacy-safe numeric telemetry.
 // Duration fields are elapsed nanoseconds, matching time.Duration's underlying
 // unit without exposing a provider-specific duration type.
@@ -28,6 +47,7 @@ type Response struct {
 	PromptEvalDuration int64
 	EvalCount          int
 	EvalDuration       int64
+	Availability       TelemetryAvailability
 }
 
 // ChatResponse is a descriptive alias for backend implementations.
