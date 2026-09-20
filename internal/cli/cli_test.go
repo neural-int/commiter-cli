@@ -42,6 +42,16 @@ func TestVersionHumanAndJSON(t *testing.T) {
 	}
 }
 
+func TestHelpIncludesInitIgnoreUsage(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	if code := Run([]string{"--help"}, &stdout, &stderr); code != 0 {
+		t.Fatalf("code=%d stderr=%q", code, stderr.String())
+	}
+	if !strings.Contains(stdout.String(), "commiter init [--ignore PATTERN]...") {
+		t.Fatalf("help = %q", stdout.String())
+	}
+}
+
 func TestInitDeclineDoesNotChangeDirectory(t *testing.T) {
 	dir := t.TempDir()
 	oldDir, err := os.Getwd()

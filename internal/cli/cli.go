@@ -843,6 +843,7 @@ func exactTarget(args []string) (string, error) {
 func printHelp(printer *output.Printer) error {
 	lines := []string{
 		"Usage: commiter [flags] [--] [pathspec...]",
+		"       commiter init [--ignore PATTERN]...",
 		"Commands: init, setup, doctor, config, trust, version",
 		"Flags: --dry-run --no-push --no-confirm-commit --no-confirm-push",
 		"       --language en|ja --model NAME --record-metrics --json",
