@@ -41,9 +41,10 @@ type Result struct {
 	Telemetry Telemetry
 }
 
-// Telemetry contains only numeric Ollama timings/counts and the model tag.
+// Telemetry contains only backend model metadata and numeric timings/counts.
 // It deliberately excludes prompts, generated content, and validation reasons.
 type Telemetry struct {
+	Backend            string
 	Model              string
 	LoadDuration       int64
 	PromptEvalDuration int64

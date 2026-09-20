@@ -225,6 +225,8 @@ CLI は chunk 圧縮 profile またはコンテキスト予算を遷移するた
 
 ### FR-008 コミット計画の生成
 
+計画生成は runtime-neutral な LLM backend contract（メッセージ、構造化出力スキーマ、応答、数値 telemetry、能力情報、および retry 可否）を介して実行します。v1 の既定 backend は Ollama adapter とし、backend の選択設定や MLX の model lifecycle はこの要件の範囲に含めません。adapter の導入は、既存の Ollama の structured output、retry、daemon/model lifecycle、およびローカル送信境界を変更してはなりません。
+
 CLI は Ollama のローカル API へ構造化された入力を送信し、ファイル単位のコミット計画を取得しなければなりません。
 
 ### FR-009 LLM 生成失敗と出力検証

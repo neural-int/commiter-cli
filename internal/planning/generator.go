@@ -8,15 +8,15 @@ import (
 
 	"github.com/natsuki0413/commiter-cli/internal/contextinput"
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
-	"github.com/natsuki0413/commiter-cli/internal/ollama"
+	"github.com/natsuki0413/commiter-cli/internal/llm"
 )
 
 type ChatClient interface {
-	Chat(context.Context, []ollama.Message, json.RawMessage) (ollama.ChatResponse, error)
+	Chat(context.Context, []llm.Message, json.RawMessage) (llm.Response, error)
 }
 
 type optionsChatClient interface {
-	ChatWithOptions(context.Context, []ollama.Message, json.RawMessage, ollama.ChatOptions) (ollama.ChatResponse, error)
+	ChatWithOptions(context.Context, []llm.Message, json.RawMessage, llm.Options) (llm.Response, error)
 }
 
 type Generator struct{ Client ChatClient }
@@ -51,13 +51,13 @@ func (generator Generator) Generate(ctx context.Context, prepared contextinput.P
 	}
 	calls, retryAvailable := 0, true
 	telemetry := Telemetry{}
-	request := func(messages []ollama.Message) (ollama.ChatResponse, error) {
+	request := func(messages []llm.Message) (llm.Response, error) {
 		for {
 			calls++
-			var response ollama.ChatResponse
+			var response llm.Response
 			var callErr error
 			if client, ok := generator.Client.(optionsChatClient); ok {
-				response, callErr = client.ChatWithOptions(ctx, messages, schema, ollama.ChatOptions{
+				response, callErr = client.ChatWithOptions(ctx, messages, schema, llm.Options{
 					ContextTokens: prepared.Budget.ContextTokens,
 					OutputTokens:  prepared.Budget.ReservedOutputTokens,
 				})
@@ -68,13 +68,13 @@ func (generator Generator) Generate(ctx context.Context, prepared contextinput.P
 				telemetry.add(response)
 				return response, nil
 			}
-			if !retryAvailable || !ollama.IsRetryable(callErr) || ctx.Err() != nil {
-				return ollama.ChatResponse{}, callErr
+			if !retryAvailable || !llm.IsRetryable(callErr) || ctx.Err() != nil {
+				return llm.Response{}, callErr
 			}
 			retryAvailable = false
 		}
 	}
-	initial := []ollama.Message{
+	initial := []llm.Message{
 		{Role: "system", Content: systemMessage},
 		{Role: "user", Content: string(prepared.Prompt)},
 	}
@@ -101,7 +101,8 @@ func (generator Generator) Generate(ctx context.Context, prepared contextinput.P
 	return Result{Plan: plan, Calls: calls, Repaired: true, Telemetry: telemetry}, nil
 }
 
-func (telemetry *Telemetry) add(response ollama.ChatResponse) {
+func (telemetry *Telemetry) add(response llm.Response) {
+	telemetry.Backend = response.Backend
 	telemetry.Model = response.Model
 	telemetry.LoadDuration += response.LoadDuration
 	telemetry.PromptEvalDuration += response.PromptEvalDuration
@@ -110,7 +111,7 @@ func (telemetry *Telemetry) add(response ollama.ChatResponse) {
 	telemetry.EvalCount += response.EvalCount
 }
 
-func repairMessages(original, candidate []byte, violations []Violation) ([]ollama.Message, error) {
+func repairMessages(original, candidate []byte, violations []Violation) ([]llm.Message, error) {
 	payload, err := json.Marshal(struct {
 		Task          string      `json:"task"`
 		TrustBoundary string      `json:"trust_boundary"`
@@ -125,7 +126,7 @@ func repairMessages(original, candidate []byte, violations []Violation) ([]ollam
 	if err != nil {
 		return nil, err
 	}
-	return []ollama.Message{
+	return []llm.Message{
 		{Role: "system", Content: "Repair JSON using the supplied constraints, including summary_language. Violation codes never contain sensitive raw values."},
 		{Role: "user", Content: string(payload)},
 	}, nil

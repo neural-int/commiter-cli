@@ -226,6 +226,8 @@ Hierarchical summarization and structural-evidence reduction must preserve the c
 
 ### FR-008 Commit Plan Generation
 
+Plan generation uses a runtime-neutral LLM backend contract for messages, structured-output schemas, responses, numeric telemetry, capabilities, and retry classification. The v1 default remains an Ollama adapter; backend selection configuration and MLX model lifecycle are outside this requirement. Introducing the adapter must not change Ollama structured output, retry, daemon/model lifecycle, or the local transmission boundary.
+
 The CLI must send structured input to the local Ollama API and obtain a file-level commit plan.
 
 ### FR-009 LLM Generation Failure and Output Validation
