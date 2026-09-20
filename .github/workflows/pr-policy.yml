@@ -156,7 +156,7 @@ jobs:
               selected = 0
               for option in impact_options:
                   checked_re = re.compile(
-                      rf"(?im)^[ \\t]*-[ \\t]+\\[[xX]\\][ \\t]+{re.escape(option)}[ \\t]*$"
+                      rf"(?im)^[ \t]*-[ \t]+\[[xX]\][ \t]+{re.escape(option)}[ \t]*$"
                   )
                   if checked_re.search(requirements):
                       selected += 1
