@@ -42,6 +42,69 @@ func TestVersionHumanAndJSON(t *testing.T) {
 	}
 }
 
+func TestHelpIncludesInitIgnoreUsage(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	if code := Run([]string{"--help"}, &stdout, &stderr); code != 0 {
+		t.Fatalf("code=%d stderr=%q", code, stderr.String())
+	}
+	if !strings.Contains(stdout.String(), "commiter init [--ignore PATTERN]...") {
+		t.Fatalf("help = %q", stdout.String())
+	}
+}
+
+func TestInitDeclineDoesNotChangeDirectory(t *testing.T) {
+	dir := t.TempDir()
+	oldDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(dir); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(oldDir) })
+	oldConfirm := confirmFunc
+	confirmFunc = func(string) bool { return false }
+	t.Cleanup(func() { confirmFunc = oldConfirm })
+
+	var stdout, stderr bytes.Buffer
+	if code := Run([]string{"init"}, &stdout, &stderr); code != 0 {
+		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
+	}
+	if _, err := os.Stat(filepath.Join(dir, ".git")); !os.IsNotExist(err) {
+		t.Fatalf(".git exists after rejection: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(dir, ".gitignore")); !os.IsNotExist(err) {
+		t.Fatalf(".gitignore exists after rejection: %v", err)
+	}
+}
+
+func TestInitIgnoreAppendsOnlyApprovedPatterns(t *testing.T) {
+	dir := t.TempDir()
+	oldDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(dir); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(oldDir) })
+	oldConfirm := confirmFunc
+	confirmFunc = func(string) bool { return true }
+	t.Cleanup(func() { confirmFunc = oldConfirm })
+
+	var stdout, stderr bytes.Buffer
+	if code := Run([]string{"init", "--ignore", "*.tmp", "--ignore=build/"}, &stdout, &stderr); code != 0 {
+		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
+	}
+	got, err := os.ReadFile(filepath.Join(dir, ".gitignore"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(got) != "*.tmp\nbuild/\n" {
+		t.Fatalf("gitignore = %q", got)
+	}
+}
+
 func TestUpdateCheckIsSkippedForJSONOutput(t *testing.T) {
 	repo := cliRepository(t)
 	cliWrite(t, repo, "README.md", "base\n", 0o644)
