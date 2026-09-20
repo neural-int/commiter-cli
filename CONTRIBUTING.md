@@ -17,7 +17,7 @@ Before opening an issue or pull request, review existing issues and the SRS. If 
 
 For v1, the primary target is macOS 14 or later on Apple Silicon. The CLI is implemented primarily in Go and uses system Git and Ollama at runtime.
 
-If a change alters behavior described by an FR, SR, NFR, or AC requirement, update the affected specification text and acceptance criteria in the same pull request. Keep the English and Japanese SRS versions aligned.
+If you know that a change affects behavior described by the SRS, update the relevant specification or documentation when practical and call out any uncertainty in the pull request. Contributors are not required to determine exact FR / SR / NFR / AC IDs or certify English/Japanese SRS alignment in order to submit a pull request. Maintainers make the final determination before merge.
 
 ## Issues
 
@@ -132,11 +132,11 @@ When a change affects Git mutation, verification, hooks, sensitive-file handling
 
 Use repository-relative links for repository documents.
 
-When changing requirements, commands, configuration, safety behavior, or contributor workflow, update the relevant documentation in the same pull request. Keep translated documents semantically aligned; code blocks, configuration keys, requirement IDs, command names, file names, and numeric thresholds should remain identical across translations unless the underlying specification changes.
+When you knowingly change requirements, commands, configuration, safety behavior, or contributor workflow, update the relevant documentation when practical and note any uncertainty in the pull request. Maintainers are responsible for the final determination of documentation completeness and English/Japanese SRS semantic alignment before merge. Code blocks, configuration keys, requirement IDs, command names, file names, and numeric thresholds should remain identical across translations unless the underlying specification changes.
 
 ## Pull Requests
 
-Pull requests use one repository-wide contract. The pull request template and the `PR Policy / validate` check enforce the machine-verifiable parts of that contract once a pull request is ready for review.
+Pull requests use one repository-wide contract. The pull request template and the `PR Policy / pr-policy` check enforce the machine-verifiable contributor-facing parts of that contract once a pull request is ready for review.
 
 ### Title
 
@@ -163,10 +163,12 @@ Keep all required template sections and complete them before marking the pull re
 - `Related issue`: normally use `Closes #123`, `Fixes #123`, or `Resolves #123`. In the limited cases where an issue is not appropriate, write `N/A: <reason>`.
 - `Changes`: list the concrete changes in the pull request.
 - `Verification`: mark the standard checks that were run. Explain every unchecked standard check under `Skipped / not applicable`.
-- `Requirements and documentation`: select exactly one SRS-impact option. When requirements change, list the affected FR / SR / NFR / AC IDs. Confirm documentation and English/Japanese SRS alignment.
+- `Requirements impact`: select exactly one declaration based on what you know: no expected requirements impact, possible requirements impact, or maintainer review required. Contributors do not need to identify exact FR / SR / NFR / AC IDs or certify English/Japanese SRS alignment.
 - `Safety impact`: describe effects on Git-state handling, local-only LLM processing, sensitive-file handling, verification, hooks, or output safety. Write `None.` when there is no safety impact.
 
 The policy check validates structure and explicit confirmations. It does not judge whether the technical explanation is sufficient; reviewers make that determination.
+
+Before merge, maintainers must make the final determination of SRS impact, affected requirement IDs when applicable, English/Japanese SRS semantic alignment, and release/breaking-change impact. Merging the pull request signifies that the maintainer considers those checks acceptable for the change.
 
 Draft pull requests may be incomplete. The PR policy is enforced when the pull request becomes ready for review.
 

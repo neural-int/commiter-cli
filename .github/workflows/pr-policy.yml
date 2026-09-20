@@ -14,13 +14,11 @@ on:
       - converted_to_draft
 
 jobs:
-  validate:
-    name: validate
+  pr-policy:
+    name: pr-policy
     runs-on: ubuntu-latest
     steps:
       - name: Validate pull request contract
-        env:
-          EVENT_PATH: ${{ github.event_path }}
         run: |
           python3 - <<'PY'
           import json
@@ -28,7 +26,7 @@ jobs:
           import re
           import sys
 
-          with open(os.environ["EVENT_PATH"], "r", encoding="utf-8") as f:
+          with open(os.environ["GITHUB_EVENT_PATH"], "r", encoding="utf-8") as f:
               event = json.load(f)
 
           pr = event["pull_request"]
@@ -70,7 +68,7 @@ jobs:
               "Related issue",
               "Changes",
               "Verification",
-              "Requirements and documentation",
+              "Requirements impact",
               "Safety impact",
           ]
 
@@ -148,59 +146,23 @@ jobs:
                       "'Skipped / not applicable:'."
                   )
 
-          requirements = cleaned("Requirements and documentation")
-          if "Requirements and documentation" in sections:
-              no_srs = bool(
-                  re.search(
-                      r"(?im)^-[ \t]+\[[xX]\][ \t]+No FR / SR / NFR / AC requirement is affected\.[ \t]*$",
-                      requirements,
+          requirements = cleaned("Requirements impact")
+          if "Requirements impact" in sections:
+              impact_options = [
+                  "I believe this PR does not affect requirements.",
+                  "I believe this PR may affect requirements.",
+                  "I am unsure; maintainer review is required.",
+              ]
+              selected = 0
+              for option in impact_options:
+                  checked_re = re.compile(
+                      rf"(?im)^[ \t]*-[ \t]+\[[xX]\][ \t]+{re.escape(option)}[ \t]*$"
                   )
-              )
-              changed_srs = bool(
-                  re.search(
-                      r"(?im)^-[ \t]+\[[xX]\][ \t]+Requirements are affected and updated in this PR\.[ \t]*$",
-                      requirements,
-                  )
-              )
-              if no_srs == changed_srs:
-                  errors.append(
-                      "Select exactly one SRS impact option in Requirements and documentation."
-                  )
+                  if checked_re.search(requirements):
+                      selected += 1
 
-              docs_confirmed = bool(
-                  re.search(
-                      r"(?im)^-[ \t]+\[[xX]\][ \t]+Relevant documentation is updated, or no documentation update is required\.[ \t]*$",
-                      requirements,
-                  )
-              )
-              translations_confirmed = bool(
-                  re.search(
-                      r"(?im)^-[ \t]+\[[xX]\][ \t]+English and Japanese SRS versions remain semantically aligned, or SRS is not changed\.[ \t]*$",
-                      requirements,
-                  )
-              )
-              if not docs_confirmed:
-                  errors.append("Confirm the documentation update requirement.")
-              if not translations_confirmed:
-                  errors.append(
-                      "Confirm English/Japanese SRS alignment or that the SRS is unchanged."
-                  )
-
-              affected_match = re.search(
-                  r"(?is)Affected requirements:\s*(.*?)(?:\n[ \t]*Documentation:|\Z)",
-                  requirements,
-              )
-              affected = affected_match.group(1).strip() if affected_match else ""
-
-              if changed_srs:
-                  if not re.search(r"\b(?:FR|SR|NFR|AC)-\d+\b", affected):
-                      errors.append(
-                          "List at least one affected FR/SR/NFR/AC requirement ID."
-                      )
-              elif no_srs and affected.upper() not in {"N/A", "N/A."}:
-                  errors.append(
-                      "Write 'N/A' under Affected requirements when the SRS is unaffected."
-                  )
+              if selected != 1:
+                  errors.append("Select exactly one Requirements impact option.")
 
           safety = cleaned("Safety impact")
           if "Safety impact" in sections and not safety:
