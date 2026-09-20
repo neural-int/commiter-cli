@@ -47,7 +47,7 @@ type options struct {
 }
 
 var commands = map[string]bool{
-	"setup": true, "doctor": true, "config": true, "trust": true, "version": true,
+	"init": true, "setup": true, "doctor": true, "config": true, "trust": true, "version": true,
 }
 
 func Run(args []string, stdout, stderr io.Writer) int {
@@ -67,6 +67,8 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	}
 
 	switch opts.command {
+	case "init":
+		return runInit(opts.args, printer)
 	case "version":
 		return runVersion(opts, printer)
 	case "config":
@@ -82,6 +84,46 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	default:
 		return fail(printer, exitcode.New(exitcode.Usage, "unknown command"))
 	}
+}
+
+func runInit(args []string, printer *output.Printer) int {
+	if len(args) != 0 {
+		return fail(printer, exitcode.New(exitcode.Usage, "init does not accept arguments"))
+	}
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fail(printer, exitcode.New(exitcode.Usage, "cannot determine current directory"))
+	}
+	plan, err := repository.PlanInitialization(cwd)
+	if err != nil {
+		return fail(printer, exitcode.New(exitcode.Usage, err.Error()))
+	}
+	if !plan.InitializeGit && !plan.CreateGitignore {
+		if err := printer.Lines("Git repository and .gitignore already exist; nothing to initialize"); err != nil {
+			return fail(printer, exitcode.New(exitcode.Internal, "cannot write output"))
+		}
+		return exitcode.Success
+	}
+	lines := []string{"Initialization plan", "repository: " + plan.Root}
+	if plan.InitializeGit {
+		lines = append(lines, "operation: initialize Git repository")
+	}
+	if plan.CreateGitignore {
+		lines = append(lines, "operation: create empty .gitignore")
+	}
+	if err := printer.PromptLines(lines...); err != nil {
+		return fail(printer, exitcode.New(exitcode.Internal, "cannot write initialization confirmation"))
+	}
+	if !confirm("Apply initialization? [y/N] ") {
+		return finishSetup(printer, "initialization canceled; no changes were made")
+	}
+	if err := repository.ApplyInitialization(plan); err != nil {
+		return fail(printer, exitcode.New(exitcode.Usage, err.Error()))
+	}
+	if err := printer.Lines("initialization completed"); err != nil {
+		return fail(printer, exitcode.New(exitcode.Internal, "cannot write output"))
+	}
+	return exitcode.Success
 }
 
 func runSetup(args []string, printer *output.Printer) int {
@@ -451,6 +493,9 @@ func validateJSONMode(opts options) error {
 	if opts.command == "version" {
 		return nil
 	}
+	if opts.command == "init" {
+		return exitcode.New(exitcode.Usage, "--json is not supported for init")
+	}
 	if opts.command == "doctor" {
 		return nil
 	}
@@ -770,7 +815,7 @@ func exactTarget(args []string) (string, error) {
 func printHelp(printer *output.Printer) error {
 	lines := []string{
 		"Usage: commiter [flags] [--] [pathspec...]",
-		"Commands: setup, doctor, config, trust, version",
+		"Commands: init, setup, doctor, config, trust, version",
 		"Flags: --dry-run --no-push --no-confirm-commit --no-confirm-push",
 		"       --language en|ja --model NAME --record-metrics --json",
 	}
