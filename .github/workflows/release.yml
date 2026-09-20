@@ -175,8 +175,9 @@ jobs:
           gh api \
             --paginate \
             --slurp \
-            --jq 'add' \
             "repos/${GITHUB_REPOSITORY}/pulls?state=closed&base=main&per_page=100" \
+            > "$RUNNER_TEMP/release-pr-pages.json"
+          jq 'add' "$RUNNER_TEMP/release-pr-pages.json" \
             > "$RUNNER_TEMP/release-prs.json"
 
           python3 .github/scripts/release-notes/collect.py \
