@@ -92,6 +92,8 @@ commiter
 
 `commiter doctor` is read-only and checks the repository, configuration, Git identity, Ollama connectivity, configured model, structured-output support, and related prerequisites. It does not start or stop Ollama. If the daemon is stopped, start Ollama manually (for example, with `ollama serve`) and rerun `commiter doctor` for a complete capability diagnosis. If Ollama is not installed, run `commiter setup` first.
 
+When run from an interactive terminal, commiter checks the official GitHub Releases metadata at most once every 24 hours. If a newer stable release is available, it prints the release version and the Homebrew upgrade command. The check stores only its timestamp and latest version in the user state directory. Network failures are ignored so the normal command continues. Update checks are skipped for JSON output and CI environments.
+
 `commiter --dry-run` performs analysis and plan generation without modifying the index, creating commits, or pushing. Like a plain run, it temporarily starts Ollama when the daemon is stopped and stops only the daemon it started.
 
 A plain `commiter` run can create commits and push. It temporarily starts Ollama when needed and stops only the daemon it started. Review the displayed plan and prompts before approving mutation.

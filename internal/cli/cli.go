@@ -19,6 +19,7 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/output"
 	"github.com/natsuki0413/commiter-cli/internal/repository"
 	"github.com/natsuki0413/commiter-cli/internal/trust"
+	"github.com/natsuki0413/commiter-cli/internal/updatecheck"
 )
 
 var Version = "dev"
@@ -26,6 +27,14 @@ var Version = "dev"
 var lookPath = exec.LookPath
 var commandFactory = exec.Command
 var statPath = os.Stat
+var updateCheckInteractive = func() bool {
+	if os.Getenv("CI") != "" {
+		return false
+	}
+	in, inErr := os.Stdin.Stat()
+	out, outErr := os.Stdout.Stat()
+	return inErr == nil && outErr == nil && in.Mode()&os.ModeCharDevice != 0 && out.Mode()&os.ModeCharDevice != 0
+}
 
 const doctorCapabilityTimeout = 2 * time.Minute
 
@@ -661,6 +670,16 @@ func runMain(opts options, printer *output.Printer) int {
 	effective, err := config.Resolve(paths.GlobalConfig, paths.RepoConfig, root, overrides(opts))
 	if err != nil {
 		return fail(printer, exitcode.New(exitcode.Usage, err.Error()))
+	}
+	if updateCheckInteractive() && !printer.JSON() {
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		latest, checkErr := updatecheck.Check(ctx, paths.StateDir, Version)
+		cancel()
+		if checkErr == nil && latest != "" {
+			if err := printer.Lines("Update available: "+Version+" → "+latest, "Run `brew upgrade commiter` to update."); err != nil {
+				return fail(printer, exitcode.New(exitcode.Internal, "cannot write update notification"))
+			}
+		}
 	}
 	recorder := runmetrics.New()
 	code := runCollection(opts, root, effective.Values, printer, recorder)
