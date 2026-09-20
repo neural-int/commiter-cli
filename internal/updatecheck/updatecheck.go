@@ -29,6 +29,11 @@ type cache struct {
 	LatestVersion string    `json:"latest_version"`
 }
 
+type semanticVersion struct {
+	parts      [3]int
+	prerelease []string
+}
+
 type release struct {
 	TagName    string `json:"tag_name"`
 	Draft      bool   `json:"draft"`
@@ -45,6 +50,7 @@ func Check(ctx context.Context, stateDir, current string) (string, error) {
 	var saved cache
 	if data, err := os.ReadFile(path); err == nil {
 		if json.Unmarshal(data, &saved) == nil && now().Sub(saved.CheckedAt) < checkInterval && saved.LatestVersion != "" {
+			_ = os.Chmod(path, 0o600)
 			return newer(current, saved.LatestVersion), nil
 		}
 	}
@@ -84,13 +90,16 @@ func Check(ctx context.Context, stateDir, current string) (string, error) {
 	if err := os.WriteFile(path, data, 0o600); err != nil {
 		return "", err
 	}
+	if err := os.Chmod(path, 0o600); err != nil {
+		return "", err
+	}
 	return newer(current, result.TagName), nil
 }
 
 func newer(current, latest string) string {
 	c, _ := parseVersion(current)
 	l, _ := parseVersion(latest)
-	if l[0] > c[0] || (l[0] == c[0] && (l[1] > c[1] || (l[1] == c[1] && l[2] > c[2]))) {
+	if compare(l, c) > 0 {
 		return latest
 	}
 	return ""
@@ -98,13 +107,13 @@ func newer(current, latest string) string {
 
 var versionPattern = regexp.MustCompile(`^v?(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$`)
 
-func parseVersion(value string) ([3]int, error) {
-	var result [3]int
+func parseVersion(value string) (semanticVersion, error) {
+	var result semanticVersion
 	if !versionPattern.MatchString(value) {
 		return result, fmt.Errorf("invalid semantic version")
 	}
 	parts := strings.SplitN(strings.TrimPrefix(value, "v"), ".", 3)
-	for i := range result {
+	for i := range result.parts {
 		part := parts[i]
 		if dash := strings.IndexByte(part, '-'); dash >= 0 {
 			part = part[:dash]
@@ -116,7 +125,64 @@ func parseVersion(value string) ([3]int, error) {
 		if err != nil {
 			return result, err
 		}
-		result[i] = n
+		result.parts[i] = n
+	}
+	if dash := strings.IndexByte(parts[2], '-'); dash >= 0 {
+		prerelease := parts[2][dash+1:]
+		if plus := strings.IndexByte(prerelease, '+'); plus >= 0 {
+			prerelease = prerelease[:plus]
+		}
+		result.prerelease = strings.Split(prerelease, ".")
 	}
 	return result, nil
+}
+
+func compare(left, right semanticVersion) int {
+	for i := range left.parts {
+		if left.parts[i] != right.parts[i] {
+			if left.parts[i] > right.parts[i] {
+				return 1
+			}
+			return -1
+		}
+	}
+	if len(left.prerelease) == 0 && len(right.prerelease) == 0 {
+		return 0
+	}
+	if len(left.prerelease) == 0 {
+		return 1
+	}
+	if len(right.prerelease) == 0 {
+		return -1
+	}
+	for i := 0; i < len(left.prerelease) && i < len(right.prerelease); i++ {
+		l, r := left.prerelease[i], right.prerelease[i]
+		ln, lerr := strconv.Atoi(l)
+		rn, rerr := strconv.Atoi(r)
+		if lerr == nil && rerr == nil && ln != rn {
+			if ln > rn {
+				return 1
+			}
+			return -1
+		}
+		if lerr == nil && rerr != nil {
+			return -1
+		}
+		if lerr != nil && rerr == nil {
+			return 1
+		}
+		if l != r {
+			if l > r {
+				return 1
+			}
+			return -1
+		}
+	}
+	if len(left.prerelease) > len(right.prerelease) {
+		return 1
+	}
+	if len(left.prerelease) < len(right.prerelease) {
+		return -1
+	}
+	return 0
 }

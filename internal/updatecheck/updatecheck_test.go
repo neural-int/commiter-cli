@@ -70,3 +70,40 @@ func TestCheckSkipsDevelopmentVersion(t *testing.T) {
 		t.Fatalf("development version = %q, %v", got, err)
 	}
 }
+
+func TestCheckUsesSemVerPrereleasePrecedenceAndIgnoresBuildMetadata(t *testing.T) {
+	for _, test := range []struct {
+		current, latest string
+		want            string
+	}{
+		{current: "v1.2.0-beta", latest: "v1.2.0", want: "v1.2.0"},
+		{current: "v1.2.0", latest: "v1.2.0+build.7", want: ""},
+		{current: "v1.2.0-alpha.1", latest: "v1.2.0-alpha.2", want: "v1.2.0-alpha.2"},
+		{current: "v1.2.0-alpha.2", latest: "v1.2.0-alpha.10", want: "v1.2.0-alpha.10"},
+	} {
+		t.Run(test.current+"_"+test.latest, func(t *testing.T) {
+			if got := newer(test.current, test.latest); got != test.want {
+				t.Fatalf("newer(%q, %q) = %q, want %q", test.current, test.latest, got, test.want)
+			}
+		})
+	}
+}
+
+func TestCheckRepairsExistingCachePermissions(t *testing.T) {
+	state := t.TempDir()
+	path := filepath.Join(state, cacheFileName)
+	data, err := json.Marshal(cache{CheckedAt: now().UTC(), LatestVersion: "v1.3.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, data, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Check(context.Background(), state, "v1.2.1"); err != nil {
+		t.Fatal(err)
+	}
+	info, err := os.Stat(path)
+	if err != nil || info.Mode().Perm() != 0o600 {
+		t.Fatalf("cache permissions = %v, %v", info, err)
+	}
+}
