@@ -1,33 +1,46 @@
 ## Summary
 
-<!-- Briefly describe the problem and the approach taken. -->
+<!-- Required. Briefly describe the problem and the approach taken. -->
 
 ## Related issue
 
-<!-- Use an auto-closing keyword when this PR fully resolves an issue, for example: Closes #123 -->
+<!-- Required. Use an auto-closing keyword when this PR resolves an issue, for example: `Closes #123`. If no issue applies, write `N/A: <reason>`. -->
 
 ## Changes
+
+<!-- Required. List the concrete changes in this PR. -->
 
 -
 
 ## Verification
 
-<!-- Check the commands that apply. Explain any skipped checks. -->
+<!-- Mark every standard check that was run. If a check is not run or is not applicable, explain it under "Skipped / not applicable". -->
 
 - [ ] `go test ./...`
 - [ ] `go vet ./...`
 - [ ] `go build ./cmd/commiter`
 - [ ] `git diff --check`
-- [ ] Additional verification described below, if applicable
+
+Skipped / not applicable:
+
+<!-- Required when any standard check above is unchecked. Explain what was skipped and why. -->
 
 ## Requirements and documentation
 
-- [ ] No FR / SR / NFR / AC requirement is changed, or affected requirements are listed below
-- [ ] Relevant documentation is updated
-- [ ] English and Japanese SRS versions remain semantically aligned, if changed
+<!-- Select exactly one SRS-impact option. If requirements are affected, list the requirement IDs below. -->
+
+- [ ] No FR / SR / NFR / AC requirement is affected.
+- [ ] Requirements are affected and updated in this PR.
+
+Affected requirements:
+
+<!-- Write `N/A` when the SRS is unaffected. Otherwise list IDs such as `FR-012`, `SR-003`. -->
+
+Documentation:
+
+- [ ] Relevant documentation is updated, or no documentation update is required.
+- [ ] English and Japanese SRS versions remain semantically aligned, or SRS is not changed.
 
 ## Safety impact
 
-<!-- Describe any effect on Git-state handling, local-only LLM processing, sensitive-file handling, verification, hooks, or output safety. Write "None" when not applicable. -->
-
-None.
+<!-- Required. Describe any effect on Git-state handling, local-only LLM processing, sensitive-file handling, verification, hooks, or output safety. Write exactly `None.` when not applicable. -->

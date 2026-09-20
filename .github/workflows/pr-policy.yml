@@ -1,0 +1,218 @@
+name: PR Policy
+
+permissions: {}
+
+on:
+  pull_request_target:
+    branches: ["main"]
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+      - ready_for_review
+      - converted_to_draft
+
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate pull request contract
+        env:
+          EVENT_PATH: ${{ github.event_path }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import sys
+
+          with open(os.environ["EVENT_PATH"], "r", encoding="utf-8") as f:
+              event = json.load(f)
+
+          pr = event["pull_request"]
+          title = pr.get("title") or ""
+          body = pr.get("body") or ""
+          author = (pr.get("user") or {}).get("login") or ""
+          draft = bool(pr.get("draft"))
+
+          if draft:
+              print("Draft PR: policy validation is deferred until the PR is ready for review.")
+              sys.exit(0)
+
+          errors = []
+
+          title_pattern = re.compile(
+              r"^(feat|fix|docs|test|refactor|perf|build|ci|chore)"
+              r"(\([a-z0-9][a-z0-9._/-]*\))?!?: [A-Za-z0-9].+$"
+          )
+          if not title_pattern.fullmatch(title):
+              errors.append(
+                  "PR title must use Conventional Commits: "
+                  "<type>(<scope>): <English summary>. "
+                  "Allowed types: feat, fix, docs, test, refactor, perf, build, ci, chore."
+              )
+          if not title.isascii():
+              errors.append("PR title must use English/ASCII characters.")
+
+          bot_allowlist = {"dependabot[bot]", "github-actions[bot]"}
+          if author in bot_allowlist:
+              if errors:
+                  for error in errors:
+                      print(f"::error::{error}")
+                  sys.exit(1)
+              print(f"Allowed bot PR ({author}): body validation skipped.")
+              sys.exit(0)
+
+          required_sections = [
+              "Summary",
+              "Related issue",
+              "Changes",
+              "Verification",
+              "Requirements and documentation",
+              "Safety impact",
+          ]
+
+          heading_re = re.compile(r"(?m)^##[ \t]+(.+?)[ \t]*$")
+          matches = list(heading_re.finditer(body))
+          sections = {}
+          duplicates = set()
+
+          for index, match in enumerate(matches):
+              name = match.group(1).strip()
+              start = match.end()
+              end = matches[index + 1].start() if index + 1 < len(matches) else len(body)
+              if name in sections:
+                  duplicates.add(name)
+              sections[name] = body[start:end]
+
+          for section in required_sections:
+              if section not in sections:
+                  errors.append(f"Missing required section: ## {section}")
+          for section in sorted(duplicates):
+              if section in required_sections:
+                  errors.append(f"Required section appears more than once: ## {section}")
+
+          comment_re = re.compile(r"<!--.*?-->", re.S)
+
+          def cleaned(name):
+              value = sections.get(name, "")
+              return comment_re.sub("", value).strip()
+
+          summary = cleaned("Summary")
+          if "Summary" in sections and not summary:
+              errors.append("Summary must not be empty.")
+
+          related = cleaned("Related issue")
+          if "Related issue" in sections:
+              closes_issue = re.search(
+                  r"(?i)\b(?:closes|fixes|resolves)\s+#\d+\b", related
+              )
+              explicit_na = re.search(r"(?im)^N/A:\s+\S.*$", related)
+              if not (closes_issue or explicit_na):
+                  errors.append(
+                      "Related issue must contain 'Closes/Fixes/Resolves #<number>' "
+                      "or 'N/A: <reason>'."
+                  )
+
+          changes = cleaned("Changes")
+          meaningful_changes = re.sub(r"(?m)^[ \t]*[-*+][ \t]*$", "", changes).strip()
+          if "Changes" in sections and not meaningful_changes:
+              errors.append("Changes must contain at least one concrete change.")
+
+          verification = cleaned("Verification")
+          standard_checks = [
+              "go test ./...",
+              "go vet ./...",
+              "go build ./cmd/commiter",
+              "git diff --check",
+          ]
+          if "Verification" in sections:
+              unchecked = []
+              for check in standard_checks:
+                  checked_re = re.compile(
+                      rf"(?im)^[ \t]*-[ \t]+\[[xX]\][ \t]+\x60{re.escape(check)}\x60[ \t]*$"
+                  )
+                  if not checked_re.search(verification):
+                      unchecked.append(check)
+
+              skip_match = re.search(
+                  r"(?is)Skipped / not applicable:\s*(.*)$", verification
+              )
+              skip_reason = skip_match.group(1).strip() if skip_match else ""
+
+              if unchecked and (not skip_reason or skip_reason.lower() in {"none", "none."}):
+                  errors.append(
+                      "Verification must explain unchecked standard checks under "
+                      "'Skipped / not applicable:'."
+                  )
+
+          requirements = cleaned("Requirements and documentation")
+          if "Requirements and documentation" in sections:
+              no_srs = bool(
+                  re.search(
+                      r"(?im)^-[ \t]+\[[xX]\][ \t]+No FR / SR / NFR / AC requirement is affected\.[ \t]*$",
+                      requirements,
+                  )
+              )
+              changed_srs = bool(
+                  re.search(
+                      r"(?im)^-[ \t]+\[[xX]\][ \t]+Requirements are affected and updated in this PR\.[ \t]*$",
+                      requirements,
+                  )
+              )
+              if no_srs == changed_srs:
+                  errors.append(
+                      "Select exactly one SRS impact option in Requirements and documentation."
+                  )
+
+              docs_confirmed = bool(
+                  re.search(
+                      r"(?im)^-[ \t]+\[[xX]\][ \t]+Relevant documentation is updated, or no documentation update is required\.[ \t]*$",
+                      requirements,
+                  )
+              )
+              translations_confirmed = bool(
+                  re.search(
+                      r"(?im)^-[ \t]+\[[xX]\][ \t]+English and Japanese SRS versions remain semantically aligned, or SRS is not changed\.[ \t]*$",
+                      requirements,
+                  )
+              )
+              if not docs_confirmed:
+                  errors.append("Confirm the documentation update requirement.")
+              if not translations_confirmed:
+                  errors.append(
+                      "Confirm English/Japanese SRS alignment or that the SRS is unchanged."
+                  )
+
+              affected_match = re.search(
+                  r"(?is)Affected requirements:\s*(.*?)(?:\n[ \t]*Documentation:|\Z)",
+                  requirements,
+              )
+              affected = affected_match.group(1).strip() if affected_match else ""
+
+              if changed_srs:
+                  if not re.search(r"\b(?:FR|SR|NFR|AC)-\d+\b", affected):
+                      errors.append(
+                          "List at least one affected FR/SR/NFR/AC requirement ID."
+                      )
+              elif no_srs and affected.upper() not in {"N/A", "N/A."}:
+                  errors.append(
+                      "Write 'N/A' under Affected requirements when the SRS is unaffected."
+                  )
+
+          safety = cleaned("Safety impact")
+          if "Safety impact" in sections and not safety:
+              errors.append(
+                  "Safety impact must not be empty. Write 'None.' when not applicable."
+              )
+
+          if errors:
+              for error in errors:
+                  print(f"::error::{error}")
+              print(f"PR policy validation failed with {len(errors)} error(s).")
+              sys.exit(1)
+
+          print("PR policy validation passed.")
+          PY
