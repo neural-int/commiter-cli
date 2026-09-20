@@ -25,21 +25,17 @@ Skipped / not applicable:
 
 <!-- Required when any standard check above is unchecked. Explain what was skipped and why. -->
 
-## Requirements and documentation
+## Requirements impact
 
-<!-- Select exactly one SRS-impact option. If requirements are affected, list the requirement IDs below. -->
+<!-- Required. Select exactly one based on what you know. You do not need to identify FR / SR / NFR / AC IDs or certify SRS translation alignment to submit the PR; maintainers make the final determination before merge. -->
 
-- [ ] No FR / SR / NFR / AC requirement is affected.
-- [ ] Requirements are affected and updated in this PR.
+- [ ] I believe this PR does not affect requirements.
+- [ ] I believe this PR may affect requirements.
+- [ ] I am unsure; maintainer review is required.
 
-Affected requirements:
+Notes:
 
-<!-- Write `N/A` when the SRS is unaffected. Otherwise list IDs such as `FR-012`, `SR-003`. -->
-
-Documentation:
-
-- [ ] Relevant documentation is updated, or no documentation update is required.
-- [ ] English and Japanese SRS versions remain semantically aligned, or SRS is not changed.
+<!-- Optional. Mention any behavior, specification, documentation, or compatibility area you think may be affected. -->
 
 ## Safety impact
 
