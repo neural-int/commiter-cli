@@ -17,6 +17,9 @@ type Constraints struct {
 	Assignment      string   `json:"assignment"`
 	Grouping        string   `json:"grouping"`
 	OpaqueGrouping  string   `json:"opaque_grouping"`
+	Scope           string   `json:"scope"`
+	Breaking        string   `json:"breaking"`
+	Performance     string   `json:"performance"`
 	Summary         string   `json:"summary"`
 }
 
@@ -32,8 +35,11 @@ func NewConstraints(language Language, fileIDs []string) (Constraints, error) {
 		SchemaVersion: SchemaVersion, Language: language,
 		AllowedTypes: append([]string(nil), allowedTypes...), RequiredFileIDs: ids,
 		Assignment:     "assign every required_file_id to exactly one commit; do not invent IDs or split a file",
-		Grouping:       "infer purpose from actual change content; preserve every legal grouping and order returned by the model",
+		Grouping:       "infer purpose from actual change content; group implementation changes with their directly corresponding tests unless there is a concrete reason to separate them; preserve every legal grouping and order returned by the model",
 		OpaqueGrouping: "only opaque files may use path, status, size, type, and other metadata as supporting grouping evidence",
+		Scope:          "name the affected component; never use Conventional Commit type names as scope",
+		Breaking:       "set breaking=true only when the diff explains an incompatible public API, CLI, configuration format, or stored format change; ordinary UI changes and internal refactors are not breaking",
+		Performance:    "use perf only when performance improvement is the purpose and performance evidence is present in the change; use refactor for JSX cleanup or responsibility moves without performance evidence",
 		Summary:        summaryConstraint(language),
 	}, nil
 }
@@ -67,9 +73,9 @@ func Schema(fileIDs []string) (json.RawMessage, error) {
 				"items": map[string]any{
 					"type": "object", "additionalProperties": false,
 					"properties": map[string]any{
-						"type":     map[string]any{"type": "string", "enum": allowedTypes},
-						"scope":    map[string]any{"type": "string", "minLength": 1, "pattern": `^[^\r\n]+$`},
-						"breaking": map[string]any{"type": "boolean"},
+						"type":     map[string]any{"type": "string", "enum": allowedTypes, "description": "Choose by change purpose; perf requires performance evidence, while structural JSX cleanup without it is refactor"},
+						"scope":    map[string]any{"type": "string", "minLength": 1, "pattern": `^[^\r\n]+$`, "description": "Affected component; not a Conventional Commit type name"},
+						"breaking": map[string]any{"type": "boolean", "description": "True only for a diff-supported incompatible public interface or stored format change"},
 						"summary":  map[string]any{"type": "string", "minLength": 1, "pattern": `^[^\r\n]+$`},
 						"file_ids": map[string]any{"type": "array", "minItems": 1, "maxItems": len(ids), "uniqueItems": true, "items": map[string]any{"type": "string", "enum": ids}},
 					},
