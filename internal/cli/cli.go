@@ -87,18 +87,19 @@ func Run(args []string, stdout, stderr io.Writer) int {
 }
 
 func runInit(args []string, printer *output.Printer) int {
-	if len(args) != 0 {
-		return fail(printer, exitcode.New(exitcode.Usage, "init does not accept arguments"))
+	patterns, err := parseInitArgs(args)
+	if err != nil {
+		return fail(printer, exitcode.New(exitcode.Usage, err.Error()))
 	}
 	cwd, err := os.Getwd()
 	if err != nil {
 		return fail(printer, exitcode.New(exitcode.Usage, "cannot determine current directory"))
 	}
-	plan, err := repository.PlanInitialization(cwd)
+	plan, err := repository.PlanInitializationWithIgnore(cwd, patterns)
 	if err != nil {
 		return fail(printer, exitcode.New(exitcode.Usage, err.Error()))
 	}
-	if !plan.InitializeGit && !plan.CreateGitignore {
+	if !plan.InitializeGit && !plan.CreateGitignore && !plan.UpdateGitignore {
 		if err := printer.Lines("Git repository and .gitignore already exist; nothing to initialize"); err != nil {
 			return fail(printer, exitcode.New(exitcode.Internal, "cannot write output"))
 		}
@@ -109,7 +110,13 @@ func runInit(args []string, printer *output.Printer) int {
 		lines = append(lines, "operation: initialize Git repository")
 	}
 	if plan.CreateGitignore {
-		lines = append(lines, "operation: create empty .gitignore")
+		if len(plan.GitignoreEntries) == 0 {
+			lines = append(lines, "operation: create empty .gitignore")
+		} else {
+			lines = append(lines, "operation: create .gitignore with: "+strings.Join(plan.GitignoreEntries, ", "))
+		}
+	} else if plan.UpdateGitignore {
+		lines = append(lines, "operation: append to .gitignore: "+strings.Join(plan.GitignoreEntries, ", "))
 	}
 	if err := printer.PromptLines(lines...); err != nil {
 		return fail(printer, exitcode.New(exitcode.Internal, "cannot write initialization confirmation"))
@@ -124,6 +131,27 @@ func runInit(args []string, printer *output.Printer) int {
 		return fail(printer, exitcode.New(exitcode.Internal, "cannot write output"))
 	}
 	return exitcode.Success
+}
+
+func parseInitArgs(args []string) ([]string, error) {
+	patterns := make([]string, 0)
+	for i := 0; i < len(args); i++ {
+		arg := args[i]
+		if arg == "--ignore" {
+			if i+1 >= len(args) {
+				return nil, fmt.Errorf("--ignore requires a value")
+			}
+			i++
+			patterns = append(patterns, args[i])
+			continue
+		}
+		if strings.HasPrefix(arg, "--ignore=") {
+			patterns = append(patterns, strings.TrimPrefix(arg, "--ignore="))
+			continue
+		}
+		return nil, fmt.Errorf("init accepts only --ignore")
+	}
+	return patterns, nil
 }
 
 func runSetup(args []string, printer *output.Printer) int {

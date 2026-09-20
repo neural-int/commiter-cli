@@ -68,6 +68,33 @@ func TestInitDeclineDoesNotChangeDirectory(t *testing.T) {
 	}
 }
 
+func TestInitIgnoreAppendsOnlyApprovedPatterns(t *testing.T) {
+	dir := t.TempDir()
+	oldDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(dir); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(oldDir) })
+	oldConfirm := confirmFunc
+	confirmFunc = func(string) bool { return true }
+	t.Cleanup(func() { confirmFunc = oldConfirm })
+
+	var stdout, stderr bytes.Buffer
+	if code := Run([]string{"init", "--ignore", "*.tmp", "--ignore=build/"}, &stdout, &stderr); code != 0 {
+		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
+	}
+	got, err := os.ReadFile(filepath.Join(dir, ".gitignore"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(got) != "*.tmp\nbuild/\n" {
+		t.Fatalf("gitignore = %q", got)
+	}
+}
+
 func TestJSONRestrictionIsUsageErrorAndDoesNotMixStderr(t *testing.T) {
 	var stdout, stderr bytes.Buffer
 	code := Run([]string{"--json"}, &stdout, &stderr)
