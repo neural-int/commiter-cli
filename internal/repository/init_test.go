@@ -68,6 +68,18 @@ func TestPlanInitializationPreservesExistingRepositoryAndGitignore(t *testing.T)
 	}
 }
 
+func TestPlanInitializationRejectsBareRepository(t *testing.T) {
+	dir := filepath.Join(t.TempDir(), "bare.git")
+	command := exec.Command("git", "init", "--bare", dir)
+	if output, err := command.CombinedOutput(); err != nil {
+		t.Fatalf("git init --bare: %v: %s", err, output)
+	}
+
+	if _, err := PlanInitialization(dir); err == nil {
+		t.Fatal("PlanInitialization accepted a bare repository")
+	}
+}
+
 func TestPlanInitializationRejectsInvalidGitMetadata(t *testing.T) {
 	dir := t.TempDir()
 	if err := os.Mkdir(filepath.Join(dir, ".git"), 0o755); err != nil {

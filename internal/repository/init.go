@@ -97,6 +97,13 @@ func ApplyInitialization(plan InitializationPlan) error {
 }
 
 func detectRoot(path string) (string, bool, error) {
+	bareCommand := exec.Command("git", "-C", path, "rev-parse", "--is-bare-repository")
+	var bareStdout bytes.Buffer
+	bareCommand.Stdout = &bareStdout
+	if err := bareCommand.Run(); err == nil && strings.TrimSpace(bareStdout.String()) == "true" {
+		return "", false, fmt.Errorf("bare Git repository at %s is not supported; refusing to initialize", path)
+	}
+
 	command := exec.Command("git", "-C", path, "rev-parse", "--show-toplevel")
 	var stdout bytes.Buffer
 	command.Stdout = &stdout
