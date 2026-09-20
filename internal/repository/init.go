@@ -78,12 +78,12 @@ func normalizeGitignorePatterns(patterns []string) ([]string, error) {
 	seen := make(map[string]bool, len(patterns))
 	result := make([]string, 0, len(patterns))
 	for _, pattern := range patterns {
+		if strings.ContainsAny(pattern, "\r\n") {
+			return nil, fmt.Errorf("gitignore pattern must be a single line")
+		}
 		pattern = strings.TrimSpace(pattern)
 		if pattern == "" {
 			return nil, fmt.Errorf("gitignore pattern must not be empty")
-		}
-		if strings.ContainsAny(pattern, "\r\n") {
-			return nil, fmt.Errorf("gitignore pattern must be a single line")
 		}
 		if !seen[pattern] {
 			seen[pattern] = true
@@ -145,7 +145,7 @@ func ApplyInitialization(plan InitializationPlan) error {
 	if plan.CreateGitignore || plan.UpdateGitignore {
 		gitignorePath := filepath.Join(plan.Root, ".gitignore")
 		if plan.UpdateGitignore && plan.GitignoreExists {
-			file, err := os.OpenFile(gitignorePath, os.O_RDWR, 0o644)
+			file, err := os.OpenFile(gitignorePath, os.O_RDWR|os.O_APPEND, 0o644)
 			if err != nil {
 				return fmt.Errorf("cannot open .gitignore")
 			}

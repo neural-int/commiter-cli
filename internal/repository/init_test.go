@@ -164,8 +164,10 @@ func TestApplyInitializationRejectsChangedGitignore(t *testing.T) {
 
 func TestPlanInitializationRejectsUnsafeGitignorePatternAndSymlink(t *testing.T) {
 	dir := t.TempDir()
-	if _, err := PlanInitializationWithIgnore(dir, []string{"safe\nsecret"}); err == nil {
-		t.Fatal("accepted multi-line gitignore pattern")
+	for _, pattern := range []string{"safe\nsecret", "\nfoo\n"} {
+		if _, err := PlanInitializationWithIgnore(dir, []string{pattern}); err == nil {
+			t.Fatalf("accepted multi-line gitignore pattern %q", pattern)
+		}
 	}
 	target := filepath.Join(t.TempDir(), "outside")
 	if err := os.WriteFile(target, []byte("outside\n"), 0o644); err != nil {
