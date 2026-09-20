@@ -90,6 +90,59 @@ func TestValidateAcceptsLegalGroupingWithoutReordering(t *testing.T) {
 	}
 }
 
+func TestValidateRejectsTypeNamesAsScopes(t *testing.T) {
+	for _, pair := range [][2]string{{"feat", "feat"}, {"test", "test"}, {"fix", "PERF"}} {
+		t.Run(pair[0]+"-"+pair[1], func(t *testing.T) {
+			candidate, err := json.Marshal(Plan{SchemaVersion: SchemaVersion, Commits: []Commit{{Type: pair[0], Scope: pair[1], Summary: "describe change", FileIDs: []string{"F001", "F002"}}}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			_, violations := Validate(candidate, []string{"F001", "F002"}, SensitiveValues{}, English)
+			if !containsViolation(violations, InvalidScope) {
+				t.Fatalf("violations=%v", violations)
+			}
+		})
+	}
+}
+
+func TestConstraintsExplainClassificationAndTestGrouping(t *testing.T) {
+	constraints, err := NewConstraints(English, []string{"F001", "F002"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, phrase := range []string{"type names", "public API", "performance evidence", "refactor", "corresponding tests"} {
+		encoded, err := json.Marshal(constraints)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !strings.Contains(string(encoded), phrase) {
+			t.Fatalf("missing %q from constraints: %s", phrase, encoded)
+		}
+	}
+}
+
+func TestGeneratorRepairsTypeScopeDuplication(t *testing.T) {
+	invalid := `{"schema_version":1,"commits":[{"type":"feat","scope":"feat","breaking":false,"summary":"add CLI option","file_ids":["F001","F002"]}]}`
+	valid := `{"schema_version":1,"commits":[{"type":"feat","scope":"cli","breaking":false,"summary":"add CLI option","file_ids":["F001","F002"]}]}`
+	client := &scriptedChat{steps: []chatStep{{content: invalid}, {content: valid}}}
+	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !result.Repaired || result.Calls != 2 || result.Plan.Commits[0].Scope != "cli" {
+		t.Fatalf("unexpected repair result: %#v", result)
+	}
+	var repair struct {
+		Violations []Violation `json:"violations"`
+	}
+	if err := json.Unmarshal([]byte(client.messages[1][1].Content), &repair); err != nil {
+		t.Fatal(err)
+	}
+	if !containsViolation(repair.Violations, InvalidScope) {
+		t.Fatalf("repair violations=%v", repair.Violations)
+	}
+}
+
 func TestValidateAcceptsMatchingSummaryLanguages(t *testing.T) {
 	tests := map[string]struct {
 		language Language

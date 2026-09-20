@@ -111,6 +111,20 @@ func TestRenderEscapesUntrustedPlanAndMetadata(t *testing.T) {
 	}
 }
 
+func TestRenderShowsBreakingClassification(t *testing.T) {
+	request := ReviewRequest{
+		Plan:  planning.Plan{SchemaVersion: planning.SchemaVersion, Commits: []planning.Commit{{Type: "feat", Scope: "cli", Breaking: true, Summary: "change config format", FileIDs: []string{"F001"}}}},
+		Files: map[string]string{"F001": "config.go"},
+	}
+	var stdout, stderr bytes.Buffer
+	if err := Render(output.New(&stdout, &stderr, false), request); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(stdout.String(), "feat(cli)!: change config format breaking=true files=F001=config.go") {
+		t.Fatalf("breaking classification is unclear: %q", stdout.String())
+	}
+}
+
 func TestResolvePushTargetUsesUpstreamAndFallsBackToSingleRemote(t *testing.T) {
 	repo := t.TempDir()
 	runGit(t, repo, "init", "-b", "main")

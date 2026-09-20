@@ -49,7 +49,7 @@ func Validate(candidate []byte, fileIDs []string, sensitive SensitiveValues, lan
 		if !allowed[commit.Type] {
 			violations = append(violations, InvalidType)
 		}
-		if !oneNonEmptyLine(commit.Scope) {
+		if !oneNonEmptyLine(commit.Scope) || allowed[strings.ToLower(strings.TrimSpace(commit.Scope))] {
 			violations = append(violations, InvalidScope)
 		}
 		if !oneNonEmptyLine(commit.Summary) {

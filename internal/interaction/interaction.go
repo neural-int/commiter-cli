@@ -136,7 +136,11 @@ func Render(printer *output.Printer, request ReviewRequest) error {
 		for _, id := range commit.FileIDs {
 			files = append(files, id+"="+request.Files[id])
 		}
-		lines = append(lines, fmt.Sprintf("%d. %s files=%s", index+1, commit.Subject(), strings.Join(files, ",")))
+		breaking := ""
+		if commit.Breaking {
+			breaking = " breaking=true"
+		}
+		lines = append(lines, fmt.Sprintf("%d. %s%s files=%s", index+1, commit.Subject(), breaking, strings.Join(files, ",")))
 	}
 	if len(request.Excluded) == 0 {
 		lines = append(lines, "Excluded: none")
