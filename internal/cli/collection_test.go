@@ -166,6 +166,9 @@ func TestMainPromptsCandidatesOnceAndAcceptsAll(t *testing.T) {
 	if strings.Count(stdout.String(), "Read all listed candidates?") != 1 || !strings.Contains(stdout.String(), "F001") || !strings.Contains(stdout.String(), "F002") {
 		t.Fatalf("stdout=%q", stdout.String())
 	}
+	if !strings.Contains(stdout.String(), "matched path-name rules") || !strings.Contains(stdout.String(), "does not mean a secret value was detected") || !strings.Contains(stdout.String(), "File contents have not been read") || strings.Contains(stdout.String(), "local-only") {
+		t.Fatalf("sensitive candidate explanation=%q", stdout.String())
+	}
 }
 
 func TestMainDoesNotApproveSensitiveCandidatesAtEOF(t *testing.T) {
@@ -222,7 +225,10 @@ func TestMainRejectsPlanAndNoConfirmSkipsPrompt(t *testing.T) {
 		wantCode int
 		want     string
 	}{
-		{name: "reject", input: "n\n", wantCode: 3, want: "commit plan rejected"},
+		{name: "reject", input: "n\n", wantCode: 3, want: "commit plan rejected by user"},
+		{name: "empty", input: "\n", wantCode: 3, want: "empty input (default: no)"},
+		{name: "eof", input: "", wantCode: 3, want: "input stream ended (EOF; default: no)"},
+		{name: "invalid then eof", input: "other\n", wantCode: 3, want: "Invalid choice. Enter y, r, or n."},
 		{name: "no confirm", args: []string{"--no-confirm-commit", "--no-push"}, wantCode: 0, want: "Commit confirmation skipped"},
 	} {
 		t.Run(test.name, func(t *testing.T) {

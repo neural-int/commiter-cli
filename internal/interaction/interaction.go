@@ -19,9 +19,13 @@ import (
 type Decision string
 
 const (
-	Approve    Decision = "approve"
-	Regenerate Decision = "regenerate"
-	Reject     Decision = "reject"
+	Approve             Decision = "approve"
+	Regenerate          Decision = "regenerate"
+	Reject              Decision = "reject"
+	RejectEmpty         Decision = "reject_empty"
+	RejectEOF           Decision = "reject_eof"
+	RejectEmptyFeedback Decision = "reject_empty_feedback"
+	RejectEOFFeedback   Decision = "reject_eof_feedback"
 )
 
 // ReviewRequest is the immutable information displayed to a user. Supplement
@@ -41,9 +45,8 @@ type VerificationCommand struct {
 	Argv      []string
 }
 
-// Reviewer presents a plan once and obtains y/r/N.  A short supplement is
-// read only after r, then regenerate is returned to the caller. EOF is a
-// rejection (never an approval).
+// Reviewer presents a plan once and obtains y/r/N. Invalid choices are
+// retried. A short supplement is read only after r. EOF never approves.
 type Reviewer struct {
 	In      io.Reader
 	Printer *output.Printer
@@ -67,36 +70,42 @@ func (r Reviewer) ReviewContext(ctx context.Context, request ReviewRequest) (Dec
 		return Reject, "", err
 	}
 	reader := buffered(r.In)
-	answer, err := readLineContext(ctx, reader)
-	if err != nil {
-		if errors.Is(err, io.EOF) {
-			return Reject, "", nil
-		}
-		return Reject, "", err
-	}
-	if answer == "" {
-		return Reject, "", nil
-	}
-	switch strings.ToLower(answer) {
-	case "y", "yes":
-		return Approve, "", nil
-	case "r", "regenerate":
-		if err := r.Printer.Lines("Why should the plan be regenerated?"); err != nil {
-			return Reject, "", err
-		}
-		supplement, err := readLineContext(ctx, reader)
+	for {
+		answer, err := readLineContext(ctx, reader)
 		if err != nil {
 			if errors.Is(err, io.EOF) {
-				return Reject, "", nil
+				return RejectEOF, "", nil
 			}
 			return Reject, "", err
 		}
-		if supplement == "" {
-			return Reject, "", nil
+		if answer == "" {
+			return RejectEmpty, "", nil
 		}
-		return Regenerate, supplement, nil
-	default:
-		return Reject, "", nil
+		switch strings.ToLower(answer) {
+		case "y", "yes":
+			return Approve, "", nil
+		case "n", "no":
+			return Reject, "", nil
+		case "r", "regenerate":
+			if err := r.Printer.Lines("Why should the plan be regenerated?"); err != nil {
+				return Reject, "", err
+			}
+			supplement, err := readLineContext(ctx, reader)
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					return RejectEOFFeedback, "", nil
+				}
+				return Reject, "", err
+			}
+			if supplement == "" {
+				return RejectEmptyFeedback, "", nil
+			}
+			return Regenerate, supplement, nil
+		default:
+			if err := r.Printer.Lines("Invalid choice. Enter y, r, or n."); err != nil {
+				return Reject, "", err
+			}
+		}
 	}
 }
 
