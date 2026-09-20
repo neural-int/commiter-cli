@@ -91,7 +91,7 @@ func TestValidateAcceptsLegalGroupingWithoutReordering(t *testing.T) {
 }
 
 func TestValidateRejectsTypeNamesAsScopes(t *testing.T) {
-	for _, pair := range [][2]string{{"feat", "feat"}, {"test", "test"}, {"fix", "PERF"}} {
+	for _, pair := range [][2]string{{"feat", "feat"}, {"test", "test"}, {"fix", "PERF"}, {"fix", " PERF "}} {
 		t.Run(pair[0]+"-"+pair[1], func(t *testing.T) {
 			candidate, err := json.Marshal(Plan{SchemaVersion: SchemaVersion, Commits: []Commit{{Type: pair[0], Scope: pair[1], Summary: "describe change", FileIDs: []string{"F001", "F002"}}}})
 			if err != nil {
@@ -100,6 +100,38 @@ func TestValidateRejectsTypeNamesAsScopes(t *testing.T) {
 			_, violations := Validate(candidate, []string{"F001", "F002"}, SensitiveValues{}, English)
 			if !containsViolation(violations, InvalidScope) {
 				t.Fatalf("violations=%v", violations)
+			}
+		})
+	}
+}
+
+func TestValidateAcceptsRepresentativeClassificationPlans(t *testing.T) {
+	tests := []struct {
+		name     string
+		typeName string
+		scope    string
+		breaking bool
+		summary  string
+	}{
+		{name: "structural UI refactor with tests", typeName: "refactor", scope: "ui", summary: "reorganize JSX responsibilities"},
+		{name: "evidenced performance improvement", typeName: "perf", scope: "parser", summary: "reduce parser allocations"},
+		{name: "incompatible configuration format", typeName: "feat", scope: "config", breaking: true, summary: "change configuration format"},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			candidate, err := json.Marshal(Plan{SchemaVersion: SchemaVersion, Commits: []Commit{{
+				Type: test.typeName, Scope: test.scope, Breaking: test.breaking, Summary: test.summary, FileIDs: []string{"F001", "F002"},
+			}}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			plan, violations := Validate(candidate, []string{"F001", "F002"}, SensitiveValues{}, English)
+			if len(violations) != 0 {
+				t.Fatalf("violations=%v", violations)
+			}
+			commit := plan.Commits[0]
+			if commit.Type != test.typeName || commit.Scope != test.scope || commit.Breaking != test.breaking || len(commit.FileIDs) != 2 {
+				t.Fatalf("classification was rewritten: %#v", commit)
 			}
 		})
 	}
@@ -118,6 +150,9 @@ func TestConstraintsExplainClassificationAndTestGrouping(t *testing.T) {
 		if !strings.Contains(string(encoded), phrase) {
 			t.Fatalf("missing %q from constraints: %s", phrase, encoded)
 		}
+	}
+	if constraints.Scope == "" || constraints.Breaking == "" || constraints.Performance == "" || constraints.Grouping == "" {
+		t.Fatalf("classification constraints are incomplete: %#v", constraints)
 	}
 }
 

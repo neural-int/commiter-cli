@@ -246,6 +246,8 @@ Therefore, an individual plan-generation cycle may make at most three Ollama cal
 
 The LLM must infer the meaning and intent of each change from the diff and structural evidence and group files by purpose when it judges them to belong to the same logical change. The mechanical layer must not merge, split, or reorder otherwise valid LLM grouping based on heuristics such as source/test relationships, directories, filenames, imports, or dependencies.
 
+Implementation changes and their directly corresponding test changes should be included in the same commit candidate unless there is a concrete reason to separate them. The LLM must infer the separation reason from the diff, and the mechanical layer must not rewrite this valid decision afterward.
+
 Opaque files are an exception because their contents cannot be used for semantic judgment; path, status, size, type, and other metadata may be used as supporting evidence for grouping.
 
 The CLI must not assign the same file ID to multiple commits. Even when a target file contains both staged and unstaged changes, it must not split the file at hunk granularity and must include the file's complete change in one commit. A rename is one file ID with old/new paths and must not be split into deletion and addition.
@@ -391,9 +393,11 @@ The output schema must have the following form:
 
 `type` must be one of `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, or `revert`.
 
-`scope` is a required single-line string and must not be empty. It must not be one of the Conventional Commit type names `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, or `revert`. A plan that uses one of these type names as its scope is rejected by deterministic post-generation validation and sent to automatic repair.
+`scope` is a required single-line string and must not be empty. After trimming surrounding whitespace, it must not match any of the Conventional Commit type names `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, or `revert`, case-insensitively. A plan that uses one of these type names as its scope is rejected by deterministic post-generation validation and sent to automatic repair.
 
-`breaking` is boolean; when true, `!` is appended after the scope in the subject.
+`breaking` is boolean. It may be true only when the diff explains an incompatible change to a public API, CLI, configuration format, or stored format. Ordinary UI changes and internal refactors alone must not set `breaking=true`. When true, `!` is appended after the scope in the subject.
+
+`perf` may be used only when performance improvement is the purpose of the change and performance evidence is present in the diff or corresponding verification. Structural changes such as JSX cleanup or responsibility moves without performance evidence must use `refactor`.
 
 `summary` must be a single line. Commit bodies, multiline summaries, unassigned file IDs, and duplicate file IDs are not allowed.
 
@@ -639,7 +643,7 @@ Using fixtures for Go, JavaScript, JSX, TypeScript, TSX, Python, Rust, HTML, and
 
 Verify that an unsupported-language text file or a text file with deliberately failed syntax parsing falls back to raw diff plus Git metadata and the overall run continues.
 
-Using a diff containing source, tests, docs, dependency changes, and mechanical changes, verify that the LLM groups by meaning and intent, the mechanical layer does not rewrite valid grouping, missing/duplicate/out-of-range file-ID assignments are detected, and same-file hunks are never split. Verify that only opaque files may use metadata as supporting evidence for grouping.
+Using a diff containing implementation, corresponding tests, docs, dependency changes, and mechanical changes, verify that the LLM groups by meaning and intent, keeps directly corresponding implementation and test changes together unless a concrete separation reason exists, the mechanical layer does not rewrite valid grouping, missing/duplicate/out-of-range file-ID assignments are detected, and same-file hunks are never split. Verify that only opaque files may use metadata as supporting evidence for grouping.
 
 ### AC-007 LLM Retry and Output Validation
 
@@ -712,7 +716,7 @@ Verify output and state changes for `config init --global`, `config init --repo`
 
 ### AC-017 JSON Constraints and Assignment
 
-Verify detection of invalid type, empty scope, a scope equal to a Conventional Commit type name (`feat(feat)`, `test(test)`, or `fix(perf)`), multiline summary, body, missing file IDs, duplicate file IDs, out-of-range file IDs, and assignment of one file to multiple commits. Verify that a candidate with a type-name scope is sent to exactly one automatic repair and that the CLI stops without modifying Git if the violation remains after repair.
+Verify detection of invalid type, empty scope, and a scope equal to a Conventional Commit type name after trimming and case folding (`feat(feat)`, `test(test)`, `fix(perf)`, or `fix(PERF)`), multiline summary, body, missing file IDs, duplicate file IDs, out-of-range file IDs, and assignment of one file to multiple commits. Verify that a candidate with a type-name scope is sent to exactly one automatic repair and that the CLI stops without modifying Git if the violation remains after repair.
 
 Verify that `--json` succeeds with `--dry-run` and read-only subcommands and causes exit code 2 as a usage error when used with execution that performs commits or push.
 
