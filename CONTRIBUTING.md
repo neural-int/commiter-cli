@@ -168,6 +168,14 @@ Free-form explanations in the body may be written in English or Japanese. Keep t
 - `Requirements impact`: select exactly one declaration based on what you know: no expected requirements impact, possible requirements impact, or maintainer review required. Contributors do not need to identify exact FR / SR / NFR / AC IDs or certify English/Japanese SRS alignment.
 - `Safety impact`: describe effects on Git-state handling, local-only LLM processing, sensitive-file handling, verification, hooks, or output safety. Write `None.` when there is no safety impact.
 
+### Release note metadata
+
+Every pull request must keep the `Release note`, `Release category`, and `Breaking change` sections from the template. Select exactly one category and one breaking-change value. The release note is written in English from the user's perspective and is the canonical text used by the release workflow. Do not add a Japanese release note; the workflow derives it locally from the English text.
+
+Use `None` for the release note only when the category is `Internal` or `None`. User-facing categories (`Added`, `Changed`, `Fixed`, `Security`, and `Distribution`) require a concrete English description. The release workflow validates merged pull requests again and stops before publishing when metadata is missing or ambiguous.
+
+The Japanese text is generated on the GitHub Actions runner with the pinned `Helsinki-NLP/opus-mt-en-jap` revision `a863894cdd2b80f3bc1c5966734aee9ffec207d1`. The pinned runtime versions are recorded in `.github/scripts/release-notes/requirements.txt`. Release note text is passed only to this local model; no external translation API or LLM is used. Code spans, commands, versions, URLs, paths, configuration keys, and pull request references are protected and checked after translation.
+
 The policy check validates structure and explicit confirmations. It does not judge whether the technical explanation is sufficient; reviewers make that determination.
 
 Before merge, maintainers must make the final determination of SRS impact, affected requirement IDs when applicable, English/Japanese SRS semantic alignment, and release/breaking-change impact. Merging the pull request signifies that the maintainer considers those checks acceptable for the change.

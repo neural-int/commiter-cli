@@ -168,6 +168,14 @@ Ready for review にする前に、template の必須 section を残したまま
 - `Requirements impact`: 分かる範囲で「要件への影響はないと思う」「要件へ影響する可能性がある」「判断できないため Maintainer review が必要」のいずれか1つを選択する。正確な FR / SR / NFR / AC ID の特定や、英語版 / 日本語版 SRS の整合性保証はコントリビューターの必須要件ではない。
 - `Safety impact`: Git-state handling、local-only LLM processing、sensitive-file handling、verification、hook、output safety への影響を記載する。影響がない場合は `None.` と記載する。
 
+### Release note metadata
+
+すべての Pull Request で、template の `Release note`、`Release category`、`Breaking change` section を保持してください。カテゴリと breaking-change は、それぞれ1つだけ選択します。Release note には利用者から見た変更内容を英語で記載し、release workflow が使用する正本にします。日本語の Release note は追加しないでください。workflow が英語からローカル生成します。
+
+Release note に `None` を指定できるのは、カテゴリが `Internal` または `None` の場合だけです。利用者向けカテゴリ（`Added`、`Changed`、`Fixed`、`Security`、`Distribution`）では、具体的な英語の説明が必要です。Release workflow は merge 済み Pull Request の metadata を再検証し、metadata が不足または曖昧な場合は公開前に停止します。
+
+日本語文は GitHub Actions runner 上で、`Helsinki-NLP/opus-mt-en-jap` の revision `a863894cdd2b80f3bc1c5966734aee9ffec207d1` を固定して生成します。固定した runtime version は `.github/scripts/release-notes/requirements.txt` に記載しています。Release note 本文はこのローカルモデルにだけ渡し、外部の翻訳 API や LLM は使用しません。コード span、コマンド、version、URL、path、configuration key、Pull Request reference は保護し、翻訳後に検証します。
+
 Policy check は構造と明示的な確認事項だけを検証します。技術的な説明が十分かどうかは CI では判定せず、review で判断します。
 
 merge 前に Maintainer は、SRS impact、該当する場合の Requirement ID、英語版 / 日本語版 SRS の意味上の整合性、release / breaking-change impact を最終確認します。Pull Request を merge することは、Maintainer がその変更についてこれらの確認を妥当と判断したことを意味します。

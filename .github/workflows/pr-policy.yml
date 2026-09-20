@@ -170,6 +170,55 @@ jobs:
                   "Safety impact must not be empty. Write 'None.' when not applicable."
               )
 
+          release_sections = ["Release note", "Release category", "Breaking change"]
+          for section in release_sections:
+              if section not in sections:
+                  errors.append(f"Missing required section: ## {section}")
+          for section in sorted(duplicates):
+              if section in release_sections:
+                  errors.append(f"Required section appears more than once: ## {section}")
+
+          release_categories = {
+              "Added",
+              "Changed",
+              "Fixed",
+              "Security",
+              "Distribution",
+              "Internal",
+              "None",
+          }
+          breaking_options = {"Yes", "No"}
+          checkbox_re = re.compile(r"(?m)^\s*-[ \t]+\[([ xX])\][ \t]+(.+?)[ \t]*$")
+
+          def selected_release_option(section, allowed, label):
+              selected = []
+              for match in checkbox_re.finditer(sections.get(section, "")):
+                  option = match.group(2).strip()
+                  if option not in allowed:
+                      errors.append(f"{label} contains an invalid option: {option}")
+                  elif match.group(1).lower() == "x":
+                      selected.append(option)
+              if section in sections and len(selected) != 1:
+                  errors.append(f"{label} must select exactly one option.")
+              return selected[0] if len(selected) == 1 else None
+
+          category = selected_release_option(
+              "Release category", release_categories, "Release category"
+          )
+          selected_breaking = selected_release_option(
+              "Breaking change", breaking_options, "Breaking change"
+          )
+          release_note = cleaned("Release note")
+          if "Release note" in sections and not release_note:
+              errors.append("English Release note must not be empty.")
+          if (
+              category in {"Added", "Changed", "Fixed", "Security", "Distribution"}
+              and release_note.casefold() == "none"
+          ):
+              errors.append(
+                  f"English Release note is required for category {category}."
+              )
+
           if errors:
               for error in errors:
                   print(f"::error::{error}")

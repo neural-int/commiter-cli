@@ -13,6 +13,40 @@
 
 -
 
+## Release note
+
+<!--
+Required for user-facing changes.
+
+Describe the observable effect of this change from the user's perspective.
+Do not copy the commit or PR title.
+
+This English text is the canonical release note and is used to generate
+the Japanese translation during the release workflow.
+
+Write "None" only when Release category is Internal or None.
+-->
+
+
+## Release category
+
+<!-- Select exactly one. -->
+
+- [ ] Added
+- [ ] Changed
+- [ ] Fixed
+- [ ] Security
+- [ ] Distribution
+- [ ] Internal
+- [ ] None
+
+## Breaking change
+
+<!-- Select exactly one. -->
+
+- [ ] Yes
+- [ ] No
+
 ## Verification
 
 <!-- Mark every standard check that was run. If a check is not run or is not applicable, explain it under "Skipped / not applicable". -->
