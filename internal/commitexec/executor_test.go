@@ -115,11 +115,45 @@ func TestExecuteRejectsModifiedApprovedSensitiveCandidate(t *testing.T) {
 	}
 }
 
-func TestExecuteRejectsNewUnapprovedSensitiveCandidate(t *testing.T) {
+func TestExecuteIgnoresUnapprovedSensitiveCandidateOutsidePlannedPaths(t *testing.T) {
+	repo := newRepo(t, "base.txt")
+	if err := os.MkdirAll(filepath.Join(repo, "src"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	writeFile(t, repo, "src/main.go", "base\n")
+	gitExec(t, repo, "add", "src/main.go")
+	gitExec(t, repo, "commit", "-m", "base source")
+	writeFile(t, repo, "src/main.go", "planned\n")
+	snapshot, err := gitstate.Collect(repo, gitstate.Options{Pathspecs: []string{"src"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	change := snapshot.Changes[0]
+	if err := os.MkdirAll(filepath.Join(repo, "private"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	writeFile(t, repo, "private/auth.json", "outside fixture\n")
+
+	result, err := Execute(Options{
+		Root:    repo,
+		Changes: []gitstate.Change{change},
+		Plan: planning.Plan{SchemaVersion: planning.SchemaVersion, Commits: []planning.Commit{
+			{Type: "fix", Scope: "src", Summary: "update main", FileIDs: []string{change.ID}},
+		}},
+	})
+	if err != nil || len(result.Hashes) != 1 {
+		t.Fatalf("result=%#v err=%v", result, err)
+	}
+	if got := gitExec(t, repo, "status", "--short"); got != "?? private/\n" {
+		t.Fatalf("status = %q", got)
+	}
+}
+
+func TestExecuteRejectsChangedPlannedPathWhenNewSensitiveCandidateAppears(t *testing.T) {
 	repo := newRepo(t, "a.txt")
 	writeFile(t, repo, "a.txt", "planned\n")
 	change := collect(t, repo).Changes[0]
-	writeFile(t, repo, "auth.json", "new unapproved fixture\n")
+	gitExec(t, repo, "mv", "a.txt", "auth.json")
 
 	result, err := Execute(Options{
 		Root:    repo,

@@ -226,6 +226,7 @@ func interruption(ctx context.Context) error {
 
 func verifyHashes(root string, changes []gitstate.Change, ids []string, options Options) error {
 	current, err := gitstate.Collect(root, gitstate.Options{
+		Pathspecs:                allPlannedPaths(changes),
 		ApprovedSensitivePaths:   options.ApprovedSensitivePaths,
 		AdditionalSensitiveGlobs: options.AdditionalSensitiveGlobs,
 	})
