@@ -65,9 +65,13 @@ func TestReviewApproveRegenerateAndReject(t *testing.T) {
 		{"approve", "y\n", Approve, ""},
 		{"regenerate", "r\nmake one commit\n", Regenerate, "make one commit"},
 		{"reject", "n\n", Reject, ""},
-		{"eof", "", Reject, ""},
-		{"eof after approve text", "y", Reject, ""},
-		{"eof after regenerate text", "r\nfeedback", Reject, ""},
+		{"empty", "\n", RejectEmpty, ""},
+		{"eof", "", RejectEOF, ""},
+		{"eof after approve text", "y", RejectEOF, ""},
+		{"empty regeneration feedback", "r\n\n", RejectEmptyFeedback, ""},
+		{"eof after regenerate text", "r\nfeedback", RejectEOFFeedback, ""},
+		{"invalid then approve", "other\ny\n", Approve, ""},
+		{"invalid then eof", "other\n", RejectEOF, ""},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			var out, stderr bytes.Buffer
@@ -77,6 +81,9 @@ func TestReviewApproveRegenerateAndReject(t *testing.T) {
 			}
 			if strings.Contains(out.String(), "secret") {
 				t.Fatal("review output contains unexpected sensitive text")
+			}
+			if strings.HasPrefix(test.name, "invalid") && !strings.Contains(out.String(), "Invalid choice. Enter y, r, or n.") {
+				t.Fatalf("missing retry guidance: %q", out.String())
 			}
 		})
 	}

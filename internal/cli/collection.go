@@ -48,7 +48,10 @@ func runCollectionCycle(opts options, root string, values config.Values, reader 
 	defer stop()
 	var approvalWait time.Duration
 	snapshot, err := collectSnapshot(ctx, root, values, opts.pathspecs, func(candidates []gitstate.Candidate) (bool, error) {
-		lines := []string{"Sensitive candidates require approval before reading:"}
+		lines := []string{
+			"Sensitive candidates matched path-name rules; this does not mean a secret value was detected.",
+			"File contents have not been read. Approval is required before reading:",
+		}
 		for _, candidate := range candidates {
 			lines = append(lines, fmt.Sprintf("%s (%s)", candidate.Path, candidate.Reason))
 		}
@@ -134,6 +137,9 @@ func runCollectionCycle(opts options, root string, values config.Values, reader 
 				}
 				return fail(printer, exitcode.New(exitcode.Internal, "cannot review commit plan")), false
 			}
+			if ctx.Err() != nil {
+				return fail(printer, interruptedBeforeCommit()), false
+			}
 			switch decision {
 			case interaction.Approve:
 				if err := printer.Lines("Commit plan approved."); err != nil {
@@ -141,7 +147,15 @@ func runCollectionCycle(opts options, root string, values config.Values, reader 
 				}
 				goto approved
 			case interaction.Reject:
-				return fail(printer, exitcode.New(exitcode.Canceled, "commit plan rejected")), false
+				return fail(printer, exitcode.New(exitcode.Canceled, "commit plan rejected by user")), false
+			case interaction.RejectEmpty:
+				return fail(printer, exitcode.New(exitcode.Canceled, "commit plan canceled: empty input (default: no)")), false
+			case interaction.RejectEOF:
+				return fail(printer, exitcode.New(exitcode.Canceled, "commit plan canceled: input stream ended (EOF; default: no)")), false
+			case interaction.RejectEmptyFeedback:
+				return fail(printer, exitcode.New(exitcode.Canceled, "commit plan canceled: regeneration feedback was empty")), false
+			case interaction.RejectEOFFeedback:
+				return fail(printer, exitcode.New(exitcode.Canceled, "commit plan canceled: input stream ended (EOF) during regeneration feedback")), false
 			case interaction.Regenerate:
 				plan, err = planFlow(metricsContext, root, snapshot, values, supplement)
 				if err != nil {
