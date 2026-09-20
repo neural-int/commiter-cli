@@ -671,7 +671,7 @@ func runMain(opts options, printer *output.Printer) int {
 	if err != nil {
 		return fail(printer, exitcode.New(exitcode.Usage, err.Error()))
 	}
-	if updateCheckInteractive() && !printer.JSON() {
+	if !printer.JSON() && updateCheckInteractive() {
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 		latest, checkErr := updatecheck.Check(ctx, paths.StateDir, Version)
 		cancel()

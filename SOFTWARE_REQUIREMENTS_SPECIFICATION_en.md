@@ -368,6 +368,10 @@ If any target file ID is missing, duplicated, or out of range, the CLI must stop
 
 `--json` may be used only with `--dry-run` and read-only subcommands. Combining it with normal execution that performs commits or push is a usage error causing exit code 2.
 
+### FR-025 Update Check
+
+During interactive normal execution, the CLI must send at most one HTTP GET every 24 hours to a fixed official GitHub Releases metadata endpoint without repository content and must notify the user when a newer stable release is available. The update-check attempt timestamp must be saved to the state directory before the HTTP request; if that save fails, the CLI must make no HTTP request and return the error. Network or state-save errors from the update check must not interrupt normal processing, and update checks must be skipped for JSON output and CI environments.
+
 ## 10. LLM Input and Output
 
 The Ollama endpoint is restricted to loopback and uses `think: false`, `stream: false`, JSON Schema, and `keep_alive: 0`. Based on the API features required by commiter v1, operational compatibility of the default model `qwen3.5:4b-q4_K_M`, and the structured-output fix for models with thinking disabled, supported Ollama versions are `0.31.2` or later. Earlier versions, prereleases of `0.31.2`, and invalid version responses are treated as API-incompatible. See [Ollama Chat API](https://docs.ollama.com/api/chat), [Structured Outputs](https://docs.ollama.com/capabilities/structured-outputs), and [Ollama v0.31.2](https://github.com/ollama/ollama/releases/tag/v0.31.2).
@@ -742,6 +746,10 @@ For a verification fixture that only generates or modifies ignored files, verify
 
 Using fixtures containing ANSI escape sequences, control characters, and newlines in paths, LLM output, verification output, and Git-hook output, verify that they are safely encoded or escaped rather than interpreted as terminal control and cannot spoof displayed content or terminal state.
 
+### AC-022 Update Check
+
+Verify that interactive normal execution sends no repository content, saves the update-check attempt timestamp before the HTTP request, and makes no HTTP request while returning an error when that save fails. Also verify that network or state-save errors do not interrupt normal processing and that update checks are skipped for JSON output and CI environments.
+
 ## 17. Requirements Traceability Matrix
 
 | Acceptance criterion | Functional requirements | Safety requirements | Non-functional requirements |
@@ -767,6 +775,7 @@ Using fixtures containing ANSI escape sequences, control characters, and newline
 | AC-019 | FR-014 | SR-007 | NFR-004 |
 | AC-020 | FR-012, FR-013 | SR-006, SR-007 | NFR-001, NFR-004 |
 | AC-021 | FR-016 | SR-009, SR-011 | NFR-004 |
+| AC-022 | FR-025 | SR-001 | NFR-004 |
 
 ## 18. Future Candidates
 

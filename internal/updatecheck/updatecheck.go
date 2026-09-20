@@ -64,7 +64,9 @@ func Check(ctx context.Context, stateDir, current string) (string, error) {
 	// Cache the attempt before performing the request so transient failures do
 	// not cause every subsequent invocation to retry within the same TTL.
 	saved.CheckedAt = now().UTC()
-	_ = writeCache(stateDir, path, saved)
+	if err := writeCache(stateDir, path, saved); err != nil {
+		return "", err
+	}
 	response, err := httpClient.Do(req)
 	if err != nil {
 		return "", err
@@ -113,7 +115,7 @@ func newer(current, latest string) string {
 	return ""
 }
 
-var versionPattern = regexp.MustCompile(`^v?(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$`)
+var versionPattern = regexp.MustCompile(`^v?(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$`)
 
 func parseVersion(value string) (semanticVersion, error) {
 	var result semanticVersion
@@ -141,6 +143,11 @@ func parseVersion(value string) (semanticVersion, error) {
 			prerelease = prerelease[:plus]
 		}
 		result.prerelease = strings.Split(prerelease, ".")
+		for _, identifier := range result.prerelease {
+			if len(identifier) > 1 && identifier[0] == '0' && strings.Trim(identifier, "0123456789") == "" {
+				return result, fmt.Errorf("invalid semantic version")
+			}
+		}
 	}
 	return result, nil
 }

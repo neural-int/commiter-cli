@@ -91,6 +91,23 @@ func TestCheckUsesSemVerPrereleasePrecedenceAndIgnoresBuildMetadata(t *testing.T
 	}
 }
 
+func TestParseVersionRejectsMalformedSemVerIdentifiers(t *testing.T) {
+	for _, version := range []string{
+		"v1.2.3-",
+		"v1.2.3+",
+		"v1.2.3-rc..1",
+		"v1.2.3+build..1",
+		"v1.2.3-01",
+		"v1.2.3-rc.01",
+	} {
+		t.Run(version, func(t *testing.T) {
+			if _, err := parseVersion(version); err == nil {
+				t.Fatalf("parseVersion(%q) accepted malformed SemVer", version)
+			}
+		})
+	}
+}
+
 func TestCheckRepairsExistingCachePermissions(t *testing.T) {
 	state := t.TempDir()
 	path := filepath.Join(state, cacheFileName)
@@ -135,6 +152,33 @@ func TestCheckCachesFailedAttemptForTwentyFourHours(t *testing.T) {
 	}
 	if requests != 1 {
 		t.Fatalf("requests = %d, want 1", requests)
+	}
+}
+
+func TestCheckDoesNotRequestWhenAttemptCacheCannotBeWritten(t *testing.T) {
+	parent := t.TempDir()
+	state := filepath.Join(parent, "state-file")
+	if err := os.WriteFile(state, []byte("not a directory"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	requests := 0
+	oldEndpoint, oldHTTPClient := endpoint, httpClient
+	endpoint = "https://updates.invalid/latest"
+	httpClient = &http.Client{Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		requests++
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(strings.NewReader(`{"tag_name":"v1.3.0","draft":false,"prerelease":false}`)),
+			Header:     make(http.Header),
+		}, nil
+	})}
+	t.Cleanup(func() { endpoint, httpClient = oldEndpoint, oldHTTPClient })
+
+	if got, err := Check(context.Background(), state, "v1.2.1"); err == nil || got != "" {
+		t.Fatalf("uncacheable check = %q, %v", got, err)
+	}
+	if requests != 0 {
+		t.Fatalf("requests = %d, want 0", requests)
 	}
 }
 
