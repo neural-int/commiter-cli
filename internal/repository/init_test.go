@@ -39,6 +39,44 @@ func TestApplyInitializationCreatesRepositoryAndEmptyGitignore(t *testing.T) {
 	}
 }
 
+func TestApplyInitializationRejectsGitignoreCreationRace(t *testing.T) {
+	dir := t.TempDir()
+	fakeBin := t.TempDir()
+	fakeGit := filepath.Join(fakeBin, "git")
+	script := `#!/bin/sh
+case "$1" in
+  -C)
+    case "$3 $4" in
+      "rev-parse --is-bare-repository"|"rev-parse --show-toplevel") exit 1 ;;
+    esac
+    ;;
+  init)
+    mkdir -p "$2/.git" || exit 1
+    printf 'raced\n' > "$2/.gitignore" || exit 1
+    exit 0
+    ;;
+esac
+exit 1
+`
+	if err := os.WriteFile(fakeGit, []byte(script), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("PATH", fakeBin+string(os.PathListSeparator)+os.Getenv("PATH"))
+
+	plan, err := PlanInitialization(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !plan.InitializeGit || !plan.CreateGitignore {
+		t.Fatalf("plan = %#v", plan)
+	}
+	if err := ApplyInitialization(plan); err == nil {
+		t.Fatal("ApplyInitialization accepted a .gitignore created after confirmation")
+	} else if err.Error() != ".gitignore changed after confirmation; rerun init" {
+		t.Fatalf("ApplyInitialization error = %q", err)
+	}
+}
+
 func TestPlanInitializationPreservesExistingRepositoryAndGitignore(t *testing.T) {
 	dir := t.TempDir()
 	command := exec.Command("git", "-C", dir, "init")
@@ -164,9 +202,9 @@ func TestApplyInitializationRejectsChangedGitignore(t *testing.T) {
 
 func TestPlanInitializationRejectsUnsafeGitignorePatternAndSymlink(t *testing.T) {
 	dir := t.TempDir()
-	for _, pattern := range []string{"safe\nsecret", "\nfoo\n"} {
+	for _, pattern := range []string{"", "safe\nsecret", "\nfoo\n"} {
 		if _, err := PlanInitializationWithIgnore(dir, []string{pattern}); err == nil {
-			t.Fatalf("accepted multi-line gitignore pattern %q", pattern)
+			t.Fatalf("accepted invalid gitignore pattern %q", pattern)
 		}
 	}
 	target := filepath.Join(t.TempDir(), "outside")
@@ -178,6 +216,18 @@ func TestPlanInitializationRejectsUnsafeGitignorePatternAndSymlink(t *testing.T)
 	}
 	if _, err := PlanInitializationWithIgnore(dir, []string{"*.tmp"}); err == nil {
 		t.Fatal("accepted symlink .gitignore")
+	}
+}
+
+func TestPlanInitializationWithIgnorePreservesPatternWhitespace(t *testing.T) {
+	dir := t.TempDir()
+	pattern := "foo\\ "
+	plan, err := PlanInitializationWithIgnore(dir, []string{pattern})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(plan.GitignoreEntries) != 1 || plan.GitignoreEntries[0] != pattern {
+		t.Fatalf("gitignore entries = %#v, want %#v", plan.GitignoreEntries, []string{pattern})
 	}
 }
 
