@@ -102,6 +102,9 @@ func TestInitIgnoreAppendsOnlyApprovedPatterns(t *testing.T) {
 	}
 	if string(got) != "*.tmp\nbuild/\n" {
 		t.Fatalf("gitignore = %q", got)
+	}
+}
+
 func TestUpdateCheckIsSkippedForJSONOutput(t *testing.T) {
 	repo := cliRepository(t)
 	cliWrite(t, repo, "README.md", "base\n", 0o644)
