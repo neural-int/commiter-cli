@@ -10,7 +10,7 @@ import (
 
 	"github.com/natsuki0413/commiter-cli/internal/contextinput"
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
-	"github.com/natsuki0413/commiter-cli/internal/ollama"
+	"github.com/natsuki0413/commiter-cli/internal/llm"
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
 )
 
@@ -438,6 +438,9 @@ func TestGeneratorReportsOnlyFinalViolationCodes(t *testing.T) {
 	if exitcode.Code(err) != exitcode.LLM || !strings.Contains(err.Error(), "violations: invalid_assignment") {
 		t.Fatalf("error=%v code=%d", err, exitcode.Code(err))
 	}
+	if strings.Contains(err.Error(), "Ollama") || !strings.Contains(err.Error(), "LLM backend") {
+		t.Fatalf("error exposed a provider-specific message: %v", err)
+	}
 	if strings.Contains(err.Error(), candidate) || strings.Contains(err.Error(), "F001") {
 		t.Fatalf("error exposed candidate content: %v", err)
 	}
@@ -540,7 +543,7 @@ type chatStep struct {
 
 type scriptedChat struct {
 	steps    []chatStep
-	messages [][]ollama.Message
+	messages [][]llm.Message
 }
 
 type optionsScriptedChat struct {
@@ -549,20 +552,20 @@ type optionsScriptedChat struct {
 	outputs  []int
 }
 
-func (client *optionsScriptedChat) ChatWithOptions(ctx context.Context, messages []ollama.Message, schema json.RawMessage, options ollama.ChatOptions) (ollama.ChatResponse, error) {
+func (client *optionsScriptedChat) ChatWithOptions(ctx context.Context, messages []llm.Message, schema json.RawMessage, options llm.ChatOptions) (llm.ChatResponse, error) {
 	client.contexts = append(client.contexts, options.ContextTokens)
 	client.outputs = append(client.outputs, options.OutputTokens)
 	return client.Chat(ctx, messages, schema)
 }
 
-func (client *scriptedChat) Chat(_ context.Context, messages []ollama.Message, schema json.RawMessage) (ollama.ChatResponse, error) {
-	client.messages = append(client.messages, append([]ollama.Message(nil), messages...))
+func (client *scriptedChat) Chat(_ context.Context, messages []llm.Message, schema json.RawMessage) (llm.ChatResponse, error) {
+	client.messages = append(client.messages, append([]llm.Message(nil), messages...))
 	if !json.Valid(schema) || len(client.steps) == 0 {
-		return ollama.ChatResponse{}, errors.New("invalid fixture call")
+		return llm.ChatResponse{}, errors.New("invalid fixture call")
 	}
 	step := client.steps[0]
 	client.steps = client.steps[1:]
-	return ollama.ChatResponse{
+	return llm.ChatResponse{
 		Model: step.model, Content: step.content, LoadDuration: step.loadDuration,
 		PromptEvalDuration: step.promptEvalDuration, EvalDuration: step.evalDuration,
 		PromptEvalCount: step.promptEvalCount, EvalCount: step.evalCount,

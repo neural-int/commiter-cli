@@ -16,6 +16,8 @@ type Message struct {
 }
 
 // Response contains generated content and privacy-safe numeric telemetry.
+// Duration fields are elapsed nanoseconds, matching time.Duration's underlying
+// unit without exposing a provider-specific duration type.
 type Response struct {
 	Backend            string
 	Model              string
@@ -48,6 +50,13 @@ type Capability struct {
 
 // CapabilityResult is a descriptive alias for capability probes.
 type CapabilityResult = Capability
+
+// CapabilityBackend is an optional extension for probing backend capabilities
+// without changing backend state.
+type CapabilityBackend interface {
+	Backend
+	ProbeCapabilities(context.Context) (Capability, error)
+}
 
 // Backend is the planning-facing contract implemented by backend adapters.
 type Backend interface {

@@ -53,6 +53,7 @@ type Client struct {
 }
 
 var _ llm.OptionsBackend = (*Client)(nil)
+var _ llm.CapabilityBackend = (*Client)(nil)
 
 // Pull downloads or updates the configured model. Callers must obtain
 // explicit user approval before invoking this mutating API.

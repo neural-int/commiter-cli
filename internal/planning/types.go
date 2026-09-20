@@ -42,6 +42,7 @@ type Result struct {
 }
 
 // Telemetry contains only backend model metadata and numeric timings/counts.
+// Duration fields are elapsed nanoseconds.
 // It deliberately excludes prompts, generated content, and validation reasons.
 type Telemetry struct {
 	Backend            string

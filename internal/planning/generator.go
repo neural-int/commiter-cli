@@ -137,7 +137,7 @@ func generationFailure(calls int, telemetry Telemetry, violations []Violation) (
 }
 
 func generationError(violations []Violation) error {
-	message := "Ollama could not produce a safe, completely assigned commit plan"
+	message := "LLM backend could not produce a safe, completely assigned commit plan"
 	if len(violations) > 0 {
 		codes := make([]string, len(violations))
 		for index, violation := range violations {

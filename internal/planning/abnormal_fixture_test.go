@@ -270,7 +270,7 @@ func violationsFromError(err error) []Violation {
 		return nil
 	}
 	message := err.Error()
-	const prefix = "Ollama could not produce a safe, completely assigned commit plan (violations: "
+	const prefix = "LLM backend could not produce a safe, completely assigned commit plan (violations: "
 	if !strings.HasPrefix(message, prefix) || !strings.HasSuffix(message, ")") {
 		return nil
 	}

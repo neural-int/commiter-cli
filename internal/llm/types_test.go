@@ -2,6 +2,7 @@ package llm
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net"
 	"testing"
@@ -30,6 +31,18 @@ func TestAliasesExposeTheRuntimeNeutralContract(t *testing.T) {
 		t.Fatal("aliases do not preserve the neutral types")
 	}
 }
+
+type capabilityProbe struct{}
+
+func (capabilityProbe) Chat(context.Context, []Message, json.RawMessage) (Response, error) {
+	return Response{}, nil
+}
+
+func (capabilityProbe) ProbeCapabilities(context.Context) (Capability, error) {
+	return Capability{}, nil
+}
+
+var _ CapabilityBackend = capabilityProbe{}
 
 type retryableError struct{}
 
