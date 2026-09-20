@@ -18,6 +18,7 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
 	"github.com/natsuki0413/commiter-cli/internal/gitstate"
 	"github.com/natsuki0413/commiter-cli/internal/interaction"
+	"github.com/natsuki0413/commiter-cli/internal/llm"
 	runmetrics "github.com/natsuki0413/commiter-cli/internal/metrics"
 	"github.com/natsuki0413/commiter-cli/internal/output"
 	"github.com/natsuki0413/commiter-cli/internal/planning"
@@ -304,12 +305,30 @@ func TestRecordGeneratedTelemetryKeepsPartialSuccessAndOmitsEmpty(t *testing.T) 
 	recorder = runmetrics.New()
 	recordGeneratedTelemetry(recorder, planning.Result{Telemetry: planning.Telemetry{
 		Model: "model:tag", LoadDuration: 10, PromptEvalDuration: 20, EvalDuration: 30,
+		Availability: llm.TelemetryAvailability{LoadDuration: true, PromptEvalDuration: true, EvalDuration: true},
 	}})
 	partial := recorder.Finish("llm_error")
 	if partial.Durations.ModelLoad == nil || *partial.Durations.ModelLoad != 10 ||
 		partial.Durations.PromptEvaluation == nil || *partial.Durations.PromptEvaluation != 20 ||
 		partial.Durations.Generation == nil || *partial.Durations.Generation != 30 {
 		t.Fatalf("partial telemetry was discarded: %+v", partial.Durations)
+	}
+}
+
+func TestRecordGeneratedTelemetryDistinguishesMeasuredZeroFromUnavailable(t *testing.T) {
+	recorder := runmetrics.New()
+	recordGeneratedTelemetry(recorder, planning.Result{Telemetry: planning.Telemetry{
+		Availability: llm.TelemetryAvailability{LoadDuration: true, EvalDuration: true},
+	}})
+	record := recorder.Finish("success")
+	if record.Durations.ModelLoad == nil || *record.Durations.ModelLoad != 0 {
+		t.Fatalf("measured zero model load was omitted: %+v", record.Durations)
+	}
+	if record.Durations.Generation == nil || *record.Durations.Generation != 0 {
+		t.Fatalf("measured zero generation was omitted: %+v", record.Durations)
+	}
+	if record.Durations.PromptEvaluation != nil {
+		t.Fatalf("unavailable prompt evaluation was recorded: %+v", record.Durations)
 	}
 }
 

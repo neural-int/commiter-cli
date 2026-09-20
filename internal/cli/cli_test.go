@@ -102,6 +102,38 @@ func TestInitIgnoreAppendsOnlyApprovedPatterns(t *testing.T) {
 	}
 	if string(got) != "*.tmp\nbuild/\n" {
 		t.Fatalf("gitignore = %q", got)
+func TestUpdateCheckIsSkippedForJSONOutput(t *testing.T) {
+	repo := cliRepository(t)
+	cliWrite(t, repo, "README.md", "base\n", 0o644)
+	cliGit(t, repo, "add", "README.md")
+	cliGit(t, repo, "commit", "-m", "base")
+	chdir(t, repo)
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+	t.Setenv("XDG_STATE_HOME", t.TempDir())
+
+	old := updateCheckInteractive
+	updateCheckInteractive = func() bool {
+		t.Fatal("update check should be skipped for JSON output")
+		return true
+	}
+	t.Cleanup(func() { updateCheckInteractive = old })
+
+	var stdout, stderr bytes.Buffer
+	if code := Run([]string{"--json", "--dry-run"}, &stdout, &stderr); code != 0 {
+		t.Fatalf("code = %d, stdout = %q, stderr = %q", code, stdout.String(), stderr.String())
+	}
+	var result struct {
+		DryRun bool `json:"dry_run"`
+	}
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil || !result.DryRun {
+		t.Fatalf("JSON = %q, error = %v", stdout.String(), err)
+	}
+}
+
+func TestUpdateCheckInteractiveSkipsCI(t *testing.T) {
+	t.Setenv("CI", "true")
+	if updateCheckInteractive() {
+		t.Fatal("update check should be skipped in CI")
 	}
 }
 

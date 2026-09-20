@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
-	"github.com/natsuki0413/commiter-cli/internal/ollama"
+	"github.com/natsuki0413/commiter-cli/internal/llm"
 )
 
 //go:embed testdata/abnormal_cases.json
@@ -206,7 +206,7 @@ type abnormalFixtureRepairPayload struct {
 	Candidate     string      `json:"untrusted_candidate"`
 }
 
-func abnormalFixtureRepairPayloads(t *testing.T, messages [][]ollama.Message) []abnormalFixtureRepairPayload {
+func abnormalFixtureRepairPayloads(t *testing.T, messages [][]llm.Message) []abnormalFixtureRepairPayload {
 	t.Helper()
 	result := make([]abnormalFixtureRepairPayload, 0, 1)
 	for _, messages := range messages {
@@ -270,7 +270,7 @@ func violationsFromError(err error) []Violation {
 		return nil
 	}
 	message := err.Error()
-	const prefix = "Ollama could not produce a safe, completely assigned commit plan (violations: "
+	const prefix = "LLM backend could not produce a safe, completely assigned commit plan (violations: "
 	if !strings.HasPrefix(message, prefix) || !strings.HasSuffix(message, ")") {
 		return nil
 	}

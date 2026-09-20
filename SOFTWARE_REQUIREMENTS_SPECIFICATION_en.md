@@ -60,6 +60,8 @@ The target OS for v1 is macOS 14 or later, the target architecture is Apple Sili
 
 The only external runtime dependencies are system Git and Ollama. Syntax-aware structural analysis uses the official `github.com/tree-sitter/go-tree-sitter` package and target-language grammars, embedding Tree-sitter's C implementation into the single CLI binary via CGo. CGo must not be extended beyond the Tree-sitter boundary, and the implementation must not require an external parser executable, runtime shared grammar, Oniguruma, or a cloud-LLM fallback.
 
+During interactive normal execution, the CLI may send an HTTP GET containing no repository content to a fixed official GitHub Releases metadata endpoint for an update check at most once every 24 hours. Update-check network failures must not interrupt normal processing, and update checks are skipped for JSON output and CI environments.
+
 The default model is `qwen3.5:4b-q4_K_M`; its size is treated as approximately 3.4 GB based on official distribution information. [Qwen3.5 model information](https://ollama.com/library/qwen3.5%3A4b-q4_K_M/blobs/81fb60c7daa8)
 
 ## 6. Normal Flow
@@ -226,6 +228,8 @@ Hierarchical summarization and structural-evidence reduction must preserve the c
 
 ### FR-008 Commit Plan Generation
 
+Plan generation uses a runtime-neutral LLM backend contract for messages, structured-output schemas, responses, numeric telemetry, capabilities, and retry classification. The v1 default remains an Ollama adapter; backend selection configuration and MLX model lifecycle are outside this requirement. Introducing the adapter must not change Ollama structured output, retry, daemon/model lifecycle, or the local transmission boundary.
+
 The CLI must send structured input to the local Ollama API and obtain a file-level commit plan.
 
 ### FR-009 LLM Generation Failure and Output Validation
@@ -365,6 +369,10 @@ If any target file ID is missing, duplicated, or out of range, the CLI must stop
 ### FR-024 Machine-readable Output
 
 `--json` may be used only with `--dry-run` and read-only subcommands. Combining it with normal execution that performs commits or push is a usage error causing exit code 2.
+
+### FR-025 Update Check
+
+During interactive normal execution, the CLI must send at most one HTTP GET every 24 hours to a fixed official GitHub Releases metadata endpoint without repository content and must notify the user when a newer stable release is available. The update-check attempt timestamp must be saved to the state directory before the HTTP request; if that save fails, the CLI must make no HTTP request and return the error. Network or state-save errors from the update check must not interrupt normal processing, and update checks must be skipped for JSON output and CI environments.
 
 ## 10. LLM Input and Output
 
@@ -740,6 +748,10 @@ For a verification fixture that only generates or modifies ignored files, verify
 
 Using fixtures containing ANSI escape sequences, control characters, and newlines in paths, LLM output, verification output, and Git-hook output, verify that they are safely encoded or escaped rather than interpreted as terminal control and cannot spoof displayed content or terminal state.
 
+### AC-022 Update Check
+
+Verify that interactive normal execution sends no repository content, saves the update-check attempt timestamp before the HTTP request, and makes no HTTP request while returning an error when that save fails. Also verify that network or state-save errors do not interrupt normal processing and that update checks are skipped for JSON output and CI environments.
+
 ## 17. Requirements Traceability Matrix
 
 | Acceptance criterion | Functional requirements | Safety requirements | Non-functional requirements |
@@ -765,6 +777,7 @@ Using fixtures containing ANSI escape sequences, control characters, and newline
 | AC-019 | FR-014 | SR-007 | NFR-004 |
 | AC-020 | FR-012, FR-013 | SR-006, SR-007 | NFR-001, NFR-004 |
 | AC-021 | FR-016 | SR-009, SR-011 | NFR-004 |
+| AC-022 | FR-025 | SR-001 | NFR-004 |
 
 ## 18. Future Candidates
 

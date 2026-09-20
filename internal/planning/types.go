@@ -2,7 +2,11 @@
 // plans before any approval or Git mutation is possible.
 package planning
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/natsuki0413/commiter-cli/internal/llm"
+)
 
 const SchemaVersion = 1
 
@@ -41,15 +45,19 @@ type Result struct {
 	Telemetry Telemetry
 }
 
-// Telemetry contains only numeric Ollama timings/counts and the model tag.
+// Telemetry contains only backend model metadata and numeric timings/counts.
+// Duration fields are elapsed nanoseconds.
 // It deliberately excludes prompts, generated content, and validation reasons.
 type Telemetry struct {
+	Backend            string
 	Model              string
+	TotalDuration      int64
 	LoadDuration       int64
 	PromptEvalDuration int64
 	EvalDuration       int64
 	PromptEvalCount    int
 	EvalCount          int
+	Availability       llm.TelemetryAvailability
 }
 
 type Violation string
