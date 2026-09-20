@@ -182,6 +182,10 @@ func statusName(xy, headMode, indexMode string) string {
 	return "modified"
 }
 
+func StatusName(xy, headMode, indexMode string) string {
+	return statusName(xy, headMode, indexMode)
+}
+
 func stringPointer(value string) *string { return &value }
 
 func modePointer(value string) *string {

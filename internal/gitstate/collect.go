@@ -68,15 +68,16 @@ func Collect(root string, options Options) (snapshot Snapshot, err error) {
 		}
 	}
 
-	preapproved := make(map[string]bool, len(options.ApprovedSensitivePaths))
-	for _, path := range options.ApprovedSensitivePaths {
-		preapproved[path] = true
+	preapproved := make(map[ChangeIdentity]bool, len(options.ApprovedSensitiveChanges))
+	for _, identity := range options.ApprovedSensitiveChanges {
+		preapproved[identity] = true
 	}
 	approvedIndexes := make(map[int]bool, len(candidateIndexes))
 	pendingIndexes := make([]int, 0, len(candidateIndexes))
 	pendingCandidates := make([]Candidate, 0, len(candidates))
 	for candidateOffset, selectedIndex := range candidateIndexes {
-		if preapproved[candidates[candidateOffset].Path] {
+		change := selected[selectedIndex]
+		if preapproved[ChangeIdentity{Status: change.status, OldPath: pointerValue(change.oldPath), NewPath: pointerValue(change.newPath)}] {
 			approvedIndexes[selectedIndex] = true
 			continue
 		}
@@ -98,7 +99,9 @@ func Collect(root string, options Options) (snapshot Snapshot, err error) {
 		if approved {
 			approvedIndexes[selectedIndex] = true
 		} else {
-			excluded = append(excluded, Excluded{Path: pendingCandidates[candidateOffset].Path, Reason: SensitiveCandidateNotApprovedReason})
+			change := selected[selectedIndex]
+			identity := ChangeIdentity{Status: change.status, OldPath: pointerValue(change.oldPath), NewPath: pointerValue(change.newPath)}
+			excluded = append(excluded, Excluded{Path: pendingCandidates[candidateOffset].Path, Reason: SensitiveCandidateNotApprovedReason, Identity: &identity})
 		}
 	}
 

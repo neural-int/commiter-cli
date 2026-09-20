@@ -262,14 +262,14 @@ approved:
 	var hookOutput bytes.Buffer
 	started = time.Now()
 	result, commitErr := commitFlow(commitexec.Options{
-		Context:                       ctx,
-		Root:                          root,
-		Changes:                       snapshot.Changes,
-		Plan:                          plan,
-		Writer:                        &hookOutput,
-		ApprovedSensitivePaths:        statePolicy.ApprovedSensitive,
-		KnownUnapprovedSensitivePaths: knownUnapprovedSensitivePaths(snapshot),
-		AdditionalSensitiveGlobs:      statePolicy.AdditionalSensitiveGlobs,
+		Context:                         ctx,
+		Root:                            root,
+		Changes:                         snapshot.Changes,
+		Plan:                            plan,
+		Writer:                          &hookOutput,
+		ApprovedSensitiveChanges:        statePolicy.ApprovedSensitive,
+		KnownUnapprovedSensitiveChanges: knownUnapprovedSensitiveChanges(snapshot),
+		AdditionalSensitiveGlobs:        statePolicy.AdditionalSensitiveGlobs,
 	})
 	recorder.AddDuration(runmetrics.Git, time.Since(started))
 	if hookOutput.Len() > 0 {
@@ -398,42 +398,30 @@ func readYes(reader *bufio.Reader) bool {
 }
 
 func revalidateSnapshot(ctx context.Context, root string, values config.Values, pathspecs []string, original gitstate.Snapshot) (gitstate.Snapshot, error) {
-	approved := []string{}
-	for _, change := range original.Changes {
-		if change.Sensitive {
-			approved = append(approved, snapshotChangePaths(change)...)
-		}
-	}
 	return gitstate.Collect(root, gitstate.Options{
 		Context:                  ctx,
 		Pathspecs:                pathspecs,
 		Include:                  values.Include,
 		Exclude:                  values.Exclude,
 		AdditionalSensitiveGlobs: values.SensitivePatterns,
-		ApprovedSensitivePaths:   uniqueStrings(approved),
+		ApprovedSensitiveChanges: gitstate.ApprovedSensitiveChanges(original.Changes),
 	})
 }
 
-func knownUnapprovedSensitivePaths(snapshot gitstate.Snapshot) []string {
-	paths := []string{}
+func knownUnapprovedSensitiveChanges(snapshot gitstate.Snapshot) []gitstate.ChangeIdentity {
+	changes := []gitstate.ChangeIdentity{}
 	for _, excluded := range snapshot.Excluded {
-		if excluded.Reason == gitstate.SensitiveCandidateNotApprovedReason {
-			paths = append(paths, excluded.Path)
+		if excluded.Reason == gitstate.SensitiveCandidateNotApprovedReason && excluded.Identity != nil {
+			changes = append(changes, *excluded.Identity)
 		}
 	}
-	return uniqueStrings(paths)
+	return changes
 }
 
 func verificationStatePolicy(snapshot gitstate.Snapshot, values config.Values) verification.StatePolicy {
-	approved := []string{}
-	for _, change := range snapshot.Changes {
-		if change.Sensitive {
-			approved = append(approved, snapshotChangePaths(change)...)
-		}
-	}
 	return verification.StatePolicy{
 		TargetUntracked:          append([]string{}, snapshot.Untracked...),
-		ApprovedSensitive:        uniqueStrings(approved),
+		ApprovedSensitive:        gitstate.ApprovedSensitiveChanges(snapshot.Changes),
 		AdditionalSensitiveGlobs: append([]string{}, values.SensitivePatterns...),
 	}
 }

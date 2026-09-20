@@ -77,9 +77,9 @@ func TestExecuteCommitsApprovedSensitiveCandidate(t *testing.T) {
 	ordinary, sensitive := byPath["a.txt"], byPath["credentials.json"]
 
 	result, err := Execute(Options{
-		Root:                   repo,
-		Changes:                []gitstate.Change{ordinary, sensitive},
-		ApprovedSensitivePaths: []string{"credentials.json"},
+		Root:                     repo,
+		Changes:                  []gitstate.Change{ordinary, sensitive},
+		ApprovedSensitiveChanges: gitstate.ApprovedSensitiveChanges(snapshot.Changes),
 		Plan: planning.Plan{SchemaVersion: planning.SchemaVersion, Commits: []planning.Commit{
 			{Type: "fix", Scope: "auth", Summary: "update credentials", FileIDs: []string{ordinary.ID, sensitive.ID}},
 		}},
@@ -102,11 +102,37 @@ func TestExecuteRejectsModifiedApprovedSensitiveCandidate(t *testing.T) {
 	writeFile(t, repo, "credentials.json", "mutated fixture\n")
 
 	result, err := Execute(Options{
-		Root:                   repo,
-		Changes:                []gitstate.Change{change},
-		ApprovedSensitivePaths: []string{"credentials.json"},
+		Root:                     repo,
+		Changes:                  []gitstate.Change{change},
+		ApprovedSensitiveChanges: gitstate.ApprovedSensitiveChanges(snapshot.Changes),
 		Plan: planning.Plan{SchemaVersion: planning.SchemaVersion, Commits: []planning.Commit{
 			{Type: "fix", Scope: "auth", Summary: "update credentials", FileIDs: []string{change.ID}},
+		}},
+	})
+	var failure *Error
+	if !errors.As(err, &failure) || failure.Message != "change hash changed before staging" || len(result.Hashes) != 0 || !failure.Restored {
+		t.Fatalf("result=%#v err=%#v", result, err)
+	}
+}
+
+func TestExecuteRejectsRecreatedOldPathAfterApprovedSensitiveRename(t *testing.T) {
+	repo := newRepo(t, "auth.json")
+	gitExec(t, repo, "mv", "auth.json", "config.json")
+	snapshot, err := gitstate.Collect(repo, gitstate.Options{
+		ApproveSensitiveCandidates: func([]gitstate.Candidate) (bool, error) { return true, nil },
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	change := snapshot.Changes[0]
+	writeFile(t, repo, "auth.json", "new secret\n")
+
+	result, err := Execute(Options{
+		Root:                     repo,
+		Changes:                  []gitstate.Change{change},
+		ApprovedSensitiveChanges: gitstate.ApprovedSensitiveChanges(snapshot.Changes),
+		Plan: planning.Plan{SchemaVersion: planning.SchemaVersion, Commits: []planning.Commit{
+			{Type: "fix", Scope: "auth", Summary: "rename auth", FileIDs: []string{change.ID}},
 		}},
 	})
 	var failure *Error
@@ -182,9 +208,9 @@ func TestExecuteAllowsKnownRejectedSensitiveCandidate(t *testing.T) {
 	change := changesByPath(snapshot)["a.txt"]
 
 	result, err := Execute(Options{
-		Root:                          repo,
-		Changes:                       []gitstate.Change{change},
-		KnownUnapprovedSensitivePaths: []string{"auth.json"},
+		Root:                            repo,
+		Changes:                         []gitstate.Change{change},
+		KnownUnapprovedSensitiveChanges: []gitstate.ChangeIdentity{*snapshot.Excluded[0].Identity},
 		Plan: planning.Plan{SchemaVersion: planning.SchemaVersion, Commits: []planning.Commit{
 			{Type: "fix", Scope: "a", Summary: "update a", FileIDs: []string{change.ID}},
 		}},

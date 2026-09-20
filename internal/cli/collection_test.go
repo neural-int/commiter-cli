@@ -378,7 +378,7 @@ func TestMainForcesPushConfirmationForSensitiveCandidate(t *testing.T) {
 	}
 }
 
-func TestMainCarriesApprovedSensitivePathsToCommitExecution(t *testing.T) {
+func TestMainCarriesApprovedSensitiveChangesToCommitExecution(t *testing.T) {
 	repo := cliRepository(t)
 	cliWrite(t, repo, "base.txt", "base\n", 0o644)
 	cliGit(t, repo, "add", "base.txt")
@@ -406,8 +406,8 @@ func TestMainCarriesApprovedSensitivePathsToCommitExecution(t *testing.T) {
 	if code := Run([]string{"--no-push"}, &stdout, &stderr); code != 0 || stderr.Len() != 0 {
 		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
 	}
-	if !reflect.DeepEqual(commitOptions.ApprovedSensitivePaths, []string{"auth.json"}) {
-		t.Fatalf("approved sensitive paths = %#v", commitOptions.ApprovedSensitivePaths)
+	if !reflect.DeepEqual(commitOptions.ApprovedSensitiveChanges, []gitstate.ChangeIdentity{{Status: "added", NewPath: "auth.json"}}) {
+		t.Fatalf("approved sensitive changes = %#v", commitOptions.ApprovedSensitiveChanges)
 	}
 }
 
@@ -816,7 +816,7 @@ func TestVerificationStatePolicyCarriesOnlyApprovedSensitiveChanges(t *testing.T
 	snapshot := gitstate.Snapshot{
 		Untracked: []string{"target.txt"},
 		Changes: []gitstate.Change{
-			{OldPath: &oldPath, NewPath: &newPath, Sensitive: true},
+			{Status: "renamed", OldPath: &oldPath, NewPath: &newPath, Sensitive: true},
 			{NewPath: &ordinaryPath},
 		},
 	}
@@ -824,7 +824,7 @@ func TestVerificationStatePolicyCarriesOnlyApprovedSensitiveChanges(t *testing.T
 	if !reflect.DeepEqual(policy.TargetUntracked, []string{"target.txt"}) {
 		t.Fatalf("target untracked = %#v", policy.TargetUntracked)
 	}
-	if !reflect.DeepEqual(policy.ApprovedSensitive, []string{"new-credentials.json", "old-credentials.json"}) {
+	if !reflect.DeepEqual(policy.ApprovedSensitive, []gitstate.ChangeIdentity{{Status: "renamed", OldPath: oldPath, NewPath: newPath}}) {
 		t.Fatalf("approved sensitive = %#v", policy.ApprovedSensitive)
 	}
 	if !reflect.DeepEqual(policy.AdditionalSensitiveGlobs, []string{"private.cfg"}) {
@@ -832,13 +832,14 @@ func TestVerificationStatePolicyCarriesOnlyApprovedSensitiveChanges(t *testing.T
 	}
 }
 
-func TestKnownUnapprovedSensitivePathsIncludesOnlyRejectedCandidates(t *testing.T) {
+func TestKnownUnapprovedSensitiveChangesIncludesOnlyRejectedCandidates(t *testing.T) {
+	identity := gitstate.ChangeIdentity{Status: "added", NewPath: "auth.json"}
 	snapshot := gitstate.Snapshot{Excluded: []gitstate.Excluded{
-		{Path: "auth.json", Reason: gitstate.SensitiveCandidateNotApprovedReason},
+		{Path: "auth.json", Reason: gitstate.SensitiveCandidateNotApprovedReason, Identity: &identity},
 		{Path: ".env", Reason: "known credential-bearing configuration path"},
 	}}
-	if got := knownUnapprovedSensitivePaths(snapshot); !reflect.DeepEqual(got, []string{"auth.json"}) {
-		t.Fatalf("known unapproved sensitive paths = %#v", got)
+	if got := knownUnapprovedSensitiveChanges(snapshot); !reflect.DeepEqual(got, []gitstate.ChangeIdentity{identity}) {
+		t.Fatalf("known unapproved sensitive changes = %#v", got)
 	}
 }
 
