@@ -91,12 +91,19 @@ func recordSummarization(recorder *runmetrics.Recorder, prepared contextinput.Pr
 }
 
 func recordGeneratedTelemetry(recorder *runmetrics.Recorder, generated planning.Result) {
-	if generated.Telemetry == (planning.Telemetry{}) {
+	availability := generated.Telemetry.Availability
+	if !availability.Any() {
 		return
 	}
-	recorder.AddDuration(runmetrics.ModelLoad, time.Duration(generated.Telemetry.LoadDuration))
-	recorder.AddDuration(runmetrics.PromptEvaluation, time.Duration(generated.Telemetry.PromptEvalDuration))
-	recorder.AddDuration(runmetrics.Generation, time.Duration(generated.Telemetry.EvalDuration))
+	if availability.LoadDuration {
+		recorder.AddDuration(runmetrics.ModelLoad, time.Duration(generated.Telemetry.LoadDuration))
+	}
+	if availability.PromptEvalDuration {
+		recorder.AddDuration(runmetrics.PromptEvaluation, time.Duration(generated.Telemetry.PromptEvalDuration))
+	}
+	if availability.EvalDuration {
+		recorder.AddDuration(runmetrics.Generation, time.Duration(generated.Telemetry.EvalDuration))
+	}
 }
 
 func supplementRenderer(base contextinput.Renderer, supplement string) contextinput.Renderer {

@@ -106,6 +106,25 @@ func TestChatFixesSafetyFieldsAndReturnsContent(t *testing.T) {
 	}
 }
 
+func TestChatDistinguishesMeasuredZeroFromUnavailableTelemetry(t *testing.T) {
+	client := testClient(roundTripFunc(func(*http.Request) (*http.Response, error) {
+		return jsonResponse(http.StatusOK, `{"model":"model","message":{"content":"{}"},"done":true,"load_duration":0,"eval_duration":0}`), nil
+	}))
+	response, err := client.Chat(context.Background(), []Message{{Role: "user", Content: "prompt"}}, json.RawMessage(`{"type":"object"}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if response.LoadDuration != 0 || response.EvalDuration != 0 {
+		t.Fatalf("zero telemetry values changed: %+v", response)
+	}
+	if !response.Availability.LoadDuration || !response.Availability.EvalDuration {
+		t.Fatalf("measured zero telemetry was unavailable: %+v", response.Availability)
+	}
+	if response.Availability.PromptEvalDuration || response.Availability.EvalCount {
+		t.Fatalf("omitted telemetry was reported as available: %+v", response.Availability)
+	}
+}
+
 func TestChatWithOptionsSendsSelectedContextAndOutputLimit(t *testing.T) {
 	for _, contextTokens := range []int{8192, 16384, 32768, 65536} {
 		t.Run(fmt.Sprint(contextTokens), func(t *testing.T) {

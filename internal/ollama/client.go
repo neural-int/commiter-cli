@@ -15,6 +15,7 @@ import (
 
 	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
+	"github.com/natsuki0413/commiter-cli/internal/llm"
 )
 
 const (
@@ -24,32 +25,13 @@ const (
 	minimumSupportedVersion = "0.31.2"
 )
 
-type Message struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
-}
-
-type ChatResponse struct {
-	Model              string
-	Content            string
-	TotalDuration      int64
-	LoadDuration       int64
-	PromptEvalCount    int
-	PromptEvalDuration int64
-	EvalCount          int
-	EvalDuration       int64
-}
+type Message = llm.Message
+type ChatResponse = llm.Response
 
 // ChatOptions controls optional Ollama chat settings selected by the caller.
-type ChatOptions struct {
-	ContextTokens int
-	OutputTokens  int
-}
+type ChatOptions = llm.Options
 
-type CapabilityResult struct {
-	StructuredOutput bool
-	ThinkingDisabled bool
-}
+type CapabilityResult = llm.Capability
 
 // ModelInfo contains the installed model metadata exposed by Ollama's local
 // list API. Remote changes are not available until Ollama starts a pull.
@@ -69,6 +51,9 @@ type Client struct {
 	model    string
 	http     *http.Client
 }
+
+var _ llm.OptionsBackend = (*Client)(nil)
+var _ llm.CapabilityBackend = (*Client)(nil)
 
 // Pull downloads or updates the configured model. Callers must obtain
 // explicit user approval before invoking this mutating API.
@@ -315,13 +300,13 @@ func (c *Client) ChatWithOptions(ctx context.Context, messages []Message, schema
 		Message struct {
 			Content string `json:"content"`
 		} `json:"message"`
-		Done               bool  `json:"done"`
-		TotalDuration      int64 `json:"total_duration"`
-		LoadDuration       int64 `json:"load_duration"`
-		PromptEvalCount    int   `json:"prompt_eval_count"`
-		PromptEvalDuration int64 `json:"prompt_eval_duration"`
-		EvalCount          int   `json:"eval_count"`
-		EvalDuration       int64 `json:"eval_duration"`
+		Done               bool   `json:"done"`
+		TotalDuration      *int64 `json:"total_duration"`
+		LoadDuration       *int64 `json:"load_duration"`
+		PromptEvalCount    *int   `json:"prompt_eval_count"`
+		PromptEvalDuration *int64 `json:"prompt_eval_duration"`
+		EvalCount          *int   `json:"eval_count"`
+		EvalDuration       *int64 `json:"eval_duration"`
 	}
 	if err := c.post(ctx, "/api/chat", payload, &response); err != nil {
 		return ChatResponse{}, err
@@ -329,11 +314,29 @@ func (c *Client) ChatWithOptions(ctx context.Context, messages []Message, schema
 	if !response.Done || strings.TrimSpace(response.Message.Content) == "" {
 		return ChatResponse{}, llmError("Ollama returned an incomplete chat response")
 	}
+	value := func(value *int64) int64 {
+		if value == nil {
+			return 0
+		}
+		return *value
+	}
+	count := func(value *int) int {
+		if value == nil {
+			return 0
+		}
+		return *value
+	}
 	return ChatResponse{
-		Model: response.Model, Content: response.Message.Content,
-		TotalDuration: response.TotalDuration, LoadDuration: response.LoadDuration,
-		PromptEvalCount: response.PromptEvalCount, PromptEvalDuration: response.PromptEvalDuration,
-		EvalCount: response.EvalCount, EvalDuration: response.EvalDuration,
+		Backend: "ollama",
+		Model:   response.Model, Content: response.Message.Content,
+		TotalDuration: value(response.TotalDuration), LoadDuration: value(response.LoadDuration),
+		PromptEvalCount: count(response.PromptEvalCount), PromptEvalDuration: value(response.PromptEvalDuration),
+		EvalCount: count(response.EvalCount), EvalDuration: value(response.EvalDuration),
+		Availability: llm.TelemetryAvailability{
+			TotalDuration: response.TotalDuration != nil, LoadDuration: response.LoadDuration != nil,
+			PromptEvalCount: response.PromptEvalCount != nil, PromptEvalDuration: response.PromptEvalDuration != nil,
+			EvalCount: response.EvalCount != nil, EvalDuration: response.EvalDuration != nil,
+		},
 	}, nil
 }
 
@@ -429,25 +432,15 @@ func (c *Client) do(request *http.Request, target any) error {
 
 type transportError struct{ cause error }
 
-func (e transportError) Error() string { return "cannot connect to the local Ollama API" }
-func (e transportError) Unwrap() error { return e.cause }
+func (e transportError) Error() string   { return "cannot connect to the local Ollama API" }
+func (e transportError) Unwrap() error   { return e.cause }
+func (e transportError) Retryable() bool { return true }
 
 // IsRetryable reports whether a normal chat request may consume the single
 // transport/timeout retry budget. Context cancellation is deliberately not
 // retryable.
 func IsRetryable(err error) bool {
-	if err == nil || errors.Is(err, context.Canceled) {
-		return false
-	}
-	var transport transportError
-	if errors.As(err, &transport) {
-		return true
-	}
-	if errors.Is(err, context.DeadlineExceeded) {
-		return true
-	}
-	var timeout interface{ Timeout() bool }
-	return errors.As(err, &timeout) && timeout.Timeout()
+	return llm.IsRetryable(err)
 }
 
 func llmError(message string) error {
