@@ -1,6 +1,7 @@
 ## Summary
 
 <!-- Required. Briefly describe the problem and the approach taken. -->
+<!-- Free-form explanations may be written in English or Japanese. Keep the section headings and required labels unchanged because PR Policy validates them. -->
 
 ## Related issue
 
