@@ -42,6 +42,30 @@ func TestVersionHumanAndJSON(t *testing.T) {
 	}
 }
 
+func TestUpdateCheckIsSkippedForJSONOutput(t *testing.T) {
+	old := updateCheckInteractive
+	updateCheckInteractive = func() bool {
+		t.Fatal("update check should be skipped for JSON output")
+		return true
+	}
+	t.Cleanup(func() { updateCheckInteractive = old })
+
+	var stdout, stderr bytes.Buffer
+	if code := Run([]string{"--json", "version"}, &stdout, &stderr); code != 0 {
+		t.Fatalf("code = %d, stdout = %q, stderr = %q", code, stdout.String(), stderr.String())
+	}
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q", stderr.String())
+	}
+}
+
+func TestUpdateCheckInteractiveSkipsCI(t *testing.T) {
+	t.Setenv("CI", "true")
+	if updateCheckInteractive() {
+		t.Fatal("update check should be skipped in CI")
+	}
+}
+
 func TestJSONRestrictionIsUsageErrorAndDoesNotMixStderr(t *testing.T) {
 	var stdout, stderr bytes.Buffer
 	code := Run([]string{"--json"}, &stdout, &stderr)

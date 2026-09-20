@@ -49,7 +49,7 @@ func Check(ctx context.Context, stateDir, current string) (string, error) {
 	path := filepath.Join(stateDir, cacheFileName)
 	var saved cache
 	if data, err := os.ReadFile(path); err == nil {
-		if json.Unmarshal(data, &saved) == nil && now().Sub(saved.CheckedAt) < checkInterval && saved.LatestVersion != "" {
+		if json.Unmarshal(data, &saved) == nil && now().Sub(saved.CheckedAt) < checkInterval {
 			_ = os.Chmod(path, 0o600)
 			return newer(current, saved.LatestVersion), nil
 		}
@@ -61,6 +61,10 @@ func Check(ctx context.Context, stateDir, current string) (string, error) {
 	}
 	req.Header.Set("Accept", "application/vnd.github+json")
 	req.Header.Set("User-Agent", "commiter-update-check")
+	// Cache the attempt before performing the request so transient failures do
+	// not cause every subsequent invocation to retry within the same TTL.
+	saved.CheckedAt = now().UTC()
+	_ = writeCache(stateDir, path, saved)
 	response, err := httpClient.Do(req)
 	if err != nil {
 		return "", err
@@ -79,21 +83,25 @@ func Check(ctx context.Context, stateDir, current string) (string, error) {
 	if _, err := parseVersion(result.TagName); err != nil {
 		return "", err
 	}
-	saved = cache{CheckedAt: now().UTC(), LatestVersion: result.TagName}
-	data, err := json.Marshal(saved)
-	if err != nil {
-		return "", err
-	}
-	if err := os.MkdirAll(stateDir, 0o700); err != nil {
-		return "", err
-	}
-	if err := os.WriteFile(path, data, 0o600); err != nil {
-		return "", err
-	}
-	if err := os.Chmod(path, 0o600); err != nil {
+	saved.LatestVersion = result.TagName
+	if err := writeCache(stateDir, path, saved); err != nil {
 		return "", err
 	}
 	return newer(current, result.TagName), nil
+}
+
+func writeCache(stateDir, path string, saved cache) error {
+	data, err := json.Marshal(saved)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(stateDir, 0o700); err != nil {
+		return err
+	}
+	if err := os.WriteFile(path, data, 0o600); err != nil {
+		return err
+	}
+	return os.Chmod(path, 0o600)
 }
 
 func newer(current, latest string) string {

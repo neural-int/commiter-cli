@@ -3,10 +3,12 @@ package updatecheck
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -107,3 +109,35 @@ func TestCheckRepairsExistingCachePermissions(t *testing.T) {
 		t.Fatalf("cache permissions = %v, %v", info, err)
 	}
 }
+
+func TestCheckCachesFailedAttemptForTwentyFourHours(t *testing.T) {
+	state := t.TempDir()
+	requests := 0
+	oldEndpoint, oldNow, oldHTTPClient := endpoint, now, httpClient
+	endpoint = "https://updates.invalid/latest"
+	httpClient = &http.Client{Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		requests++
+		if requests == 1 {
+			return &http.Response{StatusCode: http.StatusServiceUnavailable, Body: io.NopCloser(strings.NewReader("temporarily unavailable")), Header: make(http.Header)}, nil
+		}
+		return &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(strings.NewReader(`{"tag_name":"v1.3.0","draft":false,"prerelease":false}`)), Header: make(http.Header)}, nil
+	})}
+	clock := time.Date(2026, 9, 20, 1, 0, 0, 0, time.UTC)
+	now = func() time.Time { return clock }
+	t.Cleanup(func() { endpoint, now, httpClient = oldEndpoint, oldNow, oldHTTPClient })
+
+	if got, err := Check(context.Background(), state, "v1.2.1"); err == nil || got != "" {
+		t.Fatalf("failed check = %q, %v", got, err)
+	}
+	clock = clock.Add(time.Hour)
+	if got, err := Check(context.Background(), state, "v1.2.1"); err != nil || got != "" {
+		t.Fatalf("cached failed check = %q, %v", got, err)
+	}
+	if requests != 1 {
+		t.Fatalf("requests = %d, want 1", requests)
+	}
+}
+
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) { return f(req) }

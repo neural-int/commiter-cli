@@ -60,6 +60,8 @@ The target OS for v1 is macOS 14 or later, the target architecture is Apple Sili
 
 The only external runtime dependencies are system Git and Ollama. Syntax-aware structural analysis uses the official `github.com/tree-sitter/go-tree-sitter` package and target-language grammars, embedding Tree-sitter's C implementation into the single CLI binary via CGo. CGo must not be extended beyond the Tree-sitter boundary, and the implementation must not require an external parser executable, runtime shared grammar, Oniguruma, or a cloud-LLM fallback.
 
+During interactive normal execution, the CLI may send an HTTP GET containing no repository content to a fixed official GitHub Releases metadata endpoint for an update check at most once every 24 hours. Update-check network failures must not interrupt normal processing, and update checks are skipped for JSON output and CI environments.
+
 The default model is `qwen3.5:4b-q4_K_M`; its size is treated as approximately 3.4 GB based on official distribution information. [Qwen3.5 model information](https://ollama.com/library/qwen3.5%3A4b-q4_K_M/blobs/81fb60c7daa8)
 
 ## 6. Normal Flow
