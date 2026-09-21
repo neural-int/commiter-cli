@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import importlib
+import io
+import json
 import sys
 import unittest
+from unittest.mock import patch
 
 from pathlib import Path
 
@@ -97,13 +100,23 @@ class TranslationTests(unittest.TestCase):
         translated = translate.translate_text(source, lambda text: text)
         self.assertEqual(translated, source)
 
-    def test_long_input_is_rejected_before_model_call(self):
-        class Tokenizer:
-            def __call__(self, text, **kwargs):
-                return {"input_ids": list(range(len(text)))}
+    def test_cloud_request_sends_only_masked_note_to_nmt(self):
+        response = {"data": {"translations": [{"model": "nmt", "translatedText": "修正 __RN_PROTECTED_0000__。"}]}}
+        with patch.object(translate.request, "urlopen", return_value=io.BytesIO(json.dumps(response).encode())) as open_url:
+            result = translate.translate_text("Fix `commiter doctor`.", translate._cloud_translator("test-key"))
+        self.assertEqual(result, "修正 `commiter doctor`。")
+        sent = open_url.call_args.args[0]
+        self.assertEqual(sent.full_url, translate.TRANSLATE_URL)
+        self.assertEqual(sent.get_header("X-goog-api-key"), "test-key")
+        self.assertEqual(json.loads(sent.data), {"q": "Fix __RN_PROTECTED_0000__.", "source": "en", "target": "ja", "format": "text", "model": "nmt"})
 
-        with self.assertRaisesRegex(ValueError, "too long"):
-            translate.ensure_input_length(Tokenizer(), "x" * 5, max_tokens=4)
+    def test_cloud_translation_fails_closed(self):
+        with self.assertRaisesRegex(RuntimeError, "GOOGLE_TRANSLATE_API_KEY"):
+            translate._cloud_translator("")
+        response = {"data": {"translations": [{"model": "nmt", "translatedText": "修正。"}]}}
+        with patch.object(translate.request, "urlopen", return_value=io.BytesIO(json.dumps(response).encode())):
+            with self.assertRaisesRegex(ValueError, "placeholder missing"):
+                translate.translate_text("Fix `commiter doctor`.", translate._cloud_translator("test-key"))
 
 
 class ValidationAndRenderTests(unittest.TestCase):

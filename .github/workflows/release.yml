@@ -162,6 +162,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.validate.outputs.tag }}
+          GOOGLE_TRANSLATE_API_KEY: ${{ secrets.GOOGLE_TRANSLATE_API_KEY }}
         run: |
           set -euo pipefail
 
@@ -188,12 +189,7 @@ jobs:
           if [[ "$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1], encoding="utf-8"))["entries"]))' "$RUNNER_TEMP/release-notes-english.json")" == "0" ]]; then
             printf '%s\n' '{"entries": []}' > "$RUNNER_TEMP/release-notes-japanese.json"
           else
-            python3 -m venv "$RUNNER_TEMP/release-note-venv"
-            "$RUNNER_TEMP/release-note-venv/bin/python" -m pip install \
-              --disable-pip-version-check \
-              --requirement .github/scripts/release-notes/requirements.txt
-            "$RUNNER_TEMP/release-note-venv/bin/python" \
-              .github/scripts/release-notes/translate.py \
+            python3 .github/scripts/release-notes/translate.py \
               --input "$RUNNER_TEMP/release-notes-english.json" \
               --output "$RUNNER_TEMP/release-notes-japanese.json"
             python3 .github/scripts/release-notes/validate.py \

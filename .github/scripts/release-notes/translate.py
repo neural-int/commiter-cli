@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Translate release notes locally while preserving technical literals."""
+"""Translate release notes with Cloud Translation NMT while preserving literals."""
 
 from __future__ import annotations
 
 import argparse
 from collections.abc import Callable, Iterable
 import json
+import os
 from pathlib import Path
 import re
+from urllib import error, request
 
-MODEL_ID = "Helsinki-NLP/opus-mt-en-jap"
-MODEL_REVISION = "a863894cdd2b80f3bc1c5966734aee9ffec207d1"
-MODEL_MAX_INPUT_TOKENS = 512
+TRANSLATE_URL = "https://translation.googleapis.com/language/translate/v2"
 
 _PROTECTED_PATTERNS = (
     re.compile(r"__RN_PROTECTED_[0-9]+__"),
@@ -23,7 +23,7 @@ _PROTECTED_PATTERNS = (
     re.compile(r"(?<!\w)(?:\.{0,2}/)?[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+(?!\w)"),
     re.compile(r"(?<![A-Za-z0-9])[A-Z][A-Z0-9_]{2,}(?![A-Za-z0-9])"),
 )
-_PROTECTED_NAMES = ("commiter", "Ollama", "Homebrew", "GitHub", "Hugging Face", "Helsinki-NLP")
+_PROTECTED_NAMES = ("commiter", "Ollama", "Homebrew", "GitHub")
 
 
 def _literal_matches(text: str) -> list[tuple[int, int, str]]:
@@ -90,41 +90,32 @@ def translate_text(text: str, translator: Callable[[str], str]) -> str:
     return restore_literals(translated, literals).strip()
 
 
-def ensure_input_length(tokenizer, text: str, *, max_tokens: int = MODEL_MAX_INPUT_TOKENS) -> None:
-    """Reject long notes instead of silently truncating source content."""
-
-    encoded = tokenizer(text, add_special_tokens=True, truncation=False)
-    input_ids = encoded.get("input_ids")
-    if isinstance(input_ids, list) and input_ids and isinstance(input_ids[0], list):
-        input_ids = input_ids[0]
-    if not isinstance(input_ids, list):
-        raise ValueError("tokenizer did not return input_ids")
-    if len(input_ids) > max_tokens:
-        raise ValueError(
-            f"English release note is too long for the pinned model: "
-            f"{len(input_ids)} tokens exceeds {max_tokens}"
-        )
-
-
-def _model_translator() -> Callable[[str], str]:
-    try:
-        from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, pipeline
-    except ImportError as error:  # pragma: no cover - exercised only in CI setup
-        raise RuntimeError("transformers is required for release-note translation") from error
-
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, revision=MODEL_REVISION)
-    model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_ID, revision=MODEL_REVISION)
-    pipe = pipeline("translation", model=model, tokenizer=tokenizer)
+def _cloud_translator(api_key: str) -> Callable[[str], str]:
+    if not api_key:
+        raise RuntimeError("GOOGLE_TRANSLATE_API_KEY is required for release-note translation")
 
     def translate(text: str) -> str:
-        ensure_input_length(tokenizer, text)
-        result = pipe(text, max_new_tokens=512, truncation=False)
-        if not result or not isinstance(result[0], dict):
-            raise ValueError("translation model returned no result")
-        value = result[0].get("translation_text")
-        if not isinstance(value, str):
-            raise ValueError("translation model returned no translation_text")
-        return value
+        payload = json.dumps({"q": text, "source": "en", "target": "ja", "format": "text", "model": "nmt"}).encode("utf-8")
+        translation_request = request.Request(
+            TRANSLATE_URL,
+            data=payload,
+            headers={"Content-Type": "application/json; charset=utf-8", "X-goog-api-key": api_key},
+            method="POST",
+        )
+        try:
+            with request.urlopen(translation_request, timeout=30) as response:
+                result = json.load(response)
+        except error.HTTPError as exc:
+            raise RuntimeError(f"Cloud Translation request failed with HTTP {exc.code}") from None
+        except error.URLError as exc:
+            raise RuntimeError("Cloud Translation request failed") from None
+        translations = result.get("data", {}).get("translations", []) if isinstance(result, dict) else []
+        if not isinstance(translations, list) or len(translations) != 1:
+            raise ValueError("Cloud Translation returned an invalid translation count")
+        item = translations[0]
+        if not isinstance(item, dict) or item.get("model") != "nmt" or not isinstance(item.get("translatedText"), str):
+            raise ValueError("Cloud Translation returned an invalid NMT response")
+        return item["translatedText"]
 
     return translate
 
@@ -147,7 +138,7 @@ def main() -> int:
     entries = payload.get("entries") if isinstance(payload, dict) else payload
     if not isinstance(entries, list):
         raise SystemExit("canonical release notes must contain an entries array")
-    translated = translate_entries(entries, _model_translator()) if entries else []
+    translated = translate_entries(entries, _cloud_translator(os.environ.get("GOOGLE_TRANSLATE_API_KEY", ""))) if entries else []
     args.output.write_text(
         json.dumps({"entries": translated}, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
