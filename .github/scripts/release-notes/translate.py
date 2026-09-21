@@ -20,6 +20,9 @@ _PROTECTED_PATTERNS = (
     re.compile(r"(?<![A-Za-z0-9])#[0-9]+(?![A-Za-z0-9])"),
     re.compile(r"(?<![A-Za-z0-9])v[0-9]+(?:\.[0-9]+)+(?:-[0-9A-Za-z.-]+)?(?![A-Za-z0-9])"),
     re.compile(r"(?<![A-Za-z0-9])--[A-Za-z0-9][A-Za-z0-9-]*(?:=[A-Za-z0-9_.-]+)?"),
+    re.compile(r"(?<![A-Za-z0-9-])-[A-Za-z](?![A-Za-z0-9-])"),
+    re.compile(r"(?<![A-Za-z0-9_.-])[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+(?![A-Za-z0-9_-])"),
+    re.compile(r"(?<![A-Za-z0-9_])commiter(?:[ \t]+(?:init|setup|doctor|config|trust|version)(?:[ \t]+(?:init|show|path))?)?(?![A-Za-z0-9_])"),
     re.compile(r"(?<!\w)(?:\.{0,2}/)?[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+(?!\w)"),
     re.compile(r"(?<![A-Za-z0-9])[A-Z][A-Z0-9_]{2,}(?![A-Za-z0-9])"),
 )

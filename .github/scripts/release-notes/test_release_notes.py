@@ -100,6 +100,13 @@ class TranslationTests(unittest.TestCase):
         translated = translate.translate_text(source, lambda text: text)
         self.assertEqual(translated, source)
 
+    def test_unquoted_command_short_flag_and_config_key_are_masked(self):
+        source = "Run commiter doctor -v with analysis.preserve_outside_staged."
+        masked, _ = translate.protect_literals(source)
+        for literal in ("commiter doctor", "-v", "analysis.preserve_outside_staged"):
+            self.assertNotIn(literal, masked)
+        self.assertEqual(translate.translate_text(source, lambda text: text), source)
+
     def test_cloud_request_sends_only_masked_note_to_nmt(self):
         response = {"data": {"translations": [{"model": "nmt", "translatedText": "修正 __RN_PROTECTED_0000__。"}]}}
         with patch.object(translate.request, "urlopen", return_value=io.BytesIO(json.dumps(response).encode())) as open_url:
@@ -126,6 +133,17 @@ class ValidationAndRenderTests(unittest.TestCase):
         validate.validate_translation(english, japanese)
         with self.assertRaises(metadata.MetadataError):
             validate.validate_translation(english, [{**japanese[0], "number": 13}])
+
+    def test_translation_validation_rejects_changed_unquoted_literals(self):
+        source = "Run commiter doctor -v with analysis.preserve_outside_staged."
+        english = [{"number": 92, "category": "Fixed", "breaking": False, "english": source}]
+        for changed in (
+            source.replace("commiter doctor", "commiter setup"),
+            source.replace("-v", "-h"),
+            source.replace("analysis.preserve_outside_staged", "analysis.preserve_outside_stage"),
+        ):
+            with self.subTest(changed=changed), self.assertRaisesRegex(metadata.MetadataError, "protected literal"):
+                validate.validate_translation(english, [{"number": 92, "category": "Fixed", "breaking": False, "japanese": changed}])
 
     def test_render_is_deterministic_and_omits_empty_categories(self):
         entries = [
