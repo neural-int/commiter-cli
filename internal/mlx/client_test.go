@@ -30,15 +30,19 @@ printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{}","model
 }
 
 func TestGenerateRejectsNonCompletedStopStateAndPartialJSON(t *testing.T) {
-	helper := shellHelper(t, `printf '%s\n' '{"ok":false,"stop_reason":"max_tokens","generated_json":"{\"partial\":true}"}'
-`)
-	response, err := NewClient(helper).Generate(context.Background(), validRequest())
-	if response.StopReason != StopReasonMaxTokens {
-		t.Fatalf("response = %+v", response)
-	}
-	var failure *Error
-	if !errors.As(err, &failure) || failure.Kind != FailureStopState || failure.StopReason != StopReasonMaxTokens {
-		t.Fatalf("error = %#v", err)
+	for _, reason := range []StopReason{StopReasonMaxTokens, StopReasonGrammar, StopReasonInternal} {
+		t.Run(string(reason), func(t *testing.T) {
+			helper := shellHelper(t, "printf '%s\\n' "+shellQuote(fmt.Sprintf(
+				`{"ok":false,"stop_reason":%q,"generated_json":"{\"partial\":true}"}`, reason))+"\n")
+			response, err := NewClient(helper).Generate(context.Background(), validRequest())
+			if response.StopReason != reason {
+				t.Fatalf("response = %+v", response)
+			}
+			var failure *Error
+			if !errors.As(err, &failure) || failure.Kind != FailureStopState || failure.StopReason != reason {
+				t.Fatalf("error = %#v", err)
+			}
+		})
 	}
 }
 

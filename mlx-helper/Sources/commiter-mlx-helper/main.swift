@@ -19,9 +19,24 @@ private enum StopReason: String, Encodable {
     case internalError = "internal_error"
 }
 
-private struct Message: Decodable {
-    let role: String
+private struct Message: Decodable, Sendable {
+    let role: Chat.Message.Role
     let content: String
+
+    init(from decoder: Swift.Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let rawRole = try container.decode(String.self, forKey: .role)
+        guard let role = Chat.Message.Role(rawValue: rawRole) else {
+            throw HelperError.malformedRequest
+        }
+        self.role = role
+        content = try container.decode(String.self, forKey: .content)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case role
+        case content
+    }
 }
 
 private enum JSONValue: Decodable {
@@ -141,9 +156,6 @@ struct CommiterMLXHelper {
             let request = try decodeRequest(try readBoundedRequest())
             let response = try await handle(request)
             try writeResponse(response)
-            if !response.ok {
-                exit(2)
-            }
         } catch {
             do {
                 try writeResponse(Response(
@@ -158,7 +170,6 @@ struct CommiterMLXHelper {
                 FileHandle.standardError.write(Data("response_write_failed\n".utf8))
                 exit(1)
             }
-            exit(2)
         }
     }
 
@@ -202,9 +213,7 @@ struct CommiterMLXHelper {
         guard let schema = String(data: schemaData, encoding: .utf8) else {
             throw HelperError.malformedRequest
         }
-        let prompt = request.messages
-            .map { "\($0.role): \($0.content)" }
-            .joined(separator: "\n")
+        let messages = request.messages
         let maxTokens = min(max(request.outputTokens == 0 ? 1024 : request.outputTokens, 1), 8192)
 
         do {
@@ -216,6 +225,7 @@ struct CommiterMLXHelper {
             let outputBox = OutputBox()
             let generated = try await container.perform { context in
                 try Task.checkCancellation()
+                let chat = messages.map { Chat.Message(role: $0.role, content: $0.content) }
                 let grammarVocab = TokenizerVocabExtractor.extractForGrammar(from: context.tokenizer)
                 let grammarTokenizer = try GrammarTokenizer(
                     vocab: grammarVocab.vocab,
@@ -228,7 +238,7 @@ struct CommiterMLXHelper {
                     fastForward: true,
                     hostTokenizer: context.tokenizer
                 )
-                let input = try await context.processor.prepare(input: UserInput(prompt: prompt))
+                let input = try await context.processor.prepare(input: UserInput(chat: chat))
                 do {
                     _ = try GuidedGenerationLoop.run(
                         input: input,
@@ -292,8 +302,9 @@ struct CommiterMLXHelper {
         guard data.count + 1 <= maxResponseBytes else {
             throw HelperError.responseTooLarge
         }
-        FileHandle.standardOutput.write(data)
-        FileHandle.standardOutput.write(Data([0x0A]))
+        var line = data
+        line.append(0x0A)
+        try FileHandle.standardOutput.write(contentsOf: line)
     }
 
     private static func classify(_ error: Error) -> StopReason {
