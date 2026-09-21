@@ -17,7 +17,8 @@ import (
 )
 
 func TestGenerateKeepsStdoutProtocolSeparateFromStderr(t *testing.T) {
-	helper := shellHelper(t, `printf 'model loading is diagnostic\n' >&2
+	helper := shellHelper(t, `IFS= read -r _
+printf 'model loading is diagnostic\n' >&2
 printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{}","model":"qwen3.5:4b","runtime":"mlx"}'
 `)
 	response, err := NewClient(helper).Generate(context.Background(), validRequest())
@@ -32,7 +33,7 @@ printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{}","model
 func TestGenerateRejectsNonCompletedStopStateAndPartialJSON(t *testing.T) {
 	for _, reason := range []StopReason{StopReasonMaxTokens, StopReasonGrammar, StopReasonInternal} {
 		t.Run(string(reason), func(t *testing.T) {
-			helper := shellHelper(t, "printf '%s\\n' "+shellQuote(fmt.Sprintf(
+			helper := shellHelper(t, "IFS= read -r _\nprintf '%s\\n' "+shellQuote(fmt.Sprintf(
 				`{"ok":false,"stop_reason":%q,"generated_json":"{\"partial\":true}"}`, reason))+"\n")
 			response, err := NewClient(helper).Generate(context.Background(), validRequest())
 			if response.StopReason != reason {
@@ -58,7 +59,7 @@ func TestGenerateRejectsMalformedOrTrailingResponse(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			helper := shellHelper(t, "printf '%s' "+shellQuote(test.output)+"\n")
+			helper := shellHelper(t, "IFS= read -r _\nprintf '%s' "+shellQuote(test.output)+"\n")
 			_, err := NewClient(helper).Generate(context.Background(), validRequest())
 			var failure *Error
 			if !errors.As(err, &failure) || failure.Kind != FailureProtocol {
@@ -69,7 +70,8 @@ func TestGenerateRejectsMalformedOrTrailingResponse(t *testing.T) {
 }
 
 func TestGenerateRejectsInvalidStopReasonAsProtocol(t *testing.T) {
-	helper := shellHelper(t, `printf '%s\n' '{"ok":true,"stop_reason":"unknown","generated_json":"{}"}'
+	helper := shellHelper(t, `IFS= read -r _
+printf '%s\n' '{"ok":true,"stop_reason":"unknown","generated_json":"{}"}'
 `)
 	_, err := NewClient(helper).Generate(context.Background(), validRequest())
 	var failure *Error
