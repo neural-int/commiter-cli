@@ -229,20 +229,20 @@ func (client *Client) Generate(ctx context.Context, request Request) (Response, 
 		}
 		return Response{}, &Error{Kind: kind, Cause: ctx.Err()}
 	}
-	if writeErr != nil {
-		return Response{}, &Error{Kind: FailureProtocol, Cause: writeErr}
-	}
 	if errors.Is(stdoutData.err, errMessageTooLarge) {
 		return Response{}, &Error{Kind: FailureOversized, Cause: stdoutData.err}
 	}
 	if errors.Is(stderrData.err, errMessageTooLarge) {
 		return Response{}, &Error{Kind: FailureOversized, Cause: stderrData.err}
 	}
+	if waitErr != nil {
+		return Response{}, &Error{Kind: FailureCrash, ExitCode: exitCode(waitErr), Cause: waitErr}
+	}
 	if stdoutData.err != nil {
 		return Response{}, &Error{Kind: FailureProtocol, Cause: stdoutData.err}
 	}
-	if waitErr != nil {
-		return Response{}, &Error{Kind: FailureCrash, ExitCode: exitCode(waitErr), Cause: waitErr}
+	if writeErr != nil {
+		return Response{}, &Error{Kind: FailureProtocol, Cause: writeErr}
 	}
 	response, err := decodeResponse(stdoutData.data)
 	if err != nil {
