@@ -214,12 +214,12 @@ func (client *Client) Generate(ctx context.Context, request Request) (Response, 
 	}()
 	writeErr := writeRequest(stdin, requestData)
 	_ = stdin.Close()
-	waitErr := command.Wait()
-	close(stopOverflowWatcher)
 	stdoutData := <-stdoutResult
 	// stderr is intentionally observed only to drain the pipe. Its content is
 	// never included in an Error or returned to the caller.
 	stderrData := <-stderrResult
+	waitErr := command.Wait()
+	close(stopOverflowWatcher)
 	cleanupHelperProcess(command)
 
 	if ctx.Err() != nil {
@@ -312,7 +312,6 @@ func readBoundedStream(reader io.Reader, limit int, result chan<- streamResult, 
 		n, err := buffered.Read(chunk)
 		if n > 0 {
 			if data.Len()+n > limit {
-				result <- streamResult{data: data.Bytes(), err: errMessageTooLarge}
 				select {
 				case overflow <- struct{}{}:
 				default:
@@ -320,6 +319,7 @@ func readBoundedStream(reader io.Reader, limit int, result chan<- streamResult, 
 				// Continue draining so a helper that writes diagnostics cannot
 				// deadlock before Wait reaps it.
 				_, _ = io.Copy(io.Discard, buffered)
+				result <- streamResult{data: data.Bytes(), err: errMessageTooLarge}
 				return
 			}
 			_, _ = data.Write(chunk[:n])
