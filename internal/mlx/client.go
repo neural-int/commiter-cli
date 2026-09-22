@@ -34,7 +34,8 @@ const (
 	defaultWaitDelay        = time.Second
 )
 
-// StopReason is the runtime-neutral completion state returned by the helper.
+// StopReason is the runtime-neutral completion state returned by the helper
+// or synthesized at the Go boundary when the context ends.
 // Only completed is a usable planning candidate.
 type StopReason string
 
@@ -224,10 +225,12 @@ func (client *Client) Generate(ctx context.Context, request Request) (Response, 
 
 	if ctx.Err() != nil {
 		kind := FailureCancelled
+		reason := StopReasonCancelled
 		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 			kind = FailureTimeout
+			reason = StopReasonTimeout
 		}
-		return Response{}, &Error{Kind: kind, Cause: ctx.Err()}
+		return Response{StopReason: reason}, &Error{Kind: kind, StopReason: reason, Cause: ctx.Err()}
 	}
 	if errors.Is(stdoutData.err, errMessageTooLarge) {
 		return Response{}, &Error{Kind: FailureOversized, Cause: stdoutData.err}

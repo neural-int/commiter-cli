@@ -133,10 +133,13 @@ wait
 	client.TerminateGrace = 50 * time.Millisecond
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
-	_, err := client.Generate(ctx, validRequest())
+	response, err := client.Generate(ctx, validRequest())
 	var failure *Error
-	if !errors.As(err, &failure) || failure.Kind != FailureTimeout {
+	if !errors.As(err, &failure) || failure.Kind != FailureTimeout || failure.StopReason != StopReasonTimeout {
 		t.Fatalf("error = %#v", err)
+	}
+	if response.OK || response.StopReason != StopReasonTimeout || response.GeneratedJSON != "" {
+		t.Fatalf("response = %+v", response)
 	}
 	if !waitForTestPath(pidFile, time.Second) {
 		t.Fatal("child did not start")
@@ -163,18 +166,26 @@ func TestGenerateCancellationIsClassified(t *testing.T) {
 	helper := shellHelper(t, fmt.Sprintf("printf started > %s\nsleep 30\n", shellQuote(marker)))
 	client := NewClient(helper)
 	ctx, cancel := context.WithCancel(context.Background())
-	result := make(chan error, 1)
+	type resultValue struct {
+		response Response
+		err      error
+	}
+	result := make(chan resultValue, 1)
 	go func() {
-		_, err := client.Generate(ctx, validRequest())
-		result <- err
+		response, err := client.Generate(ctx, validRequest())
+		result <- resultValue{response: response, err: err}
 	}()
 	if !waitForTestPath(marker, time.Second) {
 		t.Fatal("helper did not start")
 	}
 	cancel()
+	got := <-result
 	var failure *Error
-	if err := <-result; !errors.As(err, &failure) || failure.Kind != FailureCancelled {
-		t.Fatalf("error = %#v", err)
+	if !errors.As(got.err, &failure) || failure.Kind != FailureCancelled || failure.StopReason != StopReasonCancelled {
+		t.Fatalf("error = %#v", got.err)
+	}
+	if got.response.OK || got.response.StopReason != StopReasonCancelled || got.response.GeneratedJSON != "" {
+		t.Fatalf("response = %+v", got.response)
 	}
 }
 
