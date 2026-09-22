@@ -71,4 +71,5 @@ const (
 	InvalidSummaryLanguage Violation = "invalid_summary_language"
 	InvalidAssignment      Violation = "invalid_assignment"
 	SensitiveOutput        Violation = "sensitive_output"
+	IncompleteOutput       Violation = "incomplete_output"
 )

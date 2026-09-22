@@ -9,6 +9,27 @@ import (
 	"unicode"
 )
 
+// ValidateGrammar checks the generated JSON envelope before semantic plan
+// validation. It does not decide whether the file assignment is safe.
+func ValidateGrammar(candidate []byte) []Violation {
+	if !json.Valid(candidate) {
+		return []Violation{InvalidJSON}
+	}
+	var decoded wirePlan
+	decoder := json.NewDecoder(bytes.NewReader(candidate))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&decoded); err != nil {
+		return []Violation{InvalidSchema}
+	}
+	if err := requireEOF(decoder); err != nil {
+		return []Violation{InvalidJSON}
+	}
+	if _, ok := decoded.plan(); !ok {
+		return []Violation{InvalidSchema}
+	}
+	return nil
+}
+
 func Validate(candidate []byte, fileIDs []string, sensitive SensitiveValues, language Language) (Plan, []Violation) {
 	violations := make([]Violation, 0, 4)
 	var plan Plan
@@ -68,8 +89,8 @@ func Validate(candidate []byte, fileIDs []string, sensitive SensitiveValues, lan
 }
 
 type wirePlan struct {
-	SchemaVersion int          `json:"schema_version"`
-	Commits       []wireCommit `json:"commits"`
+	SchemaVersion json.RawMessage `json:"schema_version"`
+	Commits       []wireCommit    `json:"commits"`
 }
 
 type wireCommit struct {
@@ -81,8 +102,16 @@ type wireCommit struct {
 }
 
 func (decoded wirePlan) plan() (Plan, bool) {
-	plan := Plan{SchemaVersion: decoded.SchemaVersion, Commits: make([]Commit, len(decoded.Commits))}
+	// The schema version is a deterministic Go-side contract. Accept the
+	// legacy generated field for existing Ollama responses during transition.
+	version := SchemaVersion
 	valid := true
+	if len(decoded.SchemaVersion) != 0 {
+		if bytes.Equal(bytes.TrimSpace(decoded.SchemaVersion), []byte("null")) || json.Unmarshal(decoded.SchemaVersion, &version) != nil {
+			valid = false
+		}
+	}
+	plan := Plan{SchemaVersion: version, Commits: make([]Commit, len(decoded.Commits))}
 	for index, source := range decoded.Commits {
 		var breaking bool
 		if len(source.Breaking) == 0 || bytes.Equal(bytes.TrimSpace(source.Breaking), []byte("null")) || json.Unmarshal(source.Breaking, &breaking) != nil {

@@ -38,9 +38,12 @@ func (availability TelemetryAvailability) Any() bool {
 // Duration fields are elapsed nanoseconds, matching time.Duration's underlying
 // unit without exposing a provider-specific duration type.
 type Response struct {
-	Backend            string
-	Model              string
-	Content            string
+	Backend string
+	Model   string
+	Content string
+	// StopReason is explicit for backends that report generation completion.
+	// An empty value preserves the existing Ollama contract.
+	StopReason         string
 	TotalDuration      int64
 	LoadDuration       int64
 	PromptEvalCount    int

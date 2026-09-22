@@ -67,7 +67,6 @@ func Schema(fileIDs []string) (json.RawMessage, error) {
 	schema := map[string]any{
 		"type": "object", "additionalProperties": false,
 		"properties": map[string]any{
-			"schema_version": map[string]any{"type": "integer", "const": SchemaVersion},
 			"commits": map[string]any{
 				"type": "array", "minItems": 1, "maxItems": len(ids),
 				"items": map[string]any{
@@ -83,7 +82,7 @@ func Schema(fileIDs []string) (json.RawMessage, error) {
 				},
 			},
 		},
-		"required": []string{"schema_version", "commits"},
+		"required": []string{"commits"},
 	}
 	encoded, err := json.Marshal(schema)
 	return json.RawMessage(encoded), err
