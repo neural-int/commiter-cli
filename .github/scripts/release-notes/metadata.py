@@ -96,6 +96,8 @@ def parse_metadata(body: str, *, pr_number: int | None = None) -> ReleaseMetadat
         raise MetadataError(
             prefix + f"English Release note is required for category {category}"
         )
+    if breaking_value == "Yes" and release_note.casefold() == "none":
+        raise MetadataError(prefix + "Breaking changes require an English Release note")
     if release_note.casefold() == "none":
         release_note = "None"
 

@@ -63,6 +63,13 @@ class MetadataTests(unittest.TestCase):
         result = metadata.parse_metadata(body(note="None", category="Internal"))
         self.assertEqual(result.release_note, "None")
 
+    def test_breaking_change_requires_release_note(self):
+        for category in ("Internal", "None"):
+            with self.subTest(category=category), self.assertRaisesRegex(
+                metadata.MetadataError, "Breaking changes require an English Release note"
+            ):
+                metadata.parse_metadata(body(note="None", category=category, breaking="Yes"))
+
 
 class CollectionTests(unittest.TestCase):
     def test_collects_only_commits_in_range_and_sorts(self):
