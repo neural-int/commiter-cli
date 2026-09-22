@@ -184,6 +184,8 @@ Draft Pull Request は未完成でも構いません。PR policy は Ready for r
 
 明示的に allowlist された automation（現在は `dependabot[bot]` と `github-actions[bot]`）は、人間向け body check の対象外です。ただし title policy は適用します。Dependabot は Conventional Commit に適合する prefix を生成するよう設定します。
 
+allowlist された bot の Pull Request でも Release metadata は必須です。3つの Release metadata section がすべてない場合は、automation が既定値 `Internal / None / Breaking change: No` を追記して PR Policy を再実行します。既存または一部だけ記入済みの Release metadata は上書きしません。依存関係や automation の変更が利用者向けまたは breaking な影響を持つ場合だけ、Maintainer が分類を review して修正します。
+
 ### Scope、label、merge method
 
 1つの Pull Request は1つの一貫した目的に限定してください。原則として、1つの Pull Request は1つの primary Issue に対応させます。
