@@ -83,9 +83,12 @@ func (generator Generator) Generate(ctx context.Context, prepared contextinput.P
 	if err != nil {
 		return generationFailure(calls, telemetry, nil)
 	}
-	plan, violations := Validate([]byte(response.Content), fileIDs, sensitive, language)
+	plan, violations := validateCandidate(response, fileIDs, sensitive, language)
 	if len(violations) == 0 {
 		return Result{Plan: plan, Calls: calls, Telemetry: telemetry}, nil
+	}
+	if containsViolation(violations, IncompleteOutput) {
+		return generationFailure(calls, telemetry, violations)
 	}
 	repair, err := repairMessages(prepared.Prompt, []byte(response.Content), violations)
 	if err != nil {
@@ -95,11 +98,27 @@ func (generator Generator) Generate(ctx context.Context, prepared contextinput.P
 	if err != nil {
 		return generationFailure(calls, telemetry, nil)
 	}
-	plan, violations = Validate([]byte(response.Content), fileIDs, sensitive, language)
+	plan, violations = validateCandidate(response, fileIDs, sensitive, language)
 	if len(violations) != 0 {
 		return generationFailure(calls, telemetry, violations)
 	}
 	return Result{Plan: plan, Calls: calls, Repaired: true, Telemetry: telemetry}, nil
+}
+
+// validateCandidate keeps completion, grammar shape, and domain validation as
+// separate gates. A failed gate never returns a partial plan.
+func validateCandidate(response llm.Response, fileIDs []string, sensitive SensitiveValues, language Language) (Plan, []Violation) {
+	if response.StopReason != "" && response.StopReason != "completed" {
+		return Plan{}, []Violation{IncompleteOutput}
+	}
+	if violations := ValidateGrammar([]byte(response.Content)); len(violations) != 0 {
+		return Plan{}, violations
+	}
+	plan, violations := Validate([]byte(response.Content), fileIDs, sensitive, language)
+	if len(violations) != 0 {
+		return Plan{}, violations
+	}
+	return plan, nil
 }
 
 func (telemetry *Telemetry) add(response llm.Response, first bool) {

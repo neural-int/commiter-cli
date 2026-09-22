@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -11,6 +13,7 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/contextinput"
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
 	"github.com/natsuki0413/commiter-cli/internal/llm"
+	"github.com/natsuki0413/commiter-cli/internal/mlx"
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
 )
 
@@ -76,6 +79,85 @@ func TestSchemaBoundsCommitAndFileIDArraysByRequiredFileCount(t *testing.T) {
 	fileIDs := commitProperties["file_ids"].(map[string]any)
 	if commits["maxItems"] != float64(2) || fileIDs["maxItems"] != float64(2) {
 		t.Fatalf("schema does not bound arrays by required files: %s", encoded)
+	}
+}
+
+func TestSchemaDerivesVersionInGoAndKeepsGroupingArrays(t *testing.T) {
+	encoded, err := Schema([]string{"F001", "F002"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var schema map[string]any
+	if err := json.Unmarshal(encoded, &schema); err != nil {
+		t.Fatal(err)
+	}
+	properties := schema["properties"].(map[string]any)
+	if _, present := properties["schema_version"]; present {
+		t.Fatal("deterministic schema version is still model-generated")
+	}
+	commit := properties["commits"].(map[string]any)["items"].(map[string]any)
+	fields := commit["properties"].(map[string]any)
+	if fields["file_ids"].(map[string]any)["type"] != "array" {
+		t.Fatal("file grouping expressiveness was lost")
+	}
+	plan, violations := Validate([]byte(`{"commits":[{"type":"fix","scope":"planner","breaking":false,"summary":"fix planning","file_ids":["F001","F002"]}]}`), []string{"F001", "F002"}, SensitiveValues{}, English)
+	if len(violations) != 0 || plan.SchemaVersion != SchemaVersion {
+		t.Fatalf("plan=%#v violations=%v", plan, violations)
+	}
+}
+
+func TestValidateRejectsNullLegacySchemaVersion(t *testing.T) {
+	_, violations := Validate([]byte(`{"schema_version":null,"commits":[{"type":"fix","scope":"planner","breaking":false,"summary":"fix planning","file_ids":["F001","F002"]}]}`), []string{"F001", "F002"}, SensitiveValues{}, English)
+	if !containsViolation(violations, InvalidSchema) {
+		t.Fatalf("violations=%v", violations)
+	}
+}
+
+func TestGeneratorRejectsIncompleteStopStateWithoutPartialPlanOrRepair(t *testing.T) {
+	client := &scriptedChat{steps: []chatStep{{content: validPlan(), stopReason: "max_tokens"}, {content: validPlan()}}}
+	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	if err == nil || result.Calls != 1 || len(result.Plan.Commits) != 0 || len(client.messages) != 1 {
+		t.Fatalf("result=%#v err=%v calls=%d", result, err, len(client.messages))
+	}
+}
+
+func TestGeneratorRejectsIncompleteMLXHelperOutputAsStopViolation(t *testing.T) {
+	output, err := json.Marshal(mlx.Response{
+		OK: false, StopReason: mlx.StopReasonMaxTokens, GeneratedJSON: validPlan(),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	helper := filepath.Join(t.TempDir(), "helper.sh")
+	script := "#!/bin/sh\nset -eu\nIFS= read -r _\nprintf '%s\\n' '" + string(output) + "'\n"
+	if err := os.WriteFile(helper, []byte(script), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	backend := &mlx.Backend{Client: mlx.NewClient(helper)}
+	result, err := (Generator{Client: backend}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	if err == nil || !strings.Contains(err.Error(), string(IncompleteOutput)) || result.Calls != 1 || len(result.Plan.Commits) != 0 {
+		t.Fatalf("result=%#v err=%v", result, err)
+	}
+}
+
+func TestGeneratorRejectsIncompleteRepairEvenWhenJSONIsValid(t *testing.T) {
+	client := &scriptedChat{steps: []chatStep{
+		{content: `{"commits":[]}`, stopReason: "completed"},
+		{content: validPlan(), stopReason: "max_tokens"},
+	}}
+	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	if err == nil || result.Calls != 2 || result.Repaired || len(result.Plan.Commits) != 0 {
+		t.Fatalf("result=%#v err=%v", result, err)
+	}
+}
+
+func TestGeneratorRepairsGrammarThenValidatesDomainAgain(t *testing.T) {
+	invalidGrammar := `{"commits":[{"type":"fix","scope":"planner","breaking":false,"summary":"fix planning","file_ids":["F001","F002"],"unexpected":true}]}`
+	invalidDomain := `{"commits":[{"type":"fix","scope":"planner","breaking":false,"summary":"fix planning","file_ids":["F001"]}]}`
+	client := &scriptedChat{steps: []chatStep{{content: invalidGrammar, stopReason: "completed"}, {content: invalidDomain, stopReason: "completed"}}}
+	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	if err == nil || result.Calls != 2 || len(result.Plan.Commits) != 0 {
+		t.Fatalf("result=%#v err=%v", result, err)
 	}
 }
 
@@ -598,6 +680,7 @@ type chatStep struct {
 	content            string
 	err                error
 	model              string
+	stopReason         string
 	loadDuration       int64
 	promptEvalDuration int64
 	evalDuration       int64
@@ -631,7 +714,7 @@ func (client *scriptedChat) Chat(_ context.Context, messages []llm.Message, sche
 	step := client.steps[0]
 	client.steps = client.steps[1:]
 	return llm.ChatResponse{
-		Model: step.model, Content: step.content, LoadDuration: step.loadDuration,
+		Model: step.model, Content: step.content, StopReason: step.stopReason, LoadDuration: step.loadDuration,
 		PromptEvalDuration: step.promptEvalDuration, EvalDuration: step.evalDuration,
 		PromptEvalCount: step.promptEvalCount, EvalCount: step.evalCount,
 		Availability: step.availability,
