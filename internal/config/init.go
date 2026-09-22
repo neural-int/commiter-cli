@@ -18,6 +18,7 @@ enabled = true
 confirm = true
 
 [llm]
+backend = "ollama"
 model = "qwen3.5:4b-q4_K_M"
 endpoint = "http://127.0.0.1:11434"
 context = "auto"
@@ -41,6 +42,7 @@ const RepoTemplate = `schema_version = 1
 language = "en"
 
 [llm]
+backend = "ollama"
 model = "qwen3.5:4b-q4_K_M"
 context = "auto"
 max_context_tokens = 65536

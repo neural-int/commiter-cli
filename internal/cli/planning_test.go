@@ -6,8 +6,27 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/gitstate"
+	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 )
+
+func TestMLXPlanningFailsClosedWithoutModelOrOllamaFallback(t *testing.T) {
+	oldStore := newMLXModelStore
+	t.Cleanup(func() { newMLXModelStore = oldStore })
+	newMLXModelStore = func() (mlxmodel.Store, error) {
+		return mlxmodel.Store{Root: t.TempDir()}, nil
+	}
+	values := config.Defaults().Values
+	values.Backend = "mlx"
+	values.Model = "owner/model"
+	values.ModelRevision = strings.Repeat("a", 40)
+	values.ModelQuantization = "4bit"
+	_, err := generateCommitPlan(context.Background(), "", gitstate.Snapshot{}, values, "")
+	if err == nil || !strings.Contains(err.Error(), "run commiter setup") {
+		t.Fatalf("missing model error = %v", err)
+	}
+}
 
 func TestAnalyzeForPlanningStopsWhenContextIsCanceled(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())

@@ -111,6 +111,9 @@ func TestResolveRejectsInvalidValuesBeforeHigherPriorityOverride(t *testing.T) {
 
 func TestDefaultsCoverEverySchemaKey(t *testing.T) {
 	effective := Defaults()
+	if effective.Values.Backend != "ollama" {
+		t.Fatalf("default backend = %q", effective.Values.Backend)
+	}
 	if effective.Values.Context != "auto" || effective.Values.MaxTokens != 65536 {
 		t.Fatalf("adaptive context defaults = %q/%d", effective.Values.Context, effective.Values.MaxTokens)
 	}
@@ -131,6 +134,29 @@ func TestDefaultsCoverEverySchemaKey(t *testing.T) {
 		if entry.Source != wantSource {
 			t.Errorf("%s source = %s, want %s", key, entry.Source, wantSource)
 		}
+	}
+}
+
+func TestResolveMLXRequiresPinnedModelAndPreservesOllamaDefault(t *testing.T) {
+	root := t.TempDir()
+	global := filepath.Join(root, "global.toml")
+	repo := filepath.Join(root, ".commiter.toml")
+	writeTestFile(t, repo, "[llm]\nbackend = \"mlx\"\nmodel = \"owner/model\"\nmodel_revision = \""+strings.Repeat("a", 40)+"\"\nmodel_quantization = \"4bit\"\n")
+	effective, err := Resolve(global, repo, root, CLIOverrides{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if effective.Values.Backend != "mlx" || effective.Values.Model != "owner/model" ||
+		effective.Sources["llm.backend"] != SourceRepo {
+		t.Fatalf("unexpected MLX configuration: %#v", effective)
+	}
+	writeTestFile(t, repo, "[llm]\nbackend = \"mlx\"\nmodel = \"owner/model\"\nmodel_revision = \"main\"\nmodel_quantization = \"4bit\"\n")
+	if _, err := Resolve(global, repo, root, CLIOverrides{}); err == nil || !strings.Contains(err.Error(), "model_revision") {
+		t.Fatalf("mutable revision accepted: %v", err)
+	}
+	writeTestFile(t, repo, "[llm]\nbackend = \"auto\"\n")
+	if _, err := Resolve(global, repo, root, CLIOverrides{}); err == nil || !strings.Contains(err.Error(), "llm.backend") {
+		t.Fatalf("auto backend accepted: %v", err)
 	}
 }
 

@@ -15,8 +15,10 @@ import (
 
 	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/contextinput"
+	"github.com/natsuki0413/commiter-cli/internal/exitcode"
 	"github.com/natsuki0413/commiter-cli/internal/gitstate"
 	runmetrics "github.com/natsuki0413/commiter-cli/internal/metrics"
+	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 	"github.com/natsuki0413/commiter-cli/internal/ollama"
 	"github.com/natsuki0413/commiter-cli/internal/planning"
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
@@ -27,6 +29,16 @@ type planFlowFunc func(context.Context, string, gitstate.Snapshot, config.Values
 var planFlow planFlowFunc = generateCommitPlan
 
 func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snapshot, values config.Values, supplement string) (planning.Plan, error) {
+	if values.Backend == "mlx" {
+		store, err := newMLXModelStore()
+		if err != nil {
+			return planning.Plan{}, exitcode.New(exitcode.LLM, err.Error())
+		}
+		if _, err := store.Ready(mlxmodel.Spec{Repo: values.Model, Revision: values.ModelRevision, Quantization: values.ModelQuantization}); err != nil {
+			return planning.Plan{}, exitcode.New(exitcode.LLM, err.Error())
+		}
+		return planning.Plan{}, exitcode.New(exitcode.LLM, "MLX planning integration is not available yet; no Ollama fallback was attempted")
+	}
 	recorder := runmetrics.FromContext(ctx)
 	started := time.Now()
 	results, sensitive, stats, err := analyzeForPlanningWithStatsContext(ctx, root, snapshot)

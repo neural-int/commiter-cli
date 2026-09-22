@@ -187,6 +187,7 @@ Important defaults include:
 | `commit.confirm` | `true` |
 | `push.enabled` | `true` |
 | `push.confirm` | `true` |
+| `llm.backend` | `"ollama"` |
 | `llm.model` | `"qwen3.5:4b-q4_K_M"` |
 | `llm.endpoint` | `"http://127.0.0.1:11434"` |
 | `llm.context` | `"auto"` |
@@ -196,6 +197,8 @@ Important defaults include:
 | `metrics.persist` | `false` |
 
 The Ollama endpoint must be a loopback HTTP URL. Verification configuration is repository-scoped and cannot be configured globally.
+
+MLX model preparation is opt-in. Set `llm.backend = "mlx"`, `llm.model = "owner/repository"`, `llm.model_revision` to the full 40-character commit hash, and `llm.model_quantization` to the model's quantization (for example, `"4bit"`) in the global or repository configuration. There is no MLX default model until the 4B compatibility benchmark is complete. `commiter setup` displays the repository, pinned revision, quantization, estimated size, and cache destination before asking to download. `commiter setup --update-model` refreshes the configured pin; change the revision in configuration to move to a newer model. Model files are stored under the user's `commiter/mlx-models` cache directory and checked against the pinned file digests. A normal run never contacts the model registry or downloads a model. MLX planning remains unavailable until the separate planning integration is complete; selecting MLX currently stops with an explicit error and never falls back to Ollama.
 
 For the complete configuration schema and source restrictions, see the [Software Requirements Specification](SOFTWARE_REQUIREMENTS_SPECIFICATION_en.md).
 
@@ -208,6 +211,8 @@ For the complete configuration schema and source restrictions, see the [Software
 Repository diffs, prompts, LLM responses, and other repository content used by `commiter` are not sent outside loopback for LLM inference, analytics, or telemetry. The configured LLM endpoint is required to be a loopback HTTP URL.
 
 This boundary does not mean every child process is offline: user-approved Git pushes, verification commands, Git hooks, signing operations, and Ollama model downloads may perform their own network access. They are separate from `commiter` sending repository content to a cloud LLM.
+
+The explicit MLX setup path requests only the configured model repository, revision, and model files from Hugging Face. It does not include a repository diff, prompt, or LLM response in those requests. Normal MLX execution does not make model-registry requests.
 
 ### Sensitive files
 
