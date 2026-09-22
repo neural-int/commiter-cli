@@ -189,6 +189,42 @@ func TestGenerateCancellationIsClassified(t *testing.T) {
 	}
 }
 
+func TestGenerateAlreadyEndedContextHasStopReason(t *testing.T) {
+	for _, test := range []struct {
+		name        string
+		makeContext func() (context.Context, context.CancelFunc)
+		kind        FailureKind
+		reason      StopReason
+	}{
+		{name: "cancelled", makeContext: func() (context.Context, context.CancelFunc) {
+			ctx, cancel := context.WithCancel(context.Background())
+			cancel()
+			return ctx, cancel
+		}, kind: FailureCancelled, reason: StopReasonCancelled},
+		{name: "timeout", makeContext: func() (context.Context, context.CancelFunc) {
+			return context.WithDeadline(context.Background(), time.Now().Add(-time.Second))
+		}, kind: FailureTimeout, reason: StopReasonTimeout},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			ctx, cancel := test.makeContext()
+			defer cancel()
+			marker := filepath.Join(t.TempDir(), "started")
+			helper := shellHelper(t, "printf started > "+shellQuote(marker)+"\n")
+			response, err := NewClient(helper).Generate(ctx, validRequest())
+			var failure *Error
+			if !errors.As(err, &failure) || failure.Kind != test.kind || failure.StopReason != test.reason {
+				t.Fatalf("error = %#v", err)
+			}
+			if response.OK || response.StopReason != test.reason || response.GeneratedJSON != "" {
+				t.Fatalf("response = %+v", response)
+			}
+			if _, statErr := os.Stat(marker); !errors.Is(statErr, os.ErrNotExist) {
+				t.Fatalf("helper started unexpectedly: %v", statErr)
+			}
+		})
+	}
+}
+
 func TestMarshalRequestRequiresValidSchema(t *testing.T) {
 	request := validRequest()
 	request.Schema = json.RawMessage("not-json")

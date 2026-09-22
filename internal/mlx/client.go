@@ -178,6 +178,9 @@ func (client *Client) Generate(ctx context.Context, request Request) (Response, 
 		}
 		return Response{}, &Error{Kind: kind, Cause: err}
 	}
+	if ctxErr := ctx.Err(); ctxErr != nil {
+		return contextFailure(ctxErr)
+	}
 
 	command := client.command(ctx)
 	configureHelperProcess(command, client.grace())
@@ -197,6 +200,9 @@ func (client *Client) Generate(ctx context.Context, request Request) (Response, 
 	}
 	if err := command.Start(); err != nil {
 		_ = stdin.Close()
+		if ctxErr := ctx.Err(); ctxErr != nil {
+			return contextFailure(ctxErr)
+		}
 		return Response{}, &Error{Kind: FailureStart, Cause: err}
 	}
 
@@ -224,13 +230,7 @@ func (client *Client) Generate(ctx context.Context, request Request) (Response, 
 	cleanupHelperProcess(command)
 
 	if ctx.Err() != nil {
-		kind := FailureCancelled
-		reason := StopReasonCancelled
-		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-			kind = FailureTimeout
-			reason = StopReasonTimeout
-		}
-		return Response{StopReason: reason}, &Error{Kind: kind, StopReason: reason, Cause: ctx.Err()}
+		return contextFailure(ctx.Err())
 	}
 	if errors.Is(stdoutData.err, errMessageTooLarge) {
 		return Response{}, &Error{Kind: FailureOversized, Cause: stdoutData.err}
@@ -261,6 +261,16 @@ func (client *Client) Generate(ctx context.Context, request Request) (Response, 
 		return response, &Error{Kind: FailureProtocol, Cause: errors.New("completed response has no generated JSON")}
 	}
 	return response, nil
+}
+
+func contextFailure(cause error) (Response, error) {
+	kind := FailureCancelled
+	reason := StopReasonCancelled
+	if errors.Is(cause, context.DeadlineExceeded) {
+		kind = FailureTimeout
+		reason = StopReasonTimeout
+	}
+	return Response{StopReason: reason}, &Error{Kind: kind, StopReason: reason, Cause: cause}
 }
 
 type commandFactory func(context.Context, string, ...string) *exec.Cmd
