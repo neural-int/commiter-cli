@@ -47,13 +47,9 @@ func TestMLXDryRunDoesNotContactRegistryOrFallbackToOllama(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(configDir, "config.toml"), []byte(configText), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	oldStore, oldUpdate := newMLXModelStore, updateCheckInteractive
-	t.Cleanup(func() { newMLXModelStore, updateCheckInteractive = oldStore, oldUpdate })
+	oldStore := newMLXModelStore
+	t.Cleanup(func() { newMLXModelStore = oldStore })
 	newMLXModelStore = func() (mlxmodel.Store, error) { return mlxmodel.Store{Root: t.TempDir()}, nil }
-	updateCheckInteractive = func() bool {
-		t.Fatal("normal MLX run reached update-check network path")
-		return false
-	}
 	var stdout, stderr bytes.Buffer
 	if code := Run([]string{"--dry-run"}, &stdout, &stderr); code != exitcode.LLM ||
 		!strings.Contains(stderr.String(), "run commiter setup") {

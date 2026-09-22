@@ -89,6 +89,39 @@ func TestInstallRejectsDigestMismatchWithoutPublishing(t *testing.T) {
 	}
 }
 
+func TestInstallChecksQuantizationBeforeDownloadingWeights(t *testing.T) {
+	config := []byte(`{"quantization":{"bits":4}}`)
+	weights := []byte("mock model weights")
+	weightHash := sha256.Sum256(weights)
+	configOID := gitBlobHash(config)
+	spec := Spec{Repo: "owner/model", Revision: strings.Repeat("d", 40), Quantization: "8bit"}
+	weightRequests := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasSuffix(r.URL.Path, "/config.json"):
+			_, _ = w.Write(config)
+		case strings.HasSuffix(r.URL.Path, "/model.safetensors"):
+			weightRequests++
+			_, _ = w.Write(weights)
+		default:
+			t.Errorf("unexpected request path: %s", r.URL.Path)
+			http.NotFound(w, r)
+		}
+	}))
+	defer server.Close()
+	store := Store{Root: t.TempDir(), BaseURL: server.URL, Client: server.Client()}
+	plan := Plan{Spec: spec, Files: []File{
+		{Path: "config.json", Size: int64(len(config)), Hash: configOID},
+		{Path: "model.safetensors", Size: int64(len(weights)), Hash: hex.EncodeToString(weightHash[:]), LFS: true},
+	}}
+	if _, err := store.Install(context.Background(), plan); err == nil || !strings.Contains(err.Error(), "quantization") {
+		t.Fatalf("Install error = %v", err)
+	}
+	if weightRequests != 0 {
+		t.Fatalf("weight requests = %d, want 0", weightRequests)
+	}
+}
+
 func TestPlanRejectsUnsafeRemotePath(t *testing.T) {
 	spec := Spec{Repo: "owner/model", Revision: strings.Repeat("c", 40), Quantization: "4bit"}
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

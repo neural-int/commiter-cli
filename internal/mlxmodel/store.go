@@ -287,16 +287,35 @@ func (store Store) Install(ctx context.Context, plan Plan) (string, error) {
 		return "", errors.New("cannot create MLX model staging directory")
 	}
 	defer os.RemoveAll(staging)
+	var configFile *File
+	for index := range plan.Files {
+		if plan.Files[index].Path == "config.json" {
+			configFile = &plan.Files[index]
+			break
+		}
+	}
+	if configFile == nil {
+		return "", errors.New("MLX model download plan has no config.json")
+	}
+	if !safePath(configFile.Path) || configFile.Size < 0 || !hexHash(configFile.Hash, map[bool]int{true: 64, false: 40}[configFile.LFS]) {
+		return "", errors.New("invalid MLX model download plan")
+	}
+	if err := downloadPlannedFile(ctx, store, plan.Spec, *configFile, staging); err != nil {
+		return "", err
+	}
+	if err := verifyQuantization(filepath.Join(staging, configFile.Path), plan.Spec.Quantization); err != nil {
+		return "", err
+	}
 	for _, file := range plan.Files {
+		if file.Path == configFile.Path {
+			continue
+		}
 		if !safePath(file.Path) || file.Size < 0 || !hexHash(file.Hash, map[bool]int{true: 64, false: 40}[file.LFS]) {
 			return "", errors.New("invalid MLX model download plan")
 		}
-		if err := store.download(ctx, plan.Spec, file, staging); err != nil {
+		if err := downloadPlannedFile(ctx, store, plan.Spec, file, staging); err != nil {
 			return "", err
 		}
-	}
-	if err := verifyQuantization(filepath.Join(staging, "config.json"), plan.Spec.Quantization); err != nil {
-		return "", err
 	}
 	metadata, err := json.Marshal(plan)
 	if err != nil || os.WriteFile(filepath.Join(staging, "commiter-model.json"), metadata, 0o600) != nil {
@@ -325,7 +344,12 @@ func (store Store) Install(ctx context.Context, plan Plan) (string, error) {
 }
 
 func verifyQuantization(path, label string) error {
-	data, err := os.ReadFile(path)
+	file, err := os.Open(path)
+	if err != nil {
+		return errors.New("MLX model configuration is unavailable")
+	}
+	defer file.Close()
+	data, err := io.ReadAll(io.LimitReader(file, (1<<20)+1))
 	if err != nil || len(data) > 1<<20 {
 		return errors.New("MLX model configuration is unavailable")
 	}
@@ -349,7 +373,7 @@ func verifyQuantization(path, label string) error {
 	return errors.New("MLX model quantization does not match pinned configuration")
 }
 
-func (store Store) download(ctx context.Context, spec Spec, file File, staging string) error {
+func downloadPlannedFile(ctx context.Context, store Store, spec Spec, file File, staging string) error {
 	segments := strings.Split(file.Path, "/")
 	for i := range segments {
 		segments[i] = url.PathEscape(segments[i])
