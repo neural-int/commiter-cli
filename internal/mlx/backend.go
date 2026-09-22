@@ -31,6 +31,10 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 		OutputTokens: options.OutputTokens, Model: backend.Model, ModelPath: backend.ModelPath,
 	})
 	if err != nil {
+		var failure *Error
+		if errors.As(err, &failure) && failure.Kind == FailureStopState && response.StopReason != StopReasonCompleted {
+			return llm.Response{Backend: "mlx", Model: response.Model, StopReason: string(response.StopReason)}, nil
+		}
 		return llm.Response{}, err
 	}
 	return llm.Response{

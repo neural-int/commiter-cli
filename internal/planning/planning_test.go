@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -11,6 +13,7 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/contextinput"
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
 	"github.com/natsuki0413/commiter-cli/internal/llm"
+	"github.com/natsuki0413/commiter-cli/internal/mlx"
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
 )
 
@@ -115,6 +118,25 @@ func TestGeneratorRejectsIncompleteStopStateWithoutPartialPlanOrRepair(t *testin
 	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
 	if err == nil || result.Calls != 1 || len(result.Plan.Commits) != 0 || len(client.messages) != 1 {
 		t.Fatalf("result=%#v err=%v calls=%d", result, err, len(client.messages))
+	}
+}
+
+func TestGeneratorRejectsIncompleteMLXHelperOutputAsStopViolation(t *testing.T) {
+	output, err := json.Marshal(mlx.Response{
+		OK: false, StopReason: mlx.StopReasonMaxTokens, GeneratedJSON: validPlan(),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	helper := filepath.Join(t.TempDir(), "helper.sh")
+	script := "#!/bin/sh\nset -eu\nIFS= read -r _\nprintf '%s\\n' '" + string(output) + "'\n"
+	if err := os.WriteFile(helper, []byte(script), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	backend := &mlx.Backend{Client: mlx.NewClient(helper)}
+	result, err := (Generator{Client: backend}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	if err == nil || !strings.Contains(err.Error(), string(IncompleteOutput)) || result.Calls != 1 || len(result.Plan.Commits) != 0 {
+		t.Fatalf("result=%#v err=%v", result, err)
 	}
 }
 
