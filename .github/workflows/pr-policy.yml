@@ -1,6 +1,7 @@
 name: PR Policy
 
-permissions: {}
+permissions:
+  pull-requests: read
 
 on:
   pull_request_target:
@@ -19,12 +20,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Validate pull request contract
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           python3 - <<'PY'
           import json
           import os
           import re
           import sys
+          from urllib import request
 
           with open(os.environ["GITHUB_EVENT_PATH"], "r", encoding="utf-8") as f:
               event = json.load(f)
@@ -35,7 +39,31 @@ jobs:
           author = (pr.get("user") or {}).get("login") or ""
           draft = bool(pr.get("draft"))
 
-          if draft:
+          bot_allowlist = {"dependabot[bot]", "github-actions[bot]"}
+          is_bot = author in bot_allowlist
+          release_sections = ("Release note", "Release category", "Breaking change")
+          heading_re = re.compile(r"(?m)^##[ \t]+(.+?)[ \t]*$")
+          if is_bot:
+              token = os.environ.get("GH_TOKEN", "")
+              repo = os.environ.get("GITHUB_REPOSITORY", "")
+              number = pr.get("number")
+              if not token or not repo or not isinstance(number, int):
+                  print("::error::Bot PR metadata could not be checked.")
+                  sys.exit(1)
+              url = f"https://api.github.com/repos/{repo}/pulls/{number}"
+              try:
+                  with request.urlopen(request.Request(url, headers={
+                      "Accept": "application/vnd.github+json",
+                      "Authorization": f"Bearer {token}",
+                      "X-GitHub-Api-Version": "2026-03-10",
+                  }), timeout=10) as response:
+                      current = json.load(response)
+                  body = current.get("body") or ""
+              except (OSError, ValueError, TypeError):
+                  print("::error::Bot PR metadata could not be read.")
+                  sys.exit(1)
+
+          if draft and not is_bot:
               print("Draft PR: policy validation is deferred until the PR is ready for review.")
               sys.exit(0)
 
@@ -54,15 +82,6 @@ jobs:
           if not title.isascii():
               errors.append("PR title must use English/ASCII characters.")
 
-          bot_allowlist = {"dependabot[bot]", "github-actions[bot]"}
-          if author in bot_allowlist:
-              if errors:
-                  for error in errors:
-                      print(f"::error::{error}")
-                  sys.exit(1)
-              print(f"Allowed bot PR ({author}): body validation skipped.")
-              sys.exit(0)
-
           required_sections = [
               "Summary",
               "Related issue",
@@ -72,7 +91,6 @@ jobs:
               "Safety impact",
           ]
 
-          heading_re = re.compile(r"(?m)^##[ \t]+(.+?)[ \t]*$")
           matches = list(heading_re.finditer(body))
           sections = {}
           duplicates = set()
@@ -85,12 +103,13 @@ jobs:
                   duplicates.add(name)
               sections[name] = body[start:end]
 
-          for section in required_sections:
-              if section not in sections:
-                  errors.append(f"Missing required section: ## {section}")
-          for section in sorted(duplicates):
-              if section in required_sections:
-                  errors.append(f"Required section appears more than once: ## {section}")
+          if not is_bot:
+              for section in required_sections:
+                  if section not in sections:
+                      errors.append(f"Missing required section: ## {section}")
+              for section in sorted(duplicates):
+                  if section in required_sections:
+                      errors.append(f"Required section appears more than once: ## {section}")
 
           comment_re = re.compile(r"<!--.*?-->", re.S)
 
@@ -99,11 +118,11 @@ jobs:
               return comment_re.sub("", value).strip()
 
           summary = cleaned("Summary")
-          if "Summary" in sections and not summary:
+          if not is_bot and "Summary" in sections and not summary:
               errors.append("Summary must not be empty.")
 
           related = cleaned("Related issue")
-          if "Related issue" in sections:
+          if not is_bot and "Related issue" in sections:
               closes_issue = re.search(
                   r"(?i)\b(?:closes|fixes|resolves)\s+#\d+\b", related
               )
@@ -116,7 +135,7 @@ jobs:
 
           changes = cleaned("Changes")
           meaningful_changes = re.sub(r"(?m)^[ \t]*[-*+][ \t]*$", "", changes).strip()
-          if "Changes" in sections and not meaningful_changes:
+          if not is_bot and "Changes" in sections and not meaningful_changes:
               errors.append("Changes must contain at least one concrete change.")
 
           verification = cleaned("Verification")
@@ -126,7 +145,7 @@ jobs:
               "go build ./cmd/commiter",
               "git diff --check",
           ]
-          if "Verification" in sections:
+          if not is_bot and "Verification" in sections:
               unchecked = []
               for check in standard_checks:
                   checked_re = re.compile(
@@ -147,7 +166,7 @@ jobs:
                   )
 
           requirements = cleaned("Requirements impact")
-          if "Requirements impact" in sections:
+          if not is_bot and "Requirements impact" in sections:
               impact_options = [
                   "I believe this PR does not affect requirements.",
                   "I believe this PR may affect requirements.",
@@ -165,10 +184,60 @@ jobs:
                   errors.append("Select exactly one Requirements impact option.")
 
           safety = cleaned("Safety impact")
-          if "Safety impact" in sections and not safety:
+          if not is_bot and "Safety impact" in sections and not safety:
               errors.append(
                   "Safety impact must not be empty. Write 'None.' when not applicable."
               )
+
+          for section in release_sections:
+              if section not in sections:
+                  errors.append(f"Missing required section: ## {section}")
+          for section in sorted(duplicates):
+              if section in release_sections:
+                  errors.append(f"Required section appears more than once: ## {section}")
+
+          release_categories = {
+              "Added",
+              "Changed",
+              "Fixed",
+              "Security",
+              "Distribution",
+              "Internal",
+              "None",
+          }
+          breaking_options = {"Yes", "No"}
+          checkbox_re = re.compile(r"(?m)^\s*-[ \t]+\[([ xX])\][ \t]+(.+?)[ \t]*$")
+
+          def selected_release_option(section, allowed, label):
+              selected = []
+              for match in checkbox_re.finditer(sections.get(section, "")):
+                  option = match.group(2).strip()
+                  if option not in allowed:
+                      errors.append(f"{label} contains an invalid option: {option}")
+                  elif match.group(1).lower() == "x":
+                      selected.append(option)
+              if section in sections and len(selected) != 1:
+                  errors.append(f"{label} must select exactly one option.")
+              return selected[0] if len(selected) == 1 else None
+
+          category = selected_release_option(
+              "Release category", release_categories, "Release category"
+          )
+          selected_breaking = selected_release_option(
+              "Breaking change", breaking_options, "Breaking change"
+          )
+          release_note = cleaned("Release note")
+          if "Release note" in sections and not release_note:
+              errors.append("English Release note must not be empty.")
+          if (
+              category in {"Added", "Changed", "Fixed", "Security", "Distribution"}
+              and release_note.casefold() == "none"
+          ):
+              errors.append(
+                  f"English Release note is required for category {category}."
+              )
+          if selected_breaking == "Yes" and release_note.casefold() == "none":
+              errors.append("Breaking changes require an English Release note.")
 
           if errors:
               for error in errors:

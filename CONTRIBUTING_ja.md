@@ -168,6 +168,14 @@ Ready for review にする前に、template の必須 section を残したまま
 - `Requirements impact`: 分かる範囲で「要件への影響はないと思う」「要件へ影響する可能性がある」「判断できないため Maintainer review が必要」のいずれか1つを選択する。正確な FR / SR / NFR / AC ID の特定や、英語版 / 日本語版 SRS の整合性保証はコントリビューターの必須要件ではない。
 - `Safety impact`: Git-state handling、local-only LLM processing、sensitive-file handling、verification、hook、output safety への影響を記載する。影響がない場合は `None.` と記載する。
 
+### Release note metadata
+
+すべての Pull Request で、template の `Release note`、`Release category`、`Breaking change` section を保持してください。カテゴリと breaking-change は、それぞれ1つだけ選択します。Release note には利用者から見た変更内容を英語で記載し、release workflow が使用する正本にします。日本語の Release note は追加しないでください。workflow が英語から生成します。
+
+Release note に `None` を指定できるのは、カテゴリが `Internal` または `None` の場合だけです。利用者向けカテゴリ（`Added`、`Changed`、`Fixed`、`Security`、`Distribution`）では、具体的な英語の説明が必要です。Release workflow は merge 済み Pull Request の metadata を再検証し、metadata が不足または曖昧な場合は公開前に停止します。
+
+日本語文は Google Cloud Translation Basic の `nmt` モデルで生成します。Cloud Translation API と課金を有効化した Google Cloud project を用意し、その API に制限した API key を repository secret `GOOGLE_TRANSLATE_API_KEY` に設定してください。Release workflow は英語の Release note 本文だけを翻訳 API に送信し、ソースコードや Pull Request の diff は送信しません。コード span、コマンド、version、URL、path、configuration key、Pull Request reference は保護し、翻訳後に検証します。認証情報の欠落や翻訳結果の不正があれば公開前に停止します。
+
 Policy check は構造と明示的な確認事項だけを検証します。技術的な説明が十分かどうかは CI では判定せず、review で判断します。
 
 merge 前に Maintainer は、SRS impact、該当する場合の Requirement ID、英語版 / 日本語版 SRS の意味上の整合性、release / breaking-change impact を最終確認します。Pull Request を merge することは、Maintainer がその変更についてこれらの確認を妥当と判断したことを意味します。
@@ -175,6 +183,8 @@ merge 前に Maintainer は、SRS impact、該当する場合の Requirement ID�
 Draft Pull Request は未完成でも構いません。PR policy は Ready for review になった時点から強制します。
 
 明示的に allowlist された automation（現在は `dependabot[bot]` と `github-actions[bot]`）は、人間向け body check の対象外です。ただし title policy は適用します。Dependabot は Conventional Commit に適合する prefix を生成するよう設定します。
+
+allowlist された bot の Pull Request でも Release metadata は必須です。3つの Release metadata section がすべてない場合は、automation が既定値 `Internal / None / Breaking change: No` を追記して PR Policy を再実行します。既存または一部だけ記入済みの Release metadata は上書きしません。依存関係や automation の変更が利用者向けまたは breaking な影響を持つ場合だけ、Maintainer が分類を review して修正します。
 
 ### Scope、label、merge method
 

@@ -1,0 +1,24 @@
+name: Bot Release Metadata
+
+on:
+  workflow_run:
+    workflows: ["PR Policy"]
+    types: [completed]
+
+permissions:
+  actions: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  fill:
+    if: github.event.workflow_run.event == 'pull_request_target' && github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Fill missing bot metadata and rerun PR Policy
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 .github/scripts/release-notes/fill_bot_metadata.py

@@ -152,6 +152,61 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Set up Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v6.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Generate and validate bilingual release notes
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.validate.outputs.tag }}
+          GOOGLE_TRANSLATE_API_KEY: ${{ secrets.GOOGLE_TRANSLATE_API_KEY }}
+        run: |
+          set -euo pipefail
+
+          previous_tag="$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)"
+          if [[ -n "$previous_tag" ]]; then
+            git rev-list "${previous_tag}..${TAG}" > "$RUNNER_TEMP/release-commits.txt"
+          else
+            git rev-list "$TAG" > "$RUNNER_TEMP/release-commits.txt"
+          fi
+
+          gh api \
+            --paginate \
+            --slurp \
+            "repos/${GITHUB_REPOSITORY}/pulls?state=closed&base=main&per_page=100" \
+            > "$RUNNER_TEMP/release-pr-pages.json"
+          jq 'add' "$RUNNER_TEMP/release-pr-pages.json" \
+            > "$RUNNER_TEMP/release-prs.json"
+
+          python3 .github/scripts/release-notes/collect.py \
+            --prs "$RUNNER_TEMP/release-prs.json" \
+            --commits "$RUNNER_TEMP/release-commits.txt" \
+            --output "$RUNNER_TEMP/release-notes-english.json"
+
+          if [[ "$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1], encoding="utf-8"))["entries"]))' "$RUNNER_TEMP/release-notes-english.json")" == "0" ]]; then
+            printf '%s\n' '{"entries": []}' > "$RUNNER_TEMP/release-notes-japanese.json"
+          else
+            python3 .github/scripts/release-notes/translate.py \
+              --input "$RUNNER_TEMP/release-notes-english.json" \
+              --output "$RUNNER_TEMP/release-notes-japanese.json"
+            python3 .github/scripts/release-notes/validate.py \
+              --english "$RUNNER_TEMP/release-notes-english.json" \
+              --japanese "$RUNNER_TEMP/release-notes-japanese.json"
+          fi
+
+          python3 .github/scripts/release-notes/render.py \
+            --entries "$RUNNER_TEMP/release-notes-english.json" \
+            --japanese "$RUNNER_TEMP/release-notes-japanese.json" \
+            --output release-notes.md \
+            --previous-tag "$previous_tag" \
+            --current-tag "$TAG" \
+            --repository "$GITHUB_REPOSITORY"
+
+          test -s release-notes.md
+
       - name: Verify release credentials are configured
         shell: bash
         env:
@@ -367,13 +422,16 @@ jobs:
               "dist/${ARCHIVE}" \
               dist/checksums.txt \
               --clobber
+            gh release edit "$TAG" \
+              --title "$TAG" \
+              --notes-file release-notes.md
           else
             gh release create "$TAG" \
               "dist/${ARCHIVE}" \
               dist/checksums.txt \
               --verify-tag \
               --draft \
-              --generate-notes \
+              --notes-file release-notes.md \
               --title "$TAG"
           fi
 

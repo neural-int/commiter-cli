@@ -168,6 +168,14 @@ Free-form explanations in the body may be written in English or Japanese. Keep t
 - `Requirements impact`: select exactly one declaration based on what you know: no expected requirements impact, possible requirements impact, or maintainer review required. Contributors do not need to identify exact FR / SR / NFR / AC IDs or certify English/Japanese SRS alignment.
 - `Safety impact`: describe effects on Git-state handling, local-only LLM processing, sensitive-file handling, verification, hooks, or output safety. Write `None.` when there is no safety impact.
 
+### Release note metadata
+
+Every pull request must keep the `Release note`, `Release category`, and `Breaking change` sections from the template. Select exactly one category and one breaking-change value. The release note is written in English from the user's perspective and is the canonical text used by the release workflow. Do not add a Japanese release note; the workflow derives it from the English text.
+
+Use `None` for the release note only when the category is `Internal` or `None`. User-facing categories (`Added`, `Changed`, `Fixed`, `Security`, and `Distribution`) require a concrete English description. The release workflow validates merged pull requests again and stops before publishing when metadata is missing or ambiguous.
+
+The Japanese text is generated through Google Cloud Translation Basic with the `nmt` model. Configure a Google Cloud project with the Cloud Translation API and billing enabled, then store an API key restricted to that API as the repository secret `GOOGLE_TRANSLATE_API_KEY`. The release workflow sends only English release note text to the translation API; it does not send source code or pull request diffs. Code spans, commands, versions, URLs, paths, configuration keys, and pull request references are protected and checked after translation. Missing credentials or invalid translations stop the release before publication.
+
 The policy check validates structure and explicit confirmations. It does not judge whether the technical explanation is sufficient; reviewers make that determination.
 
 Before merge, maintainers must make the final determination of SRS impact, affected requirement IDs when applicable, English/Japanese SRS semantic alignment, and release/breaking-change impact. Merging the pull request signifies that the maintainer considers those checks acceptable for the change.
@@ -175,6 +183,8 @@ Before merge, maintainers must make the final determination of SRS impact, affec
 Draft pull requests may be incomplete. The PR policy is enforced when the pull request becomes ready for review.
 
 Pull requests created by explicitly allowlisted automation, currently `dependabot[bot]` and `github-actions[bot]`, are exempt from the human-oriented body checks. Their titles must still satisfy the title policy. Dependabot is configured to generate compatible Conventional Commit prefixes.
+
+Allowlisted bot pull requests must still carry release metadata. When all three release metadata sections are absent, automation appends the default `Internal / None / Breaking change: No` classification and reruns PR Policy. Existing or partially supplied release metadata is never overwritten; maintainers review the classification and edit it only when the dependency or automation change has user-facing or breaking impact.
 
 ### Scope, labels, and merge method
 
