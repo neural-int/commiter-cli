@@ -184,6 +184,8 @@ Draft pull requests may be incomplete. The PR policy is enforced when the pull r
 
 Pull requests created by explicitly allowlisted automation, currently `dependabot[bot]` and `github-actions[bot]`, are exempt from the human-oriented body checks. Their titles must still satisfy the title policy. Dependabot is configured to generate compatible Conventional Commit prefixes.
 
+Allowlisted bot pull requests must still carry release metadata. When all three release metadata sections are absent, automation appends the default `Internal / None / Breaking change: No` classification and reruns PR Policy. Existing or partially supplied release metadata is never overwritten; maintainers review the classification and edit it only when the dependency or automation change has user-facing or breaking impact.
+
 ### Scope, labels, and merge method
 
 Keep each pull request limited to one coherent purpose. In principle, one pull request should correspond to one primary issue.
