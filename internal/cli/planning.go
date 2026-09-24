@@ -28,6 +28,7 @@ import (
 type planFlowFunc func(context.Context, string, gitstate.Snapshot, config.Values, string) (planning.Plan, error)
 
 var planFlow planFlowFunc = generateCommitPlan
+var mlxHelperPath = mlx.ResolveBundledHelper
 
 func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snapshot, values config.Values, supplement string) (planning.Plan, error) {
 	var client planning.ChatClient
@@ -40,9 +41,9 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 		if err != nil {
 			return planning.Plan{}, exitcode.New(exitcode.LLM, err.Error())
 		}
-		helper, err := lookPath("commiter-mlx-helper")
+		helper, err := mlxHelperPath()
 		if err != nil {
-			return planning.Plan{}, exitcode.New(exitcode.LLM, "MLX helper is not installed; install commiter-mlx-helper")
+			return planning.Plan{}, exitcode.New(exitcode.LLM, "bundled MLX helper is unavailable; reinstall commiter")
 		}
 		client = &mlx.Backend{Client: mlx.NewClient(helper), Model: values.Model, ModelPath: modelPath}
 	}
