@@ -87,6 +87,59 @@ jobs:
       - name: Run go vet
         run: go vet ./...
 
+      - name: Run Swift helper tests
+        run: swift test --package-path mlx-helper --triple arm64-apple-macosx14.0
+
+      - name: Build and verify Swift helper
+        shell: bash
+        run: |
+          set -euo pipefail
+          swift build \
+            --package-path mlx-helper \
+            --configuration release \
+            --triple arm64-apple-macosx14.0 \
+            --build-path "$RUNNER_TEMP/commiter-mlx-build" \
+            --product commiter-mlx-helper
+
+          helper_bin_path="$(swift build --show-bin-path \
+            --package-path mlx-helper \
+            --configuration release \
+            --triple arm64-apple-macosx14.0 \
+            --build-path "$RUNNER_TEMP/commiter-mlx-build" \
+            --product commiter-mlx-helper)"
+          helper="$helper_bin_path/commiter-mlx-helper"
+          test -x "$helper"
+          archs="$(lipo -archs "$helper")"
+          if [[ "$archs" != "arm64" ]]; then
+            echo "::error::Expected arm64 MLX helper, got: $archs"
+            exit 1
+          fi
+
+          deployment_target="$(otool -l "$helper" | awk '
+            $1 == "cmd" && $2 == "LC_BUILD_VERSION" { in_build = 1; next }
+            in_build && $1 == "minos" { print $2; exit }
+          ')"
+          if [[ "$deployment_target" != "14.0" ]]; then
+            echo "::error::Expected MLX helper deployment target 14.0, got: ${deployment_target:-unknown}"
+            exit 1
+          fi
+
+          unexpected_dependencies="$(otool -L "$helper" | awk '
+            NR == 1 { next }
+            {
+              dependency = $1
+              if (dependency !~ /^\/usr\/lib\// && dependency !~ /^\/System\/Library\//) {
+                print dependency
+              }
+            }
+          ')"
+          if [[ -n "$unexpected_dependencies" ]]; then
+            echo "::error::MLX helper has dependencies outside macOS system libraries: $unexpected_dependencies"
+            exit 1
+          fi
+          mkdir -p dist
+          cp "$helper" dist/commiter-mlx-helper
+
       - name: Build release binary
         shell: bash
         env:
@@ -248,6 +301,24 @@ jobs:
             -o dist/commiter \
             ./cmd/commiter
 
+      - name: Build release MLX helper
+        shell: bash
+        run: |
+          set -euo pipefail
+          swift build \
+            --package-path mlx-helper \
+            --configuration release \
+            --triple arm64-apple-macosx14.0 \
+            --build-path "$RUNNER_TEMP/commiter-mlx-build" \
+            --product commiter-mlx-helper
+          helper_bin_path="$(swift build --show-bin-path \
+            --package-path mlx-helper \
+            --configuration release \
+            --triple arm64-apple-macosx14.0 \
+            --build-path "$RUNNER_TEMP/commiter-mlx-build" \
+            --product commiter-mlx-helper)"
+          cp "$helper_bin_path/commiter-mlx-helper" dist/commiter-mlx-helper
+
       - name: Verify binary
         shell: bash
         env:
@@ -269,6 +340,33 @@ jobs:
           fi
 
           file dist/commiter
+          test -x dist/commiter-mlx-helper
+          helper_archs="$(lipo -archs dist/commiter-mlx-helper)"
+          if [[ "$helper_archs" != "arm64" ]]; then
+            echo "::error::Expected arm64 MLX helper, got: $helper_archs"
+            exit 1
+          fi
+          helper_target="$(otool -l dist/commiter-mlx-helper | awk '
+            $1 == "cmd" && $2 == "LC_BUILD_VERSION" { in_build = 1; next }
+            in_build && $1 == "minos" { print $2; exit }
+          ')"
+          if [[ "$helper_target" != "14.0" ]]; then
+            echo "::error::Expected MLX helper deployment target 14.0, got: ${helper_target:-unknown}"
+            exit 1
+          fi
+          unexpected_dependencies="$(otool -L dist/commiter-mlx-helper | awk '
+            NR == 1 { next }
+            {
+              dependency = $1
+              if (dependency !~ /^\/usr\/lib\// && dependency !~ /^\/System\/Library\//) {
+                print dependency
+              }
+            }
+          ')"
+          if [[ -n "$unexpected_dependencies" ]]; then
+            echo "::error::MLX helper has dependencies outside macOS system libraries: $unexpected_dependencies"
+            exit 1
+          fi
 
       - name: Import Developer ID certificate
         shell: bash
@@ -319,6 +417,21 @@ jobs:
           codesign --verify --strict --verbose=2 dist/commiter
           codesign --display --verbose=4 dist/commiter
 
+      - name: Sign MLX helper
+        shell: bash
+        env:
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+        run: |
+          set -euo pipefail
+          codesign \
+            --force \
+            --options runtime \
+            --timestamp \
+            --sign "$APPLE_SIGNING_IDENTITY" \
+            --keychain "$COMMITER_KEYCHAIN_PATH" \
+            dist/commiter-mlx-helper
+          codesign --verify --strict --verbose=2 dist/commiter-mlx-helper
+
       - name: Create release archive
         shell: bash
         env:
@@ -326,13 +439,35 @@ jobs:
         run: |
           set -euo pipefail
           package_dir="dist/package"
-          mkdir -p "$package_dir"
-          cp dist/commiter "$package_dir/commiter"
+          mkdir -p "$package_dir/bin" "$package_dir/libexec"
+          cp dist/commiter "$package_dir/bin/commiter"
+          cp dist/commiter-mlx-helper "$package_dir/libexec/commiter-mlx-helper"
           cp LICENSE "$package_dir/LICENSE"
           (
             cd "$package_dir"
-            zip -X -q "../${ARCHIVE}" commiter LICENSE
+            zip -X -q -r "../${ARCHIVE}" bin libexec LICENSE
           )
+
+      - name: Verify packaged helper layout and signatures
+        shell: bash
+        env:
+          ARCHIVE: ${{ needs.validate.outputs.archive }}
+        run: |
+          set -euo pipefail
+          package_check="$RUNNER_TEMP/commiter-package-check"
+          mkdir -p "$package_check"
+          unzip -q "dist/${ARCHIVE}" -d "$package_check"
+          test -x "$package_check/bin/commiter"
+          test -x "$package_check/libexec/commiter-mlx-helper"
+
+          helper_entries="$(unzip -Z1 "dist/${ARCHIVE}" | awk '/(^|\/)commiter-mlx-helper$/')"
+          if [[ "$helper_entries" != "libexec/commiter-mlx-helper" ]]; then
+            echo "::error::Expected only the private libexec helper entry, got: ${helper_entries:-none}"
+            exit 1
+          fi
+
+          codesign --verify --strict "$package_check/bin/commiter"
+          codesign --verify --strict "$package_check/libexec/commiter-mlx-helper"
 
       - name: Store notarization credentials
         shell: bash

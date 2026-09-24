@@ -7,7 +7,7 @@
 | Document status | Baselined for v1 |
 | Created | 2026-08-29 |
 | Scope | v1 |
-| Target implementation | A single CLI binary primarily implemented in Go, including Tree-sitter CGo bindings |
+| Target implementation | Go CLI including Tree-sitter CGo bindings, plus a private Swift helper when using MLX |
 
 ## 1. Purpose and Background
 
@@ -58,7 +58,7 @@ v1 does not target Windows or Linux, a GUI, cloud LLMs, a llama.cpp backend, hun
 
 The target OS for v1 is macOS 14 or later, the target architecture is Apple Silicon, and the reference machine is an M3 Mac with 16 GB of memory.
 
-The only external runtime dependencies are system Git and Ollama. Syntax-aware structural analysis uses the official `github.com/tree-sitter/go-tree-sitter` package and target-language grammars, embedding Tree-sitter's C implementation into the single CLI binary via CGo. CGo must not be extended beyond the Tree-sitter boundary, and the implementation must not require an external parser executable, runtime shared grammar, Oniguruma, or a cloud-LLM fallback.
+The Ollama backend requires system Git and Ollama at runtime. The MLX backend uses the private Swift helper included in the distribution and macOS system frameworks. Syntax-aware structural analysis uses the official `github.com/tree-sitter/go-tree-sitter` package and target-language grammars, embedding Tree-sitter's C implementation into the Go CLI via CGo. CGo must not be extended beyond the Tree-sitter boundary, and the implementation must not require an external parser executable, runtime shared grammar, Oniguruma, or a cloud-LLM fallback.
 
 During interactive normal execution, the CLI may send an HTTP GET containing no repository content to a fixed official GitHub Releases metadata endpoint for an update check at most once every 24 hours. Update-check network failures must not interrupt normal processing, and update checks are skipped for JSON output and CI environments.
 
