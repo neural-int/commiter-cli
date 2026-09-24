@@ -15,10 +15,11 @@ concurrency:
 jobs:
   validate:
     name: Validate release
-    runs-on: macos-15
+    runs-on: macos-26
     permissions:
       contents: read
     env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
       MACOSX_DEPLOYMENT_TARGET: "14.0"
       CGO_ENABLED: "1"
       GOOS: darwin
@@ -88,57 +89,14 @@ jobs:
         run: go vet ./...
 
       - name: Run Swift helper tests
-        run: swift test --package-path mlx-helper --triple arm64-apple-macosx14.0
+        run: |
+          xcodebuild -version
+          swift --version
+          swift test --package-path mlx-helper --triple arm64-apple-macosx14.0
 
       - name: Build and verify Swift helper
         shell: bash
-        run: |
-          set -euo pipefail
-          swift build \
-            --package-path mlx-helper \
-            --configuration release \
-            --triple arm64-apple-macosx14.0 \
-            --build-path "$RUNNER_TEMP/commiter-mlx-build" \
-            --product commiter-mlx-helper
-
-          helper_bin_path="$(swift build --show-bin-path \
-            --package-path mlx-helper \
-            --configuration release \
-            --triple arm64-apple-macosx14.0 \
-            --build-path "$RUNNER_TEMP/commiter-mlx-build" \
-            --product commiter-mlx-helper)"
-          helper="$helper_bin_path/commiter-mlx-helper"
-          test -x "$helper"
-          archs="$(lipo -archs "$helper")"
-          if [[ "$archs" != "arm64" ]]; then
-            echo "::error::Expected arm64 MLX helper, got: $archs"
-            exit 1
-          fi
-
-          deployment_target="$(otool -l "$helper" | awk '
-            $1 == "cmd" && $2 == "LC_BUILD_VERSION" { in_build = 1; next }
-            in_build && $1 == "minos" { print $2; exit }
-          ')"
-          if [[ "$deployment_target" != "14.0" ]]; then
-            echo "::error::Expected MLX helper deployment target 14.0, got: ${deployment_target:-unknown}"
-            exit 1
-          fi
-
-          unexpected_dependencies="$(otool -L "$helper" | awk '
-            NR == 1 { next }
-            {
-              dependency = $1
-              if (dependency !~ /^\/usr\/lib\// && dependency !~ /^\/System\/Library\//) {
-                print dependency
-              }
-            }
-          ')"
-          if [[ -n "$unexpected_dependencies" ]]; then
-            echo "::error::MLX helper has dependencies outside macOS system libraries: $unexpected_dependencies"
-            exit 1
-          fi
-          mkdir -p dist
-          cp "$helper" dist/commiter-mlx-helper
+        run: bash .github/scripts/build-mlx-helper.sh
 
       - name: Build release binary
         shell: bash
@@ -179,7 +137,7 @@ jobs:
     name: Build, sign, notarize, and publish
     needs: validate
     environment: release
-    runs-on: macos-15
+    runs-on: macos-26
     permissions:
       contents: write
     outputs:
@@ -188,6 +146,7 @@ jobs:
       archive: ${{ needs.validate.outputs.archive }}
       sha256: ${{ steps.checksum.outputs.sha256 }}
     env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
       MACOSX_DEPLOYMENT_TARGET: "14.0"
       CGO_ENABLED: "1"
       GOOS: darwin
@@ -304,20 +263,9 @@ jobs:
       - name: Build release MLX helper
         shell: bash
         run: |
-          set -euo pipefail
-          swift build \
-            --package-path mlx-helper \
-            --configuration release \
-            --triple arm64-apple-macosx14.0 \
-            --build-path "$RUNNER_TEMP/commiter-mlx-build" \
-            --product commiter-mlx-helper
-          helper_bin_path="$(swift build --show-bin-path \
-            --package-path mlx-helper \
-            --configuration release \
-            --triple arm64-apple-macosx14.0 \
-            --build-path "$RUNNER_TEMP/commiter-mlx-build" \
-            --product commiter-mlx-helper)"
-          cp "$helper_bin_path/commiter-mlx-helper" dist/commiter-mlx-helper
+          xcodebuild -version
+          swift --version
+          bash .github/scripts/build-mlx-helper.sh
 
       - name: Verify binary
         shell: bash
@@ -341,6 +289,7 @@ jobs:
 
           file dist/commiter
           test -x dist/commiter-mlx-helper
+          test -s dist/mlx.metallib
           helper_archs="$(lipo -archs dist/commiter-mlx-helper)"
           if [[ "$helper_archs" != "arm64" ]]; then
             echo "::error::Expected arm64 MLX helper, got: $helper_archs"
@@ -442,6 +391,7 @@ jobs:
           mkdir -p "$package_dir/bin" "$package_dir/libexec"
           cp dist/commiter "$package_dir/bin/commiter"
           cp dist/commiter-mlx-helper "$package_dir/libexec/commiter-mlx-helper"
+          cp dist/mlx.metallib "$package_dir/libexec/mlx.metallib"
           cp LICENSE "$package_dir/LICENSE"
           (
             cd "$package_dir"
@@ -459,6 +409,7 @@ jobs:
           unzip -q "dist/${ARCHIVE}" -d "$package_check"
           test -x "$package_check/bin/commiter"
           test -x "$package_check/libexec/commiter-mlx-helper"
+          test -s "$package_check/libexec/mlx.metallib"
 
           helper_entries="$(unzip -Z1 "dist/${ARCHIVE}" | awk '/(^|\/)commiter-mlx-helper$/')"
           if [[ "$helper_entries" != "libexec/commiter-mlx-helper" ]]; then
@@ -468,6 +419,39 @@ jobs:
 
           codesign --verify --strict "$package_check/bin/commiter"
           codesign --verify --strict "$package_check/libexec/commiter-mlx-helper"
+
+          config_home="$RUNNER_TEMP/commiter-smoke-config"
+          mkdir -p "$config_home/commiter"
+          cat > "$config_home/commiter/config.toml" <<'EOF'
+          [llm]
+          backend = "mlx"
+          model = "owner/model"
+          model_revision = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          model_quantization = "4bit"
+          EOF
+          set +e
+          XDG_CONFIG_HOME="$config_home" XDG_STATE_HOME="$RUNNER_TEMP/commiter-smoke-state" \
+            "$package_check/bin/commiter" --json doctor > "$RUNNER_TEMP/commiter-smoke-doctor.json"
+          doctor_status=$?
+          set -e
+          if [[ "$doctor_status" -eq 0 ]]; then
+            echo "::error::Doctor unexpectedly accepted the absent smoke model"
+            exit 1
+          fi
+          python3 - "$RUNNER_TEMP/commiter-smoke-doctor.json" <<'PY'
+          import json
+          import sys
+          with open(sys.argv[1], encoding="utf-8") as stream:
+              checks = json.load(stream)["doctor"]
+          if checks["mlx_helper"]["ok"] is not True or checks["mlx_model"]["ok"] is not False:
+              raise SystemExit("packaged commiter did not resolve its private MLX helper")
+          PY
+
+          smoke_output="$(cd "$RUNNER_TEMP" && "$package_check/libexec/commiter-mlx-helper" --smoke-metal)"
+          if [[ "$smoke_output" != metal_ok ]]; then
+            echo "::error::Packaged MLX helper did not initialize Metal"
+            exit 1
+          fi
 
       - name: Store notarization credentials
         shell: bash
