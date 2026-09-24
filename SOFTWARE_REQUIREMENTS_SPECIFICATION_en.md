@@ -228,9 +228,9 @@ Hierarchical summarization and structural-evidence reduction must preserve the c
 
 ### FR-008 Commit Plan Generation
 
-Plan generation uses a runtime-neutral LLM backend contract for messages, structured-output schemas, responses, numeric telemetry, capabilities, and retry classification. The v1 default remains an Ollama adapter; backend selection configuration and MLX model lifecycle are outside this requirement. Introducing the adapter must not change Ollama structured output, retry, daemon/model lifecycle, or the local transmission boundary.
+Plan generation uses a runtime-neutral LLM backend contract for messages, structured-output schemas, responses, numeric telemetry, capabilities, and retry classification. The configured backend is selected explicitly, with Ollama as the default. When MLX is selected, commiter uses the prepared local model and helper and must not fall back to Ollama when they are unavailable. Adding a backend must not change existing Ollama structured output, retry, daemon/model lifecycle, or local transmission boundaries.
 
-The CLI must send structured input to the local Ollama API and obtain a file-level commit plan.
+The CLI must send structured input to the selected backend and obtain a file-level commit plan. Ollama uses its loopback API; MLX uses the prepared local model through the bounded IPC helper.
 
 ### FR-009 LLM Generation Failure and Output Validation
 
@@ -302,11 +302,11 @@ Push follows normal Git push semantics and targets every outgoing commit sent fr
 
 ### FR-015 setup
 
-`commiter setup` must separately confirm installation of Ollama, daemon startup, and download of the default model, and must not automatically install Homebrew itself.
+`commiter setup` must prepare the selected backend. For Ollama, it must separately confirm Ollama installation, daemon startup, and download of the configured model, and must not automatically install Homebrew itself. For MLX, it must check macOS Apple Silicon support and helper availability, then obtain separate confirmation before downloading the configured pinned model. It must start the helper for the installed model and check model/tokenizer loading, JSON Schema grammar compilation, and constrained generation.
 
 ### FR-016 doctor
 
-`commiter doctor` must perform read-only diagnostics for Git, Ollama, the loopback API, the default model, structured output, thinking-disabled operation, configuration, trust, and Git identity.
+`commiter doctor` must perform read-only diagnostics for Git, configuration, verification trust, Git identity, and the selected backend's capabilities. For Ollama it checks the loopback API, configured model, structured output, and thinking-disabled operation. For MLX it checks platform support, helper availability, the locally installed pinned model, model/tokenizer loading, JSON Schema grammar compilation, and constrained JSON generation. Doctor must not download or update a model, operate a daemon, or change configuration or model files, and must not fall back to Ollama when MLX fails.
 
 ### FR-017 Language Configuration
 
@@ -698,7 +698,7 @@ Prepare local commits that are already ahead of the remote-tracking ref before r
 
 ### AC-011 setup and doctor
 
-For states where Ollama is not installed, the daemon is stopped, the model is missing, and the model is present, verify setup's separate confirmations and doctor's non-destructive diagnostics.
+For states where Ollama is not installed, the daemon is stopped, the model is missing, and the model is present, verify setup's separate confirmations and doctor's non-destructive diagnostics. For MLX, verify unsupported platforms, a missing or unstartable helper, a missing, corrupt, or ready pinned model, tokenizer loading, JSON Schema grammar compilation, and constrained generation. Verify that doctor makes no model-registry requests and changes no files or configuration, and that reasoning text outside the required JSON causes the probe to fail.
 
 ### AC-012 Configuration Precedence
 

@@ -390,9 +390,18 @@ func TestMLXSetupShowsPinnedDownloadPlanBeforeApproval(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(configHome, "commiter", "config.toml"), []byte(configText), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	oldStore, oldConfirm := newMLXModelStore, confirmFunc
-	t.Cleanup(func() { newMLXModelStore, confirmFunc = oldStore, oldConfirm })
+	oldStore, oldConfirm, oldPlatform, oldLookPath := newMLXModelStore, confirmFunc, mlxPlatform, lookPath
+	t.Cleanup(func() {
+		newMLXModelStore, confirmFunc, mlxPlatform, lookPath = oldStore, oldConfirm, oldPlatform, oldLookPath
+	})
 	newMLXModelStore = func() (mlxmodel.Store, error) { return store, nil }
+	mlxPlatform = func() (string, string) { return "darwin", "arm64" }
+	lookPath = func(name string) (string, error) {
+		if name == "commiter-mlx-helper" {
+			return "/test/commiter-mlx-helper", nil
+		}
+		return oldLookPath(name)
+	}
 	var stdout bytes.Buffer
 	confirmFunc = func(string) bool {
 		if !strings.Contains(stdout.String(), "estimated download size: 2 bytes") ||

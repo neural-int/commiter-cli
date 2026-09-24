@@ -227,9 +227,9 @@ CLI は chunk 圧縮 profile またはコンテキスト予算を遷移するた
 
 ### FR-008 コミット計画の生成
 
-計画生成は runtime-neutral な LLM backend contract（メッセージ、構造化出力スキーマ、応答、数値 telemetry、能力情報、および retry 可否）を介して実行します。v1 の既定 backend は Ollama adapter とし、backend の選択設定や MLX の model lifecycle はこの要件の範囲に含めません。adapter の導入は、既存の Ollama の structured output、retry、daemon/model lifecycle、およびローカル送信境界を変更してはなりません。
+計画生成は runtime-neutral な LLM backend contract（メッセージ、構造化出力スキーマ、応答、数値 telemetry、能力情報、および retry 可否）を介して実行します。backend は設定に従って選択し、既定は Ollama とします。MLX を選択した場合は、準備済みのローカル model と helper を使用し、利用不能時に Ollama へ自動切替してはなりません。backend の追加は、既存 Ollama の structured output、retry、daemon/model lifecycle、およびローカル送信境界を変更してはなりません。
 
-CLI は Ollama のローカル API へ構造化された入力を送信し、ファイル単位のコミット計画を取得しなければなりません。
+CLI は選択された backend に構造化された入力を送り、ファイル単位のコミット計画を取得しなければなりません。Ollama は loopback API を使用し、MLX は準備済みのローカル model と bounded IPC helper を使用します。
 
 ### FR-009 LLM 生成失敗と出力検証
 
@@ -300,11 +300,11 @@ CLI は全コミットが正常に完了した後に一度だけプッシュを�
 
 ### FR-015 setup
 
-`commiter setup` は、Ollama のインストール、デーモンの起動、およびデフォルトモデルの取得について個別にユーザー確認を行い、Homebrew 自体を自動的にインストールしてはなりません。
+`commiter setup` は選択された backend に応じて準備しなければなりません。Ollama では、Ollama のインストール、デーモンの起動、および設定モデルの取得について個別にユーザー確認を行い、Homebrew 自体を自動的にインストールしてはなりません。MLX では、macOS Apple Silicon 対応と helper の利用可能性を確認し、設定された固定 model の取得を個別の確認後に行わなければなりません。取得済みまたは取得後の model について helper を起動し、model/tokenizer load、JSON Schema grammar compile、および制約付き生成を確認しなければなりません。
 
 ### FR-016 doctor
 
-`commiter doctor` は、Git、Ollama、ループバック API、デフォルトモデル、構造化出力、thinking の無効化、設定、検証 trust、および Git のユーザー識別情報（Git identity）を読み取り専用で診断しなければなりません。
+`commiter doctor` は、Git、設定、検証 trust、および Git のユーザー識別情報（Git identity）に加え、選択された backend の能力を読み取り専用で診断しなければなりません。Ollama では loopback API、設定モデル、structured output、および thinking 無効化を確認します。MLX では platform、helper、ローカルの固定 model、model/tokenizer load、JSON Schema grammar compile、および制約付き JSON 生成を確認します。診断は model download/update、daemon 操作、設定や model ファイルの変更を行ってはならず、MLX の失敗時に Ollama へ自動切替してはなりません。
 
 ### FR-017 言語設定
 
@@ -696,7 +696,7 @@ upstream あり、リモートが1つで upstream なし、複数リモート、
 
 ### AC-011 setup と doctor
 
-Ollama 未インストール、デーモン停止、モデル未取得、モデル取得済みの各状態において、setup による個別の確認と doctor による非破壊的な診断を確認します。
+Ollama 未インストール、デーモン停止、モデル未取得、モデル取得済みの各状態において、setup による個別の確認と doctor による非破壊的な診断を確認します。MLX では unsupported platform、helper 不在/起動失敗、固定モデル未取得/破損/準備済み、tokenizer load、JSON Schema grammar compile、制約付き生成の各状態を確認します。doctor が model registry に通信せず、ファイルや設定を変更しないこと、および probe 出力に JSON 以外の reasoning が混入すると失敗することを確認します。
 
 ### AC-012 設定優先順位
 

@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"runtime"
 	"sort"
 	"strings"
 	"time"
@@ -29,6 +30,7 @@ var lookPath = exec.LookPath
 var commandFactory = exec.Command
 var statPath = os.Stat
 var newMLXModelStore = mlxmodel.DefaultStore
+var mlxPlatform = func() (string, string) { return runtime.GOOS, runtime.GOARCH }
 var updateCheckInteractive = func() bool {
 	if os.Getenv("CI") != "" {
 		return false
@@ -183,7 +185,15 @@ func runSetup(args []string, printer *output.Printer) int {
 		return fail(printer, exitcode.New(exitcode.Usage, err.Error()))
 	}
 	if effective.Values.Backend == "mlx" {
-		return runMLXModelSetup(printer, effective.Values, update)
+		goos, goarch := mlxPlatform()
+		if !mlxPlatformSupported(goos, goarch) {
+			return fail(printer, exitcode.New(exitcode.LLM, mlxUnsupportedPlatformMessage))
+		}
+		helper, err := findMLXHelper()
+		if err != nil {
+			return fail(printer, exitcode.New(exitcode.LLM, "MLX helper is unavailable; install commiter-mlx-helper"))
+		}
+		return runMLXModelSetup(printer, effective.Values, update, helper)
 	}
 	client, err := ollama.New(effective.Values)
 	if err != nil {
@@ -246,14 +256,17 @@ func runSetup(args []string, printer *output.Printer) int {
 	return finishSetup(printer, "Ollama is ready")
 }
 
-func runMLXModelSetup(printer *output.Printer, values config.Values, update bool) int {
+func runMLXModelSetup(printer *output.Printer, values config.Values, update bool, helper string) int {
 	store, err := newMLXModelStore()
 	if err != nil {
 		return fail(printer, exitcode.New(exitcode.LLM, err.Error()))
 	}
 	spec := mlxmodel.Spec{Repo: values.Model, Revision: values.ModelRevision, Quantization: values.ModelQuantization}
-	if _, err := store.Ready(spec); err == nil && !update {
-		return finishSetup(printer, "MLX model is already installed at the configured revision")
+	if modelPath, err := store.Ready(spec); err == nil && !update {
+		if err := verifyMLXCapability(helper, values.Model, modelPath); err != nil {
+			return fail(printer, exitcode.New(exitcode.LLM, "MLX model capability check failed"))
+		}
+		return finishSetup(printer, "MLX model, tokenizer, JSON Schema grammar, and constrained generation are ready")
 	}
 	plan, err := store.Plan(context.Background(), spec)
 	if err != nil {
@@ -277,10 +290,14 @@ func runMLXModelSetup(printer *output.Printer, values config.Values, update bool
 	if !confirm("Download this MLX model? [y/N] ") {
 		return finishSetup(printer, "setup canceled; MLX model was not changed")
 	}
-	if _, err := store.Install(context.Background(), plan); err != nil {
+	modelPath, err := store.Install(context.Background(), plan)
+	if err != nil {
 		return fail(printer, exitcode.New(exitcode.LLM, err.Error()))
 	}
-	return finishSetup(printer, "MLX model setup completed")
+	if err := verifyMLXCapability(helper, values.Model, modelPath); err != nil {
+		return fail(printer, exitcode.New(exitcode.LLM, "MLX model was installed, but its model/tokenizer/JSON Schema capability check failed"))
+	}
+	return finishSetup(printer, "MLX model setup completed; tokenizer, JSON Schema grammar, and constrained generation passed")
 }
 
 func printModelUpdateDetails(printer *output.Printer, configuredModel string, info ollama.ModelInfo) error {
@@ -338,12 +355,7 @@ func runDoctor(args []string, printer *output.Printer) int {
 		return fail(printer, exitcode.New(exitcode.Usage, "doctor does not accept arguments"))
 	}
 	checks := map[string]any{}
-	ollamaExecutable := installedOllamaExecutable()
-	ollamaMessage := "Ollama executable unavailable"
-	if ollamaExecutable != "" {
-		ollamaMessage = "Ollama executable available"
-	}
-	checks["ollama_binary"] = check(ollamaExecutable != "", ollamaMessage)
+	backendResolved := false
 	root, rootErr := repository.Root()
 	checks["git"] = check(rootErr == nil, message(rootErr, "repository detected"))
 	if rootErr == nil {
@@ -353,21 +365,34 @@ func runDoctor(args []string, printer *output.Printer) int {
 			checks["config"] = check(resolveErr == nil, message(resolveErr, "configuration valid"))
 			checks["trust"] = checkTrust(paths.StateDir, root)
 			if resolveErr == nil {
-				ollamaChecks := doctorOllama(effective.Values, ollamaExecutable != "")
-				checks["ollama"] = ollamaChecks["ollama"]
-				checks["structured_output"] = ollamaChecks["structured_output"]
-				checks["thinking"] = ollamaChecks["thinking"]
+				backendResolved = true
+				if effective.Values.Backend == "mlx" {
+					for key, value := range doctorMLX(effective.Values) {
+						checks[key] = value
+					}
+				} else {
+					ollamaExecutable := installedOllamaExecutable()
+					checks["ollama_binary"] = check(ollamaExecutable != "", capabilityMessage(ollamaExecutable != "", "Ollama executable available", "Ollama executable unavailable"))
+					ollamaChecks := doctorOllama(effective.Values, ollamaExecutable != "")
+					checks["ollama"] = ollamaChecks["ollama"]
+					checks["structured_output"] = ollamaChecks["structured_output"]
+					checks["thinking"] = ollamaChecks["thinking"]
+				}
 			}
 		} else {
 			checks["config"] = check(false, "configuration paths unavailable")
 		}
 	}
-	checks["git_identity"] = doctorGitIdentity()
-	if checks["structured_output"] == nil {
-		checks["structured_output"] = check(false, "Ollama compatibility could not be verified")
+	if !backendResolved {
+		ollamaExecutable := installedOllamaExecutable()
+		checks["ollama_binary"] = check(ollamaExecutable != "", capabilityMessage(ollamaExecutable != "", "Ollama executable available", "Ollama executable unavailable"))
 	}
-	if checks["thinking"] == nil {
-		checks["thinking"] = check(false, "Ollama compatibility could not be verified")
+	checks["git_identity"] = doctorGitIdentity()
+	if checks["structured_output"] == nil && checks["mlx_constrained_generation"] == nil {
+		checks["structured_output"] = check(false, "configured backend capability could not be verified")
+	}
+	if checks["thinking"] == nil && checks["mlx_constrained_generation"] == nil {
+		checks["thinking"] = check(false, "configured backend capability could not be verified")
 	}
 	ok := true
 	for _, value := range checks {
