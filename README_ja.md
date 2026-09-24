@@ -88,8 +88,8 @@ commiter --dry-run
 commiter
 ```
 
-- `commiter setup`: 設定された Ollama 環境を確認します。Ollama が未インストールの場合は Homebrew 経由での導入（要確認）をサポートし、一時的なデーモン起動や指定モデルの pull も対話形式で案内します。
-- `commiter doctor`: 読み取り専用で環境診断を行います。リポジトリ状態、設定、Git の identity、Ollama との疎通、設定モデルの存在、structured output の対応状況などを一括チェックします。
+- `commiter setup`: 選択された backend を準備します。Ollama では、個別の確認後に Homebrew 経由の Ollama 導入、一時的なデーモン起動、設定モデルの pull を行えます。MLX では macOS Apple Silicon と `commiter-mlx-helper` が必要です。モデル取得を確認後に行い、モデル・tokenizer のロード、JSON Schema grammar、制約付き生成を確認します。
+- `commiter doctor`: 読み取り専用で環境診断を行います。リポジトリ状態、設定、Git の identity と、選択された backend の機能を確認します。Ollama は daemon を起動・停止せず、疎通、設定モデル、structured output を診断します。daemon が停止している場合は手動で起動して再実行してください。MLX は platform 対応、helper、ローカルに準備済みの固定モデルに加え、モデルと tokenizer をロードし、JSON Schema grammar をコンパイルして制約付き JSON 生成を試す probe を実行します。MLX の診断はモデルを download/update しません。モデルがない場合は `commiter setup` を実行してください。
 
 対話的な端末から起動した場合、commiter は公式 GitHub Releases の metadata を最大24時間に1回確認します。新しい安定版がある場合は、バージョンと Homebrew の更新コマンドを表示します。ローカルには確認時刻と最新バージョンだけを保存します。ネットワーク障害が発生しても通常処理は継続し、JSON 出力と CI 環境では更新確認を行いません。
 - `commiter --dry-run`: 差分の解析とコミット計画の生成を行いますが、インデックスの変更、コミット作成、push は一切実行しません。
@@ -127,8 +127,8 @@ commiter --no-push
 
 | コマンド | 用途 |
 | --- | --- |
-| `commiter setup [--update-model]` | Ollama 環境および指定されたローカルモデルの準備 |
-| `commiter doctor` | 実行環境や機能要件の読み取り専用チェック |
+| `commiter setup [--update-model]` | 選択された backend と指定されたローカルモデルの準備 |
+| `commiter doctor` | 選択された backend の読み取り専用診断 |
 | `commiter config init --global\|--repo` | グローバル設定またはリポジトリ用設定ファイルのテンプレート生成 |
 | `commiter config show [--effective]` | 実際に適用されている設定値とその読み込み元の表示 |
 | `commiter config path --global\|--repo` | 設定ファイルの配置パスの表示 |

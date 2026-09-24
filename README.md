@@ -88,9 +88,9 @@ commiter --dry-run
 commiter
 ```
 
-`commiter setup` checks the configured Ollama environment. If Ollama is missing and Homebrew is available, it can install Ollama after confirmation. It can also start Ollama temporarily and pull the configured model after confirmation.
+`commiter setup` prepares the configured backend. For Ollama, it can install Ollama through Homebrew, start the daemon temporarily, and pull the configured model after separate confirmations. For MLX, it requires macOS on Apple Silicon and an installed `commiter-mlx-helper`; it downloads the configured pinned model only after confirmation, then checks model loading, tokenizer loading, JSON Schema grammar, and constrained generation.
 
-`commiter doctor` is read-only and checks the repository, configuration, Git identity, Ollama connectivity, configured model, structured-output support, and related prerequisites. It does not start or stop Ollama. If the daemon is stopped, start Ollama manually (for example, with `ollama serve`) and rerun `commiter doctor` for a complete capability diagnosis. If Ollama is not installed, run `commiter setup` first.
+`commiter doctor` is read-only and checks the repository, configuration, Git identity, and the selected backend's capabilities. For Ollama, it checks connectivity, the configured model, and structured-output support without starting or stopping the daemon. If the daemon is stopped, start Ollama manually (for example, with `ollama serve`) and rerun `commiter doctor`. For MLX, it checks platform support, helper availability, the locally installed pinned model, and a probe that loads the model and tokenizer, compiles its JSON Schema grammar, and attempts constrained JSON generation. The probe uses only the local model and does not download or update model files. If the model is missing, run `commiter setup` first.
 
 When run from an interactive terminal, commiter checks the official GitHub Releases metadata at most once every 24 hours. If a newer stable release is available, it prints the release version and the Homebrew upgrade command. The check stores only its timestamp and latest version in the user state directory. Network failures are ignored so the normal command continues. Update checks are skipped for JSON output and CI environments.
 
@@ -130,8 +130,8 @@ commiter --no-push
 
 | Command | Purpose |
 | --- | --- |
-| `commiter setup [--update-model]` | Prepare Ollama and the configured local model. |
-| `commiter doctor` | Run read-only environment and capability checks without starting Ollama. |
+| `commiter setup [--update-model]` | Prepare the selected backend and its configured local model. |
+| `commiter doctor` | Run read-only environment and capability checks for the selected backend. |
 | `commiter config init --global\|--repo` | Create a global or repository configuration template. |
 | `commiter config show [--effective]` | Show resolved configuration and its sources. |
 | `commiter config path --global\|--repo` | Show a configuration path. |
