@@ -1,17 +1,15 @@
 package cli
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
-	"io"
 	"time"
 
 	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/llm"
 	"github.com/natsuki0413/commiter-cli/internal/mlx"
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
+	"github.com/natsuki0413/commiter-cli/internal/planning"
 )
 
 const mlxUnsupportedPlatformMessage = "MLX requires macOS on Apple Silicon (darwin/arm64)"
@@ -109,27 +107,21 @@ func verifyMLXCapability(helper, model, modelPath string) error {
 }
 
 func mlxCapabilityProbe(ctx context.Context, helper, model, modelPath string) (bool, error) {
+	fileIDs := []string{"F001"}
+	schema, err := planning.Schema(fileIDs)
+	if err != nil {
+		return false, err
+	}
 	response, err := mlx.NewClient(helper).Generate(ctx, mlx.Request{
-		Schema:       json.RawMessage(`{"type":"object","additionalProperties":false,"properties":{"ok":{"type":"boolean"}},"required":["ok"]}`),
-		Messages:     []llm.Message{{Role: "user", Content: "Return exactly the JSON object {\"ok\":true}. Do not include explanations or reasoning."}},
-		OutputTokens: 32, Model: model, ModelPath: modelPath,
+		Schema:       schema,
+		Messages:     []llm.Message{{Role: "user", Content: `Return exactly this JSON commit plan without explanations or reasoning: {"commits":[{"type":"fix","scope":"cli","breaking":false,"summary":"check model","file_ids":["F001"]}]}`}},
+		OutputTokens: 256, Model: model, ModelPath: modelPath,
 	})
 	if err != nil {
 		return false, err
 	}
-	var probe struct {
-		OK bool `json:"ok"`
-	}
-	decoder := json.NewDecoder(bytes.NewBufferString(response.GeneratedJSON))
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&probe); err != nil {
-		return false, nil
-	}
-	var trailing any
-	if err := decoder.Decode(&trailing); !errors.Is(err, io.EOF) {
-		return false, nil
-	}
-	return probe.OK, nil
+	_, violations := planning.Validate([]byte(response.GeneratedJSON), fileIDs, planning.SensitiveValues{}, planning.English)
+	return len(violations) == 0, nil
 }
 
 func mlxStopReason(err error) mlx.StopReason {

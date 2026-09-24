@@ -11,6 +11,7 @@ import (
 
 	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
+	"github.com/natsuki0413/commiter-cli/internal/planning"
 )
 
 func TestMLXCapabilityProbeRequiresJSONOnlyExpectedShape(t *testing.T) {
@@ -19,11 +20,11 @@ func TestMLXCapabilityProbeRequiresJSONOnlyExpectedShape(t *testing.T) {
 		json string
 		want bool
 	}{
-		{name: "valid JSON", json: `{"ok":true}`, want: true},
-		{name: "reasoning property", json: `{"ok":true,"reasoning":"because"}`},
-		{name: "prose before JSON", json: `Here is the answer: {"ok":true}`},
-		{name: "prose after JSON", json: `{"ok":true} explanation`},
-		{name: "false capability", json: `{"ok":false}`},
+		{name: "valid plan", json: `{"commits":[{"type":"fix","scope":"cli","breaking":false,"summary":"check model","file_ids":["F001"]}]}`, want: true},
+		{name: "reasoning property", json: `{"commits":[{"type":"fix","scope":"cli","breaking":false,"summary":"check model","file_ids":["F001"]}],"reasoning":"because"}`},
+		{name: "prose before JSON", json: `Here is the answer: {"commits":[{"type":"fix","scope":"cli","breaking":false,"summary":"check model","file_ids":["F001"]}]}`},
+		{name: "prose after JSON", json: `{"commits":[{"type":"fix","scope":"cli","breaking":false,"summary":"check model","file_ids":["F001"]}]} explanation`},
+		{name: "wrong file ID", json: `{"commits":[{"type":"fix","scope":"cli","breaking":false,"summary":"check model","file_ids":["F002"]}]}`},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -36,6 +37,36 @@ func TestMLXCapabilityProbeRequiresJSONOnlyExpectedShape(t *testing.T) {
 				t.Fatalf("probe result = %v, want %v", got, test.want)
 			}
 		})
+	}
+}
+
+func TestMLXCapabilityProbeUsesPlanningSchema(t *testing.T) {
+	requestPath := filepath.Join(t.TempDir(), "request.json")
+	response := `{"ok":true,"stop_reason":"completed","generated_json":"{\"commits\":[{\"type\":\"fix\",\"scope\":\"cli\",\"breaking\":false,\"summary\":\"check model\",\"file_ids\":[\"F001\"]}]}"}`
+	helper := filepath.Join(t.TempDir(), "commiter-mlx-helper")
+	body := "#!/bin/sh\ncat >" + shellQuoteForTest(requestPath) + "\nprintf '%s\\n' " + shellQuoteForTest(response) + "\n"
+	if err := os.WriteFile(helper, []byte(body), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	if ok, err := mlxCapabilityProbe(context.Background(), helper, "owner/model", "/local/model"); err != nil || !ok {
+		t.Fatalf("probe result = %v, error = %v", ok, err)
+	}
+	data, err := os.ReadFile(requestPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var request struct {
+		Schema json.RawMessage `json:"schema"`
+	}
+	if err := json.Unmarshal(data, &request); err != nil {
+		t.Fatal(err)
+	}
+	want, err := planning.Schema([]string{"F001"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(request.Schema, want) {
+		t.Fatalf("probe schema = %s, want planning schema %s", request.Schema, want)
 	}
 }
 
