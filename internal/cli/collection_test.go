@@ -22,9 +22,43 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
 	"github.com/natsuki0413/commiter-cli/internal/gitstate"
 	"github.com/natsuki0413/commiter-cli/internal/interaction"
+	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 	"github.com/natsuki0413/commiter-cli/internal/planning"
 	"github.com/natsuki0413/commiter-cli/internal/verification"
 )
+
+func TestMLXDryRunDoesNotContactRegistryOrFallbackToOllama(t *testing.T) {
+	repo := cliRepository(t)
+	cliWrite(t, repo, "a.txt", "base\n", 0o644)
+	cliGit(t, repo, "add", "a.txt")
+	cliGit(t, repo, "commit", "-m", "base")
+	cliWrite(t, repo, "a.txt", "changed\n", 0o644)
+	beforeHead := cliGitOutput(t, repo, "rev-parse", "HEAD")
+	chdir(t, repo)
+	configHome := t.TempDir()
+	t.Setenv("XDG_CONFIG_HOME", configHome)
+	t.Setenv("XDG_STATE_HOME", t.TempDir())
+	configDir := filepath.Join(configHome, "commiter")
+	if err := os.MkdirAll(configDir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	configText := "[llm]\nbackend = \"mlx\"\nmodel = \"owner/model\"\nmodel_revision = \"" +
+		strings.Repeat("a", 40) + "\"\nmodel_quantization = \"4bit\"\n"
+	if err := os.WriteFile(filepath.Join(configDir, "config.toml"), []byte(configText), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	oldStore := newMLXModelStore
+	t.Cleanup(func() { newMLXModelStore = oldStore })
+	newMLXModelStore = func() (mlxmodel.Store, error) { return mlxmodel.Store{Root: t.TempDir()}, nil }
+	var stdout, stderr bytes.Buffer
+	if code := Run([]string{"--dry-run"}, &stdout, &stderr); code != exitcode.LLM ||
+		!strings.Contains(stderr.String(), "run commiter setup") {
+		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
+	}
+	if afterHead := cliGitOutput(t, repo, "rev-parse", "HEAD"); afterHead != beforeHead {
+		t.Fatal("MLX dry-run changed HEAD")
+	}
+}
 
 func TestMainInterruptsDuringPlanningBeforeCommit(t *testing.T) {
 	repo := cliRepository(t)

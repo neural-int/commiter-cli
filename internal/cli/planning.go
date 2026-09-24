@@ -15,8 +15,11 @@ import (
 
 	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/contextinput"
+	"github.com/natsuki0413/commiter-cli/internal/exitcode"
 	"github.com/natsuki0413/commiter-cli/internal/gitstate"
 	runmetrics "github.com/natsuki0413/commiter-cli/internal/metrics"
+	"github.com/natsuki0413/commiter-cli/internal/mlx"
+	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 	"github.com/natsuki0413/commiter-cli/internal/ollama"
 	"github.com/natsuki0413/commiter-cli/internal/planning"
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
@@ -27,6 +30,22 @@ type planFlowFunc func(context.Context, string, gitstate.Snapshot, config.Values
 var planFlow planFlowFunc = generateCommitPlan
 
 func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snapshot, values config.Values, supplement string) (planning.Plan, error) {
+	var client planning.ChatClient
+	if values.Backend == "mlx" {
+		store, err := newMLXModelStore()
+		if err != nil {
+			return planning.Plan{}, exitcode.New(exitcode.LLM, err.Error())
+		}
+		modelPath, err := store.Ready(mlxmodel.Spec{Repo: values.Model, Revision: values.ModelRevision, Quantization: values.ModelQuantization})
+		if err != nil {
+			return planning.Plan{}, exitcode.New(exitcode.LLM, err.Error())
+		}
+		helper, err := lookPath("commiter-mlx-helper")
+		if err != nil {
+			return planning.Plan{}, exitcode.New(exitcode.LLM, "MLX helper is not installed; install commiter-mlx-helper")
+		}
+		client = &mlx.Backend{Client: mlx.NewClient(helper), Model: values.Model, ModelPath: modelPath}
+	}
 	recorder := runmetrics.FromContext(ctx)
 	started := time.Now()
 	results, sensitive, stats, err := analyzeForPlanningWithStatsContext(ctx, root, snapshot)
@@ -61,12 +80,15 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 	}
 	contextStage := fmt.Sprintf("%dk", prepared.Budget.ContextTokens/1024)
 	recorder.SetContext(values.Model, contextStage)
-	runtime, err := ollama.Open(ctx, values)
-	if err != nil {
-		return planning.Plan{}, err
+	if client == nil {
+		runtime, err := ollama.Open(ctx, values)
+		if err != nil {
+			return planning.Plan{}, err
+		}
+		defer runtime.Close()
+		client = runtime.Client
 	}
-	defer runtime.Close()
-	generated, err := (planning.Generator{Client: runtime.Client}).Generate(ctx, prepared, language, sensitive)
+	generated, err := (planning.Generator{Client: client}).Generate(ctx, prepared, language, sensitive)
 	recordGeneratedTelemetry(recorder, generated)
 	if err != nil {
 		return planning.Plan{}, err

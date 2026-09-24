@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
+	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 	"github.com/natsuki0413/commiter-cli/internal/trust"
 )
 
@@ -365,6 +366,47 @@ func TestSetupUpdateModelRejectsAfterDetailsWithoutPull(t *testing.T) {
 	}
 	if !detailsWereShown || pullCalls != 0 {
 		t.Fatalf("detailsWereShown=%v pullCalls=%d stdout=%q", detailsWereShown, pullCalls, stdout.String())
+	}
+}
+
+func TestMLXSetupShowsPinnedDownloadPlanBeforeApproval(t *testing.T) {
+	requests, downloads := 0, 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		requests++
+		if strings.Contains(request.URL.Path, "/resolve/") {
+			downloads++
+		}
+		_, _ = io.WriteString(w, `[{"type":"file","path":"config.json","size":1,"oid":"`+strings.Repeat("a", 40)+`"},{"type":"file","path":"model.safetensors","size":1,"oid":"`+strings.Repeat("b", 40)+`"}]`)
+	}))
+	defer server.Close()
+	store := mlxmodel.Store{Root: t.TempDir(), BaseURL: server.URL, Client: server.Client()}
+	configHome := t.TempDir()
+	t.Setenv("XDG_CONFIG_HOME", configHome)
+	if err := os.MkdirAll(filepath.Join(configHome, "commiter"), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	configText := "[llm]\nbackend = \"mlx\"\nmodel = \"owner/model\"\nmodel_revision = \"" +
+		strings.Repeat("a", 40) + "\"\nmodel_quantization = \"4bit\"\n"
+	if err := os.WriteFile(filepath.Join(configHome, "commiter", "config.toml"), []byte(configText), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	oldStore, oldConfirm := newMLXModelStore, confirmFunc
+	t.Cleanup(func() { newMLXModelStore, confirmFunc = oldStore, oldConfirm })
+	newMLXModelStore = func() (mlxmodel.Store, error) { return store, nil }
+	var stdout bytes.Buffer
+	confirmFunc = func(string) bool {
+		if !strings.Contains(stdout.String(), "estimated download size: 2 bytes") ||
+			!strings.Contains(stdout.String(), "pinned revision:") ||
+			!strings.Contains(stdout.String(), "destination:") {
+			t.Fatal("model download details were not shown before approval")
+		}
+		return false
+	}
+	if code := Run([]string{"setup"}, &stdout, io.Discard); code != 0 {
+		t.Fatalf("setup code = %d, output = %q", code, stdout.String())
+	}
+	if requests != 1 || downloads != 0 {
+		t.Fatalf("requests = %d, downloads = %d", requests, downloads)
 	}
 }
 

@@ -183,6 +183,7 @@ commiter config show --effective
 | `commit.confirm` | `true` |
 | `push.enabled` | `true` |
 | `push.confirm` | `true` |
+| `llm.backend` | `"ollama"` |
 | `llm.model` | `"qwen3.5:4b-q4_K_M"` |
 | `llm.endpoint` | `"http://127.0.0.1:11434"` |
 | `llm.context` | `"auto"` |
@@ -192,6 +193,8 @@ commiter config show --effective
 | `metrics.persist` | `false` |
 
 Ollama のエンドポイントは、必ずローカルホストを指す loopback HTTP URL である必要があります。また、検証処理（verification）に関する設定はリポジトリ固有のスコープに限定されており、グローバル設定には記述できません。
+
+MLX モデルの準備は明示的な設定で行います。グローバル設定またはリポジトリ設定に `llm.backend = "mlx"`、`llm.model = "owner/repository"`、40 文字のコミットハッシュを指定する `llm.model_revision`、量子化を表す `llm.model_quantization`（例: `"4bit"`）を設定してください。4B モデルの互換性検証が終わるまでは MLX の既定モデルを設けません。`commiter setup` はモデル ID、固定 revision、量子化、概算容量、保存先を表示してから取得の承認を求めます。新しい revision に更新する際は設定を変更し、`commiter setup --update-model` を実行します。ファイルはユーザーの `commiter/mlx-models` キャッシュに保存し、固定されたファイルのハッシュで検証します。通常実行中にモデルレジストリへの通信や自動取得は行いません。MLX の計画生成では `PATH` にインストールされた `commiter-mlx-helper` と準備済みのローカルモデルを使用し、Ollama への暗黙の切り替えは行いません。
 
 全設定項目のスキーマや詳細な制限事項については、[ソフトウェア要求仕様書](SOFTWARE_REQUIREMENTS_SPECIFICATION.md) を参照してください。
 
@@ -204,6 +207,8 @@ Ollama のエンドポイントは、必ずローカルホストを指す loopba
 `commiter` が扱うリポジトリの diff、プロンプト、LLM からの応答、その他解析に使用されるリポジトリ内のデータは、推論・分析・テレメトリなどの目的でローカルホスト（loopback）の外へ送信されることは一切ありません。設定可能な LLM エンドポイントも、loopback の HTTP URL に制限されています。
 
 ただし、この境界は「すべてのサブプロセスが完全にオフラインである」という意味ではありません。ユーザー自身が承認した Git push、検証コマンドの実行、Git フック、コミット署名処理、Ollama のモデルダウンロードなどは、各機能独自のネットワーク通信を行う可能性があります。これらは、`commiter` がリポジトリの内容をクラウド LLM に送信しないこととは明確に区別されます。
+
+MLX の明示的な setup で Hugging Face に送るのは、設定したモデル ID、revision、取得対象ファイルへのリクエストだけです。リポジトリの diff、プロンプト、LLM の応答は送信しません。通常の MLX 実行はモデルレジストリへ通信しません。
 
 ### 機密ファイルの保護
 

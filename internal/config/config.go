@@ -40,6 +40,9 @@ type Values struct {
 	PushEnabled       bool
 	PushConfirm       bool
 	Model             string
+	Backend           string
+	ModelRevision     string
+	ModelQuantization string
 	Endpoint          string
 	Context           string
 	MaxTokens         int
@@ -85,6 +88,9 @@ var schema = map[string]schemaEntry{
 	"push.enabled":                         {"boolean", allow(SourceGlobal)},
 	"push.confirm":                         {"boolean", allow(SourceGlobal)},
 	"llm.model":                            {"string", allow(SourceGlobal, SourceRepo)},
+	"llm.backend":                          {"string", allow(SourceGlobal, SourceRepo)},
+	"llm.model_revision":                   {"string", allow(SourceGlobal, SourceRepo)},
+	"llm.model_quantization":               {"string", allow(SourceGlobal, SourceRepo)},
 	"llm.endpoint":                         {"string", allow(SourceGlobal)},
 	"llm.context":                          {"string", allow(SourceGlobal, SourceRepo)},
 	"llm.max_context_tokens":               {"integer", allow(SourceGlobal, SourceRepo)},
@@ -120,6 +126,7 @@ func Defaults() Effective {
 			PushEnabled:       true,
 			PushConfirm:       true,
 			Model:             "qwen3.5:4b-q4_K_M",
+			Backend:           "ollama",
 			Endpoint:          "http://127.0.0.1:11434",
 			Context:           "auto",
 			MaxTokens:         65536,
@@ -273,6 +280,12 @@ func applyValue(e *Effective, key, kind string, raw any, source Source, repoRoot
 			e.Values.Language = value
 		case "llm.model":
 			e.Values.Model = value
+		case "llm.backend":
+			e.Values.Backend = value
+		case "llm.model_revision":
+			e.Values.ModelRevision = value
+		case "llm.model_quantization":
+			e.Values.ModelQuantization = value
 		case "llm.endpoint":
 			e.Values.Endpoint = value
 		case "llm.context":
@@ -357,6 +370,20 @@ func validateValues(v Values, repoRoot string) error {
 	if v.Model == "" {
 		return fmt.Errorf("llm.model must not be empty")
 	}
+	if v.Backend != "ollama" && v.Backend != "mlx" {
+		return fmt.Errorf("llm.backend must be ollama or mlx")
+	}
+	if v.Backend == "mlx" {
+		if !validMLXModel(v.Model) {
+			return fmt.Errorf("llm.model must be a Hugging Face owner/repository for MLX")
+		}
+		if !validHexRevision(v.ModelRevision) {
+			return fmt.Errorf("llm.model_revision must be a 40-character commit hash for MLX")
+		}
+		if !validMLXQuantization(v.ModelQuantization) {
+			return fmt.Errorf("llm.model_quantization must be none or a positive Nbit label for MLX")
+		}
+	}
 	if err := validateEndpoint(v.Endpoint); err != nil {
 		return err
 	}
@@ -392,6 +419,56 @@ func validateEndpoint(raw string) error {
 		return fmt.Errorf("llm.endpoint must be a loopback HTTP URL")
 	}
 	return nil
+}
+
+func validMLXModel(value string) bool {
+	parts := strings.Split(value, "/")
+	if len(parts) != 2 {
+		return false
+	}
+	for _, part := range parts {
+		if part == "" || part == "." || part == ".." {
+			return false
+		}
+		for _, char := range part {
+			if (char < 'a' || char > 'z') && (char < 'A' || char > 'Z') &&
+				(char < '0' || char > '9') && char != '-' && char != '_' && char != '.' {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func validHexRevision(value string) bool {
+	if len(value) != 40 {
+		return false
+	}
+	for _, char := range value {
+		if (char < '0' || char > '9') && (char < 'a' || char > 'f') && (char < 'A' || char > 'F') {
+			return false
+		}
+	}
+	return true
+}
+
+func validMLXQuantization(value string) bool {
+	if value == "none" {
+		return true
+	}
+	if !strings.HasSuffix(value, "bit") {
+		return false
+	}
+	bits := strings.TrimSuffix(value, "bit")
+	if bits == "" || bits[0] == '0' || len(bits) > 2 {
+		return false
+	}
+	for _, char := range bits {
+		if char < '0' || char > '9' {
+			return false
+		}
+	}
+	return true
 }
 
 func validateRepoPattern(pattern string) error {
@@ -512,6 +589,9 @@ func (e Effective) Entries() map[string]Entry {
 		"push.enabled":                         v.PushEnabled,
 		"push.confirm":                         v.PushConfirm,
 		"llm.model":                            v.Model,
+		"llm.backend":                          v.Backend,
+		"llm.model_revision":                   v.ModelRevision,
+		"llm.model_quantization":               v.ModelQuantization,
 		"llm.endpoint":                         v.Endpoint,
 		"llm.context":                          v.Context,
 		"llm.max_context_tokens":               v.MaxTokens,

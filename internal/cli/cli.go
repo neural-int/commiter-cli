@@ -15,6 +15,7 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
 	runmetrics "github.com/natsuki0413/commiter-cli/internal/metrics"
+	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 	"github.com/natsuki0413/commiter-cli/internal/ollama"
 	"github.com/natsuki0413/commiter-cli/internal/output"
 	"github.com/natsuki0413/commiter-cli/internal/repository"
@@ -27,6 +28,7 @@ var Version = "dev"
 var lookPath = exec.LookPath
 var commandFactory = exec.Command
 var statPath = os.Stat
+var newMLXModelStore = mlxmodel.DefaultStore
 var updateCheckInteractive = func() bool {
 	if os.Getenv("CI") != "" {
 		return false
@@ -180,6 +182,9 @@ func runSetup(args []string, printer *output.Printer) int {
 	if err != nil {
 		return fail(printer, exitcode.New(exitcode.Usage, err.Error()))
 	}
+	if effective.Values.Backend == "mlx" {
+		return runMLXModelSetup(printer, effective.Values, update)
+	}
 	client, err := ollama.New(effective.Values)
 	if err != nil {
 		return fail(printer, err)
@@ -239,6 +244,43 @@ func runSetup(args []string, printer *output.Printer) int {
 		return finishSetup(printer, "Ollama setup completed")
 	}
 	return finishSetup(printer, "Ollama is ready")
+}
+
+func runMLXModelSetup(printer *output.Printer, values config.Values, update bool) int {
+	store, err := newMLXModelStore()
+	if err != nil {
+		return fail(printer, exitcode.New(exitcode.LLM, err.Error()))
+	}
+	spec := mlxmodel.Spec{Repo: values.Model, Revision: values.ModelRevision, Quantization: values.ModelQuantization}
+	if _, err := store.Ready(spec); err == nil && !update {
+		return finishSetup(printer, "MLX model is already installed at the configured revision")
+	}
+	plan, err := store.Plan(context.Background(), spec)
+	if err != nil {
+		return fail(printer, exitcode.New(exitcode.LLM, err.Error()))
+	}
+	destination, err := store.Destination(spec)
+	if err != nil {
+		return fail(printer, exitcode.New(exitcode.LLM, err.Error()))
+	}
+	if err := printer.PromptLines(
+		"MLX model download details",
+		"model repository: "+spec.Repo,
+		"pinned revision: "+spec.Revision,
+		"quantization label: "+spec.Quantization,
+		fmt.Sprintf("estimated download size: %d bytes", plan.Bytes),
+		"destination: "+destination,
+		"operation: download and verify pinned model files from huggingface.co",
+	); err != nil {
+		return fail(printer, exitcode.New(exitcode.Internal, "cannot write model download details"))
+	}
+	if !confirm("Download this MLX model? [y/N] ") {
+		return finishSetup(printer, "setup canceled; MLX model was not changed")
+	}
+	if _, err := store.Install(context.Background(), plan); err != nil {
+		return fail(printer, exitcode.New(exitcode.LLM, err.Error()))
+	}
+	return finishSetup(printer, "MLX model setup completed")
 }
 
 func printModelUpdateDetails(printer *output.Printer, configuredModel string, info ollama.ModelInfo) error {
