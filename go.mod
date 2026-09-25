@@ -3,7 +3,7 @@ module github.com/natsuki0413/commiter-cli
 go 1.23.0
 
 require (
-	github.com/bmatcuk/doublestar/v4 v4.10.0
+	github.com/bmatcuk/doublestar/v4 v4.10.2
 	github.com/go-enry/go-enry/v2 v2.9.6
 	github.com/pelletier/go-toml/v2 v2.4.3
 	github.com/tree-sitter/go-tree-sitter v0.25.0
