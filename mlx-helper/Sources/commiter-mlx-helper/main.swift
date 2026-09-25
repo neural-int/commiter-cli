@@ -1,5 +1,6 @@
 import Foundation
 import HuggingFace
+import MLX
 import MLXGuidedGeneration
 import MLXHuggingFace
 import MLXLLM
@@ -152,6 +153,16 @@ private final class OutputBox: @unchecked Sendable {
 @main
 struct CommiterMLXHelper {
     static func main() async {
+        if CommandLine.arguments == [CommandLine.arguments[0], "--smoke-metal"] {
+            let ready = Device.withDefaultDevice(.gpu) {
+                let result = add(MLXArray([1.0 as Float]), MLXArray([2.0 as Float]))
+                eval(result)
+                return result.item(Float.self) == 3
+            }
+            guard ready else { exit(1) }
+            FileHandle.standardOutput.write(Data("metal_ok\n".utf8))
+            return
+        }
         do {
             let request = try decodeRequest(try readBoundedRequest())
             let response = try await handle(request)

@@ -70,6 +70,8 @@ func TestMLXPlanningUsesInstalledModelAndHelper(t *testing.T) {
 	oldStore := newMLXModelStore
 	t.Cleanup(func() { newMLXModelStore = oldStore })
 	newMLXModelStore = func() (mlxmodel.Store, error) { return store, nil }
+	oldHelperPath := mlxHelperPath
+	t.Cleanup(func() { mlxHelperPath = oldHelperPath })
 
 	helperDir := t.TempDir()
 	helper := filepath.Join(helperDir, "commiter-mlx-helper")
@@ -81,9 +83,9 @@ printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{\"commits
 	if err := os.WriteFile(helper, []byte(script), 0o700); err != nil {
 		t.Fatal(err)
 	}
+	mlxHelperPath = func() (string, error) { return helper, nil }
 	requestPath := filepath.Join(t.TempDir(), "request.json")
 	t.Setenv("MLX_TEST_REQUEST", requestPath)
-	t.Setenv("PATH", helperDir+string(os.PathListSeparator)+os.Getenv("PATH"))
 
 	plan, err := generateCommitPlan(context.Background(), repo, snapshot, values, "")
 	if err != nil {

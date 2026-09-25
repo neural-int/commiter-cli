@@ -7,7 +7,7 @@
 | 文書状態 | Baselined for v1 |
 | 作成日 | 2026-08-29 |
 | 対象 | v1 |
-| 対象実装 | Go を主体とする単一 CLI バイナリ（Tree-sitter CGo バインディングを内包） |
+| 対象実装 | Go CLI（Tree-sitter CGo バインディングを内包）と、MLX 利用時の非公開 Swift helper |
 
 ## 1. 目的と背景
 
@@ -58,7 +58,7 @@ v1 では、Windows および Linux、GUI、クラウド LLM、llama.cpp バッ�
 
 v1 の対象 OS は macOS 14 以降、対象アーキテクチャは Apple Silicon とし、動作基準環境は M3 チップおよび 16GB メモリのマシンとします。
 
-実行時の外部依存関係は、システムにインストールされた Git（system Git）および Ollama のみとします。構文認識構造解析には、公式の `github.com/tree-sitter/go-tree-sitter` と対象言語の文法定義（grammar）を使用し、Tree-sitter の C 実装を CGo 経由で単一 CLI バイナリに組み込みます。Tree-sitter の用途以外に CGo の利用範囲を広げることはせず、外部パーサー実行ファイル、実行時の共有文法ライブラリ（runtime shared grammar）、Oniguruma、およびクラウド LLM へのフォールバックを要求しません。
+Ollama backend の実行時依存関係は、システムにインストールされた Git（system Git）および Ollama とします。MLX backend は配布物に同梱された非公開 Swift helper と macOS の system framework を使用します。構文認識構造解析には、公式の `github.com/tree-sitter/go-tree-sitter` と対象言語の文法定義（grammar）を使用し、Tree-sitter の C 実装を CGo 経由で Go CLI に組み込みます。Tree-sitter の用途以外に CGo の利用範囲を広げることはせず、外部パーサー実行ファイル、実行時の共有文法ライブラリ（runtime shared grammar）、Oniguruma、およびクラウド LLM へのフォールバックを要求しません。
 
 対話的な通常実行では、更新確認のために固定された公式 GitHub Releases metadata エンドポイントへ、リポジトリの内容を含まない HTTP GET を最大24時間に1回だけ送信できます。更新確認のネットワーク障害は通常処理を妨げず、JSON 出力および CI 環境では更新確認を行いません。
 

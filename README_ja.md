@@ -194,7 +194,7 @@ commiter config show --effective
 
 Ollama のエンドポイントは、必ずローカルホストを指す loopback HTTP URL である必要があります。また、検証処理（verification）に関する設定はリポジトリ固有のスコープに限定されており、グローバル設定には記述できません。
 
-MLX モデルの準備は明示的な設定で行います。グローバル設定またはリポジトリ設定に `llm.backend = "mlx"`、`llm.model = "owner/repository"`、40 文字のコミットハッシュを指定する `llm.model_revision`、量子化を表す `llm.model_quantization`（例: `"4bit"`）を設定してください。4B モデルの互換性検証が終わるまでは MLX の既定モデルを設けません。`commiter setup` はモデル ID、固定 revision、量子化、概算容量、保存先を表示してから取得の承認を求めます。新しい revision に更新する際は設定を変更し、`commiter setup --update-model` を実行します。ファイルはユーザーの `commiter/mlx-models` キャッシュに保存し、固定されたファイルのハッシュで検証します。通常実行中にモデルレジストリへの通信や自動取得は行いません。MLX の計画生成では `PATH` にインストールされた `commiter-mlx-helper` と準備済みのローカルモデルを使用し、Ollama への暗黙の切り替えは行いません。
+MLX モデルの準備は明示的な設定で行います。グローバル設定またはリポジトリ設定に `llm.backend = "mlx"`、`llm.model = "owner/repository"`、40 文字のコミットハッシュを指定する `llm.model_revision`、量子化を表す `llm.model_quantization`（例: `"4bit"`）を設定してください。4B モデルの互換性検証が終わるまでは MLX の既定モデルを設けません。`commiter setup` はモデル ID、固定 revision、量子化、概算容量、保存先を表示してから取得の承認を求めます。新しい revision に更新する際は設定を変更し、`commiter setup --update-model` を実行します。ファイルはユーザーの `commiter/mlx-models` キャッシュに保存し、固定されたファイルのハッシュで検証します。通常実行中にモデルレジストリへの通信や自動取得は行いません。macOS 向け配布物には非公開の `commiter-mlx-helper` を `libexec` に含めます。MLX の計画生成では、その helper を同梱の場所から起動し、`PATH` を検索せず、Ollama へ暗黙に切り替えません。ソースからビルドする場合は、`bin/` と `libexec/` の同じ配置に helper をビルドして置く必要があります。
 
 全設定項目のスキーマや詳細な制限事項については、[ソフトウェア要求仕様書](SOFTWARE_REQUIREMENTS_SPECIFICATION.md) を参照してください。
 
