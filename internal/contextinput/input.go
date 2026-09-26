@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/natsuki0413/commiter-cli/internal/gitstate"
+	"github.com/natsuki0413/commiter-cli/internal/relation"
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
 )
 
@@ -44,10 +45,27 @@ type File struct {
 	summaryLines      []summaryLine
 }
 
+type RelationContext struct {
+	Components       []relation.CandidateComponent `json:"candidate_components"`
+	Edges            []relation.Relation           `json:"relations"`
+	Hints            []relation.Hint               `json:"auxiliary_hints,omitempty"`
+	ReductionReasons []relation.ReductionReason    `json:"reduction_reasons,omitempty"`
+	Statistics       relation.GraphStatistics      `json:"statistics"`
+}
+
+type RelationContextStatus struct {
+	Omitted               bool                     `json:"omitted"`
+	Reason                string                   `json:"reason"`
+	ObservationCount      int                      `json:"observation_count,omitempty"`
+	ObservationsByOutcome map[relation.Outcome]int `json:"observations_by_outcome,omitempty"`
+}
+
 type Document struct {
-	SchemaVersion int        `json:"schema_version"`
-	Repository    Repository `json:"repository"`
-	Files         []File     `json:"files"`
+	SchemaVersion         int                    `json:"schema_version"`
+	Repository            Repository             `json:"repository"`
+	Files                 []File                 `json:"files"`
+	RelationContext       *RelationContext       `json:"relation_context,omitempty"`
+	RelationContextStatus *RelationContextStatus `json:"relation_context_status,omitempty"`
 }
 
 type Renderer func(Document) ([]byte, error)
@@ -132,6 +150,12 @@ func JSONRenderer(document Document) ([]byte, error) {
 func ValidatePreserved(original, summarized Document) error {
 	if original.SchemaVersion != summarized.SchemaVersion || original.Repository != summarized.Repository {
 		return errors.New("summary changed repository identity")
+	}
+	if !reflect.DeepEqual(original.RelationContext, summarized.RelationContext) {
+		return errors.New("summary changed relation context")
+	}
+	if !reflect.DeepEqual(original.RelationContextStatus, summarized.RelationContextStatus) {
+		return errors.New("summary changed relation context status")
 	}
 	if len(original.Files) != len(summarized.Files) {
 		return errors.New("summary changed the file set")

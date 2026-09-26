@@ -10,10 +10,68 @@ import (
 	"testing"
 
 	"github.com/natsuki0413/commiter-cli/internal/config"
+	"github.com/natsuki0413/commiter-cli/internal/contextinput"
 	"github.com/natsuki0413/commiter-cli/internal/gitstate"
 	"github.com/natsuki0413/commiter-cli/internal/mlx"
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
+	"github.com/natsuki0413/commiter-cli/internal/planning"
+	"github.com/natsuki0413/commiter-cli/internal/relation"
 )
+
+func TestAttachRelationContextFallbackStatusReachesPlanningPrompt(t *testing.T) {
+	sourcePath, testPath, readmePath := "src/auth.ts", "src/auth.test.ts", "README.md"
+	source := gitstate.Change{ID: "F001", Status: "modified", NewPath: &sourcePath, Language: "typescript"}
+	testFile := gitstate.Change{ID: "F002", Status: "modified", NewPath: &testPath, Language: "typescript"}
+	readme := gitstate.Change{ID: "F001", Status: "modified", NewPath: &readmePath, Language: "markdown"}
+	for _, test := range []struct {
+		name              string
+		changes           []gitstate.Change
+		files             []relation.File
+		wantReason        string
+		wantObservations  int
+		wantRelationEdges int
+	}{
+		{"extract unavailable", []gitstate.Change{source}, []relation.File{{Change: source}, {Change: source}}, "unavailable", 0, 0},
+		{"graph unavailable", []gitstate.Change{source}, []relation.File{{Change: testFile}}, "unavailable", 1, 0},
+		{"no graph evidence", []gitstate.Change{readme}, []relation.File{{Change: readme}}, "ineffective", 0, 0},
+		{"diagnostic only graph", []gitstate.Change{testFile}, []relation.File{{Change: testFile}}, "", 0, 0},
+		{"usable graph", []gitstate.Change{source, testFile}, []relation.File{{Change: source}, {Change: testFile}}, "", 0, 1},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			document := contextinput.Document{SchemaVersion: contextinput.SchemaVersion}
+			for _, change := range test.changes {
+				document.Files = append(document.Files, contextinput.File{ID: change.ID})
+			}
+			attachRelationContext(&document, test.changes, test.files)
+			prepared, err := contextinput.Prepare(context.Background(), document, contextinput.BudgetConfig{Context: "8k"}, planning.Renderer(planning.English), nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var envelope struct {
+				RepositoryInput contextinput.Document `json:"repository_input"`
+			}
+			if err := json.Unmarshal(prepared.Prompt, &envelope); err != nil {
+				t.Fatal(err)
+			}
+			input := envelope.RepositoryInput
+			if test.wantReason != "" {
+				if !prepared.RelationContextOmitted || input.RelationContext != nil || input.RelationContextStatus == nil || !input.RelationContextStatus.Omitted || input.RelationContextStatus.Reason != test.wantReason || input.RelationContextStatus.ObservationCount != test.wantObservations {
+					t.Fatalf("fallback prompt=%s", prepared.Prompt)
+				}
+				if test.wantObservations > 0 && input.RelationContextStatus.ObservationsByOutcome[relation.Unresolved] != test.wantObservations {
+					t.Fatalf("diagnostic counts missing: %s", prepared.Prompt)
+				}
+				if test.name == "extract unavailable" && strings.Contains(string(prepared.Prompt), "\"observation_count\"") {
+					t.Fatalf("unknown observation count was reported as zero: %s", prepared.Prompt)
+				}
+				return
+			}
+			if prepared.RelationContextOmitted || input.RelationContextStatus != nil || input.RelationContext == nil || len(input.RelationContext.Edges) != test.wantRelationEdges {
+				t.Fatalf("usable graph missing: %s", prepared.Prompt)
+			}
+		})
+	}
+}
 
 func TestMLXPlanningFailsClosedWithoutModelOrOllamaFallback(t *testing.T) {
 	oldStore := newMLXModelStore
@@ -34,10 +92,12 @@ func TestMLXPlanningFailsClosedWithoutModelOrOllamaFallback(t *testing.T) {
 
 func TestMLXPlanningUsesInstalledModelAndHelper(t *testing.T) {
 	repo := cliRepository(t)
-	cliWrite(t, repo, "a.txt", "base\n", 0o644)
-	cliGit(t, repo, "add", "a.txt")
+	cliWrite(t, repo, "src/main.ts", "import { helper } from './helper'\nexport const value = helper()\n", 0o644)
+	cliWrite(t, repo, "src/helper.ts", "export function helper() { return 1 }\n", 0o644)
+	cliGit(t, repo, "add", "src/main.ts", "src/helper.ts")
 	cliGit(t, repo, "commit", "-m", "base")
-	cliWrite(t, repo, "a.txt", "changed\n", 0o644)
+	cliWrite(t, repo, "src/main.ts", "import { helper } from './helper'\nexport const value = helper() + 1\n", 0o644)
+	cliWrite(t, repo, "src/helper.ts", "export function helper() { return 2 }\n", 0o644)
 	snapshot, err := gitstate.Collect(repo, gitstate.Options{})
 	if err != nil {
 		t.Fatal(err)
@@ -78,7 +138,7 @@ func TestMLXPlanningUsesInstalledModelAndHelper(t *testing.T) {
 	script := `#!/bin/sh
 set -eu
 cat > "$MLX_TEST_REQUEST"
-printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"update planning\",\"file_ids\":[\"F001\"]}]}","model":"owner/model","runtime":"mlx"}'
+printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"update planning\",\"file_ids\":[\"F001\",\"F002\"]}]}","model":"owner/model","runtime":"mlx"}'
 `
 	if err := os.WriteFile(helper, []byte(script), 0o700); err != nil {
 		t.Fatal(err)
@@ -91,7 +151,7 @@ printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{\"commits
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(plan.Commits) != 1 || plan.Commits[0].Summary != "update planning" {
+	if len(plan.Commits) != 1 || plan.Commits[0].Summary != "update planning" || len(plan.Commits[0].FileIDs) != 2 {
 		t.Fatalf("plan = %#v", plan)
 	}
 	requestData, err := os.ReadFile(requestPath)
@@ -104,6 +164,9 @@ printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{\"commits
 	}
 	if request.Model != values.Model || request.ModelPath != modelPath || len(request.Schema) == 0 || len(request.Messages) != 2 {
 		t.Fatalf("helper request model=%q path=%q schema_bytes=%d messages=%d", request.Model, request.ModelPath, len(request.Schema), len(request.Messages))
+	}
+	if !strings.Contains(request.Messages[1].Content, "relation_context") || !strings.Contains(request.Messages[1].Content, "candidate_components") || !strings.Contains(request.Messages[1].Content, "observed_import_path") {
+		t.Fatalf("planning request did not include extracted relation context: %s", request.Messages[1].Content)
 	}
 }
 

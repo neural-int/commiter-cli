@@ -22,6 +22,7 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 	"github.com/natsuki0413/commiter-cli/internal/ollama"
 	"github.com/natsuki0413/commiter-cli/internal/planning"
+	"github.com/natsuki0413/commiter-cli/internal/relation"
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
 )
 
@@ -49,7 +50,7 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 	}
 	recorder := runmetrics.FromContext(ctx)
 	started := time.Now()
-	results, sensitive, stats, err := analyzeForPlanningWithStatsContext(ctx, root, snapshot)
+	results, sensitive, stats, relationFiles, err := analyzeForPlanningWithStatsAndRelationsContext(ctx, root, snapshot)
 	recorder.AddDuration(runmetrics.SyntaxAnalysis, time.Since(started))
 	if err != nil {
 		return planning.Plan{}, err
@@ -59,6 +60,7 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 	if err != nil {
 		return planning.Plan{}, err
 	}
+	attachRelationContext(&document, snapshot.Changes, relationFiles)
 	fileIDs := make([]string, len(document.Files))
 	for index, file := range document.Files {
 		fileIDs[index] = file.ID
@@ -100,6 +102,38 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 	}
 	recorder.SetContext(model, contextStage)
 	return generated.Plan, nil
+}
+
+func attachRelationContext(document *contextinput.Document, changes []gitstate.Change, files []relation.File) {
+	extracted, err := relation.Extract(files)
+	if err != nil {
+		document.RelationContextStatus = relationFallbackStatus("unavailable", nil)
+		return
+	}
+	graph, err := relation.BuildGraph(changes, extracted)
+	if err != nil {
+		document.RelationContextStatus = relationFallbackStatus("unavailable", extracted.Observations)
+		return
+	}
+	if len(graph.Edges) == 0 && len(graph.Hints) == 0 && len(graph.Observations) == 0 {
+		document.RelationContextStatus = relationFallbackStatus("ineffective", nil)
+		return
+	}
+	document.RelationContext = contextinput.RelationContextFromGraph(graph)
+}
+
+func relationFallbackStatus(reason string, observations []relation.Observation) *contextinput.RelationContextStatus {
+	status := &contextinput.RelationContextStatus{Omitted: true, Reason: reason, ObservationCount: len(observations)}
+	for _, observation := range observations {
+		switch observation.Outcome {
+		case relation.Ambiguous, relation.Unresolved, relation.Unsupported:
+			if status.ObservationsByOutcome == nil {
+				status.ObservationsByOutcome = make(map[relation.Outcome]int, 3)
+			}
+			status.ObservationsByOutcome[observation.Outcome]++
+		}
+	}
+	return status
 }
 
 func recordSummarization(recorder *runmetrics.Recorder, prepared contextinput.Prepared) {
@@ -164,25 +198,32 @@ func analyzeForPlanningWithStats(root string, snapshot gitstate.Snapshot) ([]syn
 }
 
 func analyzeForPlanningWithStatsContext(ctx context.Context, root string, snapshot gitstate.Snapshot) ([]syntax.ChangeResult, planning.SensitiveValues, planningStats, error) {
+	results, sensitive, stats, _, err := analyzeForPlanningWithStatsAndRelationsContext(ctx, root, snapshot)
+	return results, sensitive, stats, err
+}
+
+func analyzeForPlanningWithStatsAndRelationsContext(ctx context.Context, root string, snapshot gitstate.Snapshot) ([]syntax.ChangeResult, planning.SensitiveValues, planningStats, []relation.File, error) {
 	results := make([]syntax.ChangeResult, 0, len(snapshot.Changes))
+	relationFiles := make([]relation.File, 0, len(snapshot.Changes))
 	sensitiveInputs := make([][]byte, 0, len(snapshot.Changes)*2)
 	stats := planningStats{}
 	if err := ctx.Err(); err != nil {
-		return nil, planning.SensitiveValues{}, stats, err
+		return nil, planning.SensitiveValues{}, stats, nil, err
 	}
 	for _, change := range snapshot.Changes {
 		if err := ctx.Err(); err != nil {
-			return nil, planning.SensitiveValues{}, stats, err
+			return nil, planning.SensitiveValues{}, stats, nil, err
 		}
 		content, rawDiff, hunks, err := planningInputContext(ctx, root, change)
 		if err != nil {
-			return nil, planning.SensitiveValues{}, stats, err
+			return nil, planning.SensitiveValues{}, stats, nil, err
 		}
 		result, err := syntax.AnalyzeChangeContext(ctx, syntax.ChangeInput{Change: change, Content: content, RawDiff: rawDiff, Hunks: hunks})
 		if err != nil {
-			return nil, planning.SensitiveValues{}, stats, err
+			return nil, planning.SensitiveValues{}, stats, nil, err
 		}
 		results = append(results, result)
+		relationFiles = append(relationFiles, relation.File{Change: change, Evidence: result.Evidence, Content: content})
 		stats.bytes += change.Size
 		stats.lines += lineCount(content)
 		if result.Mode == syntax.ModeStructural {
@@ -199,7 +240,7 @@ func analyzeForPlanningWithStatsContext(ctx context.Context, root string, snapsh
 			}
 		}
 	}
-	return results, planning.ExtractSensitiveValues(sensitiveInputs...), stats, nil
+	return results, planning.ExtractSensitiveValues(sensitiveInputs...), stats, relationFiles, nil
 }
 
 func planningInput(root string, change gitstate.Change) ([]byte, string, []syntax.Hunk, error) {
