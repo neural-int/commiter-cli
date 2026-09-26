@@ -244,7 +244,7 @@ func collect(ctx context.Context, node *treesitter.Node, source []byte, start, e
 	}
 	kind := node.Kind()
 	current := declaration
-	if isDeclaration(kind) {
+	if IsDeclaration(kind) {
 		if declarationName(node, source) != "" || current == nil {
 			current = node
 		}
@@ -266,7 +266,8 @@ func collect(ctx context.Context, node *treesitter.Node, source []byte, start, e
 	return true
 }
 
-func isDeclaration(kind string) bool {
+// IsDeclaration reports whether a syntax node represents a declaration.
+func IsDeclaration(kind string) bool {
 	if kind == "variable_declarator" {
 		return true
 	}

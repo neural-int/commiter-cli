@@ -43,6 +43,20 @@ func TestSourceTestNamingIsSoftAndExact(t *testing.T) {
 	}
 }
 
+func TestRootTestsDirectoryMatchesSource(t *testing.T) {
+	files := []File{
+		fixture("F001", "auth.ts", "typescript", ""),
+		fixture("F002", "__tests__/auth.ts", "typescript", ""),
+	}
+	got, err := Extract(files)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !has(got.Relations, "F002", "F001", SourceTest, Soft) {
+		t.Fatalf("missing root __tests__ source relation: %#v", got.Relations)
+	}
+}
+
 func TestUnchangedSourceForChangedTestIsRecorded(t *testing.T) {
 	files := []File{fixture("F001", "src/auth.test.ts", "typescript", "")}
 	got, err := Extract(files)
@@ -100,6 +114,20 @@ func TestChangedIdentifierReferencesUniqueChangedDeclaration(t *testing.T) {
 	}
 	if !hasObservation(got.Observations, "F001", ChangedIdentifier, Ambiguous) {
 		t.Fatalf("ambiguous identifier attempt was not recorded: %#v", got.Observations)
+	}
+}
+
+func TestRustChangedFunctionIdentifierReferencesDeclaration(t *testing.T) {
+	files := []File{
+		fixture("F001", "src/caller.rs", "rust", "fn caller() { changed(); }\n"),
+		fixture("F002", "src/changed.rs", "rust", "fn changed() {}\n"),
+	}
+	got, err := Extract(files)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !has(got.Relations, "F001", "F002", ChangedIdentifier, Soft) {
+		t.Fatalf("missing Rust function identifier relation: %#v", got.Relations)
 	}
 }
 

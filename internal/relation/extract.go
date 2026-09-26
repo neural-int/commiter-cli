@@ -158,7 +158,7 @@ func Extract(files []File) (Result, error) {
 	declarations := make(map[string][]string)
 	for _, file := range ordered {
 		for _, evidence := range file.Evidence {
-			if evidence.Name != "" && isDeclaration(evidence.Kind) {
+			if evidence.Name != "" && syntax.IsDeclaration(evidence.Kind) {
 				declarations[evidence.Name] = appendUnique(declarations[evidence.Name], file.Change.ID)
 			}
 		}
@@ -268,7 +268,8 @@ func currentPath(change gitstate.Change) string {
 
 func sourceCandidates(p string) []string {
 	dir, name := path.Split(p)
-	if strings.HasSuffix(dir, "__tests__/") {
+	inTestsDir := strings.HasSuffix(dir, "__tests__/")
+	if inTestsDir {
 		dir = strings.TrimSuffix(dir, "__tests__/")
 	}
 	ext := path.Ext(name)
@@ -281,7 +282,7 @@ func sourceCandidates(p string) []string {
 	if strings.HasPrefix(base, "test_") {
 		return []string{dir + strings.TrimPrefix(base, "test_") + ext}
 	}
-	if strings.Contains(p, "/__tests__/") {
+	if inTestsDir {
 		return []string{dir + name}
 	}
 	return nil
@@ -424,10 +425,6 @@ func importExtensions(importerExt string) []string {
 	default:
 		return nil
 	}
-}
-
-func isDeclaration(kind string) bool {
-	return strings.HasSuffix(kind, "_declaration") || strings.HasSuffix(kind, "_definition") || kind == "class" || kind == "variable_declarator"
 }
 
 func referencedIdentifiers(file File) []string {
