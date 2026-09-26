@@ -39,6 +39,29 @@ func TestBuildGraphRetainsAllNodesAndDirectedIndexes(t *testing.T) {
 	}
 }
 
+func TestGraphStatisticsCountEdgesByKind(t *testing.T) {
+	changes := []gitstate.Change{
+		{ID: "F001", Status: "modified"},
+		{ID: "F002", Status: "modified"},
+		{ID: "F003", Status: "modified"},
+		{ID: "F004", Status: "modified"},
+	}
+	result := Result{Relations: []Relation{
+		{SourceID: "F001", TargetID: "F002", Kind: DirectImport, Class: Soft, Reason: "observed_import_path"},
+		{SourceID: "F002", TargetID: "F003", Kind: DirectImport, Class: Soft, Reason: "observed_import_path"},
+		{SourceID: "F003", TargetID: "F004", Kind: SourceTest, Class: Soft, Reason: "matching_test_path"},
+	}}
+
+	graph, err := BuildGraph(changes, result)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := map[Kind]int{DirectImport: 2, SourceTest: 1}
+	if !reflect.DeepEqual(graph.Statistics.EdgesByKind, want) {
+		t.Fatalf("edge counts by kind = %#v, want %#v", graph.Statistics.EdgesByKind, want)
+	}
+}
+
 func TestBuildGraphDoesNotConnectDirectoryHintMembers(t *testing.T) {
 	changes := make([]gitstate.Change, 80)
 	members := make([]string, len(changes))

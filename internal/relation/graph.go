@@ -30,6 +30,7 @@ type ReductionReason struct {
 type GraphStatistics struct {
 	NodeCount             int             `json:"node_count"`
 	EdgeCount             int             `json:"edge_count"`
+	EdgesByKind           map[Kind]int    `json:"edges_by_kind"`
 	ObservationCount      int             `json:"observation_count"`
 	ObservationsByKind    map[Kind]int    `json:"observations_by_kind"`
 	ObservationsByOutcome map[Outcome]int `json:"observations_by_outcome"`
@@ -299,11 +300,15 @@ func graphStatistics(graph CandidateGraph) GraphStatistics {
 	stats := GraphStatistics{
 		NodeCount:             len(graph.Nodes),
 		EdgeCount:             len(graph.Edges),
+		EdgesByKind:           make(map[Kind]int),
 		ObservationCount:      len(graph.Observations),
 		ObservationsByKind:    make(map[Kind]int),
 		ObservationsByOutcome: make(map[Outcome]int),
 		ComponentCount:        len(graph.Components),
 		AuxiliaryHintCount:    len(graph.Hints),
+	}
+	for _, edge := range graph.Edges {
+		stats.EdgesByKind[edge.Kind]++
 	}
 	for _, observation := range graph.Observations {
 		stats.ObservationsByKind[observation.Kind]++
