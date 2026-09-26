@@ -207,6 +207,8 @@ v1 における Tree-sitter 対応言語は Go、JavaScript、JSX、TypeScript�
 
 別の内部 API では、Git rename、対応する source / test のパス、変更ファイル間の直接 import、変更箇所に現れる識別子名、同一ディレクトリ、既知の manifest / lockfile の組から、同一 Git snapshot 内の file ID 間 relation を抽出できます。file ID は実行をまたぐ永続 ID ではありません。relation は kind、hard / soft、機械可読な根拠を持ちます。rename は変更前後を保持する単一 file ID の hard relation とし、それ以外の初期 relation は soft とします。識別子名の一致はシンボル解決を意味しません。曖昧・未解決・未対応の抽出試行は relation と分けた診断データとして保持し、relation edge として扱いません。同一ディレクトリの近接情報は file ID をまとめた補助 hint とし、全 file pair の edge に展開しません。この内部 API を planning 入力または最終グルーピングに接続することは、後続の仕様変更で扱います。
 
+内部 candidate graph は全変更 file ID を node として保持し、確定した relation を有向 edge にします。edge に対する forward / reverse 索引と、edge の接続性に基づく candidate component を構築できます。component は候補範囲に限り、孤立 file も保持します。同一ディレクトリの hint は component を接続せず、Git rename は既存 node の path 属性として扱い、自己 edge にしません。edge と component による候補 pair 数、削減数および削減理由を診断用に記録します。
+
 ### FR-006 入力サイズ制御
 
 CLI は、構造エビデンスと必要な diff hunk を優先して LLM への入力を構成しなければなりません。
