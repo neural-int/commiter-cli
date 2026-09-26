@@ -161,6 +161,36 @@ func TestDirectoryProximityStaysGroupedInsteadOfExpandingPairs(t *testing.T) {
 	}
 }
 
+func TestRootDirectoryProximityIsGrouped(t *testing.T) {
+	files := []File{
+		fixture("F002", "b.go", "go", ""),
+		fixture("F001", "a.go", "go", ""),
+	}
+	got, err := Extract(files)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got.Relations) != 0 || !reflect.DeepEqual(got.Hints, []Hint{{Kind: PathProximity, Evidence: Evidence{Type: "directory", Value: "."}, FileIDs: []string{"F001", "F002"}}}) {
+		t.Fatalf("root directory hint = %#v; relations = %#v", got.Hints, got.Relations)
+	}
+}
+
+func TestRustUseIsRecordedAsUnsupported(t *testing.T) {
+	files := []File{fixture("F001", "src/lib.rs", "rust", "use crate::foo::Bar;\n")}
+	got, err := Extract(files)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := Observation{
+		SourceID: "F001", Kind: DirectImport, Outcome: Unsupported,
+		Reason:   "module_resolution_not_available",
+		Evidence: Evidence{Type: "import_path", Value: "use crate::foo::Bar;", Related: "use_declaration"},
+	}
+	if len(got.Relations) != 0 || !reflect.DeepEqual(got.Observations, []Observation{want}) {
+		t.Fatalf("Rust use observations = %#v; relations = %#v", got.Observations, got.Relations)
+	}
+}
+
 func TestUnsupportedAndAmbiguousImportsAreOmitted(t *testing.T) {
 	files := []File{
 		fixture("F001", "src/view.ts", "typescript", "import './helper'\nimport 'external'\n"),

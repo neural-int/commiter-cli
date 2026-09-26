@@ -179,9 +179,8 @@ func Extract(files []File) (Result, error) {
 		if filePath == "" {
 			continue
 		}
-		if dir := path.Dir(filePath); dir != "." {
-			directoryMembers[dir] = append(directoryMembers[dir], file.Change.ID)
-		}
+		dir := path.Dir(filePath)
+		directoryMembers[dir] = append(directoryMembers[dir], file.Change.ID)
 	}
 	result.Relations = append(result.Relations, manifestLockRelations(ordered)...)
 	for dir, members := range directoryMembers {
@@ -302,7 +301,7 @@ func importObservations(file File) []importObservation {
 	}
 	bySpec := make(map[string]importObservation)
 	for _, evidence := range analysis.Evidence {
-		if evidence.Role != "import" || evidence.EndByte <= evidence.StartByte || int(evidence.EndByte) > len(file.Content) {
+		if (evidence.Role != "import" && evidence.Kind != "use_declaration") || evidence.EndByte <= evidence.StartByte || int(evidence.EndByte) > len(file.Content) {
 			continue
 		}
 		span := strings.TrimSpace(string(file.Content[evidence.StartByte:evidence.EndByte]))
@@ -324,6 +323,8 @@ func importObservations(file File) []importObservation {
 			if match := pythonFrom.FindStringSubmatch(span); len(match) == 2 {
 				target = match[1]
 			}
+		case "use_declaration":
+			supported = false
 		default:
 			supported = false
 		}
@@ -333,6 +334,9 @@ func importObservations(file File) []importObservation {
 		reason := ""
 		if !supported {
 			reason = "import_syntax_not_supported"
+			if evidence.Kind == "use_declaration" {
+				reason = "module_resolution_not_available"
+			}
 		}
 		key := target
 		if key == "" {
