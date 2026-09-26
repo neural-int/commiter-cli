@@ -80,6 +80,12 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Run go vet
+        run: go vet ./...
+
+      - name: Run Swift helper tests
+        run: swift test --package-path mlx-helper --triple arm64-apple-macosx14.0
+
       - name: Build and verify release package
         shell: bash
         run: |
