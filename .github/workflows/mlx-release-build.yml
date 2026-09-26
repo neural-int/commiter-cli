@@ -1,0 +1,74 @@
+name: MLX Release Build
+
+on:
+  pull_request:
+    branches: ["main"]
+  merge_group:
+    types: [checks_requested]
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    name: Detect MLX release-build changes
+    runs-on: ubuntu-latest
+    outputs:
+      mlx_release_build: ${{ steps.paths.outputs.mlx_release_build }}
+    steps:
+      - name: Check out repository history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Detect affected paths
+        id: paths
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha }}
+        run: |
+          set -euo pipefail
+
+          git cat-file -e "${BASE_SHA}^{commit}"
+          git cat-file -e "${HEAD_SHA}^{commit}"
+
+          affected=false
+          changed_paths_file="$RUNNER_TEMP/mlx-release-build-paths"
+          git diff --name-only -z "$BASE_SHA" "$HEAD_SHA" > "$changed_paths_file"
+          while IFS= read -r -d '' changed_path; do
+            case "$changed_path" in
+              mlx-helper/* | \
+              .github/scripts/build-mlx-helper.sh | \
+              .github/workflows/mlx-release-build.yml | \
+              .github/workflows/release.yml)
+                affected=true
+                break
+                ;;
+            esac
+          done < "$changed_paths_file"
+
+          echo "mlx_release_build=$affected" >> "$GITHUB_OUTPUT"
+
+  mlx-release-build:
+    name: MLX release build
+    needs: changes
+    if: needs.changes.outputs.mlx_release_build == 'true'
+    runs-on: macos-26
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      MACOSX_DEPLOYMENT_TARGET: "14.0"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Build and verify Swift helper
+        shell: bash
+        run: |
+          xcodebuild -version
+          swift --version
+          bash .github/scripts/build-mlx-helper.sh
