@@ -104,6 +104,25 @@ jobs:
           swift --version
           bash .github/scripts/release-preflight.sh "$VERSION" "$ARCHIVE"
 
+      - name: Archive validated MLX helper
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -cf "$RUNNER_TEMP/commiter-mlx-helper.tar" \
+            -C dist \
+            commiter-mlx-helper \
+            mlx.metallib
+
+      - name: Upload validated MLX helper
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: commiter-mlx-helper-${{ github.run_id }}
+          path: ${{ runner.temp }}/commiter-mlx-helper.tar
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+          overwrite: true
+
   release:
     name: Build, sign, notarize, and publish
     needs: validate
@@ -231,12 +250,19 @@ jobs:
             -o dist/commiter \
             ./cmd/commiter
 
-      - name: Build release MLX helper
+      - name: Download validated MLX helper
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: commiter-mlx-helper-${{ github.run_id }}
+          path: ${{ runner.temp }}/commiter-mlx-helper
+
+      - name: Restore validated MLX helper
         shell: bash
         run: |
-          xcodebuild -version
-          swift --version
-          bash .github/scripts/build-mlx-helper.sh
+          set -euo pipefail
+          tar -xf "$RUNNER_TEMP/commiter-mlx-helper/commiter-mlx-helper.tar" -C dist
+          test -x dist/commiter-mlx-helper
+          test -s dist/mlx.metallib
 
       - name: Verify binary
         shell: bash
