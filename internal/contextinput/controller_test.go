@@ -283,6 +283,22 @@ func TestValidatePreservedRejectsRelationContextMutation(t *testing.T) {
 	}
 }
 
+func TestValidatePreservedRejectsEdgesByKindMutation(t *testing.T) {
+	original := testDocument()
+	original.RelationContext = &RelationContext{
+		Components: []relation.CandidateComponent{{ID: "C001", FileIDs: []string{"F001"}}},
+		Statistics: relation.GraphStatistics{EdgesByKind: map[relation.Kind]int{relation.DirectImport: 1}},
+	}
+	summarized := cloneDocument(original)
+	summarized.RelationContext.Statistics.EdgesByKind[relation.DirectImport] = 2
+	if original.RelationContext.Statistics.EdgesByKind[relation.DirectImport] != 1 {
+		t.Fatal("summarizer clone mutated the original edge statistics")
+	}
+	if err := ValidatePreserved(original, summarized); err == nil {
+		t.Fatal("changed edge statistics passed preservation validation")
+	}
+}
+
 func TestPrepareFallsBackWhenRelationContextIsInvalid(t *testing.T) {
 	document := testDocument()
 	document.RelationContext = &RelationContext{

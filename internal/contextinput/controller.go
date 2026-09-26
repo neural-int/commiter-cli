@@ -295,6 +295,7 @@ func cloneDocument(document Document) Document {
 			relations.Hints[i].FileIDs = append([]string(nil), hint.FileIDs...)
 		}
 		relations.ReductionReasons = append([]relation.ReductionReason(nil), document.RelationContext.ReductionReasons...)
+		relations.Statistics.EdgesByKind = cloneMap(document.RelationContext.Statistics.EdgesByKind)
 		relations.Statistics.ObservationsByKind = cloneMap(document.RelationContext.Statistics.ObservationsByKind)
 		relations.Statistics.ObservationsByOutcome = cloneMap(document.RelationContext.Statistics.ObservationsByOutcome)
 		clone.RelationContext = &relations
