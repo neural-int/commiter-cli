@@ -94,44 +94,15 @@ jobs:
           swift --version
           swift test --package-path mlx-helper --triple arm64-apple-macosx14.0
 
-      - name: Build and verify Swift helper
-        shell: bash
-        run: bash .github/scripts/build-mlx-helper.sh
-
-      - name: Build release binary
+      - name: Run release preflight
         shell: bash
         env:
           VERSION: ${{ steps.version.outputs.version }}
+          ARCHIVE: ${{ steps.version.outputs.archive }}
         run: |
-          set -euo pipefail
-          mkdir -p dist
-          go build \
-            -trimpath \
-            -ldflags "-s -w -X github.com/natsuki0413/commiter-cli/internal/cli.Version=${VERSION}" \
-            -o dist/commiter \
-            ./cmd/commiter
-
-      - name: Verify binary
-        shell: bash
-        env:
-          VERSION: ${{ steps.version.outputs.version }}
-        run: |
-          set -euo pipefail
-
-          actual_version="$(dist/commiter version)"
-          expected_version="commiter ${VERSION}"
-          if [[ "$actual_version" != "$expected_version" ]]; then
-            echo "::error::Version mismatch: expected '$expected_version', got '$actual_version'"
-            exit 1
-          fi
-
-          archs="$(lipo -archs dist/commiter)"
-          if [[ "$archs" != "arm64" ]]; then
-            echo "::error::Expected arm64 Mach-O, got: $archs"
-            exit 1
-          fi
-
-          file dist/commiter
+          xcodebuild -version
+          swift --version
+          bash .github/scripts/release-preflight.sh "$VERSION" "$ARCHIVE"
 
   release:
     name: Build, sign, notarize, and publish
@@ -385,73 +356,13 @@ jobs:
         shell: bash
         env:
           ARCHIVE: ${{ needs.validate.outputs.archive }}
-        run: |
-          set -euo pipefail
-          package_dir="dist/package"
-          mkdir -p "$package_dir/bin" "$package_dir/libexec"
-          cp dist/commiter "$package_dir/bin/commiter"
-          cp dist/commiter-mlx-helper "$package_dir/libexec/commiter-mlx-helper"
-          cp dist/mlx.metallib "$package_dir/libexec/mlx.metallib"
-          cp LICENSE "$package_dir/LICENSE"
-          (
-            cd "$package_dir"
-            zip -X -q -r "../${ARCHIVE}" bin libexec LICENSE
-          )
+        run: bash .github/scripts/build-release-package.sh "$ARCHIVE"
 
       - name: Verify packaged helper layout and signatures
         shell: bash
         env:
           ARCHIVE: ${{ needs.validate.outputs.archive }}
-        run: |
-          set -euo pipefail
-          package_check="$RUNNER_TEMP/commiter-package-check"
-          mkdir -p "$package_check"
-          unzip -q "dist/${ARCHIVE}" -d "$package_check"
-          test -x "$package_check/bin/commiter"
-          test -x "$package_check/libexec/commiter-mlx-helper"
-          test -s "$package_check/libexec/mlx.metallib"
-
-          helper_entries="$(unzip -Z1 "dist/${ARCHIVE}" | awk '/(^|\/)commiter-mlx-helper$/')"
-          if [[ "$helper_entries" != "libexec/commiter-mlx-helper" ]]; then
-            echo "::error::Expected only the private libexec helper entry, got: ${helper_entries:-none}"
-            exit 1
-          fi
-
-          codesign --verify --strict "$package_check/bin/commiter"
-          codesign --verify --strict "$package_check/libexec/commiter-mlx-helper"
-
-          config_home="$RUNNER_TEMP/commiter-smoke-config"
-          mkdir -p "$config_home/commiter"
-          cat > "$config_home/commiter/config.toml" <<'EOF'
-          [llm]
-          backend = "mlx"
-          model = "owner/model"
-          model_revision = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-          model_quantization = "4bit"
-          EOF
-          set +e
-          XDG_CONFIG_HOME="$config_home" XDG_STATE_HOME="$RUNNER_TEMP/commiter-smoke-state" \
-            "$package_check/bin/commiter" --json doctor > "$RUNNER_TEMP/commiter-smoke-doctor.json"
-          doctor_status=$?
-          set -e
-          if [[ "$doctor_status" -eq 0 ]]; then
-            echo "::error::Doctor unexpectedly accepted the absent smoke model"
-            exit 1
-          fi
-          python3 - "$RUNNER_TEMP/commiter-smoke-doctor.json" <<'PY'
-          import json
-          import sys
-          with open(sys.argv[1], encoding="utf-8") as stream:
-              checks = json.load(stream)["doctor"]
-          if checks["mlx_helper"]["ok"] is not True or checks["mlx_model"]["ok"] is not False:
-              raise SystemExit("packaged commiter did not resolve its private MLX helper")
-          PY
-
-          smoke_output="$(cd "$RUNNER_TEMP" && "$package_check/libexec/commiter-mlx-helper" --smoke-metal)"
-          if [[ "$smoke_output" != metal_ok ]]; then
-            echo "::error::Packaged MLX helper did not initialize Metal"
-            exit 1
-          fi
+        run: bash .github/scripts/verify-release-package.sh "$ARCHIVE" true
 
       - name: Store notarization credentials
         shell: bash

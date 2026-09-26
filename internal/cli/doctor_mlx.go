@@ -16,6 +16,8 @@ const mlxUnsupportedPlatformMessage = "MLX requires macOS on Apple Silicon (darw
 
 const mlxDoctorTimeout = 2 * time.Minute
 
+var resolveBundledMLXHelper = mlx.ResolveBundledHelper
+
 func mlxPlatformSupported(goos, goarch string) bool {
 	return goos == "darwin" && goarch == "arm64"
 }
@@ -24,6 +26,9 @@ func mlxPlatformSupported(goos, goarch string) bool {
 // distribution may resolve a bundled helper here while retaining PATH lookup
 // for development builds.
 func findMLXHelper() (string, error) {
+	if helper, err := resolveBundledMLXHelper(); err == nil {
+		return helper, nil
+	}
 	return lookPath("commiter-mlx-helper")
 }
 

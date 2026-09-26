@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,6 +14,48 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 	"github.com/natsuki0413/commiter-cli/internal/planning"
 )
+
+func TestFindMLXHelperPrefersBundledHelperAndFallsBackToPath(t *testing.T) {
+	oldBundled, oldLookPath := resolveBundledMLXHelper, lookPath
+	t.Cleanup(func() {
+		resolveBundledMLXHelper = oldBundled
+		lookPath = oldLookPath
+	})
+
+	pathLookups := 0
+	resolveBundledMLXHelper = func() (string, error) {
+		return "/package/libexec/commiter-mlx-helper", nil
+	}
+	lookPath = func(name string) (string, error) {
+		pathLookups++
+		return "/usr/local/bin/" + name, nil
+	}
+
+	helper, err := findMLXHelper()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if helper != "/package/libexec/commiter-mlx-helper" {
+		t.Fatalf("helper = %q, want bundled helper", helper)
+	}
+	if pathLookups != 0 {
+		t.Fatalf("PATH lookups = %d, want 0 when bundled helper exists", pathLookups)
+	}
+
+	resolveBundledMLXHelper = func() (string, error) {
+		return "", errors.New("bundled helper unavailable")
+	}
+	helper, err = findMLXHelper()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if helper != "/usr/local/bin/commiter-mlx-helper" {
+		t.Fatalf("helper = %q, want PATH helper", helper)
+	}
+	if pathLookups != 1 {
+		t.Fatalf("PATH lookups = %d, want 1 after bundled lookup fails", pathLookups)
+	}
+}
 
 func TestMLXCapabilityProbeRequiresJSONOnlyExpectedShape(t *testing.T) {
 	tests := []struct {

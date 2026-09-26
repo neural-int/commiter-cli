@@ -40,10 +40,19 @@ jobs:
           git diff --name-only -z "$BASE_SHA" "$HEAD_SHA" > "$changed_paths_file"
           while IFS= read -r -d '' changed_path; do
             case "$changed_path" in
+              cmd/commiter/* | \
+              internal/cli/* | \
+              internal/config/* | \
+              internal/mlx/* | \
+              internal/mlxmodel/* | \
               mlx-helper/* | \
               .github/scripts/build-mlx-helper.sh | \
+              .github/scripts/build-release-package.sh | \
+              .github/scripts/release-preflight.sh | \
+              .github/scripts/verify-release-package.sh | \
               .github/workflows/mlx-release-build.yml | \
-              .github/workflows/release.yml)
+              .github/workflows/release.yml | \
+              go.mod | go.sum | LICENSE)
                 affected=true
                 break
                 ;;
@@ -66,9 +75,20 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Build and verify Swift helper
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+        with:
+          go-version-file: go.mod
+
+      - name: Run go vet
+        run: go vet ./...
+
+      - name: Run Swift helper tests
+        run: swift test --package-path mlx-helper --triple arm64-apple-macosx14.0
+
+      - name: Build and verify release package
         shell: bash
         run: |
           xcodebuild -version
           swift --version
-          bash .github/scripts/build-mlx-helper.sh
+          bash .github/scripts/release-preflight.sh
