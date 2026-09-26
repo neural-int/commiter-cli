@@ -47,6 +47,7 @@ go test, go vet, and go build are not applicable to this fixture-only check.
 
 ## Requirements impact
 - [x] I believe this PR may affect requirements.
+Notes: The release contract has been updated.
 
 ## Safety impact
 Release metadata is validated before publishing.
@@ -93,6 +94,10 @@ class PullRequestPolicyFixtureTests(unittest.TestCase):
 
     def test_inline_policy_accepts_the_same_valid_fixture(self):
         result = self._run_policy(_policy_body())
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_inline_policy_accepts_crlf_body(self):
+        result = self._run_policy(_policy_body().replace("\n", "\r\n"))
         self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_inline_policy_rejects_missing_release_note(self):

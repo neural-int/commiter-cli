@@ -67,6 +67,10 @@ jobs:
               print("Draft PR: policy validation is deferred until the PR is ready for review.")
               sys.exit(0)
 
+          # GitHub API/event bodies may use CRLF. Normalize before applying line-anchored
+          # markdown checks so a carriage return is not mistaken for checkbox content.
+          body = body.replace("\r\n", "\n").replace("\r", "\n")
+
           errors = []
 
           title_pattern = re.compile(
