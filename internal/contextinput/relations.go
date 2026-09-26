@@ -20,6 +20,23 @@ func RelationContextFromGraph(graph relation.CandidateGraph) *RelationContext {
 	}
 }
 
+func omittedRelationStatus(context *RelationContext, reason string) *RelationContextStatus {
+	status := &RelationContextStatus{Omitted: true, Reason: reason}
+	if context == nil {
+		return status
+	}
+	status.ObservationCount = max(0, context.Statistics.ObservationCount)
+	for _, outcome := range []relation.Outcome{relation.Ambiguous, relation.Unresolved, relation.Unsupported} {
+		if count := context.Statistics.ObservationsByOutcome[outcome]; count > 0 {
+			if status.ObservationsByOutcome == nil {
+				status.ObservationsByOutcome = make(map[relation.Outcome]int, 3)
+			}
+			status.ObservationsByOutcome[outcome] = count
+		}
+	}
+	return status
+}
+
 func validateRelationContext(document Document) error {
 	if document.RelationContext == nil {
 		return nil

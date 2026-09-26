@@ -2,6 +2,7 @@ package contextinput
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"reflect"
 	"strings"
@@ -201,7 +202,9 @@ func TestPrepareFallsBackWithoutOversizedRelationContext(t *testing.T) {
 	document := testDocument()
 	document.RelationContext = &RelationContext{
 		Components: []relation.CandidateComponent{{ID: "C001", FileIDs: []string{"F001"}}},
-		Statistics: relation.GraphStatistics{NodeCount: 1},
+		Statistics: relation.GraphStatistics{NodeCount: 1, ObservationCount: 3, ObservationsByOutcome: map[relation.Outcome]int{
+			relation.Ambiguous: 1, relation.Unresolved: 2,
+		}},
 	}
 	relationRenders, fallbackRenders := 0, 0
 	render := func(value Document) ([]byte, error) {
@@ -210,7 +213,7 @@ func TestPrepareFallsBackWithoutOversizedRelationContext(t *testing.T) {
 			return make([]byte, Context8K), nil
 		}
 		fallbackRenders++
-		return []byte("{}"), nil
+		return JSONRenderer(value)
 	}
 	prepared, err := Prepare(context.Background(), document, BudgetConfig{Context: "8k", MaxContextTokens: Context32K}, render, nil)
 	if err != nil {
@@ -219,8 +222,51 @@ func TestPrepareFallsBackWithoutOversizedRelationContext(t *testing.T) {
 	if !prepared.RelationContextOmitted || prepared.Document.RelationContext != nil || len(prepared.Document.Files) != 1 || prepared.Document.Files[0].ID != "F001" {
 		t.Fatalf("relation fallback changed required input or was not reported: %#v", prepared)
 	}
-	if relationRenders == 0 || fallbackRenders != 1 || string(prepared.Prompt) != "{}" {
+	var prompt Document
+	if err := json.Unmarshal(prepared.Prompt, &prompt); err != nil {
+		t.Fatal(err)
+	}
+	if relationRenders != 1 || fallbackRenders != 1 || prompt.RelationContext != nil || prompt.RelationContextStatus == nil || !prompt.RelationContextStatus.Omitted || prompt.RelationContextStatus.Reason != "over_budget" || prompt.RelationContextStatus.ObservationCount != 3 || prompt.RelationContextStatus.ObservationsByOutcome[relation.Unresolved] != 2 || prompt.RelationContextStatus.ObservationsByOutcome[relation.Ambiguous] != 1 {
 		t.Fatalf("relation/fallback renders=%d/%d prompt=%q", relationRenders, fallbackRenders, prepared.Prompt)
+	}
+}
+
+func TestPrepareOmitsOversizedRelationBeforeSummarizingFileEvidence(t *testing.T) {
+	document := testDocument()
+	document.Files[0].Mode = syntax.ModeRawDiff
+	document.Files[0].Evidence = nil
+	document.Files[0].RawDiff = "original diff"
+	document.RelationContext = &RelationContext{
+		Components: []relation.CandidateComponent{{ID: "C001", FileIDs: []string{"F001"}}},
+		Statistics: relation.GraphStatistics{NodeCount: 1, ObservationCount: 3, ObservationsByOutcome: map[relation.Outcome]int{
+			relation.Unresolved: 2, relation.Ambiguous: 1,
+		}},
+	}
+	stages := 0
+	render := func(value Document) ([]byte, error) {
+		if value.RelationContext != nil && value.Files[0].Summary == "" {
+			return make([]byte, Context8K), nil
+		}
+		if value.Files[0].Summary != "" {
+			return []byte("compressed with relation"), nil
+		}
+		return []byte("original evidence"), nil
+	}
+	summarizer := summarizeFunc(func(_ context.Context, _ SummaryStage, value Document) (Document, error) {
+		stages++
+		value.Files[0].RawDiff = ""
+		value.Files[0].Summary = "compressed"
+		return value, nil
+	})
+	prepared, err := Prepare(context.Background(), document, BudgetConfig{Context: "8k", MaxContextTokens: Context32K}, render, summarizer)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if stages != 0 || prepared.SummaryCount != 0 || prepared.EvidenceReductionCount != 0 || prepared.Document.Files[0].RawDiff != "original diff" || !prepared.RelationContextOmitted {
+		t.Fatalf("relation overflow compressed original evidence: stages=%d prepared=%#v", stages, prepared)
+	}
+	if prepared.Document.RelationContextStatus == nil || prepared.Document.RelationContextStatus.Reason != "over_budget" {
+		t.Fatalf("relation overflow status missing: %#v", prepared.Document.RelationContextStatus)
 	}
 }
 
@@ -239,12 +285,25 @@ func TestValidatePreservedRejectsRelationContextMutation(t *testing.T) {
 
 func TestPrepareFallsBackWhenRelationContextIsInvalid(t *testing.T) {
 	document := testDocument()
-	document.RelationContext = &RelationContext{Components: []relation.CandidateComponent{{ID: "C001", FileIDs: []string{"F999"}}}}
+	document.RelationContext = &RelationContext{
+		Components: []relation.CandidateComponent{{ID: "C001", FileIDs: []string{"F999"}}},
+		Statistics: relation.GraphStatistics{ObservationCount: 2, ObservationsByOutcome: map[relation.Outcome]int{
+			relation.Unsupported: 2, relation.Outcome("unexpected"): 100,
+		}},
+	}
 	prepared, err := Prepare(context.Background(), document, BudgetConfig{Context: "8k", MaxContextTokens: Context32K}, JSONRenderer, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if !prepared.RelationContextOmitted || prepared.Document.RelationContext != nil || len(prepared.Document.Files) != 1 || prepared.Document.Files[0].ID != "F001" {
 		t.Fatalf("invalid graph fallback changed required file IDs: %#v", prepared)
+	}
+	var prompt Document
+	if err := json.Unmarshal(prepared.Prompt, &prompt); err != nil {
+		t.Fatal(err)
+	}
+	status := prompt.RelationContextStatus
+	if status == nil || !status.Omitted || status.Reason != "invalid" || status.ObservationCount != 2 || len(status.ObservationsByOutcome) != 1 || status.ObservationsByOutcome[relation.Unsupported] != 2 {
+		t.Fatalf("invalid graph fallback status=%#v", status)
 	}
 }

@@ -91,6 +91,28 @@ func TestRendererMarksCandidateRelationsAsAuxiliaryAndDoesNotChangeOutputSchema(
 	}
 }
 
+func TestRendererIncludesRelationFallbackStatusWithoutGraph(t *testing.T) {
+	document := planningDocument()
+	document.RelationContextStatus = &contextinput.RelationContextStatus{
+		Omitted: true, Reason: "over_budget", ObservationCount: 3,
+		ObservationsByOutcome: map[relation.Outcome]int{relation.Unresolved: 2, relation.Ambiguous: 1},
+	}
+	prompt, err := Renderer(English)(document)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var envelope struct {
+		RepositoryInput contextinput.Document `json:"repository_input"`
+	}
+	if err := json.Unmarshal(prompt, &envelope); err != nil {
+		t.Fatal(err)
+	}
+	status := envelope.RepositoryInput.RelationContextStatus
+	if envelope.RepositoryInput.RelationContext != nil || status == nil || !status.Omitted || status.Reason != "over_budget" || status.ObservationCount != 3 || status.ObservationsByOutcome[relation.Unresolved] != 2 {
+		t.Fatalf("fallback status missing from planning prompt: %s", prompt)
+	}
+}
+
 func TestSchemaBoundsCommitAndFileIDArraysByRequiredFileCount(t *testing.T) {
 	encoded, err := Schema([]string{"F001", "F002"})
 	if err != nil {

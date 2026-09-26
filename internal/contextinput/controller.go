@@ -54,6 +54,7 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 	if err := validateRelationContext(document); err != nil {
 		fallbackDocument := cloneDocument(document)
 		fallbackDocument.RelationContext = nil
+		fallbackDocument.RelationContextStatus = omittedRelationStatus(document.RelationContext, "invalid")
 		prepared, fallbackErr := Prepare(ctx, fallbackDocument, config, render, summarizer)
 		prepared.RelationContextOmitted = true
 		return prepared, fallbackErr
@@ -94,6 +95,14 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 	}
 	if !errors.Is(err, ErrTooLarge) {
 		return prepared, err
+	}
+	if original.RelationContext != nil {
+		fallbackDocument := cloneDocument(original)
+		fallbackDocument.RelationContext = nil
+		fallbackDocument.RelationContextStatus = omittedRelationStatus(original.RelationContext, "over_budget")
+		fallback, fallbackErr := Prepare(ctx, fallbackDocument, config, render, summarizer)
+		fallback.RelationContextOmitted = true
+		return fallback, fallbackErr
 	}
 
 	summaryCount := 0
@@ -205,13 +214,6 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 		result := progress(SummaryChunk, compressionProfile, summaryCount)
 		result.EvidenceReductionDuration = time.Since(started)
 		if errors.Is(err, ErrTooLarge) {
-			if original.RelationContext != nil {
-				fallbackDocument := cloneDocument(document)
-				fallbackDocument.RelationContext = nil
-				fallback, fallbackErr := Prepare(ctx, fallbackDocument, config, render, summarizer)
-				fallback.RelationContextOmitted = true
-				return fallback, fallbackErr
-			}
 			return result, ErrTooLarge
 		}
 		return result, fmt.Errorf("evidence reduction failed: %w", err)
@@ -268,6 +270,11 @@ func evidencePrepared(document Document, prompt []byte, budget Budget, stage Sum
 
 func cloneDocument(document Document) Document {
 	clone := document
+	if document.RelationContextStatus != nil {
+		status := *document.RelationContextStatus
+		status.ObservationsByOutcome = cloneMap(document.RelationContextStatus.ObservationsByOutcome)
+		clone.RelationContextStatus = &status
+	}
 	if document.RelationContext != nil {
 		relations := *document.RelationContext
 		relations.Components = make([]relation.CandidateComponent, len(document.RelationContext.Components))
