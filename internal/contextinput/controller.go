@@ -69,7 +69,7 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 	}
 	baseConfig := normalBudgetConfig(config)
 	progress := func(stage SummaryStage, profile CompressionProfile, count int) Prepared {
-		return Prepared{SummaryStage: stage, CompressionProfile: profile, SummaryCount: count, SummaryDuration: summaryDuration, OriginalPromptBytes: originalPromptBytes}
+		return Prepared{SummaryStage: stage, CompressionProfile: profile, SummaryCount: count, SummaryDuration: summaryDuration, OriginalPromptBytes: originalPromptBytes, RelationContextOmitted: current.RelationContextStatus != nil && current.RelationContextStatus.Omitted}
 	}
 	renderCurrent := func(stage SummaryStage, profile CompressionProfile, count int, budgetConfig BudgetConfig) (Prepared, error) {
 		prompt, err := render(cloneDocument(current))
@@ -87,6 +87,7 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 			Document: cloneDocument(current), Prompt: append([]byte(nil), prompt...), Budget: budget,
 			SummaryStage: stage, CompressionProfile: profile, SummaryCount: count,
 			SummaryDuration: summaryDuration, OriginalPromptBytes: originalPromptBytes,
+			RelationContextOmitted: current.RelationContextStatus != nil && current.RelationContextStatus.Omitted,
 		}, nil
 	}
 	prepared, err := renderCurrent(SummaryNone, CompressionNone, 0, baseConfig)
@@ -258,6 +259,7 @@ func evidencePrepared(document Document, prompt []byte, budget Budget, stage Sum
 		Document: cloneDocument(document), Prompt: append([]byte(nil), prompt...), Budget: budget,
 		SummaryStage: stage, CompressionProfile: profile, SummaryCount: summaryCount, SummaryDuration: summaryDuration,
 		OriginalPromptBytes: originalPromptBytes, EvidenceReductionCount: 1, EvidenceReductionDuration: reductionDuration,
+		RelationContextOmitted: document.RelationContextStatus != nil && document.RelationContextStatus.Omitted,
 	}
 	for _, file := range document.Files {
 		if file.EvidenceReduction != nil {

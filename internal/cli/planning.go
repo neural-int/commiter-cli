@@ -60,11 +60,7 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 	if err != nil {
 		return planning.Plan{}, err
 	}
-	if extracted, extractErr := relation.Extract(relationFiles); extractErr == nil {
-		if graph, graphErr := relation.BuildGraph(snapshot.Changes, extracted); graphErr == nil {
-			document.RelationContext = contextinput.RelationContextFromGraph(graph)
-		}
-	}
+	attachRelationContext(&document, snapshot.Changes, relationFiles)
 	fileIDs := make([]string, len(document.Files))
 	for index, file := range document.Files {
 		fileIDs[index] = file.ID
@@ -106,6 +102,38 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 	}
 	recorder.SetContext(model, contextStage)
 	return generated.Plan, nil
+}
+
+func attachRelationContext(document *contextinput.Document, changes []gitstate.Change, files []relation.File) {
+	extracted, err := relation.Extract(files)
+	if err != nil {
+		document.RelationContextStatus = relationFallbackStatus("unavailable", nil)
+		return
+	}
+	graph, err := relation.BuildGraph(changes, extracted)
+	if err != nil {
+		document.RelationContextStatus = relationFallbackStatus("unavailable", extracted.Observations)
+		return
+	}
+	if len(graph.Edges) == 0 && len(graph.Hints) == 0 && len(graph.Observations) == 0 {
+		document.RelationContextStatus = relationFallbackStatus("ineffective", nil)
+		return
+	}
+	document.RelationContext = contextinput.RelationContextFromGraph(graph)
+}
+
+func relationFallbackStatus(reason string, observations []relation.Observation) *contextinput.RelationContextStatus {
+	status := &contextinput.RelationContextStatus{Omitted: true, Reason: reason, ObservationCount: len(observations)}
+	for _, observation := range observations {
+		switch observation.Outcome {
+		case relation.Ambiguous, relation.Unresolved, relation.Unsupported:
+			if status.ObservationsByOutcome == nil {
+				status.ObservationsByOutcome = make(map[relation.Outcome]int, 3)
+			}
+			status.ObservationsByOutcome[observation.Outcome]++
+		}
+	}
+	return status
 }
 
 func recordSummarization(recorder *runmetrics.Recorder, prepared contextinput.Prepared) {

@@ -56,7 +56,7 @@ type RelationContext struct {
 type RelationContextStatus struct {
 	Omitted               bool                     `json:"omitted"`
 	Reason                string                   `json:"reason"`
-	ObservationCount      int                      `json:"observation_count"`
+	ObservationCount      int                      `json:"observation_count,omitempty"`
 	ObservationsByOutcome map[relation.Outcome]int `json:"observations_by_outcome,omitempty"`
 }
 

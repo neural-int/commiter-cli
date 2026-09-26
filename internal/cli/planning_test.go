@@ -10,10 +10,68 @@ import (
 	"testing"
 
 	"github.com/natsuki0413/commiter-cli/internal/config"
+	"github.com/natsuki0413/commiter-cli/internal/contextinput"
 	"github.com/natsuki0413/commiter-cli/internal/gitstate"
 	"github.com/natsuki0413/commiter-cli/internal/mlx"
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
+	"github.com/natsuki0413/commiter-cli/internal/planning"
+	"github.com/natsuki0413/commiter-cli/internal/relation"
 )
+
+func TestAttachRelationContextFallbackStatusReachesPlanningPrompt(t *testing.T) {
+	sourcePath, testPath, readmePath := "src/auth.ts", "src/auth.test.ts", "README.md"
+	source := gitstate.Change{ID: "F001", Status: "modified", NewPath: &sourcePath, Language: "typescript"}
+	testFile := gitstate.Change{ID: "F002", Status: "modified", NewPath: &testPath, Language: "typescript"}
+	readme := gitstate.Change{ID: "F001", Status: "modified", NewPath: &readmePath, Language: "markdown"}
+	for _, test := range []struct {
+		name              string
+		changes           []gitstate.Change
+		files             []relation.File
+		wantReason        string
+		wantObservations  int
+		wantRelationEdges int
+	}{
+		{"extract unavailable", []gitstate.Change{source}, []relation.File{{Change: source}, {Change: source}}, "unavailable", 0, 0},
+		{"graph unavailable", []gitstate.Change{source}, []relation.File{{Change: testFile}}, "unavailable", 1, 0},
+		{"no graph evidence", []gitstate.Change{readme}, []relation.File{{Change: readme}}, "ineffective", 0, 0},
+		{"diagnostic only graph", []gitstate.Change{testFile}, []relation.File{{Change: testFile}}, "", 0, 0},
+		{"usable graph", []gitstate.Change{source, testFile}, []relation.File{{Change: source}, {Change: testFile}}, "", 0, 1},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			document := contextinput.Document{SchemaVersion: contextinput.SchemaVersion}
+			for _, change := range test.changes {
+				document.Files = append(document.Files, contextinput.File{ID: change.ID})
+			}
+			attachRelationContext(&document, test.changes, test.files)
+			prepared, err := contextinput.Prepare(context.Background(), document, contextinput.BudgetConfig{Context: "8k"}, planning.Renderer(planning.English), nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var envelope struct {
+				RepositoryInput contextinput.Document `json:"repository_input"`
+			}
+			if err := json.Unmarshal(prepared.Prompt, &envelope); err != nil {
+				t.Fatal(err)
+			}
+			input := envelope.RepositoryInput
+			if test.wantReason != "" {
+				if !prepared.RelationContextOmitted || input.RelationContext != nil || input.RelationContextStatus == nil || !input.RelationContextStatus.Omitted || input.RelationContextStatus.Reason != test.wantReason || input.RelationContextStatus.ObservationCount != test.wantObservations {
+					t.Fatalf("fallback prompt=%s", prepared.Prompt)
+				}
+				if test.wantObservations > 0 && input.RelationContextStatus.ObservationsByOutcome[relation.Unresolved] != test.wantObservations {
+					t.Fatalf("diagnostic counts missing: %s", prepared.Prompt)
+				}
+				if test.name == "extract unavailable" && strings.Contains(string(prepared.Prompt), "\"observation_count\"") {
+					t.Fatalf("unknown observation count was reported as zero: %s", prepared.Prompt)
+				}
+				return
+			}
+			if prepared.RelationContextOmitted || input.RelationContextStatus != nil || input.RelationContext == nil || len(input.RelationContext.Edges) != test.wantRelationEdges {
+				t.Fatalf("usable graph missing: %s", prepared.Prompt)
+			}
+		})
+	}
+}
 
 func TestMLXPlanningFailsClosedWithoutModelOrOllamaFallback(t *testing.T) {
 	oldStore := newMLXModelStore
