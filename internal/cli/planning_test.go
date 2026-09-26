@@ -34,10 +34,12 @@ func TestMLXPlanningFailsClosedWithoutModelOrOllamaFallback(t *testing.T) {
 
 func TestMLXPlanningUsesInstalledModelAndHelper(t *testing.T) {
 	repo := cliRepository(t)
-	cliWrite(t, repo, "a.txt", "base\n", 0o644)
-	cliGit(t, repo, "add", "a.txt")
+	cliWrite(t, repo, "src/main.ts", "import { helper } from './helper'\nexport const value = helper()\n", 0o644)
+	cliWrite(t, repo, "src/helper.ts", "export function helper() { return 1 }\n", 0o644)
+	cliGit(t, repo, "add", "src/main.ts", "src/helper.ts")
 	cliGit(t, repo, "commit", "-m", "base")
-	cliWrite(t, repo, "a.txt", "changed\n", 0o644)
+	cliWrite(t, repo, "src/main.ts", "import { helper } from './helper'\nexport const value = helper() + 1\n", 0o644)
+	cliWrite(t, repo, "src/helper.ts", "export function helper() { return 2 }\n", 0o644)
 	snapshot, err := gitstate.Collect(repo, gitstate.Options{})
 	if err != nil {
 		t.Fatal(err)
@@ -78,7 +80,7 @@ func TestMLXPlanningUsesInstalledModelAndHelper(t *testing.T) {
 	script := `#!/bin/sh
 set -eu
 cat > "$MLX_TEST_REQUEST"
-printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"update planning\",\"file_ids\":[\"F001\"]}]}","model":"owner/model","runtime":"mlx"}'
+printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"update planning\",\"file_ids\":[\"F001\",\"F002\"]}]}","model":"owner/model","runtime":"mlx"}'
 `
 	if err := os.WriteFile(helper, []byte(script), 0o700); err != nil {
 		t.Fatal(err)
@@ -91,7 +93,7 @@ printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{\"commits
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(plan.Commits) != 1 || plan.Commits[0].Summary != "update planning" {
+	if len(plan.Commits) != 1 || plan.Commits[0].Summary != "update planning" || len(plan.Commits[0].FileIDs) != 2 {
 		t.Fatalf("plan = %#v", plan)
 	}
 	requestData, err := os.ReadFile(requestPath)
@@ -104,6 +106,9 @@ printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{\"commits
 	}
 	if request.Model != values.Model || request.ModelPath != modelPath || len(request.Schema) == 0 || len(request.Messages) != 2 {
 		t.Fatalf("helper request model=%q path=%q schema_bytes=%d messages=%d", request.Model, request.ModelPath, len(request.Schema), len(request.Messages))
+	}
+	if !strings.Contains(request.Messages[1].Content, "relation_context") || !strings.Contains(request.Messages[1].Content, "candidate_components") || !strings.Contains(request.Messages[1].Content, "observed_import_path") {
+		t.Fatalf("planning request did not include extracted relation context: %s", request.Messages[1].Content)
 	}
 }
 

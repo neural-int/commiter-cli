@@ -14,6 +14,7 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
 	"github.com/natsuki0413/commiter-cli/internal/llm"
 	"github.com/natsuki0413/commiter-cli/internal/mlx"
+	"github.com/natsuki0413/commiter-cli/internal/relation"
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
 )
 
@@ -60,6 +61,33 @@ func TestRendererBuildsDeterministicUntrustedDataEnvelope(t *testing.T) {
 	jaSchema, err := Schema([]string{"F001", "F002"})
 	if err != nil || !bytesEqual(enSchema, jaSchema) {
 		t.Fatalf("schema changed across language: %v", err)
+	}
+}
+
+func TestRendererMarksCandidateRelationsAsAuxiliaryAndDoesNotChangeOutputSchema(t *testing.T) {
+	document := planningDocument()
+	document.RelationContext = &contextinput.RelationContext{
+		Components: []relation.CandidateComponent{{ID: "C001", FileIDs: []string{"F001", "F002"}}},
+		Edges:      []relation.Relation{{SourceID: "F001", TargetID: "F002", Kind: relation.DirectImport, Class: relation.Soft}},
+	}
+	prompt, err := Renderer(English)(document)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var envelope struct {
+		RelationGuidance string `json:"relation_context_guidance"`
+		RepositoryInput  struct {
+			RelationContext contextinput.RelationContext `json:"relation_context"`
+		} `json:"repository_input"`
+	}
+	if err := json.Unmarshal(prompt, &envelope); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(envelope.RelationGuidance, "auxiliary") || !strings.Contains(envelope.RelationGuidance, "do not define final commit boundaries") || len(envelope.RepositoryInput.RelationContext.Components) != 1 {
+		t.Fatalf("relation guidance/context missing: %#v", envelope)
+	}
+	if _, err := Schema([]string{"F001", "F002"}); err != nil {
+		t.Fatalf("output schema unexpectedly depends on relation context: %v", err)
 	}
 }
 

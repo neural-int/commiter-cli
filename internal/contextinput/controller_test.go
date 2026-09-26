@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/natsuki0413/commiter-cli/internal/relation"
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
 )
 
@@ -193,5 +194,57 @@ func testDocument() Document {
 			ID: "F001", Status: "M", NewPath: &path, Language: "Go", ChangeHash: "hash",
 			Mode: syntax.ModeStructural, Evidence: []syntax.Evidence{{Kind: "function_declaration", Name: "changed"}},
 		}},
+	}
+}
+
+func TestPrepareFallsBackWithoutOversizedRelationContext(t *testing.T) {
+	document := testDocument()
+	document.RelationContext = &RelationContext{
+		Components: []relation.CandidateComponent{{ID: "C001", FileIDs: []string{"F001"}}},
+		Statistics: relation.GraphStatistics{NodeCount: 1},
+	}
+	relationRenders, fallbackRenders := 0, 0
+	render := func(value Document) ([]byte, error) {
+		if value.RelationContext != nil {
+			relationRenders++
+			return make([]byte, Context8K), nil
+		}
+		fallbackRenders++
+		return []byte("{}"), nil
+	}
+	prepared, err := Prepare(context.Background(), document, BudgetConfig{Context: "8k", MaxContextTokens: Context32K}, render, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !prepared.RelationContextOmitted || prepared.Document.RelationContext != nil || len(prepared.Document.Files) != 1 || prepared.Document.Files[0].ID != "F001" {
+		t.Fatalf("relation fallback changed required input or was not reported: %#v", prepared)
+	}
+	if relationRenders == 0 || fallbackRenders != 1 || string(prepared.Prompt) != "{}" {
+		t.Fatalf("relation/fallback renders=%d/%d prompt=%q", relationRenders, fallbackRenders, prepared.Prompt)
+	}
+}
+
+func TestValidatePreservedRejectsRelationContextMutation(t *testing.T) {
+	original := testDocument()
+	original.RelationContext = &RelationContext{Components: []relation.CandidateComponent{{ID: "C001", FileIDs: []string{"F001"}}}}
+	summarized := cloneDocument(original)
+	summarized.RelationContext.Components[0].FileIDs[0] = "F002"
+	if err := ValidatePreserved(original, summarized); err == nil {
+		t.Fatal("summary rewrote relation context")
+	}
+	if original.RelationContext.Components[0].FileIDs[0] != "F001" {
+		t.Fatal("cloned relation context aliases the original document")
+	}
+}
+
+func TestPrepareFallsBackWhenRelationContextIsInvalid(t *testing.T) {
+	document := testDocument()
+	document.RelationContext = &RelationContext{Components: []relation.CandidateComponent{{ID: "C001", FileIDs: []string{"F999"}}}}
+	prepared, err := Prepare(context.Background(), document, BudgetConfig{Context: "8k", MaxContextTokens: Context32K}, JSONRenderer, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !prepared.RelationContextOmitted || prepared.Document.RelationContext != nil || len(prepared.Document.Files) != 1 || prepared.Document.Files[0].ID != "F001" {
+		t.Fatalf("invalid graph fallback changed required file IDs: %#v", prepared)
 	}
 }

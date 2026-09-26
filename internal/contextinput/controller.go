@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/natsuki0413/commiter-cli/internal/relation"
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
 )
 
@@ -39,6 +40,7 @@ type Prepared struct {
 	EvidenceReductionDuration time.Duration      `json:"-"`
 	EvidenceBeforeBytes       int                `json:"evidence_before_bytes"`
 	EvidenceAfterBytes        int                `json:"evidence_after_bytes"`
+	RelationContextOmitted    bool               `json:"relation_context_omitted,omitempty"`
 }
 
 // Prepare renders and measures the exact final prompt. Oversized input is
@@ -48,6 +50,13 @@ type Prepared struct {
 func Prepare(ctx context.Context, document Document, config BudgetConfig, render Renderer, summarizer Summarizer) (Prepared, error) {
 	if render == nil {
 		return Prepared{}, errors.New("prompt renderer is required")
+	}
+	if err := validateRelationContext(document); err != nil {
+		fallbackDocument := cloneDocument(document)
+		fallbackDocument.RelationContext = nil
+		prepared, fallbackErr := Prepare(ctx, fallbackDocument, config, render, summarizer)
+		prepared.RelationContextOmitted = true
+		return prepared, fallbackErr
 	}
 	original := cloneDocument(document)
 	current := cloneDocument(document)
@@ -196,6 +205,13 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 		result := progress(SummaryChunk, compressionProfile, summaryCount)
 		result.EvidenceReductionDuration = time.Since(started)
 		if errors.Is(err, ErrTooLarge) {
+			if original.RelationContext != nil {
+				fallbackDocument := cloneDocument(document)
+				fallbackDocument.RelationContext = nil
+				fallback, fallbackErr := Prepare(ctx, fallbackDocument, config, render, summarizer)
+				fallback.RelationContextOmitted = true
+				return fallback, fallbackErr
+			}
 			return result, ErrTooLarge
 		}
 		return result, fmt.Errorf("evidence reduction failed: %w", err)
@@ -252,6 +268,30 @@ func evidencePrepared(document Document, prompt []byte, budget Budget, stage Sum
 
 func cloneDocument(document Document) Document {
 	clone := document
+	if document.RelationContext != nil {
+		relations := *document.RelationContext
+		relations.Components = make([]relation.CandidateComponent, len(document.RelationContext.Components))
+		for i, component := range document.RelationContext.Components {
+			relations.Components[i] = component
+			relations.Components[i].FileIDs = append([]string(nil), component.FileIDs...)
+		}
+		relations.Edges = append([]relation.Relation(nil), document.RelationContext.Edges...)
+		for i := range relations.Edges {
+			if relations.Edges[i].Score != nil {
+				score := *relations.Edges[i].Score
+				relations.Edges[i].Score = &score
+			}
+		}
+		relations.Hints = make([]relation.Hint, len(document.RelationContext.Hints))
+		for i, hint := range document.RelationContext.Hints {
+			relations.Hints[i] = hint
+			relations.Hints[i].FileIDs = append([]string(nil), hint.FileIDs...)
+		}
+		relations.ReductionReasons = append([]relation.ReductionReason(nil), document.RelationContext.ReductionReasons...)
+		relations.Statistics.ObservationsByKind = cloneMap(document.RelationContext.Statistics.ObservationsByKind)
+		relations.Statistics.ObservationsByOutcome = cloneMap(document.RelationContext.Statistics.ObservationsByOutcome)
+		clone.RelationContext = &relations
+	}
 	clone.Files = make([]File, len(document.Files))
 	for i, file := range document.Files {
 		clone.Files[i] = file
@@ -269,6 +309,17 @@ func cloneDocument(document Document) Document {
 		}
 	}
 	return clone
+}
+
+func cloneMap[K comparable, V any](value map[K]V) map[K]V {
+	if value == nil {
+		return nil
+	}
+	cloned := make(map[K]V, len(value))
+	for key, item := range value {
+		cloned[key] = item
+	}
+	return cloned
 }
 
 func cloneString(value *string) *string {
