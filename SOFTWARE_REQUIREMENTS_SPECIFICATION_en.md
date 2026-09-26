@@ -207,6 +207,8 @@ Structural evidence itself must not include relationship labels or grouping reco
 
 A separate internal API may derive relations between file IDs within one Git snapshot from Git renames, matching source/test paths, direct imports between changed files, identifier names observed at changed locations, shared directories, and known manifest/lockfile pairs. File IDs are not persistent across runs. A relation carries a kind, hard/soft classification, and machine-readable evidence. A rename is a hard self-relation for the single file ID that holds both paths; all other initial relations are soft. Identifier-name matches do not mean symbols were resolved. Ambiguous, unresolved, and unsupported extraction attempts are retained as diagnostic data separately from relations and are not relation edges. Shared-directory proximity is a grouped auxiliary hint and is not expanded into pairwise edges. Connecting this internal API to planning input or final grouping is a later specification change.
 
+The internal candidate graph retains every changed file ID as a node and represents extracted relations as directed edges. It can build forward/reverse indexes for edges and candidate components from edge connectivity. Components bound the candidate space and retain isolated files. Shared-directory hints do not connect components; a Git rename is retained as path metadata on its existing node and does not create a self-edge. Candidate pair totals, reductions, and reduction reasons are recorded for diagnostics.
+
 ### FR-006 Input Size Control
 
 The CLI must prioritize structural evidence and required diff hunks when constructing LLM input.
