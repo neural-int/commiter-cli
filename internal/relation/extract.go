@@ -301,7 +301,12 @@ func importObservations(file File) []importObservation {
 	}
 	bySpec := make(map[string]importObservation)
 	for _, evidence := range analysis.Evidence {
-		if (evidence.Role != "import" && evidence.Kind != "use_declaration") || evidence.EndByte <= evidence.StartByte || int(evidence.EndByte) > len(file.Content) {
+		switch evidence.Kind {
+		case "import_statement", "import_spec", "import_from_statement", "use_declaration":
+		default:
+			continue
+		}
+		if evidence.EndByte <= evidence.StartByte || int(evidence.EndByte) > len(file.Content) {
 			continue
 		}
 		span := strings.TrimSpace(string(file.Content[evidence.StartByte:evidence.EndByte]))

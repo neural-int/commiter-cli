@@ -85,9 +85,21 @@ func TestDirectImportUsesObservedSyntaxAndUniqueChangedTarget(t *testing.T) {
 	if !has(got.Relations, "F001", "F002", DirectImport, Soft) {
 		t.Fatalf("missing import relation: %#v", got.Relations)
 	}
+	importCount := 0
 	for _, relation := range got.Relations {
-		if relation.Kind == DirectImport && relation.Evidence != (Evidence{"import_path", "./helper", "import_statement"}) {
-			t.Fatalf("unexpected import evidence: %#v", relation)
+		if relation.Kind == DirectImport {
+			importCount++
+			if relation.Evidence != (Evidence{"import_path", "./helper", "import_statement"}) {
+				t.Fatalf("unexpected import evidence: %#v", relation)
+			}
+		}
+	}
+	if importCount != 1 {
+		t.Fatalf("direct import relations = %d, want 1: %#v", importCount, got.Relations)
+	}
+	for _, observation := range got.Observations {
+		if observation.Kind == DirectImport && observation.Outcome == Unsupported {
+			t.Fatalf("resolved import also reported unsupported: %#v", got.Observations)
 		}
 	}
 }
