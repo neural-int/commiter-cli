@@ -2,7 +2,8 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-build_root="${RUNNER_TEMP:?}/commiter-mlx-xcode"
+runner_temp="${RUNNER_TEMP:-${TMPDIR:-/tmp}}"
+build_root="$runner_temp/commiter-mlx-xcode"
 products="$build_root/Build/Products/Release"
 
 (
