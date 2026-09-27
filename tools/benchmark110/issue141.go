@@ -302,20 +302,24 @@ func issue141RunTwoPass(ctx context.Context, backend llm.OptionsBackend, prepare
 		row.Failure = "semantic_grouping"
 		return
 	}
-	system, prompt, schema, err = issue141Pass2Input(prepared, partition.Groups, item.language)
+	issue141FinishPass2(ctx, backend, prepared, ids, item, partition.Groups, row)
+}
+
+func issue141FinishPass2(ctx context.Context, backend llm.OptionsBackend, prepared contextinput.Prepared, ids []string, item fixture, groups []issue141Group, row *issue141Row) {
+	system, prompt, schema, err := issue141Pass2Input(prepared, groups, item.language)
 	if err != nil {
 		row.Pass2Failure, row.Failure = "input_error", "input_error"
 		return
 	}
 	row.Pass2PromptBytes = len(system) + len(prompt)
-	response, err = issue141Call(ctx, backend, []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: string(prompt)}}, schema, prepared, row)
+	response, err := issue141Call(ctx, backend, []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: string(prompt)}}, schema, prepared, row)
 	row.Pass2Calls++
 	if err != nil {
 		row.Pass2Failure = row.Requests[len(row.Requests)-1].StopReason
 	} else if response.StopReason != "" && response.StopReason != "completed" {
 		row.Pass2Failure = response.StopReason
 	} else {
-		row.Pass2Failure = issue141ValidateMetadata([]byte(response.Content), partition.Groups, ids, item.language)
+		row.Pass2Failure = issue141ValidateMetadata([]byte(response.Content), groups, ids, item.language)
 	}
 	if row.Pass2Failure != "" {
 		row.Failure = row.Pass2Failure
@@ -325,6 +329,14 @@ func issue141RunTwoPass(ctx context.Context, backend llm.OptionsBackend, prepare
 }
 
 func runIssue141(ctx context.Context, options issue140Options) error {
+	return runIssue141Arms(ctx, options, []string{"full", "grouping-first"})
+}
+
+func runIssue141FileCentric(ctx context.Context, options issue140Options) error {
+	return runIssue141Arms(ctx, options, []string{"full", "grouping-first", "file-centric"})
+}
+
+func runIssue141Arms(ctx context.Context, options issue140Options, variants []string) error {
 	var backend llm.OptionsBackend
 	model := ""
 	var err error
@@ -342,9 +354,11 @@ func runIssue141(ctx context.Context, options issue140Options) error {
 		}
 		matched = true
 		for run := 1; run <= options.repeats; run++ {
-			arms := []string{"full", "grouping-first"}
+			arms := append([]string(nil), variants...)
 			if run%2 == 0 {
-				arms[0], arms[1] = arms[1], arms[0]
+				for i, j := 0, len(arms)-1; i < j; i, j = i+1, j-1 {
+					arms[i], arms[j] = arms[j], arms[i]
+				}
 			}
 			for _, arm := range arms {
 				prepared, ids, err := issue140Prepare(ctx, item, issue140ManyArms[5], options.outputBudget)
@@ -352,8 +366,12 @@ func runIssue141(ctx context.Context, options issue140Options) error {
 					return fmt.Errorf("%s: %w", item.name, err)
 				}
 				row := issue141Row{issue140Row: issue140Row{Backend: options.backendName, Fixture: item.name, Run: run, Variant: arm, Model: model, PromptBytes: prepared.Budget.PromptBytes, EstimatedInputTokens: prepared.Budget.EstimatedTokens, OutputBudget: prepared.Budget.ReservedOutputTokens, OutputTokens: "unavailable"}}
-				if options.describe && arm == "grouping-first" {
-					system, prompt, _, err := issue141Pass1Input(prepared, ids)
+				if options.describe && arm != "full" {
+					input := issue141Pass1Input
+					if arm == "file-centric" {
+						input = issue141FileCentricInput
+					}
+					system, prompt, _, err := input(prepared, ids)
 					if err != nil {
 						return err
 					}
@@ -387,8 +405,11 @@ func runIssue141(ctx context.Context, options issue140Options) error {
 						for _, request := range measured.requests {
 							row.OutputBytes += request.ResponseBytes
 						}
-					} else {
+					} else if arm == "grouping-first" {
 						issue141RunTwoPass(runCtx, backend, prepared, ids, item, &row)
+						row.RepairCalls = row.Pass1RepairCalls
+					} else {
+						issue141RunFileCentric(runCtx, backend, prepared, ids, item, &row)
 						row.RepairCalls = row.Pass1RepairCalls
 					}
 					row.WallMS = milliseconds(time.Since(start))
