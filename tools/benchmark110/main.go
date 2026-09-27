@@ -205,6 +205,7 @@ func main() {
 	describe := flag.Bool("describe", false, "print fixture sizes without calling a backend")
 	compareRelations := flag.Bool("compare-relations", false, "measure Issue #128 fixtures before and after candidate relation context")
 	issue140 := flag.Bool("issue140", false, "measure Issue #140 relation input ablations")
+	issue141 := flag.Bool("issue141", false, "measure Issue #141 grouping-first two-pass planner")
 	issue140Probe := flag.String("issue140-probe", "ablation", "Issue #140 probe: ablation, guidance-statistics, grouping, atomicity, intents, or correction")
 	prepareModel := flag.Bool("prepare-mlx-model", false, "download the pinned MLX model")
 	helpPath := flag.String("helper", "", "MLX helper executable")
@@ -244,6 +245,13 @@ func main() {
 			err = fmt.Errorf("unknown Issue #140 probe %q", *issue140Probe)
 		}
 		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+	if *issue141 {
+		if err := runIssue141(ctx, issue140Options{backendName: *backendName, fixtureName: *fixtureName, repeats: *repeats, outputBudget: *outputBudget, timeout: *timeout, describe: *describe, helper: *helpPath, ollamaModel: *ollamaModel, modelSpec: spec}); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
