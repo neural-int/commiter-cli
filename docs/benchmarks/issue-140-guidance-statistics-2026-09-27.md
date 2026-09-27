@@ -26,6 +26,8 @@
 
 ## 再実行
 
+正解 grouping を付けた追加比較は[grouping 検証](issue-140-grouping-2026-09-27.md)を参照。
+
 既存のローカル model と Release helper を用いる。`<helper-path>` は上記 SHA-256 のバイナリのパスに置き換える。
 
 ```sh
