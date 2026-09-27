@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/natsuki0413/commiter-cli/internal/planning"
 )
 
 func TestIssue140AblationChangesOnlySelectedFields(t *testing.T) {
@@ -138,6 +141,59 @@ func TestIssue140GroupingFixturesAndProductionArm(t *testing.T) {
 		if mixed.reference[0][i] != fmt.Sprintf("F%03d", 2*i+1) || mixed.reference[1][i] != fmt.Sprintf("F%03d", 2*i+2) || !strings.Contains(mixed.files[2*i].path, "login_rule") || !strings.Contains(mixed.files[2*i+1].path, "report_rule") {
 			t.Fatalf("mixed pair %d does not match preregistered labels", i)
 		}
+	}
+}
+
+func TestIssue140AtomicityPromptChangesOnlyGrouping(t *testing.T) {
+	fixtures := issue140AtomicityFixtures()
+	if len(fixtures) != 6 || len(issue140AtomicityArms) != 2 {
+		t.Fatalf("atomicity probe has %d fixtures and %d arms", len(fixtures), len(issue140AtomicityArms))
+	}
+	for _, item := range fixtures {
+		full, ids, err := issue140Prepare(context.Background(), item, issue140AtomicityArms[0], 1024)
+		if err != nil {
+			t.Fatalf("%s full: %v", item.name, err)
+		}
+		atomic, atomicIDs, err := issue140Prepare(context.Background(), item, issue140AtomicityArms[1], 1024)
+		if err != nil {
+			t.Fatalf("%s atomicity: %v", item.name, err)
+		}
+		if len(ids) != len(atomicIDs) || len(ids) != len(item.files) {
+			t.Fatalf("%s file IDs changed", item.name)
+		}
+		var original, changed struct {
+			Task                    json.RawMessage      `json:"task"`
+			TrustBoundary           json.RawMessage      `json:"trust_boundary"`
+			RelationContextGuidance json.RawMessage      `json:"relation_context_guidance,omitempty"`
+			Constraints             planning.Constraints `json:"constraints"`
+			RepositoryInput         json.RawMessage      `json:"repository_input"`
+		}
+		if err := json.Unmarshal(full.Prompt, &original); err != nil {
+			t.Fatal(err)
+		}
+		if err := json.Unmarshal(atomic.Prompt, &changed); err != nil {
+			t.Fatal(err)
+		}
+		if changed.Constraints.Grouping != original.Constraints.Grouping+" "+issue140AtomicitySentence {
+			t.Errorf("%s grouping does not contain only the new sentence", item.name)
+		}
+		changed.Constraints.Grouping = original.Constraints.Grouping
+		restored, err := json.Marshal(changed)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !bytes.Equal(restored, full.Prompt) {
+			t.Errorf("%s prompt changed beyond grouping", item.name)
+		}
+		if atomic.Budget.PromptBytes <= full.Budget.PromptBytes || atomic.Budget.ReservedOutputTokens != full.Budget.ReservedOutputTokens {
+			t.Errorf("%s prompt budget did not follow the new sentence", item.name)
+		}
+	}
+	if fixtures[4].name != "holdout_split" || !sameGroups(fixtures[4].reference, [][]string{{"F001", "F002"}, {"F003", "F004"}}) {
+		t.Fatal("split holdout labels changed")
+	}
+	if fixtures[5].name != "holdout_join" || !sameGroups(fixtures[5].reference, [][]string{{"F001", "F002", "F003"}}) {
+		t.Fatal("join holdout labels changed")
 	}
 }
 

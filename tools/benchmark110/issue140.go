@@ -17,6 +17,7 @@ import (
 type issue140Arm struct {
 	name                                           string
 	components, hints, guidance, statistics, edges bool
+	atomicity                                      bool
 }
 
 var issue140ManyArms = []issue140Arm{
@@ -46,6 +47,12 @@ var issue140GroupingArms = []issue140Arm{
 	issue140GuidanceArms[3],
 	issue140ManyArms[5], // production-valid full relation context
 }
+var issue140AtomicityArms = []issue140Arm{
+	issue140ManyArms[5],
+	{name: "full+atomicity", atomicity: true},
+}
+
+const issue140AtomicitySentence = "Put files with independent change purposes in separate commits."
 
 func issue140GroupingFixtures() []fixture {
 	selected := make([]fixture, 0, 4)
@@ -66,6 +73,22 @@ func issue140GroupingFixtures() []fixture {
 		report = append(report, fmt.Sprintf("F%03d", 2*i))
 	}
 	return append(selected, fixture{name: "mixed_24", language: planning.English, files: files, reference: [][]string{login, report}})
+}
+
+func issue140AtomicityFixtures() []fixture {
+	return append(issue140GroupingFixtures(),
+		fixture{name: "holdout_split", language: planning.English, files: []fileSpec{
+			{path: "shared/cache.go", diff: "+func CacheResult(key string) string { return key }\n"},
+			{path: "shared/cache_test.go", diff: "+func TestCacheResult(t *testing.T) { if CacheResult(\"x\") != \"x\" { t.Fatal(\"cache\") } }\n"},
+			{path: "shared/audit.go", diff: "+func RecordAudit(event string) string { return event }\n"},
+			{path: "shared/audit_test.go", diff: "+func TestRecordAudit(t *testing.T) { if RecordAudit(\"login\") != \"login\" { t.Fatal(\"audit\") } }\n"},
+		}, reference: [][]string{{"F001", "F002"}, {"F003", "F004"}}},
+		fixture{name: "holdout_join", language: planning.English, files: []fileSpec{
+			{path: "src/retry.go", diff: "+func RetryFailedRequest() bool { return true }\n"},
+			{path: "src/retry_test.go", diff: "+func TestRetryFailedRequest(t *testing.T) { if !RetryFailedRequest() { t.Fatal(\"retry\") } }\n"},
+			{path: "docs/retry.md", diff: "+Document how failed requests are retried.\n"},
+		}, reference: [][]string{{"F001", "F002", "F003"}}},
+	)
 }
 
 type issue140Options struct {
@@ -126,6 +149,38 @@ func issue140Prepare(ctx context.Context, item fixture, arm issue140Arm, outputB
 	full, _, _, err := issue128Prepare(ctx, item, true, outputBudget)
 	if err != nil {
 		return contextinput.Prepared{}, nil, err
+	}
+	if arm.atomicity {
+		system, err := planning.InitialSystemMessage(ids)
+		if err != nil {
+			return contextinput.Prepared{}, nil, err
+		}
+		render := func(document contextinput.Document) ([]byte, error) {
+			prompt, err := planning.Renderer(item.language)(document)
+			if err != nil {
+				return nil, err
+			}
+			var envelope struct {
+				Task                    json.RawMessage      `json:"task"`
+				TrustBoundary           json.RawMessage      `json:"trust_boundary"`
+				RelationContextGuidance json.RawMessage      `json:"relation_context_guidance,omitempty"`
+				Constraints             planning.Constraints `json:"constraints"`
+				RepositoryInput         json.RawMessage      `json:"repository_input"`
+			}
+			if err := json.Unmarshal(prompt, &envelope); err != nil {
+				return nil, err
+			}
+			envelope.Constraints.Grouping += " " + issue140AtomicitySentence
+			return json.Marshal(envelope)
+		}
+		prepared, err := contextinput.Prepare(ctx, full.Document, contextinput.BudgetConfig{Context: "64k", MaxContextTokens: contextinput.Context64K, PromptOverheadBytes: len(system)}, render, nil)
+		if err != nil {
+			return contextinput.Prepared{}, nil, err
+		}
+		if outputBudget > 0 {
+			prepared.Budget.ReservedOutputTokens = outputBudget
+		}
+		return prepared, ids, nil
 	}
 	if arm.name == "full" {
 		return full, ids, nil
@@ -331,12 +386,14 @@ func runIssue140(ctx context.Context, options issue140Options) error {
 	items := issue128Fixtures(options.manyFileCount)
 	if options.probe == "grouping" {
 		items = issue140GroupingFixtures()
+	} else if options.probe == "atomicity" {
+		items = issue140AtomicityFixtures()
 	}
 	for _, item := range items {
 		if options.fixtureName != "all" && options.fixtureName != item.name {
 			continue
 		}
-		if options.probe != "grouping" && (item.name == "relation_diagnostics" || item.name == "rename" || item.name == "japanese" || item.name == "same_directory_independent") {
+		if options.probe != "grouping" && options.probe != "atomicity" && (item.name == "relation_diagnostics" || item.name == "rename" || item.name == "japanese" || item.name == "same_directory_independent") {
 			continue
 		}
 		if options.probe == "guidance-statistics" && item.name != "many_files" {
@@ -346,8 +403,10 @@ func runIssue140(ctx context.Context, options issue140Options) error {
 		arms := issue140EdgeArms
 		if options.probe == "grouping" {
 			arms = issue140GroupingArms
+		} else if options.probe == "atomicity" {
+			arms = issue140AtomicityArms
 		}
-		if item.name == "many_files" {
+		if item.name == "many_files" && options.probe != "atomicity" {
 			arms = issue140ManyArms
 			if options.probe == "guidance-statistics" {
 				arms = issue140GuidanceArms
