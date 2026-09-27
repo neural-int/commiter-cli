@@ -203,6 +203,7 @@ func main() {
 	manyFileCount := flag.Int("many-file-count", 24, "number of independent files in many_files")
 	timeout := flag.Duration("timeout", 5*time.Minute, "deadline for each planning run")
 	describe := flag.Bool("describe", false, "print fixture sizes without calling a backend")
+	compareRelations := flag.Bool("compare-relations", false, "measure Issue #128 fixtures before and after candidate relation context")
 	prepareModel := flag.Bool("prepare-mlx-model", false, "download the pinned MLX model")
 	helpPath := flag.String("helper", "", "MLX helper executable")
 	ollamaModel := flag.String("ollama-model", config.Defaults().Values.Model, "Ollama model tag")
@@ -221,6 +222,13 @@ func main() {
 	if *repeats < 1 || *outputBudget < 0 || *timeout <= 0 || *manyFileCount < 1 || *manyFileCount > 100 {
 		fmt.Fprintln(os.Stderr, "invalid repeats, output-tokens, timeout, or many-file-count")
 		os.Exit(2)
+	}
+	if *compareRelations {
+		if err := runIssue128(ctx, issue128Options{backendName: *backendName, fixtureName: *fixtureName, repeats: *repeats, outputBudget: *outputBudget, manyFileCount: *manyFileCount, timeout: *timeout, describe: *describe, helper: *helpPath, ollamaModel: *ollamaModel, modelSpec: spec}); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
 	}
 	var backend llm.OptionsBackend
 	var model string
