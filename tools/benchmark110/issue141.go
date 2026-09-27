@@ -406,3 +406,117 @@ func runIssue141(ctx context.Context, options issue140Options) error {
 	}
 	return nil
 }
+
+// This supplementary probe uses the preregistered oracle groups to measure
+// Pass 2 independently of Pass 1 failures. It is not an end-to-end success.
+func runIssue141MetadataProbe(ctx context.Context, options issue140Options) error {
+	var backend llm.OptionsBackend
+	model := ""
+	var err error
+	if !options.describe {
+		backend, model, err = openBackend(options.backendName, options.helper, options.ollamaModel, options.modelSpec)
+		if err != nil {
+			return err
+		}
+	}
+	items := issue140AtomicityFixtures()
+	for _, item := range issue128Fixtures(24) {
+		if item.name == "japanese" {
+			items = append(items, item)
+		}
+	}
+	encoder := json.NewEncoder(os.Stdout)
+	matched := false
+	for _, item := range items {
+		switch item.name {
+		case "multi_commit", "mixed_24", "holdout_split", "japanese":
+		default:
+			continue
+		}
+		if options.fixtureName != "all" && options.fixtureName != item.name {
+			continue
+		}
+		matched = true
+		prepared, ids, err := issue140Prepare(ctx, item, issue140ManyArms[5], options.outputBudget)
+		if err != nil {
+			return fmt.Errorf("%s: %w", item.name, err)
+		}
+		groups := make([]issue141Group, len(item.reference))
+		for i, fileIDs := range item.reference {
+			groups[i] = issue141Group{GroupID: fmt.Sprintf("G%d", i+1), FileIDs: append([]string(nil), fileIDs...)}
+		}
+		for run := 1; run <= options.repeats; run++ {
+			arms := []string{"batch", "per-group"}
+			if run%2 == 0 {
+				arms[0], arms[1] = arms[1], arms[0]
+			}
+			for _, arm := range arms {
+				row := issue141Row{issue140Row: issue140Row{Backend: options.backendName, Fixture: item.name, Run: run, Variant: "metadata-" + arm + "-oracle", Model: model, OutputBudget: prepared.Budget.ReservedOutputTokens, OutputTokens: "unavailable"}}
+				row.CompleteAssignment = true
+				for _, group := range groups {
+					row.Groups = append(row.Groups, group.FileIDs)
+				}
+				issue140Score(&row.issue140Row, row.Groups, item.reference)
+				requestGroups := [][]issue141Group{groups}
+				if arm == "per-group" {
+					requestGroups = make([][]issue141Group, len(groups))
+					for i := range groups {
+						requestGroups[i] = groups[i : i+1]
+					}
+				}
+				var metadata []issue141Metadata
+				start := time.Now()
+				runCtx, cancel := context.WithTimeout(ctx, options.timeout)
+				for _, selected := range requestGroups {
+					system, prompt, schema, err := issue141Pass2Input(prepared, selected, item.language)
+					if err != nil {
+						row.Pass2Failure = "input_error"
+						break
+					}
+					row.Pass2PromptBytes += len(system) + len(prompt)
+					if options.describe {
+						continue
+					}
+					response, err := issue141Call(runCtx, backend, []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: string(prompt)}}, schema, prepared, &row)
+					row.Pass2Calls++
+					if err != nil {
+						row.Pass2Failure = row.Requests[len(row.Requests)-1].StopReason
+						break
+					}
+					if response.StopReason != "" && response.StopReason != "completed" {
+						row.Pass2Failure = response.StopReason
+						break
+					}
+					var output issue141MetadataOutput
+					if row.Pass2Failure = issue141Decode([]byte(response.Content), &output); row.Pass2Failure != "" {
+						break
+					}
+					metadata = append(metadata, output.Metadata...)
+				}
+				cancel()
+				row.PromptBytes = row.Pass2PromptBytes
+				row.EstimatedInputTokens = issue140EstimatedTokens(row.PromptBytes, len(ids))
+				if !options.describe {
+					row.WallMS = milliseconds(time.Since(start))
+					row.OutputTokens = issue140OutputTokens(row.Requests)
+					if row.Pass2Failure == "" {
+						encoded, err := json.Marshal(issue141MetadataOutput{Metadata: metadata})
+						if err != nil {
+							return err
+						}
+						row.Pass2Failure = issue141ValidateMetadata(encoded, groups, ids, item.language)
+					}
+					row.Failure = row.Pass2Failure
+					row.Succeeded = row.Pass2Failure == ""
+				}
+				if err := encoder.Encode(row); err != nil {
+					return err
+				}
+			}
+		}
+	}
+	if !matched {
+		return fmt.Errorf("unknown Issue #141 metadata fixture %q", options.fixtureName)
+	}
+	return nil
+}
