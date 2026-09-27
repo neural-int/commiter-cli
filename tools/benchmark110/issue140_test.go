@@ -18,7 +18,7 @@ func TestIssue140AblationChangesOnlySelectedFields(t *testing.T) {
 	if many.name == "" {
 		t.Fatal("many_files fixture missing")
 	}
-	for _, arm := range issue140ManyArms {
+	for _, arm := range append(append([]issue140Arm{}, issue140ManyArms...), issue140GuidanceArms...) {
 		prepared, _, err := issue140Prepare(context.Background(), many, arm, 1024)
 		if err != nil {
 			t.Fatalf("%s: %v", arm.name, err)
@@ -49,7 +49,7 @@ func TestIssue140AblationChangesOnlySelectedFields(t *testing.T) {
 		for key, want := range map[string]bool{
 			"candidate_components": arm.components,
 			"auxiliary_hints":      arm.hints,
-			"statistics":           arm.guidance,
+			"statistics":           arm.statistics,
 			"relations":            arm.edges,
 		} {
 			_, got := relation[key]
@@ -74,7 +74,7 @@ func TestIssue140FullMatchesIssue128Prompt(t *testing.T) {
 		if item.name == "relation_diagnostics" || item.name == "rename" {
 			continue
 		}
-		prepared, _, err := issue140Prepare(context.Background(), item, issue140Arm{name: "full", components: true, hints: true, guidance: true, edges: true}, 1024)
+		prepared, _, err := issue140Prepare(context.Background(), item, issue140Arm{name: "full", components: true, hints: true, guidance: true, statistics: true, edges: true}, 1024)
 		if err != nil {
 			t.Fatalf("%s: %v", item.name, err)
 		}
@@ -85,6 +85,30 @@ func TestIssue140FullMatchesIssue128Prompt(t *testing.T) {
 		if string(prepared.Prompt) != string(original.Prompt) {
 			t.Errorf("%s: full arm differs from Issue #128", item.name)
 		}
+	}
+}
+
+func TestIssue140GuidanceStatisticsMatchesPriorArm(t *testing.T) {
+	var many fixture
+	for _, item := range issue128Fixtures(24) {
+		if item.name == "many_files" {
+			many = item
+			break
+		}
+	}
+	if many.name == "" {
+		t.Fatal("many_files fixture missing")
+	}
+	prior, _, err := issue140Prepare(context.Background(), many, issue140ManyArms[3], 1024)
+	if err != nil {
+		t.Fatal(err)
+	}
+	current, _, err := issue140Prepare(context.Background(), many, issue140GuidanceArms[3], 1024)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(current.Prompt) != string(prior.Prompt) {
+		t.Error("guidance+statistics prompt differs from the prior guidance-stats-only arm")
 	}
 }
 

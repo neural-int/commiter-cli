@@ -15,23 +15,29 @@ import (
 )
 
 type issue140Arm struct {
-	name                               string
-	components, hints, guidance, edges bool
+	name                                           string
+	components, hints, guidance, statistics, edges bool
 }
 
 var issue140ManyArms = []issue140Arm{
 	{name: "baseline"},
 	{name: "component-list-only", components: true},
 	{name: "directory-hint-only", hints: true},
-	{name: "guidance-stats-only", guidance: true},
-	{name: "components+guidance", components: true, guidance: true},
-	{name: "full", components: true, hints: true, guidance: true, edges: true},
+	{name: "guidance-stats-only", guidance: true, statistics: true},
+	{name: "components+guidance", components: true, guidance: true, statistics: true},
+	{name: "full", components: true, hints: true, guidance: true, statistics: true, edges: true},
+}
+var issue140GuidanceArms = []issue140Arm{
+	{name: "baseline"},
+	{name: "guidance-only", guidance: true},
+	{name: "statistics-only", statistics: true},
+	{name: "guidance+statistics", guidance: true, statistics: true},
 }
 var issue140EdgeArms = []issue140Arm{
 	{name: "baseline"},
 	{name: "component-only", components: true},
-	{name: "edge-enabled", components: true, guidance: true, edges: true},
-	{name: "full", components: true, hints: true, guidance: true, edges: true},
+	{name: "edge-enabled", components: true, guidance: true, statistics: true, edges: true},
+	{name: "full", components: true, hints: true, guidance: true, statistics: true, edges: true},
 }
 
 type issue140Options struct {
@@ -126,7 +132,7 @@ func issue140Prepare(ctx context.Context, item fixture, arm issue140Arm, outputB
 	if arm.edges {
 		selected.Edges = relation["relations"]
 	}
-	if arm.guidance {
+	if arm.statistics {
 		selected.Statistics = relation["statistics"]
 	}
 	selectedBytes, err := json.Marshal(selected)
@@ -301,10 +307,16 @@ func runIssue140(ctx context.Context, options issue140Options) error {
 		if item.name == "relation_diagnostics" || item.name == "rename" || item.name == "japanese" || item.name == "same_directory_independent" {
 			continue
 		}
+		if options.probe == "guidance-statistics" && item.name != "many_files" {
+			continue
+		}
 		matched = true
 		arms := issue140EdgeArms
 		if item.name == "many_files" {
 			arms = issue140ManyArms
+			if options.probe == "guidance-statistics" {
+				arms = issue140GuidanceArms
+			}
 		}
 		for run := 1; run <= options.repeats; run++ {
 			ordered := append([]issue140Arm(nil), arms...)
