@@ -39,6 +39,34 @@ var issue140EdgeArms = []issue140Arm{
 	{name: "edge-enabled", components: true, guidance: true, statistics: true, edges: true},
 	{name: "full", components: true, hints: true, guidance: true, statistics: true, edges: true},
 }
+var issue140GroupingArms = []issue140Arm{
+	issue140GuidanceArms[0],
+	issue140GuidanceArms[1],
+	issue140GuidanceArms[2],
+	issue140GuidanceArms[3],
+	issue140ManyArms[5], // production-valid full relation context
+}
+
+func issue140GroupingFixtures() []fixture {
+	selected := make([]fixture, 0, 4)
+	for _, item := range issue128Fixtures(24) {
+		switch item.name {
+		case "multi_commit", "cross_directory", "same_directory_independent":
+			selected = append(selected, item)
+		}
+	}
+	login, report := make([]string, 0, 12), make([]string, 0, 12)
+	files := make([]fileSpec, 0, 24)
+	for i := 1; i <= 12; i++ {
+		files = append(files,
+			fileSpec{path: fmt.Sprintf("shared/login_rule%02d.go", i), diff: fmt.Sprintf("+func LoginRule%02d() bool { return true }\n", i)},
+			fileSpec{path: fmt.Sprintf("shared/report_rule%02d.go", i), diff: fmt.Sprintf("+func ReportRule%02d() bool { return true }\n", i)},
+		)
+		login = append(login, fmt.Sprintf("F%03d", 2*i-1))
+		report = append(report, fmt.Sprintf("F%03d", 2*i))
+	}
+	return append(selected, fixture{name: "mixed_24", language: planning.English, files: files, reference: [][]string{login, report}})
+}
 
 type issue140Options struct {
 	backendName, fixtureName, helper, ollamaModel, probe string
@@ -300,11 +328,15 @@ func runIssue140(ctx context.Context, options issue140Options) error {
 	}
 	encoder := json.NewEncoder(os.Stdout)
 	matched := false
-	for _, item := range issue128Fixtures(options.manyFileCount) {
+	items := issue128Fixtures(options.manyFileCount)
+	if options.probe == "grouping" {
+		items = issue140GroupingFixtures()
+	}
+	for _, item := range items {
 		if options.fixtureName != "all" && options.fixtureName != item.name {
 			continue
 		}
-		if item.name == "relation_diagnostics" || item.name == "rename" || item.name == "japanese" || item.name == "same_directory_independent" {
+		if options.probe != "grouping" && (item.name == "relation_diagnostics" || item.name == "rename" || item.name == "japanese" || item.name == "same_directory_independent") {
 			continue
 		}
 		if options.probe == "guidance-statistics" && item.name != "many_files" {
@@ -312,6 +344,9 @@ func runIssue140(ctx context.Context, options issue140Options) error {
 		}
 		matched = true
 		arms := issue140EdgeArms
+		if options.probe == "grouping" {
+			arms = issue140GroupingArms
+		}
 		if item.name == "many_files" {
 			arms = issue140ManyArms
 			if options.probe == "guidance-statistics" {

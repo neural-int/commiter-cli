@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -109,6 +110,34 @@ func TestIssue140GuidanceStatisticsMatchesPriorArm(t *testing.T) {
 	}
 	if string(current.Prompt) != string(prior.Prompt) {
 		t.Error("guidance+statistics prompt differs from the prior guidance-stats-only arm")
+	}
+}
+
+func TestIssue140GroupingFixturesAndProductionArm(t *testing.T) {
+	fixtures := issue140GroupingFixtures()
+	if len(fixtures) != 4 || len(issue140GroupingArms) != 5 {
+		t.Fatalf("grouping probe has %d fixtures and %d arms", len(fixtures), len(issue140GroupingArms))
+	}
+	wantNames := []string{"multi_commit", "cross_directory", "same_directory_independent", "mixed_24"}
+	wantGroups := []int{2, 1, 2, 2}
+	for i, item := range fixtures {
+		if item.name != wantNames[i] || len(item.reference) != wantGroups[i] {
+			t.Fatalf("fixture %d: name=%s groups=%d", i, item.name, len(item.reference))
+		}
+		for _, arm := range issue140GroupingArms {
+			if _, _, err := issue140Prepare(context.Background(), item, arm, 1024); err != nil {
+				t.Fatalf("%s %s: %v", item.name, arm.name, err)
+			}
+		}
+	}
+	mixed := fixtures[3]
+	if len(mixed.files) != 24 || len(mixed.reference[0]) != 12 || len(mixed.reference[1]) != 12 {
+		t.Fatalf("mixed fixture shape: files=%d groups=%v", len(mixed.files), mixed.reference)
+	}
+	for i := 0; i < 12; i++ {
+		if mixed.reference[0][i] != fmt.Sprintf("F%03d", 2*i+1) || mixed.reference[1][i] != fmt.Sprintf("F%03d", 2*i+2) || !strings.Contains(mixed.files[2*i].path, "login_rule") || !strings.Contains(mixed.files[2*i+1].path, "report_rule") {
+			t.Fatalf("mixed pair %d does not match preregistered labels", i)
+		}
 	}
 }
 

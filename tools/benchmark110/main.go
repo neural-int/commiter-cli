@@ -205,7 +205,7 @@ func main() {
 	describe := flag.Bool("describe", false, "print fixture sizes without calling a backend")
 	compareRelations := flag.Bool("compare-relations", false, "measure Issue #128 fixtures before and after candidate relation context")
 	issue140 := flag.Bool("issue140", false, "measure Issue #140 relation input ablations")
-	issue140Probe := flag.String("issue140-probe", "ablation", "Issue #140 probe: ablation, guidance-statistics, intents, or correction")
+	issue140Probe := flag.String("issue140-probe", "ablation", "Issue #140 probe: ablation, guidance-statistics, grouping, intents, or correction")
 	prepareModel := flag.Bool("prepare-mlx-model", false, "download the pinned MLX model")
 	helpPath := flag.String("helper", "", "MLX helper executable")
 	ollamaModel := flag.String("ollama-model", config.Defaults().Values.Model, "Ollama model tag")
@@ -236,7 +236,7 @@ func main() {
 		options := issue140Options{backendName: *backendName, fixtureName: *fixtureName, repeats: *repeats, outputBudget: *outputBudget, manyFileCount: *manyFileCount, timeout: *timeout, describe: *describe, helper: *helpPath, ollamaModel: *ollamaModel, modelSpec: spec, probe: *issue140Probe}
 		var err error
 		switch *issue140Probe {
-		case "ablation", "guidance-statistics":
+		case "ablation", "guidance-statistics", "grouping":
 			err = runIssue140(ctx, options)
 		case "intents", "correction":
 			err = runIssue140Intents(ctx, options)
