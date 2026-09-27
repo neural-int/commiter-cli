@@ -204,6 +204,8 @@ func main() {
 	timeout := flag.Duration("timeout", 5*time.Minute, "deadline for each planning run")
 	describe := flag.Bool("describe", false, "print fixture sizes without calling a backend")
 	compareRelations := flag.Bool("compare-relations", false, "measure Issue #128 fixtures before and after candidate relation context")
+	issue140 := flag.Bool("issue140", false, "measure Issue #140 relation input ablations")
+	issue140Probe := flag.String("issue140-probe", "ablation", "Issue #140 probe: ablation, intents, or correction")
 	prepareModel := flag.Bool("prepare-mlx-model", false, "download the pinned MLX model")
 	helpPath := flag.String("helper", "", "MLX helper executable")
 	ollamaModel := flag.String("ollama-model", config.Defaults().Values.Model, "Ollama model tag")
@@ -225,6 +227,23 @@ func main() {
 	}
 	if *compareRelations {
 		if err := runIssue128(ctx, issue128Options{backendName: *backendName, fixtureName: *fixtureName, repeats: *repeats, outputBudget: *outputBudget, manyFileCount: *manyFileCount, timeout: *timeout, describe: *describe, helper: *helpPath, ollamaModel: *ollamaModel, modelSpec: spec}); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+	if *issue140 {
+		options := issue140Options{backendName: *backendName, fixtureName: *fixtureName, repeats: *repeats, outputBudget: *outputBudget, manyFileCount: *manyFileCount, timeout: *timeout, describe: *describe, helper: *helpPath, ollamaModel: *ollamaModel, modelSpec: spec, probe: *issue140Probe}
+		var err error
+		switch *issue140Probe {
+		case "ablation":
+			err = runIssue140(ctx, options)
+		case "intents", "correction":
+			err = runIssue140Intents(ctx, options)
+		default:
+			err = fmt.Errorf("unknown Issue #140 probe %q", *issue140Probe)
+		}
+		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
