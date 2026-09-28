@@ -149,7 +149,11 @@ func issue141ExpandUnits(partition issue141Partition, units []issue141Unit) (iss
 }
 
 func issue141RunHybrid(ctx context.Context, backend llm.OptionsBackend, prepared contextinput.Prepared, ids []string, item fixture, policy string, row *issue141Row) {
-	units, seedEdges, err := issue141HybridUnits(prepared.Document.RelationContext, ids, policy)
+	issue141RunHybridWithContext(ctx, backend, prepared, ids, item, policy, prepared.Document.RelationContext, true, row)
+}
+
+func issue141RunHybridWithContext(ctx context.Context, backend llm.OptionsBackend, prepared contextinput.Prepared, ids []string, item fixture, policy string, selected *contextinput.RelationContext, pass2 bool, row *issue141Row) {
+	units, seedEdges, err := issue141HybridUnits(selected, ids, policy)
 	if err != nil {
 		row.Failure = "seed_error"
 		return
@@ -215,5 +219,9 @@ func issue141RunHybrid(ctx context.Context, backend llm.OptionsBackend, prepared
 		row.Failure = "semantic_grouping"
 		return
 	}
-	issue141FinishPass2(ctx, backend, prepared, ids, item, partition.Groups, row)
+	if pass2 {
+		issue141FinishPass2(ctx, backend, prepared, ids, item, partition.Groups, row)
+	} else {
+		row.Succeeded = true
+	}
 }

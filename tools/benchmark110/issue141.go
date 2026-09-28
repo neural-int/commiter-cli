@@ -354,6 +354,11 @@ func runIssue141Soft(ctx context.Context, options issue140Options) error {
 	return runIssue141ArmsFor(ctx, options, []string{"file-centric", "soft-source-test", "soft-source-test-import"}, items, false)
 }
 
+func runIssue141EdgeDecision(ctx context.Context, options issue140Options) error {
+	items := append(issue140AtomicityFixtures(), issue141GuardrailFixtures()...)
+	return runIssue141ArmsFor(ctx, options, []string{"file-centric", "hybrid-source-test-import", "decision-source-test-import"}, items, false)
+}
+
 func runIssue141Arms(ctx context.Context, options issue140Options, variants []string) error {
 	return runIssue141ArmsFor(ctx, options, variants, issue140AtomicityFixtures(), true)
 }
@@ -413,6 +418,16 @@ func runIssue141ArmsFor(ctx context.Context, options issue140Options, variants [
 						input = func(prepared contextinput.Prepared, _ []string) (string, []byte, json.RawMessage, error) {
 							return issue141HybridInput(prepared, units, unitIDs)
 						}
+					} else if arm == "decision-source-test-import" {
+						candidates, err := issue141SoftCandidates(prepared.Document.RelationContext, ids, "soft-source-test-import")
+						if err != nil {
+							return err
+						}
+						row.CandidateEdges = len(candidates)
+						row.CandidateTruePairs, row.CandidateFalsePairs = issue141CandidatePairCounts(candidates, item.reference)
+						input = func(prepared contextinput.Prepared, ids []string) (string, []byte, json.RawMessage, error) {
+							return issue141DecisionInput(prepared, ids, candidates)
+						}
 					}
 					system, prompt, _, err := input(prepared, ids)
 					if err != nil {
@@ -466,8 +481,11 @@ func runIssue141ArmsFor(ctx context.Context, options issue140Options, variants [
 							return issue141SoftInput(prepared, ids, arm)
 						}, false)
 						row.RepairCalls = row.Pass1RepairCalls
+					} else if arm == "decision-source-test-import" {
+						issue141RunEdgeDecision(runCtx, backend, prepared, ids, item, "soft-source-test-import", &row)
+						row.RepairCalls = row.Pass1RepairCalls
 					} else {
-						issue141RunHybrid(runCtx, backend, prepared, ids, item, arm, &row)
+						issue141RunHybridWithContext(runCtx, backend, prepared, ids, item, arm, prepared.Document.RelationContext, pass2, &row)
 						row.RepairCalls = row.Pass1RepairCalls
 					}
 					row.WallMS = milliseconds(time.Since(start))
@@ -525,9 +543,9 @@ func runIssue141MetadataProbe(ctx context.Context, options issue140Options) erro
 			groups[i] = issue141Group{GroupID: fmt.Sprintf("G%d", i+1), FileIDs: append([]string(nil), fileIDs...)}
 		}
 		for run := 1; run <= options.repeats; run++ {
-			arms := []string{"batch", "per-group"}
+			arms := []string{"batch", "keyed", "per-group"}
 			if run%2 == 0 {
-				arms[0], arms[1] = arms[1], arms[0]
+				arms[0], arms[2] = arms[2], arms[0]
 			}
 			for _, arm := range arms {
 				row := issue141Row{issue140Row: issue140Row{Backend: options.backendName, Fixture: item.name, Run: run, Variant: "metadata-" + arm + "-oracle", Model: model, OutputBudget: prepared.Budget.ReservedOutputTokens, OutputTokens: "unavailable"}}
@@ -547,7 +565,11 @@ func runIssue141MetadataProbe(ctx context.Context, options issue140Options) erro
 				start := time.Now()
 				runCtx, cancel := context.WithTimeout(ctx, options.timeout)
 				for _, selected := range requestGroups {
-					system, prompt, schema, err := issue141Pass2Input(prepared, selected, item.language)
+					input := issue141Pass2Input
+					if arm == "keyed" {
+						input = issue141KeyedMetadataInput
+					}
+					system, prompt, schema, err := input(prepared, selected, item.language)
 					if err != nil {
 						row.Pass2Failure = "input_error"
 						break
@@ -566,6 +588,13 @@ func runIssue141MetadataProbe(ctx context.Context, options issue140Options) erro
 						row.Pass2Failure = response.StopReason
 						break
 					}
+					if arm == "keyed" {
+						row.Pass2Failure = issue141ValidateKeyedMetadata([]byte(response.Content), groups, ids, item.language)
+						if row.Pass2Failure != "" {
+							break
+						}
+						continue
+					}
 					row.MetadataDiagnostics = append(row.MetadataDiagnostics, issue141DiagnoseMetadata([]byte(response.Content), selected))
 					var output issue141MetadataOutput
 					if row.Pass2Failure = issue141Decode([]byte(response.Content), &output); row.Pass2Failure != "" {
@@ -579,7 +608,7 @@ func runIssue141MetadataProbe(ctx context.Context, options issue140Options) erro
 				if !options.describe {
 					row.WallMS = milliseconds(time.Since(start))
 					row.OutputTokens = issue140OutputTokens(row.Requests)
-					if row.Pass2Failure == "" {
+					if row.Pass2Failure == "" && arm != "keyed" {
 						encoded, err := json.Marshal(issue141MetadataOutput{Metadata: metadata})
 						if err != nil {
 							return err
