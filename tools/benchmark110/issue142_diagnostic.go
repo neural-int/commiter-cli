@@ -52,6 +52,10 @@ func issue142Digest(value []byte) string {
 }
 
 func issue142DiagnosticCall(ctx context.Context, backend llm.OptionsBackend, model, backendName, probe, arm string, item fixture, prepared contextinput.Prepared, candidates []issue142Candidate, run, budget int, reverse bool) issue142DiagnosticRow {
+	return issue142DiagnosticCallMode(ctx, backend, model, backendName, probe, arm, item, prepared, candidates, run, budget, reverse, false)
+}
+
+func issue142DiagnosticCallMode(ctx context.Context, backend llm.OptionsBackend, model, backendName, probe, arm string, item fixture, prepared contextinput.Prepared, candidates []issue142Candidate, run, budget int, reverse, forced bool) issue142DiagnosticRow {
 	row := issue142DiagnosticRow{Probe: probe, Fixture: item.name, Run: run, Arm: arm, Backend: backendName, Model: model, OutputBudget: budget, CandidateCount: len(candidates), OutputTokens: "unavailable"}
 	for _, candidate := range candidates {
 		if sameGroups(candidate.Groups, item.reference) {
@@ -59,7 +63,15 @@ func issue142DiagnosticCall(ctx context.Context, backend llm.OptionsBackend, mod
 			row.GoldCandidateID = candidate.ID
 		}
 	}
-	system, prompt, schema, err := issue142SelectionInput(prepared, candidates, reverse)
+	var system string
+	var prompt []byte
+	var schema json.RawMessage
+	var err error
+	if forced {
+		system, prompt, schema, err = issue142ForcedSelectionInput(prepared, candidates, reverse)
+	} else {
+		system, prompt, schema, err = issue142SelectionInput(prepared, candidates, reverse)
+	}
 	if err != nil {
 		row.Failure = "input_error"
 		return row
@@ -101,6 +113,10 @@ func issue142DiagnosticCall(ctx context.Context, backend llm.OptionsBackend, mod
 	}
 	row.SelectedID = selected
 	if selected == "none" {
+		if forced {
+			row.Failure = "forbidden_none"
+			return row
+		}
 		row.None = true
 		row.CorrectSelection = !row.CandidateRecall
 		return row
@@ -120,6 +136,47 @@ func issue142DiagnosticCall(ctx context.Context, backend llm.OptionsBackend, mod
 	}
 	row.Failure = "unknown_candidate_id"
 	return row
+}
+
+func runIssue142ForcedDiagnostic(ctx context.Context, options issue140Options) error {
+	if options.backendName != "mlx" {
+		return fmt.Errorf("Issue #142 forced-choice diagnostic is fixed to MLX")
+	}
+	backend, model, err := openBackend(options.backendName, options.helper, options.ollamaModel, options.modelSpec)
+	if err != nil {
+		return err
+	}
+	encoder := json.NewEncoder(os.Stdout)
+	matched := false
+	for _, name := range issue142DiagnosticFixtures {
+		if options.fixtureName != "all" && options.fixtureName != name {
+			continue
+		}
+		matched = true
+		item, err := issue142FindFixture(name)
+		if err != nil {
+			return err
+		}
+		prepared, _, candidates, err := issue142DiagnosticInputs(ctx, item)
+		if err != nil {
+			return fmt.Errorf("%s: %w", name, err)
+		}
+		if len(candidates) != 2 || !sameGroups(candidates[0].Groups, item.reference) && !sameGroups(candidates[1].Groups, item.reference) {
+			return fmt.Errorf("%s: preregistered candidate assumption failed", name)
+		}
+		for run := 1; run <= 2; run++ {
+			runCtx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+			row := issue142DiagnosticCallMode(runCtx, backend, model, options.backendName, "forced", "two-choice", item, prepared, candidates, run, 2048, run == 2, true)
+			cancel()
+			if err := encoder.Encode(row); err != nil {
+				return err
+			}
+		}
+	}
+	if !matched {
+		return fmt.Errorf("unknown Issue #142 forced-choice fixture %q", options.fixtureName)
+	}
+	return nil
 }
 
 func issue142FindFixture(name string) (fixture, error) {

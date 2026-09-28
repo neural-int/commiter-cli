@@ -207,7 +207,7 @@ func main() {
 	issue140 := flag.Bool("issue140", false, "measure Issue #140 relation input ablations")
 	issue141 := flag.Bool("issue141", false, "measure Issue #141 grouping-first two-pass planner")
 	issue142 := flag.Bool("issue142", false, "measure Issue #142 candidate partition selection")
-	issue142Probe := flag.String("issue142-probe", "comparison", "Issue #142 probe: comparison, budget, or gold")
+	issue142Probe := flag.String("issue142-probe", "comparison", "Issue #142 probe: comparison, budget, gold, or forced")
 	issue141Probe := flag.String("issue141-probe", "comparison", "Issue #141 probe: comparison, file-centric, hybrid, soft, edge-decision, local-boundary, cluster-boundary, or metadata")
 	issue140Probe := flag.String("issue140-probe", "ablation", "Issue #140 probe: ablation, guidance-statistics, grouping, atomicity, intents, or correction")
 	prepareModel := flag.Bool("prepare-mlx-model", false, "download the pinned MLX model")
@@ -263,6 +263,8 @@ func main() {
 			err = runIssue142BudgetDiagnostic(ctx, options)
 		case "gold":
 			err = runIssue142GoldDiagnostic(ctx, options)
+		case "forced":
+			err = runIssue142ForcedDiagnostic(ctx, options)
 		default:
 			err = fmt.Errorf("unknown Issue #142 probe %q", *issue142Probe)
 		}
