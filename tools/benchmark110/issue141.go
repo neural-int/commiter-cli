@@ -49,6 +49,10 @@ type issue141Row struct {
 	Pass1PromptBytes   int      `json:"pass1_prompt_bytes,omitempty"`
 	RepairPromptBytes  int      `json:"pass1_repair_prompt_bytes,omitempty"`
 	Pass2PromptBytes   int      `json:"pass2_prompt_bytes,omitempty"`
+	SeedEdges          int      `json:"seed_edges,omitempty"`
+	SeedUnits          int      `json:"seed_units,omitempty"`
+	SeedTruePairs      int      `json:"seed_true_pairs,omitempty"`
+	SeedFalsePairs     int      `json:"seed_false_pairs,omitempty"`
 }
 
 func issue141PartitionSchema(ids []string) json.RawMessage {
@@ -336,6 +340,10 @@ func runIssue141FileCentric(ctx context.Context, options issue140Options) error 
 	return runIssue141Arms(ctx, options, []string{"full", "grouping-first", "file-centric"})
 }
 
+func runIssue141Hybrid(ctx context.Context, options issue140Options) error {
+	return runIssue141Arms(ctx, options, []string{"file-centric", "hybrid-source-test", "hybrid-source-test-import"})
+}
+
 func runIssue141Arms(ctx context.Context, options issue140Options, variants []string) error {
 	var backend llm.OptionsBackend
 	model := ""
@@ -370,6 +378,17 @@ func runIssue141Arms(ctx context.Context, options issue140Options, variants []st
 					input := issue141Pass1Input
 					if arm == "file-centric" {
 						input = issue141FileCentricInput
+					} else if arm == "hybrid-source-test" || arm == "hybrid-source-test-import" {
+						units, seedEdges, err := issue141HybridUnits(prepared.Document.RelationContext, ids, arm)
+						if err != nil {
+							return err
+						}
+						row.SeedEdges, row.SeedUnits = seedEdges, len(units)
+						row.SeedTruePairs, row.SeedFalsePairs = issue141SeedPairCounts(units, item.reference)
+						unitIDs := issue141UnitIDs(units)
+						input = func(prepared contextinput.Prepared, _ []string) (string, []byte, json.RawMessage, error) {
+							return issue141HybridInput(prepared, units, unitIDs)
+						}
 					}
 					system, prompt, _, err := input(prepared, ids)
 					if err != nil {
@@ -408,8 +427,11 @@ func runIssue141Arms(ctx context.Context, options issue140Options, variants []st
 					} else if arm == "grouping-first" {
 						issue141RunTwoPass(runCtx, backend, prepared, ids, item, &row)
 						row.RepairCalls = row.Pass1RepairCalls
-					} else {
+					} else if arm == "file-centric" {
 						issue141RunFileCentric(runCtx, backend, prepared, ids, item, &row)
+						row.RepairCalls = row.Pass1RepairCalls
+					} else {
+						issue141RunHybrid(runCtx, backend, prepared, ids, item, arm, &row)
 						row.RepairCalls = row.Pass1RepairCalls
 					}
 					row.WallMS = milliseconds(time.Since(start))

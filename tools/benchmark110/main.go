@@ -206,7 +206,7 @@ func main() {
 	compareRelations := flag.Bool("compare-relations", false, "measure Issue #128 fixtures before and after candidate relation context")
 	issue140 := flag.Bool("issue140", false, "measure Issue #140 relation input ablations")
 	issue141 := flag.Bool("issue141", false, "measure Issue #141 grouping-first two-pass planner")
-	issue141Probe := flag.String("issue141-probe", "comparison", "Issue #141 probe: comparison, file-centric, or metadata")
+	issue141Probe := flag.String("issue141-probe", "comparison", "Issue #141 probe: comparison, file-centric, hybrid, or metadata")
 	issue140Probe := flag.String("issue140-probe", "ablation", "Issue #140 probe: ablation, guidance-statistics, grouping, atomicity, intents, or correction")
 	prepareModel := flag.Bool("prepare-mlx-model", false, "download the pinned MLX model")
 	helpPath := flag.String("helper", "", "MLX helper executable")
@@ -259,6 +259,8 @@ func main() {
 			err = runIssue141(ctx, options)
 		case "file-centric":
 			err = runIssue141FileCentric(ctx, options)
+		case "hybrid":
+			err = runIssue141Hybrid(ctx, options)
 		case "metadata":
 			err = runIssue141MetadataProbe(ctx, options)
 		default:
