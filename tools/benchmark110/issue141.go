@@ -57,6 +57,16 @@ type issue141Row struct {
 	CandidateTruePairs  int                          `json:"candidate_true_pairs,omitempty"`
 	CandidateFalsePairs int                          `json:"candidate_false_pairs,omitempty"`
 	MetadataDiagnostics []issue141MetadataDiagnostic `json:"metadata_diagnostics,omitempty"`
+	PairCandidates      int                          `json:"pair_candidates,omitempty"`
+	PairTrueCandidates  int                          `json:"pair_true_candidates,omitempty"`
+	PairFalseCandidates int                          `json:"pair_false_candidates,omitempty"`
+	PairTrueTotal       int                          `json:"pair_true_total,omitempty"`
+	GoldGroupsConnected bool                         `json:"gold_groups_connected,omitempty"`
+	PairTP              int                          `json:"pair_tp,omitempty"`
+	PairTN              int                          `json:"pair_tn,omitempty"`
+	PairFP              int                          `json:"pair_fp,omitempty"`
+	PairFN              int                          `json:"pair_fn,omitempty"`
+	NegativeClosure     int                          `json:"negative_closure,omitempty"`
 }
 
 func issue141PartitionSchema(ids []string) json.RawMessage {
