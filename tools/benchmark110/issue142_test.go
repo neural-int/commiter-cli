@@ -1,7 +1,11 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
+
+	"github.com/natsuki0413/commiter-cli/internal/llm"
 	"testing"
 
 	"github.com/natsuki0413/commiter-cli/internal/contextinput"
@@ -72,5 +76,56 @@ func TestIssue142GenerateIncludesIsolatesAndIsRepeatable(t *testing.T) {
 		if _, _, err := issue142Canonical(candidate.Groups, ids); err != nil {
 			t.Fatalf("incomplete candidate: %v", err)
 		}
+	}
+}
+
+type issue142StubBackend struct {
+	responses []string
+	calls     int
+}
+
+func (stub *issue142StubBackend) Chat(ctx context.Context, messages []llm.Message, schema json.RawMessage) (llm.Response, error) {
+	return stub.ChatWithOptions(ctx, messages, schema, llm.Options{})
+}
+func (stub *issue142StubBackend) ChatWithOptions(ctx context.Context, messages []llm.Message, schema json.RawMessage, options llm.Options) (llm.Response, error) {
+	if stub.calls >= len(stub.responses) {
+		return llm.Response{}, fmt.Errorf("unexpected call")
+	}
+	content := stub.responses[stub.calls]
+	stub.calls++
+	return llm.Response{Content: content, StopReason: "completed"}, nil
+}
+
+func TestIssue142SelectedPartitionReachesKeyedPlanningValidation(t *testing.T) {
+	var item fixture
+	for _, candidate := range issue142Fixtures() {
+		if candidate.name == "cross_directory" {
+			item = candidate
+			break
+		}
+	}
+	if item.name == "" {
+		t.Fatal("fixture missing")
+	}
+	prepared, ids, err := issue140Prepare(context.Background(), item, issue140ManyArms[5], 1024)
+	if err != nil {
+		t.Fatal(err)
+	}
+	normalized, _, err := issue142Canonical(item.reference, ids)
+	if err != nil {
+		t.Fatal(err)
+	}
+	metadata := map[string]any{}
+	for i := range normalized {
+		metadata[fmt.Sprintf("G%03d", i+1)] = map[string]any{"type": "feat", "scope": "core", "summary": "Add cross directory feature", "breaking": false}
+	}
+	encoded, err := json.Marshal(metadata)
+	if err != nil {
+		t.Fatal(err)
+	}
+	backend := &issue142StubBackend{responses: []string{`{"candidate_id":"C001"}`, string(encoded)}}
+	row := issue142RunOne(context.Background(), backend, prepared, ids, item, []issue142Candidate{{ID: "C001", Groups: normalized}}, 1, 0, 1, "stub", false)
+	if !row.EndToEnd || !row.Succeeded || !row.CompleteAssignment || row.Calls != 2 || row.Pass2Calls != 1 || backend.calls != 2 {
+		t.Fatalf("keyed end-to-end failed: failure=%q pass2=%q calls=%d end_to_end=%v", row.Failure, row.Pass2Failure, row.Calls, row.EndToEnd)
 	}
 }
