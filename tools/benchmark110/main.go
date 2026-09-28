@@ -207,6 +207,7 @@ func main() {
 	issue140 := flag.Bool("issue140", false, "measure Issue #140 relation input ablations")
 	issue141 := flag.Bool("issue141", false, "measure Issue #141 grouping-first two-pass planner")
 	issue142 := flag.Bool("issue142", false, "measure Issue #142 candidate partition selection")
+	issue142Probe := flag.String("issue142-probe", "comparison", "Issue #142 probe: comparison, budget, or gold")
 	issue141Probe := flag.String("issue141-probe", "comparison", "Issue #141 probe: comparison, file-centric, hybrid, soft, edge-decision, local-boundary, cluster-boundary, or metadata")
 	issue140Probe := flag.String("issue140-probe", "ablation", "Issue #140 probe: ablation, guidance-statistics, grouping, atomicity, intents, or correction")
 	prepareModel := flag.Bool("prepare-mlx-model", false, "download the pinned MLX model")
@@ -254,7 +255,18 @@ func main() {
 	}
 	if *issue142 {
 		options := issue140Options{backendName: *backendName, fixtureName: *fixtureName, repeats: *repeats, outputBudget: *outputBudget, timeout: *timeout, describe: *describe, helper: *helpPath, ollamaModel: *ollamaModel, modelSpec: spec}
-		if err := runIssue142(ctx, options); err != nil {
+		var err error
+		switch *issue142Probe {
+		case "comparison":
+			err = runIssue142(ctx, options)
+		case "budget":
+			err = runIssue142BudgetDiagnostic(ctx, options)
+		case "gold":
+			err = runIssue142GoldDiagnostic(ctx, options)
+		default:
+			err = fmt.Errorf("unknown Issue #142 probe %q", *issue142Probe)
+		}
+		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
