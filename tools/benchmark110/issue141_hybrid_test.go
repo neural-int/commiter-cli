@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
-
-	"github.com/natsuki0413/commiter-cli/internal/planning"
 )
 
 func TestHybridSeedCensusUsesOnlyObservedEdges(t *testing.T) {
@@ -40,17 +38,7 @@ func TestHybridSeedCensusUsesOnlyObservedEdges(t *testing.T) {
 }
 
 func TestHybridSeedCounterexamplesAreNotSafeMustLinks(t *testing.T) {
-	guardrails := []fixture{
-		{name: "source_test_separate_purposes", language: planning.English, files: []fileSpec{
-			{path: "src/cache.go", diff: "+func Cache() bool { return true }\n"},
-			{path: "src/cache_test.go", diff: "+func TestCache(t *testing.T) { /* independent test cleanup */ }\n"},
-		}, reference: [][]string{{"F001"}, {"F002"}}},
-		{name: "import_separate_purposes", language: planning.English, files: []fileSpec{
-			{path: "src/shared.js", diff: "+export function helper() { return true; }\n"},
-			{path: "src/featureB.js", diff: "+import { helper } from './shared.js';\n+export function featureB() { return helper(); }\n"},
-		}, reference: [][]string{{"F001"}, {"F002"}}},
-	}
-	for _, guardrail := range guardrails {
+	for _, guardrail := range issue141GuardrailFixtures() {
 		prepared, ids, _, err := issue128Prepare(context.Background(), guardrail, true, 1024)
 		if err != nil {
 			t.Fatal(err)

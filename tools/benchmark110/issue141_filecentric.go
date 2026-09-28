@@ -182,7 +182,11 @@ func issue141ValidateAssignments(data []byte, ids []string) (issue141Partition, 
 }
 
 func issue141RunFileCentric(ctx context.Context, backend llm.OptionsBackend, prepared contextinput.Prepared, ids []string, item fixture, row *issue141Row) {
-	system, prompt, schema, err := issue141FileCentricInput(prepared, ids)
+	issue141RunAssignments(ctx, backend, prepared, ids, item, row, issue141FileCentricInput, true)
+}
+
+func issue141RunAssignments(ctx context.Context, backend llm.OptionsBackend, prepared contextinput.Prepared, ids []string, item fixture, row *issue141Row, input func(contextinput.Prepared, []string) (string, []byte, json.RawMessage, error), pass2 bool) {
+	system, prompt, schema, err := input(prepared, ids)
 	if err != nil {
 		row.Failure = "input_error"
 		return
@@ -236,5 +240,9 @@ func issue141RunFileCentric(ctx context.Context, backend llm.OptionsBackend, pre
 		row.Failure = "semantic_grouping"
 		return
 	}
-	issue141FinishPass2(ctx, backend, prepared, ids, item, partition.Groups, row)
+	if pass2 {
+		issue141FinishPass2(ctx, backend, prepared, ids, item, partition.Groups, row)
+	} else {
+		row.Succeeded = true // Pass 1 exact grouping; metadata is a separate probe.
+	}
 }

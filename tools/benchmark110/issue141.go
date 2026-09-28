@@ -39,20 +39,24 @@ type issue141MetadataOutput struct {
 
 type issue141Row struct {
 	issue140Row
-	CompleteAssignment bool     `json:"complete_assignment"`
-	Pass1Calls         int      `json:"pass1_calls"`
-	Pass1RepairCalls   int      `json:"pass1_repair_calls"`
-	Pass2Calls         int      `json:"pass2_calls"`
-	InitialFailures    []string `json:"initial_structural_failures,omitempty"`
-	StructuralFailures []string `json:"structural_failures,omitempty"`
-	Pass2Failure       string   `json:"pass2_failure,omitempty"`
-	Pass1PromptBytes   int      `json:"pass1_prompt_bytes,omitempty"`
-	RepairPromptBytes  int      `json:"pass1_repair_prompt_bytes,omitempty"`
-	Pass2PromptBytes   int      `json:"pass2_prompt_bytes,omitempty"`
-	SeedEdges          int      `json:"seed_edges,omitempty"`
-	SeedUnits          int      `json:"seed_units,omitempty"`
-	SeedTruePairs      int      `json:"seed_true_pairs,omitempty"`
-	SeedFalsePairs     int      `json:"seed_false_pairs,omitempty"`
+	CompleteAssignment  bool                         `json:"complete_assignment"`
+	Pass1Calls          int                          `json:"pass1_calls"`
+	Pass1RepairCalls    int                          `json:"pass1_repair_calls"`
+	Pass2Calls          int                          `json:"pass2_calls"`
+	InitialFailures     []string                     `json:"initial_structural_failures,omitempty"`
+	StructuralFailures  []string                     `json:"structural_failures,omitempty"`
+	Pass2Failure        string                       `json:"pass2_failure,omitempty"`
+	Pass1PromptBytes    int                          `json:"pass1_prompt_bytes,omitempty"`
+	RepairPromptBytes   int                          `json:"pass1_repair_prompt_bytes,omitempty"`
+	Pass2PromptBytes    int                          `json:"pass2_prompt_bytes,omitempty"`
+	SeedEdges           int                          `json:"seed_edges,omitempty"`
+	SeedUnits           int                          `json:"seed_units,omitempty"`
+	SeedTruePairs       int                          `json:"seed_true_pairs,omitempty"`
+	SeedFalsePairs      int                          `json:"seed_false_pairs,omitempty"`
+	CandidateEdges      int                          `json:"candidate_edges,omitempty"`
+	CandidateTruePairs  int                          `json:"candidate_true_pairs,omitempty"`
+	CandidateFalsePairs int                          `json:"candidate_false_pairs,omitempty"`
+	MetadataDiagnostics []issue141MetadataDiagnostic `json:"metadata_diagnostics,omitempty"`
 }
 
 func issue141PartitionSchema(ids []string) json.RawMessage {
@@ -323,6 +327,7 @@ func issue141FinishPass2(ctx context.Context, backend llm.OptionsBackend, prepar
 	} else if response.StopReason != "" && response.StopReason != "completed" {
 		row.Pass2Failure = response.StopReason
 	} else {
+		row.MetadataDiagnostics = append(row.MetadataDiagnostics, issue141DiagnoseMetadata([]byte(response.Content), groups))
 		row.Pass2Failure = issue141ValidateMetadata([]byte(response.Content), groups, ids, item.language)
 	}
 	if row.Pass2Failure != "" {
@@ -344,7 +349,16 @@ func runIssue141Hybrid(ctx context.Context, options issue140Options) error {
 	return runIssue141Arms(ctx, options, []string{"file-centric", "hybrid-source-test", "hybrid-source-test-import"})
 }
 
+func runIssue141Soft(ctx context.Context, options issue140Options) error {
+	items := append(issue140AtomicityFixtures(), issue141GuardrailFixtures()...)
+	return runIssue141ArmsFor(ctx, options, []string{"file-centric", "soft-source-test", "soft-source-test-import"}, items, false)
+}
+
 func runIssue141Arms(ctx context.Context, options issue140Options, variants []string) error {
+	return runIssue141ArmsFor(ctx, options, variants, issue140AtomicityFixtures(), true)
+}
+
+func runIssue141ArmsFor(ctx context.Context, options issue140Options, variants []string, items []fixture, pass2 bool) error {
 	var backend llm.OptionsBackend
 	model := ""
 	var err error
@@ -356,7 +370,7 @@ func runIssue141Arms(ctx context.Context, options issue140Options, variants []st
 	}
 	encoder := json.NewEncoder(os.Stdout)
 	matched := false
-	for _, item := range issue140AtomicityFixtures() {
+	for _, item := range items {
 		if options.fixtureName != "all" && options.fixtureName != item.name {
 			continue
 		}
@@ -378,6 +392,16 @@ func runIssue141Arms(ctx context.Context, options issue140Options, variants []st
 					input := issue141Pass1Input
 					if arm == "file-centric" {
 						input = issue141FileCentricInput
+					} else if arm == "soft-source-test" || arm == "soft-source-test-import" {
+						input = func(prepared contextinput.Prepared, ids []string) (string, []byte, json.RawMessage, error) {
+							return issue141SoftInput(prepared, ids, arm)
+						}
+						candidates, err := issue141SoftCandidates(prepared.Document.RelationContext, ids, arm)
+						if err != nil {
+							return err
+						}
+						row.CandidateEdges = len(candidates)
+						row.CandidateTruePairs, row.CandidateFalsePairs = issue141CandidatePairCounts(candidates, item.reference)
 					} else if arm == "hybrid-source-test" || arm == "hybrid-source-test-import" {
 						units, seedEdges, err := issue141HybridUnits(prepared.Document.RelationContext, ids, arm)
 						if err != nil {
@@ -428,7 +452,19 @@ func runIssue141Arms(ctx context.Context, options issue140Options, variants []st
 						issue141RunTwoPass(runCtx, backend, prepared, ids, item, &row)
 						row.RepairCalls = row.Pass1RepairCalls
 					} else if arm == "file-centric" {
-						issue141RunFileCentric(runCtx, backend, prepared, ids, item, &row)
+						issue141RunAssignments(runCtx, backend, prepared, ids, item, &row, issue141FileCentricInput, pass2)
+						row.RepairCalls = row.Pass1RepairCalls
+					} else if arm == "soft-source-test" || arm == "soft-source-test-import" {
+						candidates, candidateErr := issue141SoftCandidates(prepared.Document.RelationContext, ids, arm)
+						if candidateErr != nil {
+							cancel()
+							return candidateErr
+						}
+						row.CandidateEdges = len(candidates)
+						row.CandidateTruePairs, row.CandidateFalsePairs = issue141CandidatePairCounts(candidates, item.reference)
+						issue141RunAssignments(runCtx, backend, prepared, ids, item, &row, func(prepared contextinput.Prepared, ids []string) (string, []byte, json.RawMessage, error) {
+							return issue141SoftInput(prepared, ids, arm)
+						}, false)
 						row.RepairCalls = row.Pass1RepairCalls
 					} else {
 						issue141RunHybrid(runCtx, backend, prepared, ids, item, arm, &row)
@@ -530,6 +566,7 @@ func runIssue141MetadataProbe(ctx context.Context, options issue140Options) erro
 						row.Pass2Failure = response.StopReason
 						break
 					}
+					row.MetadataDiagnostics = append(row.MetadataDiagnostics, issue141DiagnoseMetadata([]byte(response.Content), selected))
 					var output issue141MetadataOutput
 					if row.Pass2Failure = issue141Decode([]byte(response.Content), &output); row.Pass2Failure != "" {
 						break
