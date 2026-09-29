@@ -291,6 +291,10 @@ func main() {
 			err = runIssue142Prerank(ctx, options, *issue142Probe)
 		case "capped-holdout":
 			err = runIssue142CappedHoldout(ctx, options)
+		case "capped-selector":
+			err = runIssue142CappedSelector(ctx, options)
+		case "small-enumeration":
+			err = runIssue142SmallEnumeration(ctx, options)
 		default:
 			err = fmt.Errorf("unknown Issue #142 probe %q", *issue142Probe)
 		}
