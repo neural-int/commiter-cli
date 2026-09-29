@@ -295,6 +295,10 @@ func main() {
 			err = runIssue142CappedSelector(ctx, options)
 		case "small-enumeration":
 			err = runIssue142SmallEnumeration(ctx, options)
+		case "two-selectors":
+			err = runIssue142TwoSelectors(ctx, options)
+		case "score-breakdown":
+			err = runIssue142ScoreBreakdown(ctx, options)
 		default:
 			err = fmt.Errorf("unknown Issue #142 probe %q", *issue142Probe)
 		}
