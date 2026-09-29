@@ -30,3 +30,7 @@
 ## 記録
 
 - 実行順は weighted generator、forced ranking、relation annotation。中断・失敗は記録して除外理由を明記する。結果からルールや閾値を変更して同じ fixture で再評価しない。
+
+## Forced-choice 文言の補足（モデル実行前）
+
+既存の forced-choice system 文は「two candidates」と明記しているため、3候補の C003 を含む arm にそのまま使えない。この probe の2候補・3候補 arm はともに「Choose exactly one of the complete partition candidates」という候補数に依存しない同一文言を使う。その他の選択基準、task、候補 ID、schema は上記条件どおり。したがって過去の forced-choice 測定とは system 文言も異なり、過去の実測値を同時対照として扱わない。
