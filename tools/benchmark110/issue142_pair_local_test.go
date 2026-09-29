@@ -15,7 +15,7 @@ func TestIssue142PairLocalInputScopeAndOrder(t *testing.T) {
 	for _, item := range items {
 		byName[item.name] = item
 	}
-	for name, expected := range map[string]string{"new_paraphrase": "same", "new_stem_doc_diverged": "different"} {
+	for name, expected := range map[string]string{"new_paraphrase": "same", "new_stem_doc_diverged": "different", "new_test_pair_shared": "same", "new_crossdir_shared": "same"} {
 		item := byName[name]
 		gold, err := issue142PairLocalGold(item)
 		if err != nil || gold != expected {

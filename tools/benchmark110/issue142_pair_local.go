@@ -176,7 +176,21 @@ func issue142PairLocalCall(ctx context.Context, backend llm.OptionsBackend, mode
 	return row
 }
 
+type issue142PairLocalTarget struct{ name, gold string }
+
 func runIssue142PairLocal(ctx context.Context, options issue140Options) error {
+	return runIssue142PairLocalTargets(ctx, options, []issue142PairLocalTarget{
+		{"new_paraphrase", "same"}, {"new_stem_doc_diverged", "different"},
+	})
+}
+
+func runIssue142PairLocalControls(ctx context.Context, options issue140Options) error {
+	return runIssue142PairLocalTargets(ctx, options, []issue142PairLocalTarget{
+		{"new_test_pair_shared", "same"}, {"new_crossdir_shared", "same"},
+	})
+}
+
+func runIssue142PairLocalTargets(ctx context.Context, options issue140Options, targets []issue142PairLocalTarget) error {
 	if options.backendName != "mlx" && !options.describe {
 		return fmt.Errorf("pair-local probe fixed to MLX")
 	}
@@ -191,7 +205,6 @@ func runIssue142PairLocal(ctx context.Context, options issue140Options) error {
 	for _, item := range items {
 		byName[item.name] = item
 	}
-	targets := []struct{ name, gold string }{{"new_paraphrase", "same"}, {"new_stem_doc_diverged", "different"}}
 	rows := make([]issue142PairLocalRow, 0, len(targets))
 	for _, target := range targets {
 		item := byName[target.name]

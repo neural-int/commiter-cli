@@ -301,6 +301,8 @@ func main() {
 			err = runIssue142ScoreBreakdown(ctx, options)
 		case "pair-local":
 			err = runIssue142PairLocal(ctx, options)
+		case "pair-local-controls":
+			err = runIssue142PairLocalControls(ctx, options)
 		default:
 			err = fmt.Errorf("unknown Issue #142 probe %q", *issue142Probe)
 		}
