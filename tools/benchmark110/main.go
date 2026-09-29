@@ -281,6 +281,12 @@ func main() {
 			err = runIssue142NextRanking(ctx, options)
 		case "relation-removal":
 			err = runIssue142RelationRemoval(ctx, options)
+		case "forced-lexical":
+			err = runIssue142ForcedLexical(ctx, options)
+		case "weighted-lexical":
+			err = runIssue142Weighted(ctx, options)
+		case "relation-annotation":
+			err = runIssue142RelationAnnotation(ctx, options)
 		default:
 			err = fmt.Errorf("unknown Issue #142 probe %q", *issue142Probe)
 		}
