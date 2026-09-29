@@ -15,8 +15,10 @@ import (
 
 const issue142TournamentCap = 8
 
-// The holdouts are added after this generator and tournament contract is fixed.
-func issue142TournamentFixtures() []fixture { return issue142VerificationFixtures() }
+// Holdout fixtures are added in a separate commit after the contract is fixed.
+func issue142TournamentFixtures() []fixture {
+	return append(issue142VerificationFixtures(), issue142TournamentHoldouts()...)
+}
 
 func issue142ThresholdPartition(doc contextinput.Document, ids []string) [][]string {
 	parent := make(map[string]string, len(ids))
