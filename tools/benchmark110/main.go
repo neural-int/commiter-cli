@@ -207,7 +207,7 @@ func main() {
 	issue140 := flag.Bool("issue140", false, "measure Issue #140 relation input ablations")
 	issue141 := flag.Bool("issue141", false, "measure Issue #141 grouping-first two-pass planner")
 	issue142 := flag.Bool("issue142", false, "measure Issue #142 candidate partition selection")
-	issue142Probe := flag.String("issue142-probe", "comparison", "Issue #142 probe: comparison, budget, gold, forced, verify, tournament, or bidirectional")
+	issue142Probe := flag.String("issue142-probe", "comparison", "Issue #142 probe: comparison, budget, gold, forced, verify, tournament, bidirectional, difference, or lexical")
 	issue141Probe := flag.String("issue141-probe", "comparison", "Issue #141 probe: comparison, file-centric, hybrid, soft, edge-decision, local-boundary, cluster-boundary, or metadata")
 	issue140Probe := flag.String("issue140-probe", "ablation", "Issue #140 probe: ablation, guidance-statistics, grouping, atomicity, intents, or correction")
 	prepareModel := flag.Bool("prepare-mlx-model", false, "download the pinned MLX model")
@@ -271,6 +271,10 @@ func main() {
 			err = runIssue142Tournament(ctx, options)
 		case "bidirectional":
 			err = runIssue142Bidirectional(ctx, options)
+		case "difference":
+			err = runIssue142Difference(ctx, options)
+		case "lexical":
+			err = runIssue142Lexical(ctx, options)
 		default:
 			err = fmt.Errorf("unknown Issue #142 probe %q", *issue142Probe)
 		}
