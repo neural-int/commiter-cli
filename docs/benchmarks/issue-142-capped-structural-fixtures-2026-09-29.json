@@ -1,0 +1,229 @@
+{
+  "fixtures": [
+    {
+      "name": "new_test_pair_shared",
+      "files": [
+        {
+          "path": "src/invoice_retry.go",
+          "diff": "+func RetryInvoicePayment() bool { return true }\n"
+        },
+        {
+          "path": "src/invoice_retry_test.go",
+          "diff": "+func TestRetryInvoicePayment(t *testing.T) { if !RetryInvoicePayment() { t.Fatal(\"invoice retry\") } }\n"
+        },
+        {
+          "path": "docs/alerts.md",
+          "diff": "+Document alert suppression intervals.\n"
+        }
+      ],
+      "gold": [
+        [
+          "F001",
+          "F002"
+        ],
+        [
+          "F003"
+        ]
+      ]
+    },
+    {
+      "name": "new_test_pair_diverged",
+      "files": [
+        {
+          "path": "src/report_export.go",
+          "diff": "+func ExportReportCSV() bool { return true }\n"
+        },
+        {
+          "path": "src/report_export_test.go",
+          "diff": "+func TestLegacyReportHeader(t *testing.T) { /* rename old snapshot title */ }\n"
+        },
+        {
+          "path": "docs/report_export.md",
+          "diff": "+Document the CSV export endpoint and returned columns.\n"
+        }
+      ],
+      "gold": [
+        [
+          "F001",
+          "F003"
+        ],
+        [
+          "F002"
+        ]
+      ]
+    },
+    {
+      "name": "new_stem_doc_shared",
+      "files": [
+        {
+          "path": "src/billing/receipt.go",
+          "diff": "+func RenderReceiptTotal() string { return \"total\" }\n"
+        },
+        {
+          "path": "docs/receipts/receipt.md",
+          "diff": "+Describe receipt total display and currency rounding.\n"
+        },
+        {
+          "path": "src/metrics/latency.go",
+          "diff": "+func LatencyBucket() int { return 1 }\n"
+        }
+      ],
+      "gold": [
+        [
+          "F001",
+          "F002"
+        ],
+        [
+          "F003"
+        ]
+      ]
+    },
+    {
+      "name": "new_stem_doc_diverged",
+      "files": [
+        {
+          "path": "src/cache/expiry.go",
+          "diff": "+func ExpireCacheEntry() bool { return true }\n"
+        },
+        {
+          "path": "docs/operations/expiry.md",
+          "diff": "+Document employee credential expiry policy.\n"
+        },
+        {
+          "path": "src/metrics/counters.go",
+          "diff": "+func CounterValue() int { return 1 }\n"
+        }
+      ],
+      "gold": [
+        [
+          "F001"
+        ],
+        [
+          "F002"
+        ],
+        [
+          "F003"
+        ]
+      ]
+    },
+    {
+      "name": "new_crossdir_shared",
+      "files": [
+        {
+          "path": "src/queue/backfill.go",
+          "diff": "+func StartBackfillQueue() bool { return true }\n"
+        },
+        {
+          "path": "docs/operations/backfill.md",
+          "diff": "+Describe starting the backfill queue from operations.\n"
+        },
+        {
+          "path": "src/accounts/disable.go",
+          "diff": "+func DisableAccountLogin() bool { return true }\n"
+        },
+        {
+          "path": "docs/security/disable.md",
+          "diff": "+Describe account login disablement during lockout.\n"
+        }
+      ],
+      "gold": [
+        [
+          "F001",
+          "F002"
+        ],
+        [
+          "F003",
+          "F004"
+        ]
+      ]
+    },
+    {
+      "name": "new_crossdir_collision",
+      "files": [
+        {
+          "path": "src/sales/export.go",
+          "diff": "+func ExportQuarterlySales() bool { return true }\n"
+        },
+        {
+          "path": "docs/finance/sales.md",
+          "diff": "+Describe quarterly sales export columns.\n"
+        },
+        {
+          "path": "src/security/export.go",
+          "diff": "+func ExportAuditEvents() bool { return true }\n"
+        },
+        {
+          "path": "docs/compliance/audit.md",
+          "diff": "+Describe audit event export retention.\n"
+        }
+      ],
+      "gold": [
+        [
+          "F001",
+          "F002"
+        ],
+        [
+          "F003",
+          "F004"
+        ]
+      ]
+    },
+    {
+      "name": "new_lexical_bridge",
+      "files": [
+        {
+          "path": "src/auth/token_refresh.go",
+          "diff": "+func RefreshLoginToken() bool { return true }\n"
+        },
+        {
+          "path": "docs/security/token_refresh.md",
+          "diff": "+Describe login token renewal.\n"
+        },
+        {
+          "path": "src/billing/token_meter.go",
+          "diff": "+func MeterTokenUsage() int { return 1 }\n"
+        },
+        {
+          "path": "docs/finance/token_meter.md",
+          "diff": "+Describe token usage billing meters.\n"
+        }
+      ],
+      "gold": [
+        [
+          "F001",
+          "F002"
+        ],
+        [
+          "F003",
+          "F004"
+        ]
+      ]
+    },
+    {
+      "name": "new_paraphrase",
+      "files": [
+        {
+          "path": "src/storage/prune.go",
+          "diff": "+func PruneStaleRows() bool { return true }\n"
+        },
+        {
+          "path": "docs/retention/cleanup.md",
+          "diff": "+Describe removal of obsolete records after their lifetime.\n"
+        },
+        {
+          "path": "src/alerts/pager.go",
+          "diff": "+func SendPagerAlert() bool { return true }\n"
+        }
+      ],
+      "gold": [
+        [
+          "F001",
+          "F002"
+        ],
+        [
+          "F003"
+        ]
+      ]
+    }
+  ]
+}
