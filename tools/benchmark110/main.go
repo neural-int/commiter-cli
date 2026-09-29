@@ -299,6 +299,8 @@ func main() {
 			err = runIssue142TwoSelectors(ctx, options)
 		case "score-breakdown":
 			err = runIssue142ScoreBreakdown(ctx, options)
+		case "pair-local":
+			err = runIssue142PairLocal(ctx, options)
 		default:
 			err = fmt.Errorf("unknown Issue #142 probe %q", *issue142Probe)
 		}
