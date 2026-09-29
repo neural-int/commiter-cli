@@ -303,6 +303,8 @@ func main() {
 			err = runIssue142PairLocal(ctx, options)
 		case "pair-local-controls":
 			err = runIssue142PairLocalControls(ctx, options)
+		case "pair-local-stem-doc":
+			err = runIssue142PairLocalStemDoc(ctx, options)
 		default:
 			err = fmt.Errorf("unknown Issue #142 probe %q", *issue142Probe)
 		}

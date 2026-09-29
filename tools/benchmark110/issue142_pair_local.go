@@ -190,12 +190,18 @@ func runIssue142PairLocalControls(ctx context.Context, options issue140Options) 
 	})
 }
 
+func runIssue142PairLocalStemDoc(ctx context.Context, options issue140Options) error {
+	return runIssue142PairLocalTargets(ctx, options, []issue142PairLocalTarget{
+		{"new_stem_doc_shared", "same"},
+	})
+}
+
 func runIssue142PairLocalTargets(ctx context.Context, options issue140Options, targets []issue142PairLocalTarget) error {
 	if options.backendName != "mlx" && !options.describe {
 		return fmt.Errorf("pair-local probe fixed to MLX")
 	}
 	if options.fixtureName != "all" {
-		return fmt.Errorf("pair-local probe requires both fixtures")
+		return fmt.Errorf("pair-local probe requires -fixture all")
 	}
 	items, err := issue142LoadHoldoutFixtures(issue142CappedFixturePath)
 	if err != nil {
