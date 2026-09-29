@@ -275,6 +275,12 @@ func main() {
 			err = runIssue142Difference(ctx, options)
 		case "lexical":
 			err = runIssue142Lexical(ctx, options)
+		case "next-lexical":
+			err = runIssue142NextLexical(ctx, options)
+		case "next-ranking":
+			err = runIssue142NextRanking(ctx, options)
+		case "relation-removal":
+			err = runIssue142RelationRemoval(ctx, options)
 		default:
 			err = fmt.Errorf("unknown Issue #142 probe %q", *issue142Probe)
 		}
