@@ -22,15 +22,19 @@ type issue142RankedCandidate struct {
 }
 
 type issue142RankArm struct {
-	Name         string                    `json:"name"`
-	Candidates   []issue142RankedCandidate `json:"candidates"`
-	GoldID       string                    `json:"gold_id,omitempty"`
-	GoldRank     int                       `json:"gold_rank"`
-	RecallAt1    bool                      `json:"recall_at_1"`
-	RecallAt2    bool                      `json:"recall_at_2"`
-	RecallAt3    bool                      `json:"recall_at_3"`
-	TotalRecall  bool                      `json:"total_recall"`
-	AddedNonGold int                       `json:"added_non_gold"`
+	Name             string                    `json:"name"`
+	Candidates       []issue142RankedCandidate `json:"candidates"`
+	GoldID           string                    `json:"gold_id,omitempty"`
+	GoldRank         int                       `json:"gold_rank"`
+	RecallAt1        bool                      `json:"recall_at_1"`
+	RecallAt2        bool                      `json:"recall_at_2"`
+	RecallAt3        bool                      `json:"recall_at_3"`
+	TotalRecall      bool                      `json:"total_recall"`
+	AddedNonGold     int                       `json:"added_non_gold"`
+	Top2IDs          []string                  `json:"top_2_ids"`
+	Top1Top2Margin   float64                   `json:"top_1_top_2_margin"`
+	BestNonGoldID    string                    `json:"best_non_gold_id,omitempty"`
+	BestNonGoldScore float64                   `json:"best_non_gold_score"`
 }
 
 type issue142RankRow struct {
@@ -41,6 +45,7 @@ type issue142RankRow struct {
 type issue142RankInput struct {
 	item     fixture
 	prepared contextinput.Prepared
+	ids      []string
 	arms     []issue142RankArm
 }
 
@@ -130,10 +135,15 @@ func issue142Rank(name string, candidates []issue142Candidate, baseCount int, go
 		}
 		return a.ID < b.ID
 	})
+	if len(arm.Candidates) >= 2 {
+		arm.Top2IDs = []string{arm.Candidates[0].ID, arm.Candidates[1].ID}
+		arm.Top1Top2Margin = arm.Candidates[0].Score - arm.Candidates[1].Score
+	}
 	for i, candidate := range arm.Candidates {
 		if sameGroups(candidate.Groups, gold) {
 			arm.GoldID, arm.GoldRank = candidate.ID, i+1
-			break
+		} else if arm.BestNonGoldID == "" {
+			arm.BestNonGoldID, arm.BestNonGoldScore = candidate.ID, candidate.Score
 		}
 	}
 	arm.RecallAt1 = arm.GoldRank == 1
@@ -189,7 +199,7 @@ func issue142BuildRankInput(ctx context.Context, item fixture) (issue142RankInpu
 		issue142Rank("binary", binary, len(base), item.reference, support),
 		issue142Rank("weighted", weighted, len(base), item.reference, support),
 	}
-	return issue142RankInput{item: item, prepared: prepared, arms: arms}, nil
+	return issue142RankInput{item: item, prepared: prepared, ids: ids, arms: arms}, nil
 }
 
 func issue142TopCandidates(arm issue142RankArm) ([]issue142Candidate, error) {

@@ -289,6 +289,8 @@ func main() {
 			err = runIssue142RelationAnnotation(ctx, options)
 		case "prerank", "prerank-top2", "prerank-pairwise":
 			err = runIssue142Prerank(ctx, options, *issue142Probe)
+		case "capped-holdout":
+			err = runIssue142CappedHoldout(ctx, options)
 		default:
 			err = fmt.Errorf("unknown Issue #142 probe %q", *issue142Probe)
 		}
