@@ -209,6 +209,10 @@ func issue142ForcedSelectionInput(prepared contextinput.Prepared, candidates []i
 }
 
 func issue142SelectionInputMode(prepared contextinput.Prepared, candidates []issue142Candidate, reverse, allowNone bool) (string, []byte, json.RawMessage, error) {
+	return issue142SelectionInputModeWithSchemaOrder(prepared, candidates, reverse, allowNone, false)
+}
+
+func issue142SelectionInputModeWithSchemaOrder(prepared contextinput.Prepared, candidates []issue142Candidate, reverse, allowNone, fixedSchemaOrder bool) (string, []byte, json.RawMessage, error) {
 	offered := append([]issue142Candidate(nil), candidates...)
 	if reverse {
 		for i, j := 0, len(offered)-1; i < j; i, j = i+1, j-1 {
@@ -216,7 +220,11 @@ func issue142SelectionInputMode(prepared contextinput.Prepared, candidates []iss
 		}
 	}
 	choices := make([]string, 0, len(offered)+1)
-	for _, candidate := range offered {
+	choicesFrom := offered
+	if fixedSchemaOrder {
+		choicesFrom = candidates
+	}
+	for _, candidate := range choicesFrom {
 		choices = append(choices, candidate.ID)
 	}
 	if allowNone {

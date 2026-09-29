@@ -56,6 +56,10 @@ func issue142DiagnosticCall(ctx context.Context, backend llm.OptionsBackend, mod
 }
 
 func issue142DiagnosticCallMode(ctx context.Context, backend llm.OptionsBackend, model, backendName, probe, arm string, item fixture, prepared contextinput.Prepared, candidates []issue142Candidate, run, budget int, reverse, forced bool) issue142DiagnosticRow {
+	return issue142DiagnosticCallModeWithSchemaOrder(ctx, backend, model, backendName, probe, arm, item, prepared, candidates, run, budget, reverse, forced, false)
+}
+
+func issue142DiagnosticCallModeWithSchemaOrder(ctx context.Context, backend llm.OptionsBackend, model, backendName, probe, arm string, item fixture, prepared contextinput.Prepared, candidates []issue142Candidate, run, budget int, reverse, forced, fixedSchemaOrder bool) issue142DiagnosticRow {
 	row := issue142DiagnosticRow{Probe: probe, Fixture: item.name, Run: run, Arm: arm, Backend: backendName, Model: model, OutputBudget: budget, CandidateCount: len(candidates), OutputTokens: "unavailable"}
 	for _, candidate := range candidates {
 		if sameGroups(candidate.Groups, item.reference) {
@@ -68,7 +72,7 @@ func issue142DiagnosticCallMode(ctx context.Context, backend llm.OptionsBackend,
 	var schema json.RawMessage
 	var err error
 	if forced {
-		system, prompt, schema, err = issue142ForcedSelectionInput(prepared, candidates, reverse)
+		system, prompt, schema, err = issue142SelectionInputModeWithSchemaOrder(prepared, candidates, reverse, false, fixedSchemaOrder)
 	} else {
 		system, prompt, schema, err = issue142SelectionInput(prepared, candidates, reverse)
 	}
