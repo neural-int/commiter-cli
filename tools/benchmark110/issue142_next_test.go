@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"testing"
+
+	"github.com/natsuki0413/commiter-cli/internal/llm"
 )
 
 func TestIssue142RelationRemovalChangesOnlyRepositoryRelationContext(t *testing.T) {
@@ -87,5 +89,24 @@ func TestIssue142NextFixtureGoldIsComplete(t *testing.T) {
 				t.Fatal(err)
 			}
 		})
+	}
+}
+
+func TestIssue142NextRankingFixesSchemaOrderAcrossPresentation(t *testing.T) {
+	item := issue142NextFixtures()[0]
+	input, err := issue142BuildNextInputs(context.Background(), item)
+	if err != nil {
+		t.Fatal(err)
+	}
+	stub := &issue142DiagnosticStub{response: llm.Response{StopReason: "completed", Content: `{"candidate_id":"none"}`}}
+	forward := issue142DiagnosticCallModeWithSchemaOrder(context.Background(), stub, "stub", "mlx",
+		"next-ranking", "lexical", item, input.prepared, input.lexical, 1, 2048, false, false, true)
+	reverse := issue142DiagnosticCallModeWithSchemaOrder(context.Background(), stub, "stub", "mlx",
+		"next-ranking", "lexical", item, input.prepared, input.lexical, 2, 2048, true, false, true)
+	if forward.SchemaSHA256 != reverse.SchemaSHA256 {
+		t.Fatal("schema order changed")
+	}
+	if forward.PromptSHA256 == reverse.PromptSHA256 {
+		t.Fatal("presentation order did not change")
 	}
 }

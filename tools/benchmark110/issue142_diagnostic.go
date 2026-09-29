@@ -74,7 +74,7 @@ func issue142DiagnosticCallModeWithSchemaOrder(ctx context.Context, backend llm.
 	if forced {
 		system, prompt, schema, err = issue142SelectionInputModeWithSchemaOrder(prepared, candidates, reverse, false, fixedSchemaOrder)
 	} else {
-		system, prompt, schema, err = issue142SelectionInput(prepared, candidates, reverse)
+		system, prompt, schema, err = issue142SelectionInputModeWithSchemaOrder(prepared, candidates, reverse, true, fixedSchemaOrder)
 	}
 	if err != nil {
 		row.Failure = "input_error"
