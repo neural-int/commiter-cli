@@ -1,0 +1,394 @@
+[
+  {
+    "name": "h143_source_test_independent",
+    "category": "split",
+    "guardrail": true,
+    "files": [
+      {
+        "path": "src/search/filter.go",
+        "diff": "+func HideArchivedResults(archived bool) bool { return archived }\n"
+      },
+      {
+        "path": "src/search/filter_test.go",
+        "diff": "-const legacySnapshotTitle = \"old filter behavior\"\n+const legacySnapshotTitle = \"legacy query compatibility\"\n"
+      }
+    ],
+    "gold": [
+      [
+        "F001"
+      ],
+      [
+        "F002"
+      ]
+    ],
+    "candidates": [
+      {
+        "id": "C001",
+        "groups": [
+          [
+            "F001",
+            "F002"
+          ]
+        ]
+      },
+      {
+        "id": "C002",
+        "groups": [
+          [
+            "F001"
+          ],
+          [
+            "F002"
+          ]
+        ]
+      }
+    ],
+    "rationale": "検索結果からarchive済項目を隠す機能と、既存互換性snapshotの表題変更は独立。source/test対応は同目的の証明ではない。"
+  },
+  {
+    "name": "h143_stem_docs_independent",
+    "category": "split",
+    "guardrail": true,
+    "files": [
+      {
+        "path": "src/upload/limit.go",
+        "diff": "-func MaxUploadBytes() int { return 1024 }\n+func MaxUploadBytes() int { return 2048 }\n"
+      },
+      {
+        "path": "docs/upload/limit.md",
+        "diff": "-Support mailbox: support-old@example.invalid\n+Support mailbox: helpdesk@example.invalid\n"
+      }
+    ],
+    "gold": [
+      [
+        "F001"
+      ],
+      [
+        "F002"
+      ]
+    ],
+    "candidates": [
+      {
+        "id": "C001",
+        "groups": [
+          [
+            "F001"
+          ],
+          [
+            "F002"
+          ]
+        ]
+      },
+      {
+        "id": "C002",
+        "groups": [
+          [
+            "F001",
+            "F002"
+          ]
+        ]
+      }
+    ],
+    "rationale": "upload上限値の変更とサポート窓口表記の変更は独立。basename一致をguardrailにする。"
+  },
+  {
+    "name": "h143_shared_directory_independent",
+    "category": "split",
+    "guardrail": false,
+    "files": [
+      {
+        "path": "src/ops/compress.go",
+        "diff": "-func CompressionLevel() int { return 1 }\n+func CompressionLevel() int { return 6 }\n"
+      },
+      {
+        "path": "src/ops/locale.go",
+        "diff": "-func DefaultLocale() string { return \"en\" }\n+func DefaultLocale() string { return \"ja\" }\n"
+      }
+    ],
+    "gold": [
+      [
+        "F001"
+      ],
+      [
+        "F002"
+      ]
+    ],
+    "candidates": [
+      {
+        "id": "C001",
+        "groups": [
+          [
+            "F001",
+            "F002"
+          ]
+        ]
+      },
+      {
+        "id": "C002",
+        "groups": [
+          [
+            "F001"
+          ],
+          [
+            "F002"
+          ]
+        ]
+      }
+    ],
+    "rationale": "圧縮率と表示localeの既定値は別々にrevertでき、相互依存を示す差分がない。"
+  },
+  {
+    "name": "h143_two_features_interleaved",
+    "category": "split",
+    "guardrail": false,
+    "files": [
+      {
+        "path": "src/checkout/discount.go",
+        "diff": "+func ApplyMemberDiscount(total int) int { return total * 90 / 100 }\n"
+      },
+      {
+        "path": "src/monitor/health.go",
+        "diff": "+func HealthStatus() string { return \"ready\" }\n"
+      },
+      {
+        "path": "src/checkout/discount_test.go",
+        "diff": "+func TestMemberDiscount(t *testing.T) { if ApplyMemberDiscount(100) != 90 { t.Fatal(\"member discount\") } }\n"
+      },
+      {
+        "path": "docs/monitor/readiness.md",
+        "diff": "+The readiness endpoint now returns ready when the service can accept requests.\n"
+      }
+    ],
+    "gold": [
+      [
+        "F001",
+        "F003"
+      ],
+      [
+        "F002",
+        "F004"
+      ]
+    ],
+    "candidates": [
+      {
+        "id": "C001",
+        "groups": [
+          [
+            "F001",
+            "F003"
+          ],
+          [
+            "F002",
+            "F004"
+          ]
+        ]
+      },
+      {
+        "id": "C002",
+        "groups": [
+          [
+            "F001",
+            "F002",
+            "F003",
+            "F004"
+          ]
+        ]
+      }
+    ],
+    "rationale": "会員割引の実装/テストとreadinessの実装/docsを別目的に分ける。"
+  },
+  {
+    "name": "h143_atomic_validation",
+    "category": "join",
+    "guardrail": false,
+    "files": [
+      {
+        "path": "src/accounts/handle.go",
+        "diff": "+func ValidHandle(s string) bool { return len(s) >= 3 && len(s) <= 20 }\n"
+      },
+      {
+        "path": "src/accounts/handle_test.go",
+        "diff": "+func TestHandleLength(t *testing.T) { if ValidHandle(\"ab\") || !ValidHandle(\"abc\") { t.Fatal(\"handle length\") } }\n"
+      },
+      {
+        "path": "docs/accounts/handle.md",
+        "diff": "+Account handles must contain between 3 and 20 characters.\n"
+      }
+    ],
+    "gold": [
+      [
+        "F001",
+        "F002",
+        "F003"
+      ]
+    ],
+    "candidates": [
+      {
+        "id": "C001",
+        "groups": [
+          [
+            "F001"
+          ],
+          [
+            "F002"
+          ],
+          [
+            "F003"
+          ]
+        ]
+      },
+      {
+        "id": "C002",
+        "groups": [
+          [
+            "F001",
+            "F002",
+            "F003"
+          ]
+        ]
+      }
+    ],
+    "rationale": "handle長の同一仕様を実装、境界テスト、docsで導入している。"
+  },
+  {
+    "name": "h143_crossdir_documentation",
+    "category": "join",
+    "guardrail": false,
+    "files": [
+      {
+        "path": "src/storage/prune.go",
+        "diff": "+func PruneExpiredItems(ageDays int) bool { return ageDays > 14 }\n"
+      },
+      {
+        "path": "docs/operators/cleanup.md",
+        "diff": "+Items older than fourteen days are removed automatically by the storage cleanup job.\n"
+      }
+    ],
+    "gold": [
+      [
+        "F001",
+        "F002"
+      ]
+    ],
+    "candidates": [
+      {
+        "id": "C001",
+        "groups": [
+          [
+            "F001",
+            "F002"
+          ]
+        ]
+      },
+      {
+        "id": "C002",
+        "groups": [
+          [
+            "F001"
+          ],
+          [
+            "F002"
+          ]
+        ]
+      }
+    ],
+    "rationale": "14日超のitem自動削除という同じ振る舞いの実装と運用説明。"
+  },
+  {
+    "name": "h143_paraphrased_feature",
+    "category": "join",
+    "guardrail": false,
+    "files": [
+      {
+        "path": "src/identity/recover.go",
+        "diff": "+func RecoveryLinkExpires(minutes int) bool { return minutes >= 30 }\n"
+      },
+      {
+        "path": "docs/security/credential_reset.md",
+        "diff": "+A credential reset URL becomes unusable half an hour after it is issued.\n"
+      }
+    ],
+    "gold": [
+      [
+        "F001",
+        "F002"
+      ]
+    ],
+    "candidates": [
+      {
+        "id": "C001",
+        "groups": [
+          [
+            "F001"
+          ],
+          [
+            "F002"
+          ]
+        ]
+      },
+      {
+        "id": "C002",
+        "groups": [
+          [
+            "F001",
+            "F002"
+          ]
+        ]
+      }
+    ],
+    "rationale": "recovery linkが30分で失効する仕様をコードと別語彙のdocsで表している。"
+  },
+  {
+    "name": "h143_crosscomponent_feature",
+    "category": "join",
+    "guardrail": false,
+    "files": [
+      {
+        "path": "src/api/pagination.go",
+        "diff": "+const DefaultPageSize = 25\n"
+      },
+      {
+        "path": "src/web/results.go",
+        "diff": "+func ResultPageSize() int { return api.DefaultPageSize }\n"
+      },
+      {
+        "path": "docs/api/paging.md",
+        "diff": "+API and web result pages default to 25 entries per page.\n"
+      }
+    ],
+    "gold": [
+      [
+        "F001",
+        "F002",
+        "F003"
+      ]
+    ],
+    "candidates": [
+      {
+        "id": "C001",
+        "groups": [
+          [
+            "F001",
+            "F002",
+            "F003"
+          ]
+        ]
+      },
+      {
+        "id": "C002",
+        "groups": [
+          [
+            "F001"
+          ],
+          [
+            "F002"
+          ],
+          [
+            "F003"
+          ]
+        ]
+      }
+    ],
+    "rationale": "API定数、web参照、25件というdocsは同じpagination既定値の導入。"
+  }
+]
