@@ -206,6 +206,7 @@ func main() {
 	compareRelations := flag.Bool("compare-relations", false, "measure Issue #128 fixtures before and after candidate relation context")
 	issue140 := flag.Bool("issue140", false, "measure Issue #140 relation input ablations")
 	issue141 := flag.Bool("issue141", false, "measure Issue #141 grouping-first two-pass planner")
+	issue143 := flag.Bool("issue143", false, "measure preregistered Issue #143 model exchange")
 	issue142 := flag.Bool("issue142", false, "measure Issue #142 candidate partition selection")
 	issue142Probe := flag.String("issue142-probe", "comparison", "Issue #142 probe: comparison, budget, gold, forced, verify, tournament, bidirectional, difference, or lexical")
 	issue141Probe := flag.String("issue141-probe", "comparison", "Issue #141 probe: comparison, file-centric, hybrid, soft, edge-decision, local-boundary, cluster-boundary, or metadata")
@@ -228,6 +229,13 @@ func main() {
 	if *repeats < 1 || *outputBudget < 0 || *timeout <= 0 || *manyFileCount < 1 || *manyFileCount > 100 {
 		fmt.Fprintln(os.Stderr, "invalid repeats, output-tokens, timeout, or many-file-count")
 		os.Exit(2)
+	}
+	if *issue143 {
+		if err := runIssue143(ctx, *helpPath, *describe); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
 	}
 	if *compareRelations {
 		if err := runIssue128(ctx, issue128Options{backendName: *backendName, fixtureName: *fixtureName, repeats: *repeats, outputBudget: *outputBudget, manyFileCount: *manyFileCount, timeout: *timeout, describe: *describe, helper: *helpPath, ollamaModel: *ollamaModel, modelSpec: spec}); err != nil {
