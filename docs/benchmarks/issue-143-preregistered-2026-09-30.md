@@ -30,7 +30,7 @@
 
 | モデル | 配布repository | revision | 全配布bytes | model_type | 量子化 |
 | --- | --- | --- | ---: | --- | --- |
-| Ministral baseline | mlx-community/Ministral-3-3B-Instruct-2512-4bit | a962dcb09eee4169c890e544c9eb938f1113fdee | 既存cacheを検証して別記 | ministral3 | 既存4bit |
+| Ministral baseline | mlx-community/Ministral-3-3B-Instruct-2512-4bit | a962dcb09eee4169c890e544c9eb938f1113fdee | 既存cache 2779150244 | mistral3 | 4bit/group64/affine |
 | Granite 4.2 3B | ibm-granite/granite-4.2-3b-q4-mlx | 0c6f39b1827afd5eb2c1c3b13751929857434953 | 2066182986 | granite | 4bit/group64/affine |
 | Phi-4-mini-instruct 3.8B | mlx-community/Phi-4-mini-instruct-4bit | ac1c269cb4222a4e136a3d09edad301056c1f36a | 2180067259 | phi3 | 4bit/group64 |
 | Nemotron 3 Nano 3.97B | mlx-community/NVIDIA-Nemotron-3-Nano-4B-4bit | c4d79ba1901d99806ef757642a552acebb851a35 | 2254295077 | nemotron_h | 4bit/group64/affine |
