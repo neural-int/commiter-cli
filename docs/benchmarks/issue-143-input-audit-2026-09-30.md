@@ -24,7 +24,7 @@ issue143Prepareで再構築した全12例のcontractは前回manifestと一致�
 | 合成hunk headerを除いた差分本文の完全一致 | 20/20 |
 | 正逆でsystem/schema/repository_inputが同一 | 8/8 |
 
-元diffの前に `@@ -1,1 +1,2 @@\n` が追加されており、完全byte一致ではない。このheaderのみを除くと全20fileで元diff本文と一致した。diff本文の欠落、構造evidenceへの置換、metadataのみへの縮退は観測されなかった。file IDとpathの対応、元diff SHA-256も照合した。
+元diffの前に `@@ -1,1 +1,2 @@\n` が追加されており、完全byte一致ではない。このheaderのみを除くと全20fileで元diff本文と一致した。再構築したuser JSON上ではdiff本文の欠落、構造evidenceへの置換、metadataのみへの縮退は観測されなかった。helper内のchat template適用・token化・実token列・contextへの取り込みはこの監査では検証していない。file IDとpathの対応、元diff SHA-256も照合した。
 
 ## 可視情報の具体的な観測
 
