@@ -263,7 +263,7 @@ func runMLXModelSetup(printer *output.Printer, values config.Values, update bool
 	}
 	spec := mlxmodel.Spec{Repo: values.Model, Revision: values.ModelRevision, Quantization: values.ModelQuantization}
 	if modelPath, err := store.Ready(spec); err == nil && !update {
-		if err := verifyMLXCapability(helper, values.Model, modelPath); err != nil {
+		if err := verifyMLXPlannerCapability(helper, values, modelPath); err != nil {
 			return fail(printer, exitcode.New(exitcode.LLM, "MLX model capability check failed"))
 		}
 		return finishSetup(printer, "MLX model, tokenizer, JSON Schema grammar, and constrained generation are ready")
@@ -294,7 +294,7 @@ func runMLXModelSetup(printer *output.Printer, values config.Values, update bool
 	if err != nil {
 		return fail(printer, exitcode.New(exitcode.LLM, err.Error()))
 	}
-	if err := verifyMLXCapability(helper, values.Model, modelPath); err != nil {
+	if err := verifyMLXPlannerCapability(helper, values, modelPath); err != nil {
 		return fail(printer, exitcode.New(exitcode.LLM, "MLX model was installed, but its model/tokenizer/JSON Schema capability check failed"))
 	}
 	return finishSetup(printer, "MLX model setup completed; tokenizer, JSON Schema grammar, and constrained generation passed")

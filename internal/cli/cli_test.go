@@ -177,7 +177,7 @@ func TestJSONDoctorIsStableAndReadOnly(t *testing.T) {
 		t.Fatal(err)
 	}
 	configPath := filepath.Join(configDirectory, "config.toml")
-	configBefore := []byte("[llm]\nendpoint = \"" + server.URL + "\"\n")
+	configBefore := []byte("[llm]\nplanner = \"single-pass\"\nbackend = \"ollama\"\nmodel = \"qwen3.5:4b-q4_K_M\"\nendpoint = \"" + server.URL + "\"\n")
 	if err := os.WriteFile(configPath, configBefore, 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -213,6 +213,7 @@ func TestJSONDoctorIsStableAndReadOnly(t *testing.T) {
 }
 
 func TestSetupConfirmationRejectionDoesNotInvokeOperation(t *testing.T) {
+	writeOllamaConfig(t, closedLoopbackEndpoint(t), "qwen3.5:4b-q4_K_M")
 	tests := []struct {
 		name            string
 		ollamaErr, brew bool
@@ -302,7 +303,7 @@ func TestSetupUpdateModelPullsOnlyAfterApproval(t *testing.T) {
 	if err := os.MkdirAll(filepath.Join(configHome, "commiter"), 0o700); err != nil {
 		t.Fatal(err)
 	}
-	configText := "[llm]\nmodel = \"qwen3.5:4b-q4_K_M\"\nendpoint = \"" + server.URL + "\"\n"
+	configText := "[llm]\nplanner = \"single-pass\"\nbackend = \"ollama\"\nmodel = \"qwen3.5:4b-q4_K_M\"\nendpoint = \"" + server.URL + "\"\n"
 	if err := os.WriteFile(filepath.Join(configHome, "commiter", "config.toml"), []byte(configText), 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -385,7 +386,7 @@ func TestMLXSetupShowsPinnedDownloadPlanBeforeApproval(t *testing.T) {
 	if err := os.MkdirAll(filepath.Join(configHome, "commiter"), 0o700); err != nil {
 		t.Fatal(err)
 	}
-	configText := "[llm]\nbackend = \"mlx\"\nmodel = \"owner/model\"\nmodel_revision = \"" +
+	configText := "[llm]\nplanner = \"single-pass\"\nbackend = \"mlx\"\nmodel = \"owner/model\"\nmodel_revision = \"" +
 		strings.Repeat("a", 40) + "\"\nmodel_quantization = \"4bit\"\n"
 	if err := os.WriteFile(filepath.Join(configHome, "commiter", "config.toml"), []byte(configText), 0o600); err != nil {
 		t.Fatal(err)
@@ -639,7 +640,7 @@ func writeOllamaConfig(t *testing.T, endpoint, model string) {
 	if err := os.MkdirAll(filepath.Join(configHome, "commiter"), 0o700); err != nil {
 		t.Fatal(err)
 	}
-	configText := "[llm]\nmodel = \"" + model + "\"\nendpoint = \"" + endpoint + "\"\n"
+	configText := "[llm]\nplanner = \"single-pass\"\nbackend = \"ollama\"\nmodel = \"" + model + "\"\nendpoint = \"" + endpoint + "\"\n"
 	if err := os.WriteFile(filepath.Join(configHome, "commiter", "config.toml"), []byte(configText), 0o600); err != nil {
 		t.Fatal(err)
 	}

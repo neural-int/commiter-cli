@@ -45,3 +45,26 @@ printf '%s\n' '{"ok":false,"stop_reason":"completed","generated_json":"{\"commit
 		t.Fatalf("response=%#v err=%v", response, err)
 	}
 }
+
+func TestBackendRejectsHelperThatIgnoresGenerationProfile(t *testing.T) {
+	for _, echo := range []string{"", "bounded-category", "bounded-grouping"} {
+		t.Run(echo, func(t *testing.T) {
+			helper := shellHelper(t, `IFS= read -r request
+case "$request" in
+ *'"model":"candidate@pinned"'*'"generation_profile":"bounded-grouping"'*) ;;
+ *) exit 1 ;;
+esac
+printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{}","generation_profile":"`+echo+`"}'
+`)
+			b := &Backend{Client: NewClient(helper), Model: "candidate", ModelRevision: "pinned", ModelPath: "/local/model"}
+			response, err := b.ChatWithOptions(context.Background(), []llm.Message{{Role: "user", Content: "plan"}}, json.RawMessage(`{"type":"object"}`), llm.Options{GenerationProfile: "bounded-grouping"})
+			if echo == "bounded-grouping" {
+				if err != nil || response.Content != "{}" {
+					t.Fatalf("response=%#v error=%v", response, err)
+				}
+			} else if err == nil || response.Content != "" {
+				t.Fatalf("ignored profile accepted: %#v %v", response, err)
+			}
+		})
+	}
+}

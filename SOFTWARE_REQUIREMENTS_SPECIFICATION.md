@@ -62,7 +62,7 @@ Ollama backend の実行時依存関係は、システムにインストール�
 
 対話的な通常実行では、更新確認のために固定された公式 GitHub Releases metadata エンドポイントへ、リポジトリの内容を含まない HTTP GET を最大24時間に1回だけ送信できます。更新確認のネットワーク障害は通常処理を妨げず、JSON 出力および CI 環境では更新確認を行いません。
 
-デフォルトモデルは `qwen3.5:4b-q4_K_M` とし、モデルサイズは公式配布情報に基づき約 3.4GB として扱います。[Qwen3.5 モデル情報](https://ollama.com/library/qwen3.5%3A4b-q4_K_M/blobs/81fb60c7daa8)
+既定は暫定 production 候補の Gemma 3段 planner、MLX 4bit、モデル `mlx-community/gemma-4-E4B-it-4bit`、revision `475b9088d29754a3379866cf5aeb6b41acd313c2` とします。選定根拠と未達条件は [Issue #143 選定記録](docs/decisions/issue-143-production-candidate.md) を参照してください。
 
 ## 6. 通常フロー
 
@@ -71,8 +71,8 @@ Ollama backend の実行時依存関係は、システムにインストール�
 3. CLI は pathspec を適用して無視対象（ignored）ファイルを除外し、追跡対象ファイルについては HEAD からワーキングツリーの最終状態までの変更全体をファイル単位で対象とします。部分的にステージングされている（partial stage）ファイルなど、staged と unstaged の変更が混在しているファイルもファイル全体を対象とします。名前変更（rename）は変更前パスと変更後パスを持つ1つの変更として扱い、1つの file ID を付与します。シンボリックリンクはリンク先を追従せず Git が追跡するリンク情報自体を対象とし、サブモジュールは親リポジトリ側のポインタ更新のみを対象とします。
 4. CLI はファイルパスのみに基づいて機密判定を行い、明確な機密ファイルを常に自動除外します。明確な機密ファイルを対象に含めるオーバーライド手段は提供しません。機密候補についてはファイル内容を読み取る前にユーザーに確認を求め、承認された候補のみをローカル解析に渡します。
 5. CLI は機密判定を経た対象変更について、Git のメタデータおよび Tree-sitter による構造エビデンスを生成します。v1 における構文解析の対象言語は Go、JavaScript、JSX、TypeScript、TSX、Python、Rust、HTML、CSS とし、未対応言語や構文解析に失敗したテキストファイルについては、生の差分（raw diff）と Git メタデータへフォールバックして処理を継続します。opaque file は内容を渡さず、メタデータのみを計画生成に渡します。構造エビデンスには、実装とテスト、ドキュメントとソースコード、同一機能といった関係性やグルーピングの推奨を含めません。
-6. CLI は各対象変更に file ID と change_hash を付与し、設定で許可されたコンテキスト段階から最小の段階を選んで LLM 入力を構築します。通常予算を超過する場合は、階層的な要約と許可された範囲内のコンテキスト拡張を、情報損失が少ない順に適用します。
-7. Ollama は制約付き JSON スキーマに従ったコミット計画を返却します。CLI は Git の状態変更（mutation）を行う前に、スキーマ、ファイルの割り当て、および安全条件を検証します。
+6. 既定の3段構成は固定16K context とし、圧縮を必要とする入力は停止します。単段構成では、CLI は各対象変更に file ID と change_hash を付与し、設定で許可されたコンテキスト段階から最小の段階を選んで LLM 入力を構築します。通常予算を超過する場合は、階層的な要約と許可された範囲内のコンテキスト拡張を、情報損失が少ない順に適用します。
+7. 選択された backend と planner がコミット計画を生成します。CLI は Git の状態変更（mutation）を行う前に、スキーマ、ファイルの割り当て、および安全条件を検証します。
 8. CLI はコミット計画全体と除外ファイル一覧を表示し、`Create these N commits? [y/r/N]` の確認プロンプトを一度だけ提示します。
 9. ユーザーが承認した場合にのみ、承認済みの検証定義（verification definition）に基づく検証コマンドを作業ツリー全体に対して一度だけ実行します。
 10. 検証の完了後、かつコミット処理の開始直前に、CLI は HEAD、対象変更の change_hash、インデックス、および対象の未追跡ファイル集合を再検証します。無視対象（ignored）ファイルの生成・変更のみは許容されます。追跡対象のワーキングツリー、インデックス、または対象の未追跡ファイル集合に変更が生じていた場合、CLI はコミットやプッシュを開始しません。検証処理によって生成されたワーキングツリーの変更はそのまま残し、インデックスを実行開始時の状態へ復元した上で、変更されたパスを表示して `Re-analyze changed state? [y/N]` を提示します。ユーザーが `y` を選択した場合は現在の Git 状態から手順 1 に戻り、拒否した場合は終了コード 4 で終了します。
@@ -133,10 +133,14 @@ glob、言語、モデル、および分類補助の設定は、リポジトリ�
 | `commit.confirm` | boolean | `true` | global、CLI |
 | `push.enabled` | boolean | `true` | global、CLI |
 | `push.confirm` | boolean | `true` | global、CLI |
-| `llm.model` | string | `"qwen3.5:4b-q4_K_M"` | global、repo、CLI |
+| `llm.planner` | string | `"three-phase"` | global、repo |
+| `llm.backend` | string | `"mlx"` | global、repo |
+| `llm.model_revision` | string | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` | global、repo |
+| `llm.model_quantization` | string | `"4bit"` | global、repo |
+| `llm.model` | string | `"mlx-community/gemma-4-E4B-it-4bit"` | global、repo、CLI |
 | `llm.endpoint` | string | `"http://127.0.0.1:11434"` | global |
-| `llm.context` | string | `"auto"` | global、repo |
-| `llm.max_context_tokens` | integer | `65536` | global、repo |
+| `llm.context` | string | `"16k"` | global、repo |
+| `llm.max_context_tokens` | integer | `16384` | global、repo |
 | `analysis.untracked` | string | `"auto-safe"` | global |
 | `analysis.include` | string array | `[]` | global、repo |
 | `analysis.exclude` | string array | `[]` | global、repo |
@@ -231,13 +235,15 @@ CLI は chunk 圧縮 profile またはコンテキスト予算を遷移するた
 
 ### FR-008 コミット計画の生成
 
-計画生成は runtime-neutral な LLM backend contract（メッセージ、構造化出力スキーマ、応答、数値 telemetry、能力情報、および retry 可否）を介して実行します。backend は設定に従って選択し、既定は Ollama とします。MLX を選択した場合は、準備済みのローカル model と helper を使用し、利用不能時に Ollama へ自動切替してはなりません。backend の追加は、既存 Ollama の structured output、retry、daemon/model lifecycle、およびローカル送信境界を変更してはなりません。
+計画生成は runtime-neutral な LLM backend contract（メッセージ、構造化出力スキーマ、応答、数値 telemetry、能力情報、および retry 可否）を介して実行します。backend は設定に従って選択し、既定は暫定候補の Gemma 3段構成と MLX とします。MLX を選択した場合は、準備済みのローカル model と helper を使用し、利用不能時に Ollama へ自動切替してはなりません。backend の追加は、既存 Ollama の structured output、retry、daemon/model lifecycle、およびローカル送信境界を変更してはなりません。
 
 CLI は選択された backend に構造化された入力を送り、ファイル単位のコミット計画を取得しなければなりません。Ollama は loopback API を使用し、MLX は準備済みのローカル model と bounded IPC helper を使用します。
 
 ### FR-009 LLM 生成失敗と出力検証
 
-初期生成（initial generation）の試行は1回とします。通信エラー（transport error）またはタイムアウトに対するリトライ予算は、初期生成と自動修復（repair）を通じて合計1回とします。
+既定の `three-phase` は membership、type / breaking evidence reference、scope / summary の順に最大3呼び出しで生成し、共有120秒、固定16K context、出力枠768 / 512 / 768 tokens、retry / repairなしとします。最大4ファイルかつ圧縮していない入力に限定し、未解決 evidence、途中停止または不正な出力では部分 plan を返さず終了コード5で停止します。各段階と最終 plan を検証します。
+
+以下の初期生成・修復・通信リトライの規定は、明示的に選択した `single-pass` に適用します。初期生成（initial generation）の試行は1回とします。通信エラー（transport error）またはタイムアウトに対するリトライ予算は、初期生成と自動修復（repair）を通じて合計1回とします。
 
 LLM から候補出力を受け取るたびに、Git の変更を行う前に JSON スキーマ、対象 file ID の完全な割り当て、機密値の有無、その他の安全条件を再検証しなければなりません。不正な候補出力に基づいて Git の状態を変更してはなりません。
 
@@ -378,7 +384,7 @@ setup は Homebrew 自体をインストールしてはなりません。
 
 ## 10. LLM 入力と出力
 
-Ollama エンドポイントはループバックに限定し、`think: false`、`stream: false`、JSON Schema、`keep_alive: 0` を使用します。commiter v1 が必要とする API 機能、デフォルトモデル `qwen3.5:4b-q4_K_M` の動作互換性、および thinking を無効化したモデルにおける構造化出力（structured outputs）の修正を踏まえ、対応する Ollama のバージョンは `0.31.2` 以上とします。下位バージョン、`0.31.2` のプレリリース版、および不正なバージョン応答は API 非互換として扱います。[Ollama Chat API](https://docs.ollama.com/api/chat)、[Structured Outputs](https://docs.ollama.com/capabilities/structured-outputs)、[Ollama v0.31.2](https://github.com/ollama/ollama/releases/tag/v0.31.2) を参照してください。
+Ollama エンドポイントはループバックに限定し、`think: false`、`stream: false`、JSON Schema、`keep_alive: 0` を使用します。commiter v1 が必要とする API 機能、従来の Ollama モデル `qwen3.5:4b-q4_K_M` の動作互換性、および thinking を無効化したモデルにおける構造化出力（structured outputs）の修正を踏まえ、対応する Ollama のバージョンは `0.31.2` 以上とします。下位バージョン、`0.31.2` のプレリリース版、および不正なバージョン応答は API 非互換として扱います。[Ollama Chat API](https://docs.ollama.com/api/chat)、[Structured Outputs](https://docs.ollama.com/capabilities/structured-outputs)、[Ollama v0.31.2](https://github.com/ollama/ollama/releases/tag/v0.31.2) を参照してください。
 
 入力には、機械的に計算したリポジトリ状態、対象 file ID、変更前後のパス（old/new path）、ステータス、言語、change_hash、構造エビデンス、ならびに必要な raw diff hunk または階層要約を含めます。構造エビデンスは構文上の客観的な観測事実に限定し、実装とテスト、ドキュメントとソースコード、同一機能、同一の論理的変更といった意味的な関係性ラベルやグルーピングの推奨は含めません。
 

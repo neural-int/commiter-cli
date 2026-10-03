@@ -25,6 +25,11 @@ let package = Package(
         ),
     ],
     targets: [
+        .target(name: "BoundedGeneration", dependencies: [
+            .product(name: "MLXGuidedGeneration", package: "mlx-swift-lm"),
+            .product(name: "MLXLMCommon", package: "mlx-swift-lm"),
+        ]),
+        .testTarget(name: "BoundedGenerationTests", dependencies: ["BoundedGeneration"]),
         .target(
             name: "CommiterMLXHelperProtocol"
         ),
@@ -32,6 +37,7 @@ let package = Package(
             name: "commiter-mlx-helper",
             dependencies: [
                 "CommiterMLXHelperProtocol",
+                "BoundedGeneration",
                 .product(name: "MLXGuidedGeneration", package: "mlx-swift-lm"),
                 .product(name: "MLXHuggingFace", package: "mlx-swift-lm"),
                 .product(name: "MLXLLM", package: "mlx-swift-lm"),
