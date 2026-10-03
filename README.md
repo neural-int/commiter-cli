@@ -70,10 +70,14 @@ Packaged binaries and a Homebrew distribution are not published yet. Until an ac
 ```sh
 git clone https://github.com/neural-int/commiter-cli.git
 cd commiter-cli
-go install ./cmd/commiter
+bash .github/scripts/build-mlx-helper.sh
+mkdir -p "$HOME/.local/commiter/bin" "$HOME/.local/commiter/libexec"
+go build -o "$HOME/.local/commiter/bin/commiter" ./cmd/commiter
+cp dist/commiter-mlx-helper dist/mlx.metallib "$HOME/.local/commiter/libexec/"
+export PATH="$HOME/.local/commiter/bin:$PATH"
 ```
 
-`go install` places the binary in `GOBIN`, or in `$(go env GOPATH)/bin` when `GOBIN` is unset. Ensure that directory is on your `PATH`.
+This requires Apple Silicon macOS and Xcode with Swift 6.2 or later. The CLI resides in `bin/` and its private helper and Metal library in the adjacent `libexec/`. Persist the PATH setting in your shell configuration. Existing v1 configuration files without a planner retain single-pass behavior; absent configuration files and new templates use the Gemma three-phase default.
 
 No Ollama model is bundled into the binary.
 

@@ -70,10 +70,14 @@ v1 で対象とする環境は以下のとおりです。
 ```sh
 git clone https://github.com/neural-int/commiter-cli.git
 cd commiter-cli
-go install ./cmd/commiter
+bash .github/scripts/build-mlx-helper.sh
+mkdir -p "$HOME/.local/commiter/bin" "$HOME/.local/commiter/libexec"
+go build -o "$HOME/.local/commiter/bin/commiter" ./cmd/commiter
+cp dist/commiter-mlx-helper dist/mlx.metallib "$HOME/.local/commiter/libexec/"
+export PATH="$HOME/.local/commiter/bin:$PATH"
 ```
 
-`go install` は、環境変数 `GOBIN` が設定されている場合はそのパスへ、未設定の場合は `$(go env GOPATH)/bin` へバイナリを配置します。対象ディレクトリに `PATH` が通っていることを確認してください。
+Apple Silicon の macOS と Xcode（Swift 6.2 以降）が必要です。CLI を `bin/`、helper と Metal library を隣の `libexec/` に配置します。PATH の設定は使用するシェルの設定ファイルにも追記してください。既存の planner 未指定の v1 設定は単段構成として読み込みます。設定ファイルがない場合と、新しいテンプレートでは Gemma 3段構成を使用します。
 
 なお、Ollama のモデルデータはバイナリには含まれていません。
 
