@@ -5,7 +5,7 @@ English | [日本語](README_ja.md)
 [![CI](https://github.com/neural-int/commiter-cli/actions/workflows/go.yml/badge.svg)](https://github.com/neural-int/commiter-cli/actions/workflows/go.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-`commiter` is a local-first Git commit planning CLI. It mechanically analyzes repository changes, asks a local Ollama model to propose a multi-commit Conventional Commits plan, verifies that plan against the current Git state, and only then creates commits and optionally pushes them.
+`commiter` is a local-first Git commit planning CLI. It mechanically analyzes repository changes, asks a local model to propose a multi-commit Conventional Commits plan, verifies that plan against the current Git state, and only then creates commits and optionally pushes them.
 
 > **Pre-release status:** no packaged GitHub Release is published yet. The currently available installation path is to build from source.
 
@@ -20,9 +20,9 @@ This design is intended to keep repository content local, reduce the amount of w
 ## Features
 
 - **Multi-commit planning** — groups file-level changes by purpose and generates Conventional Commits messages.
-- **Local LLM inference** — LLM requests are restricted to a loopback Ollama endpoint; repository content is not sent to a cloud LLM by `commiter`.
+- **Local LLM inference** — MLX uses a local Swift helper and Ollama uses a loopback endpoint; repository content is not sent to a cloud LLM by `commiter`.
 - **Syntax-aware preprocessing** — uses Tree-sitter where supported instead of asking the model to infer syntax from raw text alone.
-- **Adaptive context handling** — normally stays within 32K, expanding to 64K only when light compression still does not fit so stronger compression can be avoided.
+- **Bounded context handling** — the provisional three-phase default uses fixed 16K context; explicit single-pass retains adaptive compression and context tiers.
 - **Sensitive-file protection** — clearly sensitive files are always excluded; ambiguous candidates require approval before their contents are read.
 - **Plan validation and approval** — validates model output and, by default, requires approval before commits are created.
 - **Repository-scoped verification** — supports explicit verification commands and package-script autodetection with repository-scoped trust.
@@ -38,7 +38,7 @@ A normal run follows this flow:
 2. Collect staged, unstaged, and untracked state and determine the target files at file granularity.
 3. Classify sensitive paths before reading file contents; automatically exclude clearly sensitive files and ask before reading sensitive candidates.
 4. Build Git metadata and syntax-aware structural evidence. Unsupported text formats fall back to raw diff plus Git metadata.
-5. Compress the input as needed and ask the configured local Ollama model to generate a constrained JSON commit plan.
+5. Ask the configured local model for a commit plan. The default three-phase planner generates membership, type / breaking evidence reference, and scope / summary, with validation at every phase and on the final plan.
 6. Validate file assignment and safety rules, then show the plan for approval.
 7. Run the approved repository-scoped verification definition and revalidate Git state before creating commits.
 8. Create commits in plan order and, when enabled, perform one push after the commit sequence completes.
@@ -52,7 +52,7 @@ The v1 target environment is:
 - macOS 14 or later
 - Apple Silicon
 - Git
-- Ollama 0.31.2 or later
+- Bundled Swift helper for MLX (Ollama 0.31.2 or later for the explicit Ollama single-pass configuration)
 
 For the current source-build installation path, you also need:
 
@@ -61,7 +61,7 @@ For the current source-build installation path, you also need:
 
 The reference development environment is an M3 Mac with 16 GB of memory. This is a reference environment, not a declared minimum-memory requirement.
 
-The default model is `qwen3.5:4b-q4_K_M`. The default Ollama endpoint is `http://127.0.0.1:11434`.
+The default is the provisional Gemma three-phase planner with MLX, model `mlx-community/gemma-4-E4B-it-4bit`, revision `475b9088d29754a3379866cf5aeb6b41acd313c2`, and 4bit quantization.
 
 ## Installation
 
@@ -94,9 +94,9 @@ commiter
 
 When run from an interactive terminal, commiter checks the official GitHub Releases metadata at most once every 24 hours. If a newer stable release is available, it prints the release version and the Homebrew upgrade command. The check stores only its timestamp and latest version in the user state directory. Network failures are ignored so the normal command continues. Update checks are skipped for JSON output and CI environments.
 
-`commiter --dry-run` performs analysis and plan generation without modifying the index, creating commits, or pushing. Like a plain run, it temporarily starts Ollama when the daemon is stopped and stops only the daemon it started.
+`commiter --dry-run` performs analysis and plan generation without modifying the index, creating commits, or pushing. With the Ollama backend, it temporarily starts Ollama when the daemon is stopped and stops only the daemon it started.
 
-A plain `commiter` run can create commits and push. It temporarily starts Ollama when needed and stops only the daemon it started. Review the displayed plan and prompts before approving mutation.
+A plain `commiter` run can create commits and push. With the Ollama backend, it temporarily starts Ollama when needed and stops only the daemon it started. Review the displayed plan and prompts before approving mutation.
 
 ## Usage
 
@@ -187,18 +187,21 @@ Important defaults include:
 | `commit.confirm` | `true` |
 | `push.enabled` | `true` |
 | `push.confirm` | `true` |
-| `llm.backend` | `"ollama"` |
-| `llm.model` | `"qwen3.5:4b-q4_K_M"` |
+| `llm.backend` | `"mlx"` |
+| `llm.planner` | `"three-phase"` |
+| `llm.model` | `"mlx-community/gemma-4-E4B-it-4bit"` |
+| `llm.model_revision` | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` |
+| `llm.model_quantization` | `"4bit"` |
 | `llm.endpoint` | `"http://127.0.0.1:11434"` |
-| `llm.context` | `"auto"` |
-| `llm.max_context_tokens` | `65536` |
+| `llm.context` | `"16k"` |
+| `llm.max_context_tokens` | `16384` |
 | `verification.autodetect` | `true` |
 | `verification.timeout_seconds` | `600` |
 | `metrics.persist` | `false` |
 
 The Ollama endpoint must be a loopback HTTP URL. Verification configuration is repository-scoped and cannot be configured globally.
 
-MLX model preparation is opt-in. Set `llm.backend = "mlx"`, `llm.model = "owner/repository"`, `llm.model_revision` to the full 40-character commit hash, and `llm.model_quantization` to the model's quantization (for example, `"4bit"`) in the global or repository configuration. There is no MLX default model until the 4B compatibility benchmark is complete. `commiter setup` displays the repository, pinned revision, quantization, estimated size, and cache destination before asking to download. `commiter setup --update-model` refreshes the configured pin; change the revision in configuration to move to a newer model. Model files are stored under the user's `commiter/mlx-models` cache directory and checked against the pinned file digests. A normal run never contacts the model registry or downloads a model. Packaged macOS releases include the private `commiter-mlx-helper` and `mlx.metallib` side by side under `libexec`; MLX planning locates that bundled helper and never searches `PATH` or falls back to Ollama. A source build must place the helper and Metal library in the same `bin/` and `libexec/` layout.
+The provisional Gemma three-phase default accepts at most four selected files, uncompressed input, fixed 16K context, and a shared 120-second timeout, with no retry or repair. Select `llm.planner = "single-pass"` explicitly for a different backend, model, revision, quantization, or context. The [selection record](docs/decisions/issue-143-production-candidate.md) documents evidence, remaining semantic questions, and unmet timing conditions. `commiter setup` displays the repository, pinned revision, quantization, estimated size, and cache destination before asking to download. `commiter setup --update-model` refreshes the configured pin; change the revision in configuration to move to a newer model. Model files are stored under the user's `commiter/mlx-models` cache directory and checked against the pinned file digests. A normal run never contacts the model registry or downloads a model. Packaged macOS releases include the private `commiter-mlx-helper` and `mlx.metallib` side by side under `libexec`; MLX planning locates that bundled helper and never searches `PATH` or falls back to Ollama. A source build must place the helper and Metal library in the same `bin/` and `libexec/` layout.
 
 For the complete configuration schema and source restrictions, see the [Software Requirements Specification](SOFTWARE_REQUIREMENTS_SPECIFICATION_en.md).
 
