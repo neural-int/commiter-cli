@@ -39,6 +39,7 @@ doctor_output="$package_check/doctor.json"
 mkdir -p "$config_home/commiter" "$state_home"
 cat > "$config_home/commiter/config.toml" <<'EOF'
 [llm]
+planner = "single-pass"
 backend = "mlx"
 model = "owner/model"
 model_revision = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"

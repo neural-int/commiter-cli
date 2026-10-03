@@ -46,7 +46,7 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 		if err != nil {
 			return planning.Plan{}, exitcode.New(exitcode.LLM, "bundled MLX helper is unavailable; reinstall commiter")
 		}
-		client = &mlx.Backend{Client: mlx.NewClient(helper), Model: values.Model, ModelPath: modelPath}
+		client = &mlx.Backend{Client: mlx.NewClient(helper), Model: values.Model, ModelPath: modelPath, ModelRevision: values.ModelRevision}
 	}
 	recorder := runmetrics.FromContext(ctx)
 	started := time.Now()
@@ -81,6 +81,10 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 	if err != nil {
 		return planning.Plan{}, err
 	}
+	if values.Planner == config.CandidatePlanner {
+		// The candidate uses a fixed context, rather than the legacy tier choice.
+		prepared.Budget.ContextTokens = contextinput.Context16K
+	}
 	contextStage := fmt.Sprintf("%dk", prepared.Budget.ContextTokens/1024)
 	recorder.SetContext(values.Model, contextStage)
 	if client == nil {
@@ -91,7 +95,12 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 		defer runtime.Close()
 		client = runtime.Client
 	}
-	generated, err := (planning.Generator{Client: client}).Generate(ctx, prepared, language, sensitive)
+	var generated planning.Result
+	if values.Planner == config.CandidatePlanner {
+		generated, err = (planning.ThreePhaseGenerator{Client: client}).Generate(ctx, prepared, language, sensitive)
+	} else {
+		generated, err = (planning.Generator{Client: client}).Generate(ctx, prepared, language, sensitive)
+	}
 	recordGeneratedTelemetry(recorder, generated)
 	if err != nil {
 		return planning.Plan{}, err

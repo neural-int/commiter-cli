@@ -11,9 +11,10 @@ import (
 // Backend adapts the private helper to the planning-facing LLM contract.
 // ModelPath must point to an already installed local model.
 type Backend struct {
-	Client    *Client
-	Model     string
-	ModelPath string
+	Client        *Client
+	Model         string
+	ModelPath     string
+	ModelRevision string
 }
 
 var _ llm.OptionsBackend = (*Backend)(nil)
@@ -26,9 +27,14 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 	if backend == nil || backend.Client == nil {
 		return llm.Response{}, errors.New("MLX helper client is required")
 	}
+	model := backend.Model
+	if options.GenerationProfile != "" {
+		model += "@" + backend.ModelRevision
+	}
 	response, err := backend.Client.Generate(ctx, Request{
 		Schema: schema, Messages: messages, ContextTokens: options.ContextTokens,
-		OutputTokens: options.OutputTokens, Model: backend.Model, ModelPath: backend.ModelPath,
+		OutputTokens: options.OutputTokens, Model: model, ModelPath: backend.ModelPath,
+		GenerationProfile: options.GenerationProfile,
 	})
 	if err != nil {
 		var failure *Error
@@ -36,6 +42,9 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 			return llm.Response{Backend: "mlx", Model: response.Model, StopReason: string(response.StopReason)}, nil
 		}
 		return llm.Response{}, err
+	}
+	if options.GenerationProfile != "" && response.GenerationProfile != options.GenerationProfile {
+		return llm.Response{}, &Error{Kind: FailureProtocol}
 	}
 	return llm.Response{
 		Backend: "mlx", Model: response.Model, Content: response.GeneratedJSON,

@@ -68,19 +68,21 @@ type Request struct {
 	// Model is a display identifier. ModelPath is an already prepared local
 	// model directory; the helper never resolves Model through a network
 	// downloader.
-	Model     string `json:"model,omitempty"`
-	ModelPath string `json:"model_path,omitempty"`
+	Model             string `json:"model,omitempty"`
+	ModelPath         string `json:"model_path,omitempty"`
+	GenerationProfile string `json:"generation_profile,omitempty"`
 }
 
 // Response is the machine-readable helper output. GeneratedJSON is accepted
 // by a caller only when StopReason is StopReasonCompleted.
 type Response struct {
-	OK            bool       `json:"ok"`
-	StopReason    StopReason `json:"stop_reason"`
-	GeneratedJSON string     `json:"generated_json,omitempty"`
-	Model         string     `json:"model,omitempty"`
-	Runtime       string     `json:"runtime,omitempty"`
-	ErrorClass    string     `json:"error_class,omitempty"`
+	OK                bool       `json:"ok"`
+	StopReason        StopReason `json:"stop_reason"`
+	GeneratedJSON     string     `json:"generated_json,omitempty"`
+	Model             string     `json:"model,omitempty"`
+	Runtime           string     `json:"runtime,omitempty"`
+	ErrorClass        string     `json:"error_class,omitempty"`
+	GenerationProfile string     `json:"generation_profile,omitempty"`
 }
 
 // FailureKind identifies failures without exposing helper diagnostics or
