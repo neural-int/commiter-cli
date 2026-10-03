@@ -407,3 +407,50 @@ func TestThreePhaseDefaultRequiresPinnedCandidateAndFixedContext(t *testing.T) {
 		})
 	}
 }
+
+func TestLegacyV1PlannerCompatibility(t *testing.T) {
+	for _, scope := range []string{"global", "repo"} {
+		t.Run(scope, func(t *testing.T) {
+			root := t.TempDir()
+			global, repo := filepath.Join(root, "global.toml"), filepath.Join(root, "repo.toml")
+			path := global
+			if scope == "repo" {
+				path = repo
+			}
+			writeTestFile(t, path, "schema_version = 1\n[llm]\nmodel = \"qwen3.5:4b-q4_K_M\"\ncontext = \"auto\"\n")
+			e, err := Resolve(global, repo, root, CLIOverrides{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if e.Values.Planner != "single-pass" || e.Values.Backend != "ollama" || e.Values.MaxTokens != 65536 {
+				t.Fatalf("legacy config = %#v", e.Values)
+			}
+		})
+	}
+	root := t.TempDir()
+	e, err := Resolve(filepath.Join(root, "absent"), filepath.Join(root, "missing"), root, CLIOverrides{})
+	if err != nil || e.Values.Planner != CandidatePlanner {
+		t.Fatalf("fresh defaults: %#v %v", e.Values, err)
+	}
+}
+
+func TestLegacyMLXAndExplicitCandidateCompatibility(t *testing.T) {
+	root := t.TempDir()
+	global, repo := filepath.Join(root, "global.toml"), filepath.Join(root, "repo.toml")
+	writeTestFile(t, global, "[llm]\nbackend = \"mlx\"\nmodel = \"owner/model\"\nmodel_revision = \""+strings.Repeat("a", 40)+"\"\nmodel_quantization = \"4bit\"\n")
+	e, err := Resolve(global, repo, root, CLIOverrides{})
+	if err != nil || e.Values.Planner != "single-pass" || e.Values.Model != "owner/model" {
+		t.Fatalf("legacy MLX: %#v %v", e.Values, err)
+	}
+	writeTestFile(t, repo, RepoTemplate)
+	e, err = Resolve(global, repo, root, CLIOverrides{})
+	if err != nil || e.Values.Planner != CandidatePlanner || e.Values.Model != CandidateModel {
+		t.Fatalf("explicit migration: %#v %v", e.Values, err)
+	}
+	writeTestFile(t, global, GlobalTemplate)
+	writeTestFile(t, repo, "[commit]\nlanguage = \"ja\"\n")
+	e, err = Resolve(global, repo, root, CLIOverrides{})
+	if err != nil || e.Values.Planner != CandidatePlanner {
+		t.Fatalf("explicit global planner overridden: %#v %v", e.Values, err)
+	}
+}

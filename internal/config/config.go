@@ -200,6 +200,23 @@ func applyFile(effective *Effective, path string, source Source, repoRoot string
 	if err := flatten("", raw, flat); err != nil {
 		return fmt.Errorf("invalid %s configuration: %w", source, err)
 	}
+	// Existing v1 files predate planner selection. Only infer legacy defaults
+	// while no earlier configuration has explicitly selected a planner.
+	if _, explicit := flat["llm.planner"]; !explicit && effective.Sources["llm.planner"] == SourceDefault {
+		legacy := map[string]string{"llm.backend": "ollama", "llm.model": "qwen3.5:4b-q4_K_M", "llm.model_revision": "", "llm.model_quantization": "", "llm.context": "auto"}
+		for key, value := range legacy {
+			if effective.Sources[key] == SourceDefault {
+				if err := applyValue(effective, key, "string", value, SourceDefault, repoRoot); err != nil {
+					return err
+				}
+			}
+		}
+		if effective.Sources["llm.max_context_tokens"] == SourceDefault {
+			effective.Values.MaxTokens = 65536
+		}
+		effective.Values.Planner = "single-pass"
+		effective.Sources["llm.planner"] = source
+	}
 	keys := make([]string, 0, len(flat))
 	for key := range flat {
 		keys = append(keys, key)
