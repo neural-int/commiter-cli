@@ -62,7 +62,7 @@ The Ollama backend requires system Git and Ollama at runtime. The MLX backend us
 
 During interactive normal execution, the CLI may send an HTTP GET containing no repository content to a fixed official GitHub Releases metadata endpoint for an update check at most once every 24 hours. Update-check network failures must not interrupt normal processing, and update checks are skipped for JSON output and CI environments.
 
-The default model is `qwen3.5:4b-q4_K_M`; its size is treated as approximately 3.4 GB based on official distribution information. [Qwen3.5 model information](https://ollama.com/library/qwen3.5%3A4b-q4_K_M/blobs/81fb60c7daa8)
+The default is the provisional Gemma three-phase planner with MLX 4bit, model `mlx-community/gemma-4-E4B-it-4bit`, revision `475b9088d29754a3379866cf5aeb6b41acd313c2`. See the [Issue #143 selection record](docs/decisions/issue-143-production-candidate.md) for evidence and unmet conditions.
 
 ## 6. Normal Flow
 
@@ -71,8 +71,8 @@ The default model is `qwen3.5:4b-q4_K_M`; its size is treated as approximately 3
 3. The CLI applies pathspec, excludes ignored files, and targets tracked files at file granularity from HEAD through the final working-tree state. A file containing both staged and unstaged changes, including a partially staged file, is targeted as a whole file. A rename is represented as one change with an old path and new path and receives one file ID. A symlink is handled as Git-tracked link information without following the link target, and a submodule is handled only as the parent repository's pointer update.
 4. The CLI performs sensitive classification using paths only and always automatically excludes clearly sensitive files. No override is provided to target clearly sensitive files. Sensitive candidates are confirmed before their contents are read, and only approved candidates are passed to local analysis.
 5. For target changes remaining after sensitive classification, the CLI generates Git metadata and Tree-sitter structural evidence. v1 parses Go, JavaScript, JSX, TypeScript, TSX, Python, Rust, HTML, and CSS. A text file in an unsupported language or one for which syntax parsing fails falls back to raw diff plus Git metadata. Opaque files are passed to plan generation as metadata only, without their contents. Structural evidence does not include relationships or grouping recommendations such as source/test, docs/source, or same-feature relationships.
-6. The CLI assigns a file ID and change_hash to every target change and constructs LLM input using the smallest context tier allowed by configuration. When the normal budget is exceeded, it applies hierarchical summarization and permitted context expansion in order of least information loss.
-7. Ollama returns a constrained JSON commit plan. Before any Git mutation, the CLI validates the schema, file assignment, and safety conditions.
+6. The default three-phase planner uses fixed 16K context and stops if input requires compression. For single-pass, the CLI assigns a file ID and change_hash to every target change and constructs LLM input using the smallest context tier allowed by configuration. When the normal budget is exceeded, it applies hierarchical summarization and permitted context expansion in order of least information loss.
+7. The selected backend and planner produce a commit plan. Before any Git mutation, the CLI validates the schema, file assignment, and safety conditions.
 8. The CLI displays the full plan and exclusion list and prompts exactly once with `Create these N commits? [y/r/N]`.
 9. Only after user approval, the CLI runs verification once against the entire working tree based on an approved verification definition.
 10. After verification and immediately before commit creation begins, the CLI revalidates HEAD, target-change change_hash values, the index, and the target untracked set. Changes limited to ignored output are allowed. If the tracked working tree, index, or target untracked set changed, the CLI must not start commits or push. It leaves verification-generated working-tree changes intact, restores the index to its state at the start of the run, displays the changed paths, and prompts `Re-analyze changed state? [y/N]`. If the user selects `y`, processing returns to step 1 using the current Git state; if declined, the CLI exits with code 4.
@@ -133,10 +133,14 @@ Configuration files use TOML and the following v1 schema:
 | `commit.confirm` | boolean | `true` | global, CLI |
 | `push.enabled` | boolean | `true` | global, CLI |
 | `push.confirm` | boolean | `true` | global, CLI |
-| `llm.model` | string | `"qwen3.5:4b-q4_K_M"` | global, repo, CLI |
+| `llm.planner` | string | `"three-phase"` | global, repo |
+| `llm.backend` | string | `"mlx"` | global, repo |
+| `llm.model_revision` | string | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` | global, repo |
+| `llm.model_quantization` | string | `"4bit"` | global, repo |
+| `llm.model` | string | `"mlx-community/gemma-4-E4B-it-4bit"` | global, repo, CLI |
 | `llm.endpoint` | string | `"http://127.0.0.1:11434"` | global |
-| `llm.context` | string | `"auto"` | global, repo |
-| `llm.max_context_tokens` | integer | `65536` | global, repo |
+| `llm.context` | string | `"16k"` | global, repo |
+| `llm.max_context_tokens` | integer | `16384` | global, repo |
 | `analysis.untracked` | string | `"auto-safe"` | global |
 | `analysis.include` | string array | `[]` | global, repo |
 | `analysis.exclude` | string array | `[]` | global, repo |
@@ -232,13 +236,15 @@ Hierarchical summarization and structural-evidence reduction must preserve the c
 
 ### FR-008 Commit Plan Generation
 
-Plan generation uses a runtime-neutral LLM backend contract for messages, structured-output schemas, responses, numeric telemetry, capabilities, and retry classification. The configured backend is selected explicitly, with Ollama as the default. When MLX is selected, commiter uses the prepared local model and helper and must not fall back to Ollama when they are unavailable. Adding a backend must not change existing Ollama structured output, retry, daemon/model lifecycle, or local transmission boundaries.
+Plan generation uses a runtime-neutral LLM backend contract for messages, structured-output schemas, responses, numeric telemetry, capabilities, and retry classification. The configured backend is selected explicitly, with the provisional Gemma three-phase planner and MLX as the default. When MLX is selected, commiter uses the prepared local model and helper and must not fall back to Ollama when they are unavailable. Adding a backend must not change existing Ollama structured output, retry, daemon/model lifecycle, or local transmission boundaries.
 
 The CLI must send structured input to the selected backend and obtain a file-level commit plan. Ollama uses its loopback API; MLX uses the prepared local model through the bounded IPC helper.
 
 ### FR-009 LLM Generation Failure and Output Validation
 
-There is exactly one initial generation. The retry budget for transport errors or timeouts is one retry total, shared across the initial generation and repair.
+The default `three-phase` planner makes at most three calls: membership, type / breaking evidence reference, and scope / summary. It uses a shared 120-second timeout, fixed 16K context, output reservations of 768 / 512 / 768 tokens, and no retry or repair. It accepts at most four selected files and uncompressed input. Unresolved evidence, incomplete output, or invalid output stops with exit code 5 without returning a partial plan. Every phase and the final plan are validated.
+
+The following generation, repair, and transport-retry contract applies to explicitly selected `single-pass`. There is exactly one initial generation. The retry budget for transport errors or timeouts is one retry total, shared across the initial generation and repair.
 
 Every time candidate output is received from the LLM, the CLI must revalidate the JSON schema, complete assignment of target file IDs, sensitive-value constraints, and all other safety conditions before any Git mutation. Git must not be modified while the candidate output is invalid.
 
@@ -380,7 +386,7 @@ During interactive normal execution, the CLI must send at most one HTTP GET ever
 
 ## 10. LLM Input and Output
 
-The Ollama endpoint is restricted to loopback and uses `think: false`, `stream: false`, JSON Schema, and `keep_alive: 0`. Based on the API features required by commiter v1, operational compatibility of the default model `qwen3.5:4b-q4_K_M`, and the structured-output fix for models with thinking disabled, supported Ollama versions are `0.31.2` or later. Earlier versions, prereleases of `0.31.2`, and invalid version responses are treated as API-incompatible. See [Ollama Chat API](https://docs.ollama.com/api/chat), [Structured Outputs](https://docs.ollama.com/capabilities/structured-outputs), and [Ollama v0.31.2](https://github.com/ollama/ollama/releases/tag/v0.31.2).
+The Ollama endpoint is restricted to loopback and uses `think: false`, `stream: false`, JSON Schema, and `keep_alive: 0`. Based on the API features required by commiter v1, operational compatibility of the legacy Ollama model `qwen3.5:4b-q4_K_M`, and the structured-output fix for models with thinking disabled, supported Ollama versions are `0.31.2` or later. Earlier versions, prereleases of `0.31.2`, and invalid version responses are treated as API-incompatible. See [Ollama Chat API](https://docs.ollama.com/api/chat), [Structured Outputs](https://docs.ollama.com/capabilities/structured-outputs), and [Ollama v0.31.2](https://github.com/ollama/ollama/releases/tag/v0.31.2).
 
 Input includes mechanically computed repository state, target file IDs, old/new paths, status, language, change_hash, structural evidence, and required raw diff hunks or hierarchical summaries. Structural evidence is limited to syntactically observed facts and must not include semantic relation labels or grouping recommendations such as source/test, docs/source, same feature, or same logical change.
 

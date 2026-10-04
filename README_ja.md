@@ -5,7 +5,7 @@
 [![CI](https://github.com/neural-int/commiter-cli/actions/workflows/go.yml/badge.svg)](https://github.com/neural-int/commiter-cli/actions/workflows/go.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-`commiter` は、ローカル環境での実行に特化した Git コミット計画支援 CLI です。リポジトリ内の変更を機械的に解析し、ローカルで動作する Ollama モデルを用いて Conventional Commits 準拠の複数コミット計画を作成します。その計画を現在の Git の状態と照合して安全性を検証した上で、実際のコミット作成や必要に応じた push を行います。
+`commiter` は、ローカル環境での実行に特化した Git コミット計画支援 CLI です。リポジトリ内の変更を機械的に解析し、ローカルで動作するモデルを用いて Conventional Commits 準拠の複数コミット計画を作成します。その計画を現在の Git の状態と照合して安全性を検証した上で、実際のコミット作成や必要に応じた push を行います。
 
 > **プレリリース情報:** 現時点ではパッケージ化された GitHub Releases は公開されていません。現在の導入方法はソースコードからのビルドのみとなります。
 
@@ -20,9 +20,9 @@ Git の状態把握、対象ファイルの選定、機密ファイルの判別�
 ## 主な機能
 
 - **複数コミットの計画立案** — ファイル単位の変更を目的ごとにグループ化し、Conventional Commits 形式のメッセージを作成します。
-- **完全ローカルでの LLM 推論** — LLM へのリクエストはローカルホスト（loopback）上の Ollama エンドポイントのみに限定され、リポジトリの内容がクラウド上の外部 LLM に送信されることはありません。
+- **完全ローカルでの LLM 推論** — MLX はローカルの Swift helper、Ollama は loopback エンドポイントで推論し、リポジトリの内容がクラウド上の外部 LLM に送信されることはありません。
 - **構文を意識した前処理** — 対応言語では Tree-sitter を利用して構文解析を行い、生のテキスト差分のみから構文をモデルに推測させる負担を軽減します。
-- **適応型コンテキスト管理** — 通常は32K以内で処理し、light圧縮でも収まらない場合だけ64Kへ拡張して、不要に強い圧縮を避けます。
+- **コンテキスト予算管理** — 暫定候補の3段構成は固定16Kを使用します。明示的に選択した単段構成では、適応型の圧縮とコンテキスト段階を使用できます。
 - **機密情報の保護** — 明らかな機密ファイルは自動的に対象から除外されます。機密情報を含む可能性があるファイルについても、内容を読み込む前にユーザーの承認を求めます。
 - **計画の検証と承認フロー** — モデルの出力を検証し、デフォルトでは実際のコミット作成前に必ずユーザーの承認を要求します。
 - **リポジトリ単位の検証機能** — 明示的に指定した検証コマンドや、package.json のスクリプト自動検出に対応しています。検証コマンドの信頼設定（trust）はリポジトリごとに安全に管理されます。
@@ -38,7 +38,7 @@ Git の状態把握、対象ファイルの選定、機密ファイルの判別�
 2. staged / unstaged / untracked の状態を収集し、処理対象となるファイルをファイル単位で確定します。
 3. ファイル内容を読み取る前にパス情報から機密性を判定します。明らかな機密ファイルは自動で除外され、判断が分かれる候補ファイルについては読み取り前にユーザーへ確認を求めます。
 4. Git のメタデータと、Tree-sitter による構文構造エビデンス（structural evidence）を抽出します。構文解析に未対応のテキスト形式については、生の diff と Git メタデータへのフォールバックで対応します。
-5. コンテキスト上限に合わせて入力を適切に圧縮し、設定されたローカル Ollama モデルに対して制約付き JSON 形式でのコミット計画生成を要求します。
+5. 設定されたローカルモデルでコミット計画を生成します。既定の3段構成は membership、type / breaking evidence reference、scope / summary の順に生成し、各段階と最終 plan を検証します。
 6. ファイルの割り当て妥当性と安全規約を検証した上で、生成された計画を画面に表示してユーザーに承認を求めます。
 7. 承認済みのリポジトリ単位の検証処理（verification）を実行し、コミット作成直前に Git の状態を再検証します。
 8. 計画された順序に沿ってコミットを順次作成し、push が有効な場合はコミット列の完了後に一括で 1 回だけ push します。
@@ -52,7 +52,7 @@ v1 で対象とする環境は以下のとおりです。
 - macOS 14 以降
 - Apple Silicon（M シリーズ）
 - Git
-- Ollama 0.31.2 以降
+- MLX 用の同梱 Swift helper（Ollama の単段構成を選ぶ場合は Ollama 0.31.2 以降）
 
 現時点のソースビルドによる導入では、追加で以下が必要です。
 
@@ -61,7 +61,7 @@ v1 で対象とする環境は以下のとおりです。
 
 開発におけるリファレンス環境は M3 Mac（メモリ 16 GB）です。これはあくまで動作確認済みのリファレンス環境であり、必須の最小メモリ要件ではありません。
 
-デフォルトのモデルは `qwen3.5:4b-q4_K_M`、デフォルトの Ollama エンドポイントは `http://127.0.0.1:11434` です。
+既定は暫定 production 候補の Gemma 3段 planner と MLX です。モデルは `mlx-community/gemma-4-E4B-it-4bit`、revision は `475b9088d29754a3379866cf5aeb6b41acd313c2`、量子化は4bitです。
 
 ## インストール
 
@@ -70,10 +70,14 @@ v1 で対象とする環境は以下のとおりです。
 ```sh
 git clone https://github.com/neural-int/commiter-cli.git
 cd commiter-cli
-go install ./cmd/commiter
+bash .github/scripts/build-mlx-helper.sh
+mkdir -p "$HOME/.local/commiter/bin" "$HOME/.local/commiter/libexec"
+go build -o "$HOME/.local/commiter/bin/commiter" ./cmd/commiter
+cp dist/commiter-mlx-helper dist/mlx.metallib "$HOME/.local/commiter/libexec/"
+export PATH="$HOME/.local/commiter/bin:$PATH"
 ```
 
-`go install` は、環境変数 `GOBIN` が設定されている場合はそのパスへ、未設定の場合は `$(go env GOPATH)/bin` へバイナリを配置します。対象ディレクトリに `PATH` が通っていることを確認してください。
+Apple Silicon の macOS と Xcode（Swift 6.2 以降）が必要です。CLI を `bin/`、helper と Metal library を隣の `libexec/` に配置します。PATH の設定は使用するシェルの設定ファイルにも追記してください。既存の planner 未指定の v1 設定は単段構成として読み込みます。設定ファイルがない場合と、新しいテンプレートでは Gemma 3段構成を使用します。
 
 なお、Ollama のモデルデータはバイナリには含まれていません。
 
@@ -145,7 +149,7 @@ commiter --no-push
 | `--no-confirm-commit` | 通常のコミット計画承認プロンプトをスキップ（安全上不可欠な確認はスキップされません） |
 | `--no-confirm-push` | 通常の push 承認プロンプトをスキップ（安全上不可欠な確認はスキップされません） |
 | `--language en\|ja` | 今回の実行で使用するコミットメッセージ言語を一時的に変更 |
-| `--model NAME` | 今回の実行で使用する Ollama モデルを一時的に変更 |
+| `--model NAME` | 今回の実行で使用するモデルを変更（別モデルには単段構成を明示） |
 | `--record-metrics` | 今回の実行のメトリクスログをローカルに保存 |
 | `--json` | `--dry-run` または対応する読み取り専用コマンドの出力を JSON 形式で表示 |
 
@@ -183,18 +187,21 @@ commiter config show --effective
 | `commit.confirm` | `true` |
 | `push.enabled` | `true` |
 | `push.confirm` | `true` |
-| `llm.backend` | `"ollama"` |
-| `llm.model` | `"qwen3.5:4b-q4_K_M"` |
+| `llm.backend` | `"mlx"` |
+| `llm.planner` | `"three-phase"` |
+| `llm.model` | `"mlx-community/gemma-4-E4B-it-4bit"` |
+| `llm.model_revision` | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` |
+| `llm.model_quantization` | `"4bit"` |
 | `llm.endpoint` | `"http://127.0.0.1:11434"` |
-| `llm.context` | `"auto"` |
-| `llm.max_context_tokens` | `65536` |
+| `llm.context` | `"16k"` |
+| `llm.max_context_tokens` | `16384` |
 | `verification.autodetect` | `true` |
 | `verification.timeout_seconds` | `600` |
 | `metrics.persist` | `false` |
 
 Ollama のエンドポイントは、必ずローカルホストを指す loopback HTTP URL である必要があります。また、検証処理（verification）に関する設定はリポジトリ固有のスコープに限定されており、グローバル設定には記述できません。
 
-MLX モデルの準備は明示的な設定で行います。グローバル設定またはリポジトリ設定に `llm.backend = "mlx"`、`llm.model = "owner/repository"`、40 文字のコミットハッシュを指定する `llm.model_revision`、量子化を表す `llm.model_quantization`（例: `"4bit"`）を設定してください。4B モデルの互換性検証が終わるまでは MLX の既定モデルを設けません。`commiter setup` はモデル ID、固定 revision、量子化、概算容量、保存先を表示してから取得の承認を求めます。新しい revision に更新する際は設定を変更し、`commiter setup --update-model` を実行します。ファイルはユーザーの `commiter/mlx-models` キャッシュに保存し、固定されたファイルのハッシュで検証します。通常実行中にモデルレジストリへの通信や自動取得は行いません。macOS 向け配布物には非公開の `commiter-mlx-helper` を `libexec` に含めます。MLX の計画生成では、その helper を同梱の場所から起動し、`PATH` を検索せず、Ollama へ暗黙に切り替えません。ソースからビルドする場合は、`bin/` と `libexec/` の同じ配置に helper をビルドして置く必要があります。
+既定の Gemma 3段構成は最大4ファイル、圧縮していない入力、固定16K context、共有120秒、retry / repairなしに限定します。モデル、backend、revision、量子化、context の別構成には `llm.planner = "single-pass"` を明示してください。[選定根拠と制約](docs/decisions/issue-143-production-candidate.md) に未確認の意味評価と時間の課題を記録しています。`commiter setup` はモデル ID、固定 revision、量子化、概算容量、保存先を表示してから取得の承認を求めます。新しい revision に更新する際は設定を変更し、`commiter setup --update-model` を実行します。ファイルはユーザーの `commiter/mlx-models` キャッシュに保存し、固定されたファイルのハッシュで検証します。通常実行中にモデルレジストリへの通信や自動取得は行いません。macOS 向け配布物には非公開の `commiter-mlx-helper` を `libexec` に含めます。MLX の計画生成では、その helper を同梱の場所から起動し、`PATH` を検索せず、Ollama へ暗黙に切り替えません。ソースからビルドする場合は、`bin/` と `libexec/` の同じ配置に helper をビルドして置く必要があります。
 
 全設定項目のスキーマや詳細な制限事項については、[ソフトウェア要求仕様書](SOFTWARE_REQUIREMENTS_SPECIFICATION.md) を参照してください。
 

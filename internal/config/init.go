@@ -18,11 +18,14 @@ enabled = true
 confirm = true
 
 [llm]
-backend = "ollama"
-model = "qwen3.5:4b-q4_K_M"
+planner = "three-phase"
+backend = "mlx"
+model = "mlx-community/gemma-4-E4B-it-4bit"
+model_revision = "475b9088d29754a3379866cf5aeb6b41acd313c2"
+model_quantization = "4bit"
 endpoint = "http://127.0.0.1:11434"
-context = "auto"
-max_context_tokens = 65536
+context = "16k"
+max_context_tokens = 16384
 
 [analysis]
 untracked = "auto-safe"
@@ -42,10 +45,13 @@ const RepoTemplate = `schema_version = 1
 language = "en"
 
 [llm]
-backend = "ollama"
-model = "qwen3.5:4b-q4_K_M"
-context = "auto"
-max_context_tokens = 65536
+planner = "three-phase"
+backend = "mlx"
+model = "mlx-community/gemma-4-E4B-it-4bit"
+model_revision = "475b9088d29754a3379866cf5aeb6b41acd313c2"
+model_quantization = "4bit"
+context = "16k"
+max_context_tokens = 16384
 
 [analysis]
 include = []

@@ -17,6 +17,11 @@ import (
 
 const MaxFileSize int64 = 1 << 20
 
+// Provisional candidate selected in Issue #143; adoption quality remains bounded.
+const CandidateModel = "mlx-community/gemma-4-E4B-it-4bit"
+const CandidateRevision = "475b9088d29754a3379866cf5aeb6b41acd313c2"
+const CandidatePlanner = "three-phase"
+
 type Source string
 
 const (
@@ -39,6 +44,7 @@ type Values struct {
 	CommitConfirm     bool
 	PushEnabled       bool
 	PushConfirm       bool
+	Planner           string
 	Model             string
 	Backend           string
 	ModelRevision     string
@@ -87,6 +93,7 @@ var schema = map[string]schemaEntry{
 	"commit.confirm":                       {"boolean", allow(SourceGlobal)},
 	"push.enabled":                         {"boolean", allow(SourceGlobal)},
 	"push.confirm":                         {"boolean", allow(SourceGlobal)},
+	"llm.planner":                          {"string", allow(SourceGlobal, SourceRepo)},
 	"llm.model":                            {"string", allow(SourceGlobal, SourceRepo)},
 	"llm.backend":                          {"string", allow(SourceGlobal, SourceRepo)},
 	"llm.model_revision":                   {"string", allow(SourceGlobal, SourceRepo)},
@@ -125,11 +132,14 @@ func Defaults() Effective {
 			CommitConfirm:     true,
 			PushEnabled:       true,
 			PushConfirm:       true,
-			Model:             "qwen3.5:4b-q4_K_M",
-			Backend:           "ollama",
+			Planner:           CandidatePlanner,
+			Model:             CandidateModel,
+			ModelRevision:     CandidateRevision,
+			ModelQuantization: "4bit",
+			Backend:           "mlx",
 			Endpoint:          "http://127.0.0.1:11434",
-			Context:           "auto",
-			MaxTokens:         65536,
+			Context:           "16k",
+			MaxTokens:         16384,
 			Untracked:         "auto-safe",
 			Include:           []string{},
 			Exclude:           []string{},
@@ -189,6 +199,23 @@ func applyFile(effective *Effective, path string, source Source, repoRoot string
 	flat := make(map[string]any)
 	if err := flatten("", raw, flat); err != nil {
 		return fmt.Errorf("invalid %s configuration: %w", source, err)
+	}
+	// Existing v1 files predate planner selection. Only infer legacy defaults
+	// while no earlier configuration has explicitly selected a planner.
+	if _, explicit := flat["llm.planner"]; !explicit && effective.Sources["llm.planner"] == SourceDefault {
+		legacy := map[string]string{"llm.backend": "ollama", "llm.model": "qwen3.5:4b-q4_K_M", "llm.model_revision": "", "llm.model_quantization": "", "llm.context": "auto"}
+		for key, value := range legacy {
+			if effective.Sources[key] == SourceDefault {
+				if err := applyValue(effective, key, "string", value, SourceDefault, repoRoot); err != nil {
+					return err
+				}
+			}
+		}
+		if effective.Sources["llm.max_context_tokens"] == SourceDefault {
+			effective.Values.MaxTokens = 65536
+		}
+		effective.Values.Planner = "single-pass"
+		effective.Sources["llm.planner"] = source
 	}
 	keys := make([]string, 0, len(flat))
 	for key := range flat {
@@ -278,6 +305,8 @@ func applyValue(e *Effective, key, kind string, raw any, source Source, repoRoot
 		switch key {
 		case "commit.language":
 			e.Values.Language = value
+		case "llm.planner":
+			e.Values.Planner = value
 		case "llm.model":
 			e.Values.Model = value
 		case "llm.backend":
@@ -367,6 +396,9 @@ func validateValues(v Values, repoRoot string) error {
 	if v.Timeout <= 0 {
 		return fmt.Errorf("verification.timeout_seconds must be positive")
 	}
+	if v.Planner != "single-pass" && v.Planner != CandidatePlanner {
+		return fmt.Errorf("llm.planner must be single-pass or three-phase")
+	}
 	if v.Model == "" {
 		return fmt.Errorf("llm.model must not be empty")
 	}
@@ -382,6 +414,14 @@ func validateValues(v Values, repoRoot string) error {
 		}
 		if !validMLXQuantization(v.ModelQuantization) {
 			return fmt.Errorf("llm.model_quantization must be none or a positive Nbit label for MLX")
+		}
+	}
+	if v.Planner == CandidatePlanner {
+		if v.Backend != "mlx" || v.Model != CandidateModel || v.ModelRevision != CandidateRevision || v.ModelQuantization != "4bit" {
+			return fmt.Errorf("three-phase planner requires the pinned Gemma MLX 4bit candidate; use single-pass for another model or backend")
+		}
+		if v.Context != "16k" || v.MaxTokens != 16384 {
+			return fmt.Errorf("three-phase planner requires llm.context = 16k and llm.max_context_tokens = 16384")
 		}
 	}
 	if err := validateEndpoint(v.Endpoint); err != nil {
@@ -588,6 +628,7 @@ func (e Effective) Entries() map[string]Entry {
 		"commit.confirm":                       v.CommitConfirm,
 		"push.enabled":                         v.PushEnabled,
 		"push.confirm":                         v.PushConfirm,
+		"llm.planner":                          v.Planner,
 		"llm.model":                            v.Model,
 		"llm.backend":                          v.Backend,
 		"llm.model_revision":                   v.ModelRevision,

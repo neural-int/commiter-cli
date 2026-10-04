@@ -146,7 +146,7 @@ func TestMLXDoctorJSONKeepsEnvelopeAndUsesSelectedBackend(t *testing.T) {
 	if err := os.MkdirAll(filepath.Join(configHome, "commiter"), 0o700); err != nil {
 		t.Fatal(err)
 	}
-	configText := "[llm]\nbackend = \"mlx\"\nmodel = \"owner/model\"\nmodel_revision = \"" + strings.Repeat("a", 40) + "\"\nmodel_quantization = \"4bit\"\n"
+	configText := "[llm]\nplanner = \"single-pass\"\nbackend = \"mlx\"\nmodel = \"owner/model\"\nmodel_revision = \"" + strings.Repeat("a", 40) + "\"\nmodel_quantization = \"4bit\"\n"
 	if err := os.WriteFile(filepath.Join(configHome, "commiter", "config.toml"), []byte(configText), 0o600); err != nil {
 		t.Fatal(err)
 	}

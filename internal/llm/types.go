@@ -60,6 +60,8 @@ type ChatResponse = Response
 type Options struct {
 	ContextTokens int
 	OutputTokens  int
+	// GenerationProfile selects an explicitly supported bounded generation contract.
+	GenerationProfile string
 }
 
 // ChatOptions is a descriptive alias for callers that use chat terminology.

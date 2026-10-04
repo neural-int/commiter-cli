@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/contextinput"
@@ -80,6 +81,7 @@ func TestMLXPlanningFailsClosedWithoutModelOrOllamaFallback(t *testing.T) {
 		return mlxmodel.Store{Root: t.TempDir()}, nil
 	}
 	values := config.Defaults().Values
+	values.Planner = "single-pass"
 	values.Backend = "mlx"
 	values.Model = "owner/model"
 	values.ModelRevision = strings.Repeat("a", 40)
@@ -104,6 +106,7 @@ func TestMLXPlanningUsesInstalledModelAndHelper(t *testing.T) {
 	}
 
 	values := config.Defaults().Values
+	values.Planner = "single-pass"
 	values.Backend = "mlx"
 	values.Model = "owner/model"
 	values.ModelRevision = strings.Repeat("a", 40)
@@ -247,4 +250,93 @@ func TestWorktreeDiffTreatsCollectedPathsLiterally(t *testing.T) {
 	if !strings.Contains(diff, "literal change") || strings.Contains(diff, "outside change") {
 		t.Fatalf("worktree diff expanded collected path as pathspec: %q", diff)
 	}
+}
+
+// The optional smoke path reuses an installed pin; it never downloads a model.
+func TestGemmaThreePhaseDefaultPlanning(t *testing.T) {
+	repo := cliRepository(t)
+	cliWrite(t, repo, "sample.go", "package sample\nfunc value() int { return 1 }\n", 0o644)
+	cliGit(t, repo, "add", "sample.go")
+	cliGit(t, repo, "commit", "-m", "base")
+	cliWrite(t, repo, "sample.go", "package sample\nfunc value() int { return 2 }\n", 0o644)
+	snapshot, err := gitstate.Collect(repo, gitstate.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	values := config.Defaults().Values
+	store := mlxmodel.Store{Root: t.TempDir()}
+	realHelper := os.Getenv("COMMITER_CANDIDATE_SMOKE_HELPER")
+	if realHelper != "" {
+		store.Root = os.Getenv("COMMITER_CANDIDATE_SMOKE_CACHE")
+	} else {
+		spec := mlxmodel.Spec{Repo: values.Model, Revision: values.ModelRevision, Quantization: values.ModelQuantization}
+		path, err := store.Destination(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := os.MkdirAll(path, 0o700); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(path, "config.json"), []byte("{}"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		metadata, _ := json.Marshal(mlxmodel.Plan{Spec: spec, Files: []mlxmodel.File{{Path: "config.json", Size: 2}}})
+		if err := os.WriteFile(filepath.Join(path, "commiter-model.json"), metadata, 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	oldStore, oldHelper := newMLXModelStore, mlxHelperPath
+	t.Cleanup(func() { newMLXModelStore = oldStore; mlxHelperPath = oldHelper })
+	newMLXModelStore = func() (mlxmodel.Store, error) { return store, nil }
+	if realHelper != "" {
+		mlxHelperPath = func() (string, error) { return realHelper, nil }
+	} else {
+		helper := filepath.Join(t.TempDir(), "helper")
+		script := `#!/bin/sh
+set -eu
+request=$(cat)
+case "$request" in
+ *'"context_tokens":16384'*) ;;
+ *) exit 1 ;;
+esac
+case "$request" in
+ *'"generation_profile":"bounded-grouping"'*) profile=bounded-grouping; result='{"path:sample.go":"G001"}' ;;
+ *'"generation_profile":"bounded-category"'*) profile=bounded-category; result='{"G001":{"type":"fix","breaking_evidence_ref":"none"}}' ;;
+ *'"generation_profile":"bounded-text"'*) profile=bounded-text; result='{"G001":{"scope":"sample","summary":"correct value"}}' ;;
+ *) exit 1 ;;
+esac
+escaped=$(printf '%s' "$result" | sed 's/"/\\"/g')
+printf '{"ok":true,"stop_reason":"completed","generation_profile":"%s","generated_json":"%s"}\n' "$profile" "$escaped"
+`
+		if err := os.WriteFile(helper, []byte(script), 0o700); err != nil {
+			t.Fatal(err)
+		}
+		mlxHelperPath = func() (string, error) { return helper, nil }
+	}
+	started := time.Now()
+	plan, err := generateCommitPlan(context.Background(), repo, snapshot, values, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(plan.Commits) != 1 || strings.Join(plan.Commits[0].FileIDs, ",") != "F001" {
+		t.Fatalf("invalid assignment: %#v", plan)
+	}
+	t.Logf("three-phase installed helper=%t elapsed=%s commits=%d", realHelper != "", time.Since(started).Round(time.Millisecond), len(plan.Commits))
+	status := cliGitOutput(t, repo, "status", "--porcelain")
+	if strings.TrimSpace(status) != "M sample.go" {
+		t.Fatalf("planning changed Git state: %q", status)
+	}
+	helper, err := mlxHelperPath()
+	if err != nil {
+		t.Fatal(err)
+	}
+	modelPath, err := store.Ready(mlxmodel.Spec{Repo: values.Model, Revision: values.ModelRevision, Quantization: values.ModelQuantization})
+	if err != nil {
+		t.Fatal(err)
+	}
+	started = time.Now()
+	if ok, err := mlxPlannerCapabilityProbe(context.Background(), helper, values, modelPath); err != nil || !ok {
+		t.Fatalf("candidate setup/doctor probe: ok=%t error=%v", ok, err)
+	}
+	t.Logf("candidate setup/doctor probe elapsed=%s", time.Since(started).Round(time.Millisecond))
 }

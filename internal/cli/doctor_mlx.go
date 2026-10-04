@@ -6,10 +6,12 @@ import (
 	"time"
 
 	"github.com/natsuki0413/commiter-cli/internal/config"
+	"github.com/natsuki0413/commiter-cli/internal/contextinput"
 	"github.com/natsuki0413/commiter-cli/internal/llm"
 	"github.com/natsuki0413/commiter-cli/internal/mlx"
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 	"github.com/natsuki0413/commiter-cli/internal/planning"
+	"github.com/natsuki0413/commiter-cli/internal/syntax"
 )
 
 const mlxUnsupportedPlatformMessage = "MLX requires macOS on Apple Silicon (darwin/arm64)"
@@ -77,7 +79,7 @@ func doctorMLXFor(values config.Values, goos, goarch string) map[string]map[stri
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), mlxDoctorTimeout)
 	defer cancel()
-	probeOK, err := mlxCapabilityProbe(ctx, helper, values.Model, modelPath)
+	probeOK, err := mlxPlannerCapabilityProbe(ctx, helper, values, modelPath)
 	if err != nil {
 		if mlxFailureKind(err) == mlx.FailureStart {
 			checks["mlx_helper"] = check(false, "MLX helper could not be started")
@@ -109,6 +111,42 @@ func verifyMLXCapability(helper, model, modelPath string) error {
 		return errors.New("MLX constrained JSON capability failed")
 	}
 	return nil
+}
+
+func verifyMLXPlannerCapability(helper string, values config.Values, modelPath string) error {
+	if values.Planner != config.CandidatePlanner {
+		return verifyMLXCapability(helper, values.Model, modelPath)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), mlxDoctorTimeout)
+	defer cancel()
+	ok, err := mlxPlannerCapabilityProbe(ctx, helper, values, modelPath)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return errors.New("MLX planner capability failed")
+	}
+	return nil
+}
+
+func mlxPlannerCapabilityProbe(ctx context.Context, helper string, values config.Values, modelPath string) (bool, error) {
+	if values.Planner != config.CandidatePlanner {
+		return mlxCapabilityProbe(ctx, helper, values.Model, modelPath)
+	}
+	// Public synthetic input only; diagnostic success requires all three profiles.
+	path := "sample.go"
+	document := contextinput.Document{SchemaVersion: contextinput.SchemaVersion, Files: []contextinput.File{{
+		ID: "F001", NewPath: &path, Status: "M", ChangeHash: "probe", WorktreeKind: "file", Language: "go", Mode: syntax.ModeRawDiff,
+		RawDiff: "@@ -1 +1 @@\n-func value() int { return 1 }\n+func value() int { return 2 }\n",
+	}}}
+	prepared, err := contextinput.Prepare(ctx, document, contextinput.BudgetConfig{Context: "16k", MaxContextTokens: 16384}, planning.Renderer(planning.English), nil)
+	if err != nil {
+		return false, err
+	}
+	prepared.Budget.ContextTokens = contextinput.Context16K
+	backend := &mlx.Backend{Client: mlx.NewClient(helper), Model: values.Model, ModelRevision: values.ModelRevision, ModelPath: modelPath}
+	_, err = (planning.ThreePhaseGenerator{Client: backend}).Generate(ctx, prepared, planning.English, planning.SensitiveValues{})
+	return err == nil, err
 }
 
 func mlxCapabilityProbe(ctx context.Context, helper, model, modelPath string) (bool, error) {
