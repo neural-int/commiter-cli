@@ -29,20 +29,25 @@ type metric struct {
 	Stop   string  `json:"stop"`
 }
 type observation struct {
-	Fixture      string     `json:"fixture"`
-	Architecture string     `json:"architecture"`
-	Files        int        `json:"files"`
-	Exact        *bool      `json:"exact"`
-	FM           *int       `json:"false_merge_pairs"`
-	FS           *int       `json:"false_split_pairs"`
-	Complete     bool       `json:"complete_assignment"`
-	Unresolved   bool       `json:"unresolved"`
-	Reason       string     `json:"reason,omitempty"`
-	Groups       [][]string `json:"groups,omitempty"`
-	Calls        []metric   `json:"calls"`
-	Wall         float64    `json:"wall_seconds"`
-	PlanValid    *bool      `json:"plan_valid,omitempty"`
-	PlanStop     string     `json:"plan_stop,omitempty"`
+	Fixture       string     `json:"fixture"`
+	Architecture  string     `json:"architecture"`
+	Files         int        `json:"files"`
+	Exact         *bool      `json:"exact"`
+	FM            *int       `json:"false_merge_pairs"`
+	FS            *int       `json:"false_split_pairs"`
+	Complete      bool       `json:"complete_assignment"`
+	Unresolved    bool       `json:"unresolved"`
+	Reason        string     `json:"reason,omitempty"`
+	Groups        [][]string `json:"groups,omitempty"`
+	Calls         []metric   `json:"calls"`
+	Wall          float64    `json:"wall_seconds"`
+	DraftComplete *bool      `json:"draft_complete_assignment,omitempty"`
+	DraftExact    *bool      `json:"draft_exact,omitempty"`
+	DraftFM       *int       `json:"draft_false_merge_pairs,omitempty"`
+	DraftFS       *int       `json:"draft_false_split_pairs,omitempty"`
+	DraftGroups   [][]string `json:"-"`
+	PlanValid     *bool      `json:"plan_valid,omitempty"`
+	PlanStop      string     `json:"plan_stop,omitempty"`
 }
 
 func shape(props map[string]any) map[string]any {
@@ -163,6 +168,17 @@ func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBac
 			for j := range o.Groups[i] {
 				o.Groups[i][j] = restore[o.Groups[i][j]]
 			}
+		}
+		for i := range o.DraftGroups {
+			for j := range o.DraftGroups[i] {
+				o.DraftGroups[i][j] = restore[o.DraftGroups[i][j]]
+			}
+		}
+		if o.DraftComplete != nil && *o.DraftComplete {
+			x, fm, fs := quality(o.DraftGroups, f.Expected)
+			o.DraftExact = &x
+			o.DraftFM = &fm
+			o.DraftFS = &fs
 		}
 		if o.Complete {
 			x, fm, fs := quality(o.Groups, f.Expected)

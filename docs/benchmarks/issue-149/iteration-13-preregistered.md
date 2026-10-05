@@ -1,0 +1,5 @@
+# Iteration13事前登録: H8 draft品質の診断
+
+H8 cross12を1回だけ再計測する。model input/schema/profile/seed/budgetはIteration11と同じ。benchmark instrumentationだけを追加し、decoded draft membershipの全件性、exact/FM/FSを、元のgrounding gate前に数値診断する。draft groupsや契約自由文はartifactへ出力せず、最終complete=falseならmetadataを実行しない。以前のinvalid結果を上書きしない。raw responseはRAMから破棄済みで追加の診断が必要なための最小1回。
+
+draft自体が失敗なら同条件反復・順序/prompt tuningを増やさない。semantic正解かつcoverageだけが失敗している場合に限り、次のhost/model観測coverage責務分割を検証する。有限probeで全architecture不可能とは主張しない。

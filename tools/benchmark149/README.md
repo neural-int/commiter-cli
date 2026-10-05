@@ -22,6 +22,8 @@ python3 tools/benchmark149/prepare_helper.py mlx-helper /tmp/new-experiment-help
 | grounded-facts | hostが変更前後のliteralを観測し、soft graphと全体判断へ渡す |
 | contract-facts | Go ASTのunique caller/callee観測を追加 |
 | assertion-facts | 対応testのinputと期待条件観測を追加 |
+| observed-contracts | 具体的subject/before-after/member/根拠を伴う全体contract出力。draft診断はfinal gateと別の数値で記録 |
+| observed-anchors | host保持の観測契約E-IDへのglobal所属。root実在/自己所属を検証 |
 | canonical-contracts | source/path順とmodel IDをhostで固定し、宣言・定数・関数body観測も追加 |
 
 Go observerは公開合成fixtureのmodule `fixture`とfull before/after diffを対象にしたprototypeである。Go type checkerや汎用module resolver、partial Git diffからのfull source収集は実装していない。解決できないsymbolを推測しない。soft relation、test-pass、graph componentを不可逆なcommit boundaryにしない。
@@ -37,3 +39,5 @@ N<=16、context16K、per-call120秒、grouping-only全fixture600秒、最大N+1c
 input tokensはhelperのinput.text.tokens.size、outputはinfo.generationTokenCountで実測し、native thought/channelも含む。nullは取得不能であり0ではない。wallには各callのmodel loadを含み、fixture構築/build/Git収集は含まない。初期の一部はhost tests/buildと並行。Iteration10のinitial full4は別model推論とも並行したためlatency比較から除外し、原記録を保持してserialized比較を追加した。熱やCPUを隔離したproduction latency評価ではない。
 
 入力監査testは、同じ観測入力と異なる著者partitionを比較する識別可能性の検査である。counterfactual goldをmodelへ送信しない。runtime boundary testは公開cross12 fixtureの5中間状態だけをtemporary directoryで実行する。利用者repositoryの任意コードを実行する機能ではない。両監査はmodel精度の測定ではなく、観測入力・test-passだけでは著者の変更目的を一意に証明できない範囲を記録する。
+
+未推論fresh protocol8はIteration11 cross12結果確認前に固定した共有protocol変更＋独立health変更。現時点で資格試験に失敗しているため推論を開始していない。H8/H9の全体結果を参照し、rootの実在・groundedな構造をsemantic proofへ読み替えない。

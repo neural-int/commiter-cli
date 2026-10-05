@@ -69,3 +69,26 @@ func TestGroundedContractStructureDoesNotProveSemanticCorrectness(t *testing.T) 
 		t.Fatal("structural grounding was confused with semantic proof")
 	}
 }
+
+func TestDraftDiagnosticsCannotAuthorizeIncompleteEvidence(t *testing.T) {
+	f, _, _ := canonicalFixture(contractFixtures()[0])
+	facts := observedEvidence(f)
+	contracts := []observedContract{}
+	for i := 0; i < len(f.Files); i += 2 {
+		members := []string{f.Files[i].ID, f.Files[i+1].ID}
+		var fact contractEvidence
+		for _, e := range facts {
+			if e.File == members[0] {
+				fact = e
+				break
+			}
+		}
+		contracts = append(contracts, observedContract{fact.Subject, "old contract", "new contract", members, []string{fact.ID}})
+	}
+	if groups, e := draftContractPartition(f, contracts); e != nil || len(groups) != 2 {
+		t.Fatal("diagnostic lost valid selected partition")
+	}
+	if groups, e := validateObservedContracts(f, facts, contractOutput{Contracts: contracts}); e == nil || groups != nil {
+		t.Fatal("draft diagnostic bypassed evidence gate")
+	}
+}

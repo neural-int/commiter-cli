@@ -166,6 +166,12 @@ func observedContractRun(parent context.Context, f fixture, b llm.OptionsBackend
 		o.Reason = err.Error()
 		return finish()
 	}
+	complete := false
+	o.DraftComplete = &complete
+	if draft, e := draftContractPartition(f, answer.Contracts); e == nil {
+		complete = true
+		o.DraftGroups = draft
+	}
 	groups, err := validateObservedContracts(f, facts, answer)
 	if err != nil {
 		o.Reason = err.Error()
@@ -179,4 +185,18 @@ func observedContractRun(parent context.Context, f fixture, b llm.OptionsBackend
 	o.FM = &fm
 	o.FS = &fs
 	return finish()
+}
+
+// Numeric diagnostic only. It never authorizes metadata or a final partition.
+func draftContractPartition(f fixture, contracts []observedContract) ([][]string, error) {
+	membership := map[string]string{}
+	for i, c := range contracts {
+		for _, id := range c.Members {
+			if _, ok := membership[id]; ok {
+				return nil, errors.New("duplicate_draft_member")
+			}
+			membership[id] = groupID(i)
+		}
+	}
+	return partition(fixtureIDs(f), membership)
 }
