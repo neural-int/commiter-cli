@@ -21,6 +21,7 @@ import (
 )
 
 type metric struct {
+	Model  string  `json:"model,omitempty"`
 	Phase  string  `json:"phase"`
 	Input  *int    `json:"input_tokens"`
 	Output *int    `json:"output_tokens"`
@@ -63,7 +64,7 @@ func invoke(ctx context.Context, b llm.OptionsBackend, phase, system string, pay
 		profile = "bounded-text"
 	}
 	response, err := b.ChatWithOptions(callCtx, []llm.Message{{Role: "system", Content: system + " Output JSON matching this schema: " + string(s)}, {Role: "user", Content: string(data)}}, s, llm.Options{ContextTokens: 16384, OutputTokens: 768, GenerationProfile: profile})
-	m := metric{Phase: phase, Wall: time.Since(start).Seconds(), Stop: safeStop(response.StopReason)}
+	m := metric{Model: response.Model, Phase: phase, Wall: time.Since(start).Seconds(), Stop: safeStop(response.StopReason)}
 	if response.Availability.PromptEvalCount {
 		v := response.PromptEvalCount
 		m.Input = &v
@@ -301,6 +302,9 @@ func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBac
 	return o
 }
 func main() {
+	globalProfile := flag.String("global-profile", "", "explicit experimental global generation profile")
+	groupModel := flag.String("group-model", "", "existing pinned grouping-only model")
+	groupRevision := flag.String("group-revision", "", "full grouping model revision")
 	arch := flag.String("architecture", "semantic-ir", "semantic-ir or raw-global")
 	metadata := flag.Bool("metadata", false, "final metadata and authoritative validation; Japanese summaries")
 	reverse := flag.Bool("reverse", false, "reverse file presentation; no gold changes")
@@ -316,7 +320,23 @@ func main() {
 	if err != nil || *helper == "" {
 		panic("existing helper and cached model required")
 	}
-	b := &measuredBackend{Executable: *helper, Model: v.Model, Revision: v.ModelRevision, Path: p}
+	base := &measuredBackend{Executable: *helper, Model: v.Model, Revision: v.ModelRevision, Path: p}
+	var b llm.OptionsBackend = base
+	if *globalProfile != "" {
+		candidate := base
+		profile := *globalProfile
+		if *groupModel != "" {
+			gp, e := (mlxmodel.Store{Root: *cache}).Ready(mlxmodel.Spec{Repo: *groupModel, Revision: *groupRevision, Quantization: "4bit"})
+			if e != nil {
+				panic("grouping model must already be cached and pinned")
+			}
+			candidate = &measuredBackend{Executable: *helper, Model: *groupModel, Revision: *groupRevision, Path: gp}
+		}
+		if profile != "bounded-global-contract" && profile != "bounded-routed-grouping" {
+			panic("unknown global contract")
+		}
+		b = &groupingBackend{Group: candidate, Base: base, Profile: profile, Output: 1536}
+	}
 	found := false
 	for _, f := range append(append(append(contractFixtures(), fixtures()...), holdouts()...), holdout16(), sharedCalleeGuardrail()) {
 		if f.Name == *filter {
