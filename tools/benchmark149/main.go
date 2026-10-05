@@ -15,6 +15,7 @@ import (
 	"os"
 	"sort"
 	"time"
+	"unicode/utf8"
 )
 
 type metric struct {
@@ -165,7 +166,7 @@ func run(f fixture, arch string, b llm.OptionsBackend) observation {
 			}
 			valid := len(ir) == 4
 			for k := range props {
-				if ir[k] == "" || len(ir[k]) > 960 {
+				if ir[k] == "" || utf8.RuneCountInString(ir[k]) > 240 {
 					valid = false
 				}
 			}
@@ -206,7 +207,7 @@ func run(f fixture, arch string, b llm.OptionsBackend) observation {
 				ir := extracted[file.ID]
 				valid := len(ir) == 4
 				for _, k := range []string{"before", "after", "changed_contract", "symbols"} {
-					if ir[k] == "" || len(ir[k]) > 960 {
+					if ir[k] == "" || utf8.RuneCountInString(ir[k]) > 240 {
 						valid = false
 					}
 				}
@@ -263,7 +264,7 @@ func main() {
 	}
 	b := &measuredBackend{Executable: *helper, Model: v.Model, Revision: v.ModelRevision, Path: p}
 	found := false
-	for _, f := range append(append(contractFixtures(), fixtures()...), holdouts()...) {
+	for _, f := range append(append(append(contractFixtures(), fixtures()...), holdouts()...), holdout16()) {
 		if f.Name == *filter {
 			found = true
 			if *reverse {
