@@ -6,6 +6,7 @@ import (
 	"errors"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/natsuki0413/commiter-cli/internal/contextinput"
 	"github.com/natsuki0413/commiter-cli/internal/llm"
@@ -50,6 +51,9 @@ func (c *recordingClient) ChatWithOptions(ctx context.Context, m []llm.Message, 
 	}
 	if err != nil {
 		metric.Stop = "backend_error"
+	}
+	if o.GenerationProfile == "bounded-text" {
+		metric.TextDiagnostics = diagnoseText(s, r.Content)
 	}
 	c.Calls = append(c.Calls, metric)
 	return r, err
@@ -109,4 +113,44 @@ func runBaseline(parent context.Context, f fixture, mode string, backend llm.Opt
 	o.FM = &fm
 	o.FS = &fs
 	return o
+}
+
+// Numeric diagnostics preserve no generated prose or unexpected key values.
+type textDiagnostics struct {
+	ExpectedGroups       int  `json:"expected_groups"`
+	ReturnedGroups       int  `json:"returned_groups"`
+	MissingGroups        int  `json:"missing_groups"`
+	UnknownGroups        int  `json:"unknown_groups"`
+	MaxScopeCharacters   int  `json:"max_scope_characters"`
+	MaxSummaryCharacters int  `json:"max_summary_characters"`
+	StrictSchema         bool `json:"strict_schema"`
+}
+
+func diagnoseText(schema json.RawMessage, content string) *textDiagnostics {
+	var shape struct {
+		Required []string `json:"required"`
+	}
+	if json.Unmarshal(schema, &shape) != nil {
+		return nil
+	}
+	out := map[string]commitText{}
+	d := &textDiagnostics{ExpectedGroups: len(shape.Required)}
+	if strictDecode([]byte(content), &out) != nil {
+		return d
+	}
+	d.StrictSchema = true
+	d.ReturnedGroups = len(out)
+	for _, id := range shape.Required {
+		if _, ok := out[id]; !ok {
+			d.MissingGroups++
+		}
+	}
+	for id, t := range out {
+		if !contains(shape.Required, id) {
+			d.UnknownGroups++
+		}
+		d.MaxScopeCharacters = max(d.MaxScopeCharacters, utf8.RuneCountInString(t.Scope))
+		d.MaxSummaryCharacters = max(d.MaxSummaryCharacters, utf8.RuneCountInString(t.Summary))
+	}
+	return d
 }

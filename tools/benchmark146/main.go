@@ -19,15 +19,16 @@ import (
 )
 
 type callMetric struct {
-	Window            []string `json:"window"`
-	Phase             string   `json:"phase"`
-	WallMS            float64  `json:"wall_ms"`
-	InputBytes        int      `json:"input_bytes"`
-	OutputBytes       int      `json:"output_bytes"`
-	InputTokens       *int     `json:"input_tokens"`
-	OutputTokens      *int     `json:"output_tokens"`
-	OutputReservation int      `json:"output_reservation"`
-	Stop              string   `json:"stop"`
+	Window            []string         `json:"window"`
+	Phase             string           `json:"phase"`
+	WallMS            float64          `json:"wall_ms"`
+	InputBytes        int              `json:"input_bytes"`
+	OutputBytes       int              `json:"output_bytes"`
+	InputTokens       *int             `json:"input_tokens"`
+	OutputTokens      *int             `json:"output_tokens"`
+	OutputReservation int              `json:"output_reservation"`
+	Stop              string           `json:"stop"`
+	TextDiagnostics   *textDiagnostics `json:"text_diagnostics,omitempty"`
 }
 type observation struct {
 	Fixture          string         `json:"fixture"`
@@ -192,6 +193,15 @@ func run(parent context.Context, f fixture, strategy, mode string, backend llm.O
 	o := observation{Fixture: f.Name, Files: len(f.Files), Mode: mode, Strategy: strategy, Calls: []callMetric{}, MaxWindows: maxWindows, TimeoutSeconds: timeout.Seconds()}
 	ctx, cancel := context.WithTimeout(parent, timeout)
 	defer cancel()
+	selected := make([]string, len(f.Files))
+	for i, file := range f.Files {
+		selected[i] = file.ID
+	}
+	if !complete(selected, [][]string{idsFor(f.Graph)}) {
+		o.Reason = "graph_selected_id_mismatch"
+		o.Unresolved = true
+		return o
+	}
 	windows, err := initialWindows(f.Graph)
 	if err != nil {
 		o.Reason = err.Error()
@@ -233,6 +243,12 @@ func run(parent context.Context, f fixture, strategy, mode string, backend llm.O
 			break
 		}
 		p = reconcile(idsFor(f.Graph), results)
+		if strategy == "audited" && p.Reason == "" {
+			if w := auditWindow(idsFor(f.Graph), results); len(w) > 0 {
+				windows = [][]string{w}
+				continue
+			}
+		}
 		if strategy == "graph-only" || p.Reason != "unobserved_group_relation" {
 			o.Reason = p.Reason
 			break
@@ -288,11 +304,11 @@ func main() {
 	helper := flag.String("helper", "", "already built production helper")
 	cache := flag.String("cache", "", "existing model cache root")
 	filter := flag.String("fixture", "", "one fixed fixture, empty runs all")
-	strategy := flag.String("strategy", "both", "graph-only, bridge, both, or baseline")
+	strategy := flag.String("strategy", "both", "graph-only, bridge, audited, both, or baseline")
 	maxWindows := flag.Int("max-windows", 48, "experimental call guard, not an adopted production limit")
 	timeout := flag.Duration("timeout", 10*time.Minute, "experimental per-fixture wall-time guard")
 	flag.Parse()
-	if *maxWindows < 1 || *timeout <= 0 || (*strategy != "both" && *strategy != "bridge" && *strategy != "graph-only" && *strategy != "baseline") {
+	if *maxWindows < 1 || *timeout <= 0 || (*strategy != "both" && *strategy != "bridge" && *strategy != "graph-only" && *strategy != "baseline" && *strategy != "audited") {
 		fmt.Fprintln(os.Stderr, "invalid experiment bounds")
 		os.Exit(2)
 	}
@@ -330,8 +346,8 @@ func main() {
 			}
 			continue
 		}
-		for _, s := range []string{"graph-only", "bridge"} {
-			if *strategy != "both" && *strategy != s {
+		for _, s := range []string{"graph-only", "bridge", "audited"} {
+			if (*strategy == "both" && s == "audited") || (*strategy != "both" && *strategy != s) {
 				continue
 			}
 			if err := encoder.Encode(run(context.Background(), f, s, *mode, backend, *maxWindows, *timeout, *metadata)); err != nil {

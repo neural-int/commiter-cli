@@ -16,6 +16,8 @@
 
 `bridge` は `graph-only` の結果を統合した後、関係が未確認の group 同士について代表ファイルを最大4つ追加判断する。代表は group 内の最小 file ID とする。未確認の group 対を多く覆う代表を選び、同点では ID 順にする。代表の提示によって group の関係を判断することの意味的な限界も評価対象にする。
 
+`audited` は `bridge` で全体 partition が決まった後も、同じ window に直接提示していない file 対を覆う。最小の未提示対を seed とし、未提示対を多く覆う file を追加する。最大4ファイル、ID 順の tie break、同じ停止予算を守り、矛盾が見つかれば直ちに停止する。全対の提示は意味的な正解を保証せず、固定された context での整合性を検査する。
+
 局所判断は、通常の `ThreePhaseGenerator` と同じ prompt、path ID、source-first 表示、JSON schema、generation profile、全件・一意割当の検証を再利用する。局所 category の呼び出し直前を捕捉し、その時点までに検証済みの membership だけを取り出す。局所 type / summary は生成しない。
 
 ## 統合と停止条件
@@ -24,7 +26,11 @@
 
 group 間に different の観測がなく、same とも決まっていない場合は未確認とする。graph に edge がないことを different とみなさない。未確認が残る `graph-only` は `unresolved` で終了する。`bridge` も window 数、cycle 時間、入力 context を超えた場合は停止し、部分 plan を返さない。
 
+graph の ID 集合と selected files の ID 集合が一致しない場合は、backend 呼び出し前に停止する。
+
 全体の grouping が確定し、全 selected file ID の一意割当を確認した後にのみ Stage 2 / 3 を開始する。最大4ファイルの制約は Stage 1 の membership 判断に適用する。metadata は確定済み group の全ファイルを保持し、最大4 group の packet ごとに実 prompt と output 枠が固定16K context 内に収まるか確認する。group は packet 境界によって統合・分割しない。全 category が成功してから summary を生成し、最後に `planning.Validate()` を実行する。
+
+metadata の source-first path 順と group の first-seen canonicalization は現行 generator と一致させ、4ファイルの実 request を比較するテストで確認する。
 
 category / summary の system instruction と schema の prototype は既存 generator の検証済み1ファイル経路から取得し、変更しない。空の host evidence pool は互換性の証明と扱わず、`unresolved` は停止する。packet の duplicate / unknown group ID、未知 field、過長 scope / summary、不正な最終 plan も拒否する。
 
@@ -72,3 +78,5 @@ go run ./tools/benchmark146 -mode mlx -strategy bridge -metadata \
 ```
 
 `-suite contract` で別の固定 suite を選ぶ。比較対象を変える場合は新しい fixture / run として記録し、既存の測定結果や参照を上書きしない。
+
+Stage 3 の追加診断は expected / returned / missing / unknown group 数、scope / summary の最大文字数、strict schema の成否だけを記録する。生成テキストや未知 key の値は記録しない。

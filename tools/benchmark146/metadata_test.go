@@ -4,11 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/natsuki0413/commiter-cli/internal/contextinput"
 	"github.com/natsuki0413/commiter-cli/internal/llm"
+	"github.com/natsuki0413/commiter-cli/internal/planning"
 )
 
 type fixtureBackend struct {
@@ -17,6 +20,7 @@ type fixtureBackend struct {
 	Deadline       time.Time
 	Invalid        string
 	MetadataGroups [][]string
+	Requests       []phaseRequest
 }
 
 func (b *fixtureBackend) Chat(context.Context, []llm.Message, json.RawMessage) (llm.Response, error) {
@@ -34,6 +38,7 @@ func (b *fixtureBackend) ChatWithOptions(ctx context.Context, m []llm.Message, s
 		return llm.Response{}, errors.New("deadline reset")
 	}
 	b.Profiles = append(b.Profiles, o.GenerationProfile)
+	b.Requests = append(b.Requests, phaseRequest{m, string(s), o})
 	if o.GenerationProfile == "bounded-grouping" {
 		truth := map[string]string{}
 		for g, group := range b.Fixture.Expected {
@@ -152,5 +157,91 @@ func TestOverflowAndCancellationStopBeforeBackend(t *testing.T) {
 	plan, _, failure := finalMetadata(context.Background(), f, p, nil, "oracle")
 	if failure != "context_overflow" || len(plan.Commits) > 0 {
 		t.Fatalf("metadata overflow: %s %+v", failure, plan)
+	}
+}
+
+// The four-file adapter must preserve actual requests, not merely counts.
+type phaseRequest struct {
+	Messages []llm.Message
+	Schema   string
+	Options  llm.Options
+}
+
+func TestFourFileMetadataMatchesProductionRequests(t *testing.T) {
+	for _, f := range []fixture{fixtures()[0], contractFixtures()[0]} {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		original := &fixtureBackend{Fixture: f}
+		d := contextinput.Document{SchemaVersion: 1, Files: f.Files}
+		prompt, err := planning.Renderer(planning.English)(d)
+		if err != nil {
+			t.Fatal(err)
+		}
+		_, err = (planning.ThreePhaseGenerator{Client: original}).Generate(ctx, contextinput.Prepared{Document: d, Prompt: prompt, Budget: contextinput.Budget{ContextTokens: 16384}}, planning.English, planning.SensitiveValues{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		candidate := &fixtureBackend{Fixture: f}
+		_, _, failure := finalMetadata(ctx, f, partition{Groups: f.Expected}, candidate, "mock")
+		cancel()
+		if failure != "" {
+			t.Fatal(failure)
+		}
+		if !reflect.DeepEqual(original.Requests[1:], candidate.Requests) {
+			t.Fatalf("%s metadata requests differ from production", f.Name)
+		}
+	}
+}
+
+func TestTextDiagnosticsSeparateSchemaIDsAndLengthWithoutSavingText(t *testing.T) {
+	schema := json.RawMessage(`{"required":["G001","G002"]}`)
+	content := `{"G001":{"scope":"scope","summary":"` + strings.Repeat("あ", 49) + `"},"unexpected":{"scope":"","summary":"private generated prose"}}`
+	d := diagnoseText(schema, content)
+	if !d.StrictSchema || d.MissingGroups != 1 || d.UnknownGroups != 1 || d.MaxSummaryCharacters != 49 {
+		t.Fatalf("%+v", d)
+	}
+	encoded, _ := json.Marshal(d)
+	if strings.Contains(string(encoded), "unexpected") || strings.Contains(string(encoded), "private") || strings.Contains(string(encoded), "あ") {
+		t.Fatal("generated output leaked into diagnostics")
+	}
+	d = diagnoseText(schema, `{"G001":{"scope":"a","scope":"b","summary":"x"}}`)
+	if d.StrictSchema {
+		t.Fatal("duplicate property passed diagnostics")
+	}
+}
+
+type auditConflictBackend struct {
+	fixtureBackend
+	GroupingCalls int
+}
+
+func (b *auditConflictBackend) ChatWithOptions(ctx context.Context, m []llm.Message, s json.RawMessage, o llm.Options) (llm.Response, error) {
+	if o.GenerationProfile == "bounded-grouping" {
+		b.GroupingCalls++
+		if b.GroupingCalls == 4 {
+			var payload struct {
+				Files []contextinput.File `json:"files"`
+			}
+			if err := json.Unmarshal([]byte(m[1].Content), &payload); err != nil {
+				return llm.Response{}, err
+			}
+			out := map[string]string{}
+			for _, f := range payload.Files {
+				out[f.ID] = "G001"
+			}
+			data, _ := json.Marshal(out)
+			return llm.Response{Content: string(data), StopReason: "completed"}, nil
+		}
+	}
+	return b.fixtureBackend.ChatWithOptions(ctx, m, s, o)
+}
+func TestAuditContradictionStopsBeforeMetadata(t *testing.T) {
+	f := fixtures()[2]
+	b := &auditConflictBackend{fixtureBackend: fixtureBackend{Fixture: f}}
+	o := run(context.Background(), f, "audited", "mock", b, 48, time.Second, true)
+	if !o.Unresolved || o.Reason != "transitive_contradiction" || o.MetadataExecuted || o.Exact != nil {
+		t.Fatalf("%+v", o)
+	}
+	if b.GroupingCalls != 4 {
+		t.Fatalf("unexpected calls: %d", b.GroupingCalls)
 	}
 }

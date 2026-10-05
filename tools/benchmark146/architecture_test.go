@@ -139,3 +139,30 @@ func TestProductionStageOneRejectsMalformedMembershipBeforeReconciliation(t *tes
 		}
 	}
 }
+
+func TestAuditCoversEveryPairWithinWindowBudget(t *testing.T) {
+	for _, f := range fixtures() {
+		o := run(context.Background(), f, "audited", "oracle", nil, 48, time.Second)
+		if o.Unresolved || !o.Complete || o.Exact == nil || !*o.Exact {
+			t.Fatalf("%s: %+v", f.Name, o)
+		}
+		if len(auditWindow(idsFor(f.Graph), o.LocalResults)) != 0 {
+			t.Fatal("unobserved pair remained")
+		}
+	}
+	f := fixtures()[3]
+	o := run(context.Background(), f, "audited", "oracle", nil, 3, time.Second, true)
+	if !o.Unresolved || o.Reason != "window_budget" || o.MetadataExecuted {
+		t.Fatalf("budget did not stop: %+v", o)
+	}
+}
+
+func TestGraphCannotOmitSelectedFiles(t *testing.T) {
+	f := fixtures()[0]
+	f.Graph.Nodes = f.Graph.Nodes[1:]
+	b := &fixtureBackend{Fixture: f}
+	o := run(context.Background(), f, "bridge", "mock", b, 48, time.Second, true)
+	if o.Reason != "graph_selected_id_mismatch" || !o.Unresolved || len(b.Profiles) != 0 {
+		t.Fatalf("%+v", o)
+	}
+}

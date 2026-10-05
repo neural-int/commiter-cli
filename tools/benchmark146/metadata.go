@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 	"unicode/utf8"
 
@@ -138,17 +139,33 @@ func finalMetadata(ctx context.Context, f fixture, p partition, backend llm.Opti
 	if err != nil {
 		return planning.Plan{}, nil, "metadata_template_contract"
 	}
-	groups := []finalizedGroup{}
-	for i, ids := range p.Groups {
-		g := finalizedGroup{ID: groupID(i), FileIDs: ids}
-		for _, file := range f.Files {
-			if contains(ids, file.ID) {
-				visible := file
-				visible.ID = "path:" + *file.NewPath
-				g.Files = append(g.Files, visible)
-			}
+	files := append([]contextinput.File(nil), f.Files...)
+	sort.Slice(files, func(i, j int) bool {
+		pi, pj := *files[i].NewPath, *files[j].NewPath
+		ti, tj := strings.HasSuffix(pi, "_test.go"), strings.HasSuffix(pj, "_test.go")
+		if ti != tj {
+			return !ti
 		}
-		groups = append(groups, g)
+		return pi < pj
+	})
+	groups := []finalizedGroup{}
+	indices := map[int]int{}
+	for _, file := range files {
+		for membership, ids := range p.Groups {
+			if !contains(ids, file.ID) {
+				continue
+			}
+			index, exists := indices[membership]
+			if !exists {
+				index = len(groups)
+				indices[membership] = index
+				groups = append(groups, finalizedGroup{ID: groupID(index)})
+			}
+			groups[index].FileIDs = append(groups[index].FileIDs, file.ID)
+			file.ID = "path:" + *file.NewPath
+			groups[index].Files = append(groups[index].Files, file)
+			break
+		}
 	}
 	recorder := &recordingClient{Backend: backend}
 	categories := map[string]category{}

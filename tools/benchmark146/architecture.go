@@ -285,3 +285,56 @@ func signature(groups [][]string) string {
 	sort.Strings(parts)
 	return fmt.Sprint(parts)
 }
+
+// auditWindow covers file pairs not directly presented together. It probes
+// context dependence without treating inferred equivalence as another vote.
+func auditWindow(ids []string, results []windowResult) []string {
+	ids = append([]string(nil), ids...)
+	sort.Strings(ids)
+	observed := map[pair]bool{}
+	for _, r := range results {
+		for i, a := range r.IDs {
+			for _, b := range r.IDs[i+1:] {
+				observed[key(a, b)] = true
+			}
+		}
+	}
+	var w []string
+	for i, a := range ids {
+		for _, b := range ids[i+1:] {
+			if !observed[key(a, b)] {
+				w = []string{a, b}
+				break
+			}
+		}
+		if len(w) > 0 {
+			break
+		}
+	}
+	if len(w) == 0 {
+		return nil
+	}
+	for len(w) < 4 {
+		best, score := "", 0
+		for _, id := range ids {
+			if contains(w, id) {
+				continue
+			}
+			n := 0
+			for _, other := range w {
+				if !observed[key(id, other)] {
+					n++
+				}
+			}
+			if n > score {
+				best, score = id, n
+			}
+		}
+		if best == "" {
+			break
+		}
+		w = append(w, best)
+	}
+	sort.Strings(w)
+	return w
+}
