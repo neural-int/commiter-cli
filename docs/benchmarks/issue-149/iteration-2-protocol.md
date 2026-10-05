@@ -1,0 +1,7 @@
+# Iteration 2 評価条件
+
+Iteration 1のNext Stepsを引き継ぎ、24b166bのstrict JSONとper-call120秒guardを持つbinaryで、現行Stage1/IRのcontract-baseline-4、IRのcontract-cross-boundary-12、IRのholdout-independent-6を順に各1回測る。4file回帰は同一file content/model/context/profile、ただしarchitecture固有のprompt/task/call数は異なる。goldを変更しない。holdoutは24b166b（初回結果確認前）で固定した。
+
+本書は4file測定開始後の記録であり、全条件の推論前commitとは主張しない。評価対象はIteration1公開Next Stepsおよび24b166bで既に固定していた。本書作成時点では4file結果を確認済み、12fileは実行中、holdoutは未実行である。独立した事前登録の証拠はIteration1公開Next Stepsと24b166bを参照する。grouping only probe、metadata/Validate未実行。
+
+cost判断: per-file extractionのN+1call/600秒guardは実験上限でありproduction採用予算ではない。現行120秒サイクルと比べた増加を明記し、分離品質だけでproduction candidateとしない。情報内容を維持できるbounded batch抽出を候補とし、global判断と独立の抽出失敗を分類する。
