@@ -1,0 +1,63 @@
+{
+  "original_helper_source_sha256": "ba2e6629dd9f7002d6b647050dac4b36622008d4d23c9a64a7df2cf2a6958201",
+  "instrumented_helper_source_sha256": "fadab4f0b1ee8da61bf35c8d9ab12cbee2493a08a6ad4ff122eb81797df53e45",
+  "global_profiles": {
+    "bounded-global-contract": {
+      "native": 1024,
+      "output": 1536
+    },
+    "bounded-routed-grouping": {
+      "native": 0,
+      "output": 1536
+    }
+  },
+  "measurement": "input.text.tokens.size and info.generationTokenCount; output includes native thought and channel tokens",
+  "helper_binary_sha256": "b11adabc1754e9cb872f86a001117a1ceeec6bbb58a1591eefca40d4680d00cd",
+  "build": "swift build -c release --skip-update --disable-automatic-resolution; existing build cache APFS clone",
+  "model_downloaded": false,
+  "cached_specs": [
+    {
+      "repo": "mlx-community/Ministral-3-3B-Reasoning-2512-4bit",
+      "revision": "2cd2087aad40c28747f8ede17851de6035f12b16",
+      "quantization": "4bit"
+    },
+    {
+      "repo": "mlx-community/Ministral-3-3B-Instruct-2512-4bit",
+      "revision": "a962dcb09eee4169c890e544c9eb938f1113fdee",
+      "quantization": "4bit"
+    },
+    {
+      "repo": "ibm-granite/granite-4.2-3b-q4-mlx",
+      "revision": "0c6f39b1827afd5eb2c1c3b13751929857434953",
+      "quantization": "4bit"
+    },
+    {
+      "repo": "mlx-community/NVIDIA-Nemotron-3-Nano-4B-4bit",
+      "revision": "c4d79ba1901d99806ef757642a552acebb851a35",
+      "quantization": "4bit"
+    },
+    {
+      "repo": "mlx-community/Phi-4-mini-instruct-4bit",
+      "revision": "ac1c269cb4222a4e136a3d09edad301056c1f36a",
+      "quantization": "4bit"
+    },
+    {
+      "repo": "mlx-community/gemma-4-E4B-it-4bit",
+      "revision": "475b9088d29754a3379866cf5aeb6b41acd313c2",
+      "quantization": "4bit"
+    },
+    {
+      "repo": "mlx-community/Qwen3.5-4B-MLX-4bit",
+      "revision": "32f3e8ecf65426fc3306969496342d504bfa13f3",
+      "quantization": "4bit"
+    }
+  ],
+  "fixture_sha256": {
+    "contract_fixtures.go": "e258738fb64b05bd80a4a549a5d1d94c34fbcb0d232ed2f424411f7f631a6eef",
+    "fixtures.go": "4838be45fc8659d8653a4245a649915e2ee90e3d06b2460910058499d0e89360"
+  },
+  "additional_fixture_sha256": {
+    "holdout.go": "dd8b9c1fb45777508edd6ca85aa3477b86e0415817a9d4fa04d62eda398d0639",
+    "guardrail.go": "cba40fb6d112d5dce5f6bf51763d8cd8de7c952a29a8ecaf365668bba97d9ff7"
+  }
+}
