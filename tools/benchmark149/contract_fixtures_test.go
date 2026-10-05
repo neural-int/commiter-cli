@@ -13,7 +13,7 @@ import (
 // Ground the fixture references in executable before/after contracts rather
 // than treating parser acceptance as proof that a synthetic change is valid.
 func TestContractFixtureProgramsPassBeforeAndAfter(t *testing.T) {
-	for _, f := range contractFixtures() {
+	for _, f := range append(contractFixtures(), holdouts()...) {
 		for _, prefix := range []string{"-", "+"} {
 			t.Run(f.Name+prefix, func(t *testing.T) {
 				root := t.TempDir()

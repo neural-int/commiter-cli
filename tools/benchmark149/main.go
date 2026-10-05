@@ -2,6 +2,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -10,6 +11,7 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/llm"
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
+	"io"
 	"os"
 	"sort"
 	"time"
@@ -46,10 +48,12 @@ func shape(props map[string]any) map[string]any {
 	return map[string]any{"type": "object", "properties": props, "required": keys, "additionalProperties": false}
 }
 func invoke(ctx context.Context, b llm.OptionsBackend, phase, system string, payload, schema any, calls *[]metric, out any) error {
+	callCtx, cancel := context.WithTimeout(ctx, 120*time.Second)
+	defer cancel()
 	data, _ := json.Marshal(payload)
 	s, _ := json.Marshal(schema)
 	start := time.Now()
-	response, err := b.ChatWithOptions(ctx, []llm.Message{{Role: "system", Content: system + " Output JSON matching this schema: " + string(s)}, {Role: "user", Content: string(data)}}, s, llm.Options{ContextTokens: 16384, OutputTokens: 768, GenerationProfile: "bounded-grouping"})
+	response, err := b.ChatWithOptions(callCtx, []llm.Message{{Role: "system", Content: system + " Output JSON matching this schema: " + string(s)}, {Role: "user", Content: string(data)}}, s, llm.Options{ContextTokens: 16384, OutputTokens: 768, GenerationProfile: "bounded-grouping"})
 	m := metric{Phase: phase, Wall: time.Since(start).Seconds(), Stop: response.StopReason}
 	if response.Availability.PromptEvalCount {
 		v := response.PromptEvalCount
@@ -66,7 +70,7 @@ func invoke(ctx context.Context, b llm.OptionsBackend, phase, system string, pay
 	if response.StopReason != "completed" {
 		return fmt.Errorf("stop_%s", response.StopReason)
 	}
-	return json.Unmarshal([]byte(response.Content), out)
+	return strictCandidateJSON([]byte(response.Content), out)
 }
 func partition(ids []string, membership map[string]string) ([][]string, error) {
 	if len(ids) != len(membership) {
@@ -129,7 +133,10 @@ func run(f fixture, arch string, b llm.OptionsBackend) observation {
 	o := observation{Fixture: f.Name, Architecture: arch, Files: len(f.Files), Unresolved: true}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
-	defer func() {}()
+	if len(f.Files) < 1 || len(f.Files) > 16 {
+		o.Reason = "file_budget"
+		return o
+	}
 	ids := []string{}
 	representations := []any{}
 	for _, file := range f.Files {
@@ -194,7 +201,7 @@ func main() {
 	helper := flag.String("helper", "", "explicit measured local helper")
 	cache := flag.String("cache", "", "existing pinned model store")
 	flag.Parse()
-	if *arch != "semantic-ir" && *arch != "raw-global" {
+	if *arch != "semantic-ir" && *arch != "raw-global" && *arch != "baseline" {
 		panic("unknown architecture")
 	}
 	v := config.Defaults().Values
@@ -204,13 +211,70 @@ func main() {
 	}
 	b := &measuredBackend{Executable: *helper, Model: v.Model, Revision: v.ModelRevision, Path: p}
 	found := false
-	for _, f := range append(contractFixtures(), fixtures()...) {
+	for _, f := range append(append(contractFixtures(), fixtures()...), holdouts()...) {
 		if f.Name == *filter {
 			found = true
-			json.NewEncoder(os.Stdout).Encode(run(f, *arch, b))
+			if *arch == "baseline" {
+				json.NewEncoder(os.Stdout).Encode(baseline(f, b))
+			} else {
+				json.NewEncoder(os.Stdout).Encode(run(f, *arch, b))
+			}
 		}
 	}
 	if !found {
 		panic("unknown fixture")
 	}
+}
+
+func strictCandidateJSON(data []byte, target any) error {
+	// Recursive duplicate-key detection runs before decoding into typed maps.
+	d := json.NewDecoder(bytes.NewReader(data))
+	var walk func() error
+	walk = func() error {
+		token, err := d.Token()
+		if err != nil {
+			return err
+		}
+		delimiter, ok := token.(json.Delim)
+		if !ok {
+			return nil
+		}
+		switch delimiter {
+		case '{':
+			seen := map[string]bool{}
+			for d.More() {
+				key, err := d.Token()
+				if err != nil {
+					return err
+				}
+				s, ok := key.(string)
+				if !ok || seen[s] {
+					return errors.New("duplicate JSON key")
+				}
+				seen[s] = true
+				if err := walk(); err != nil {
+					return err
+				}
+			}
+		case '[':
+			for d.More() {
+				if err := walk(); err != nil {
+					return err
+				}
+			}
+		default:
+			return errors.New("invalid JSON delimiter")
+		}
+		_, err = d.Token()
+		return err
+	}
+	if err := walk(); err != nil {
+		return err
+	}
+	if _, err := d.Token(); err != io.EOF {
+		return errors.New("trailing JSON")
+	}
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	return decoder.Decode(target)
 }
