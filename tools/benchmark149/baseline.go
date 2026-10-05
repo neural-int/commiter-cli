@@ -11,9 +11,10 @@ import (
 )
 
 type baselineCapture struct {
-	backend llm.OptionsBackend
-	calls   []metric
-	groups  [][]string
+	backend   llm.OptionsBackend
+	calls     []metric
+	groups    [][]string
+	ProbeOnly bool
 }
 
 func (c *baselineCapture) Chat(context.Context, []llm.Message, json.RawMessage) (llm.Response, error) {
@@ -32,7 +33,9 @@ func (c *baselineCapture) ChatWithOptions(ctx context.Context, m []llm.Message, 
 		for _, g := range p.Groups {
 			c.groups = append(c.groups, g.FileIDs)
 		}
-		return llm.Response{}, errors.New("grouping probe stops before metadata")
+		if c.ProbeOnly {
+			return llm.Response{}, errors.New("grouping probe stops before metadata")
+		}
 	}
 	start := time.Now()
 	r, e := c.backend.ChatWithOptions(ctx, m, s, o)
@@ -48,17 +51,32 @@ func (c *baselineCapture) ChatWithOptions(ctx context.Context, m []llm.Message, 
 	c.calls = append(c.calls, v)
 	return r, e
 }
-func baseline(f fixture, b llm.OptionsBackend) observation {
+func baselineMode(f fixture, b llm.OptionsBackend, full bool) observation {
 	start := time.Now()
 	o := observation{Fixture: f.Name, Architecture: "current-stage1", Files: len(f.Files), Unresolved: true}
+	language := planning.English
+	if full {
+		language = planning.Japanese
+	}
 	d := contextinput.Document{SchemaVersion: 1, Files: f.Files}
-	p, e := planning.Renderer(planning.English)(d)
+	p, e := planning.Renderer(language)(d)
 	if e != nil {
 		o.Reason = "render_failure"
 		return o
 	}
-	c := &baselineCapture{backend: b}
-	_, e = (planning.ThreePhaseGenerator{Client: c}).Generate(context.Background(), contextinput.Prepared{Document: d, Prompt: p, Budget: contextinput.Budget{ContextTokens: 16384}}, planning.English, planning.SensitiveValues{})
+	c := &baselineCapture{backend: b, ProbeOnly: !full}
+	result, e := (planning.ThreePhaseGenerator{Client: c}).Generate(context.Background(), contextinput.Prepared{Document: d, Prompt: p, Budget: contextinput.Budget{ContextTokens: 16384}}, language, planning.SensitiveValues{})
+	if full {
+		valid := e == nil
+		o.PlanValid = &valid
+		if e != nil {
+			o.PlanStop = "baseline_failed"
+		} else {
+			data, _ := json.Marshal(result.Plan)
+			_, v := planning.Validate(data, fixtureIDs(f), planning.SensitiveValues{}, language)
+			valid = len(v) == 0
+		}
+	}
 	o.Calls = c.calls
 	o.Wall = time.Since(start).Seconds()
 	if len(c.groups) == 0 {

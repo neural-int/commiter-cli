@@ -11,6 +11,7 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/llm"
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
+	"github.com/natsuki0413/commiter-cli/internal/planning"
 	"io"
 	"os"
 	"sort"
@@ -39,6 +40,8 @@ type observation struct {
 	Groups       [][]string `json:"groups,omitempty"`
 	Calls        []metric   `json:"calls"`
 	Wall         float64    `json:"wall_seconds"`
+	PlanValid    *bool      `json:"plan_valid,omitempty"`
+	PlanStop     string     `json:"plan_stop,omitempty"`
 }
 
 func shape(props map[string]any) map[string]any {
@@ -138,9 +141,12 @@ func quality(groups, gold [][]string) (bool, int, int) {
 	return fm == 0 && fs == 0, fm, fs
 }
 func run(f fixture, arch string, b llm.OptionsBackend) observation {
+	return runContext(context.Background(), f, arch, b)
+}
+func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBackend) observation {
 	start := time.Now()
 	o := observation{Fixture: f.Name, Architecture: arch, Files: len(f.Files), Unresolved: true}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	ctx, cancel := context.WithTimeout(parent, 10*time.Minute)
 	defer cancel()
 	if len(f.Files) < 1 || len(f.Files) > 16 {
 		o.Reason = "file_budget"
@@ -273,6 +279,7 @@ func run(f fixture, arch string, b llm.OptionsBackend) observation {
 }
 func main() {
 	arch := flag.String("architecture", "semantic-ir", "semantic-ir or raw-global")
+	metadata := flag.Bool("metadata", false, "final metadata and authoritative validation; Japanese summaries")
 	reverse := flag.Bool("reverse", false, "reverse file presentation; no gold changes")
 	filter := flag.String("fixture", "contract-independent-6", "fixture name")
 	helper := flag.String("helper", "", "explicit measured local helper")
@@ -297,9 +304,13 @@ func main() {
 				}
 			}
 			if *arch == "baseline" {
-				json.NewEncoder(os.Stdout).Encode(baseline(f, b))
+				json.NewEncoder(os.Stdout).Encode(baselineMode(f, b, *metadata))
 			} else {
-				json.NewEncoder(os.Stdout).Encode(run(f, *arch, b))
+				if *metadata {
+					json.NewEncoder(os.Stdout).Encode(fullCycle(f, *arch, b))
+				} else {
+					json.NewEncoder(os.Stdout).Encode(run(f, *arch, b))
+				}
 			}
 		}
 	}
@@ -383,4 +394,36 @@ func irFailure(ir map[string]string) string {
 		}
 	}
 	return "invalid_ir"
+}
+
+func fullCycle(f fixture, arch string, b llm.OptionsBackend) observation {
+	start := time.Now()
+	budget := 240 * time.Second
+	if len(f.Files) <= 4 {
+		budget = planning.CandidateCycleTimeout
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), budget)
+	defer cancel()
+	o := runContext(ctx, f, arch, b)
+	valid := false
+	o.PlanValid = &valid
+	if !o.Complete {
+		o.PlanStop = "global_grouping_not_final"
+		o.Wall = time.Since(start).Seconds()
+		return o
+	}
+	plan, calls, reason := finalMetadata(ctx, f, o.Groups, b)
+	o.Calls = append(o.Calls, calls...)
+	if reason == "" {
+		data, _ := json.Marshal(plan)
+		_, violations := planning.Validate(data, fixtureIDs(f), planning.SensitiveValues{}, planning.Japanese)
+		if len(violations) == 0 {
+			valid = true
+		} else {
+			reason = "invalid_final_plan"
+		}
+	}
+	o.PlanStop = reason
+	o.Wall = time.Since(start).Seconds()
+	return o
 }
