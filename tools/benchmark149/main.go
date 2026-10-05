@@ -144,6 +144,26 @@ func run(f fixture, arch string, b llm.OptionsBackend) observation {
 	return runContext(context.Background(), f, arch, b)
 }
 func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBackend) observation {
+	if arch == "canonical-contracts" {
+		c, restore, e := canonicalFixture(f)
+		if e != nil {
+			return observation{Fixture: f.Name, Architecture: arch, Files: len(f.Files), Unresolved: true, Reason: e.Error()}
+		}
+		o := runContext(parent, c, "declaration-facts", b)
+		o.Architecture = arch
+		for i := range o.Groups {
+			for j := range o.Groups[i] {
+				o.Groups[i][j] = restore[o.Groups[i][j]]
+			}
+		}
+		if o.Complete {
+			x, fm, fs := quality(o.Groups, f.Expected)
+			o.Exact = &x
+			o.FM = &fm
+			o.FS = &fs
+		}
+		return o
+	}
 	start := time.Now()
 	o := observation{Fixture: f.Name, Architecture: arch, Files: len(f.Files), Unresolved: true}
 	ctx, cancel := context.WithTimeout(parent, 10*time.Minute)
@@ -183,7 +203,7 @@ func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBac
 				return o
 			}
 			representations = append(representations, map[string]any{"id": file.ID, "path": file.NewPath, "semantic": ir})
-		} else if arch == "grounded-facts" || arch == "contract-facts" || arch == "assertion-facts" {
+		} else if arch == "grounded-facts" || arch == "contract-facts" || (arch == "assertion-facts" || arch == "declaration-facts") {
 			before, after := []string{}, []string{}
 			for _, line := range strings.Split(file.RawDiff, "\n") {
 				if strings.HasPrefix(line, "-") && !strings.HasPrefix(line, "---") {
@@ -249,13 +269,16 @@ func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBac
 	}
 	var membership map[string]string
 	payload := map[string]any{"files": representations}
-	if arch == "grounded-facts" || arch == "contract-facts" || arch == "assertion-facts" {
+	if arch == "grounded-facts" || arch == "contract-facts" || (arch == "assertion-facts" || arch == "declaration-facts") {
 		payload["soft_relations"] = f.Graph.Edges
 		payload["relation_role"] = "candidate evidence only; never a required grouping or pruning boundary"
-		if arch == "contract-facts" || arch == "assertion-facts" {
+		if arch == "contract-facts" || (arch == "assertion-facts" || arch == "declaration-facts") {
 			payload["observed_calls"] = callFacts(f)
-			if arch == "assertion-facts" {
+			if arch == "assertion-facts" || arch == "declaration-facts" {
 				payload["observed_test_assertions"] = assertionFacts(f)
+				if arch == "declaration-facts" {
+					payload["observed_declarations"] = declarationFacts(f)
+				}
 			}
 			payload["observed_module"] = "fixture (synthetic fixture module, not an inferred production module)"
 		}
@@ -285,7 +308,7 @@ func main() {
 	helper := flag.String("helper", "", "explicit measured local helper")
 	cache := flag.String("cache", "", "existing pinned model store")
 	flag.Parse()
-	if *arch != "semantic-ir" && *arch != "raw-global" && *arch != "baseline" && *arch != "batch-ir" && *arch != "grounded-facts" && *arch != "contract-facts" && *arch != "assertion-facts" {
+	if *arch != "semantic-ir" && *arch != "raw-global" && *arch != "baseline" && *arch != "batch-ir" && *arch != "grounded-facts" && *arch != "contract-facts" && *arch != "assertion-facts" && *arch != "canonical-contracts" {
 		panic("unknown architecture")
 	}
 	v := config.Defaults().Values
