@@ -177,7 +177,7 @@ func run(f fixture, arch string, b llm.OptionsBackend) observation {
 				return o
 			}
 			representations = append(representations, map[string]any{"id": file.ID, "path": file.NewPath, "semantic": ir})
-		} else if arch == "grounded-facts" || arch == "contract-facts" {
+		} else if arch == "grounded-facts" || arch == "contract-facts" || arch == "assertion-facts" {
 			before, after := []string{}, []string{}
 			for _, line := range strings.Split(file.RawDiff, "\n") {
 				if strings.HasPrefix(line, "-") && !strings.HasPrefix(line, "---") {
@@ -243,11 +243,14 @@ func run(f fixture, arch string, b llm.OptionsBackend) observation {
 	}
 	var membership map[string]string
 	payload := map[string]any{"files": representations}
-	if arch == "grounded-facts" || arch == "contract-facts" {
+	if arch == "grounded-facts" || arch == "contract-facts" || arch == "assertion-facts" {
 		payload["soft_relations"] = f.Graph.Edges
 		payload["relation_role"] = "candidate evidence only; never a required grouping or pruning boundary"
-		if arch == "contract-facts" {
+		if arch == "contract-facts" || arch == "assertion-facts" {
 			payload["observed_calls"] = callFacts(f)
+			if arch == "assertion-facts" {
+				payload["observed_test_assertions"] = assertionFacts(f)
+			}
 			payload["observed_module"] = "fixture (synthetic fixture module, not an inferred production module)"
 		}
 	}
@@ -275,7 +278,7 @@ func main() {
 	helper := flag.String("helper", "", "explicit measured local helper")
 	cache := flag.String("cache", "", "existing pinned model store")
 	flag.Parse()
-	if *arch != "semantic-ir" && *arch != "raw-global" && *arch != "baseline" && *arch != "batch-ir" && *arch != "grounded-facts" && *arch != "contract-facts" {
+	if *arch != "semantic-ir" && *arch != "raw-global" && *arch != "baseline" && *arch != "batch-ir" && *arch != "grounded-facts" && *arch != "contract-facts" && *arch != "assertion-facts" {
 		panic("unknown architecture")
 	}
 	v := config.Defaults().Values
@@ -285,7 +288,7 @@ func main() {
 	}
 	b := &measuredBackend{Executable: *helper, Model: v.Model, Revision: v.ModelRevision, Path: p}
 	found := false
-	for _, f := range append(append(append(contractFixtures(), fixtures()...), holdouts()...), holdout16()) {
+	for _, f := range append(append(append(contractFixtures(), fixtures()...), holdouts()...), holdout16(), sharedCalleeGuardrail()) {
 		if f.Name == *filter {
 			found = true
 			if *reverse {
