@@ -54,7 +54,7 @@ func invoke(ctx context.Context, b llm.OptionsBackend, phase, system string, pay
 	s, _ := json.Marshal(schema)
 	start := time.Now()
 	response, err := b.ChatWithOptions(callCtx, []llm.Message{{Role: "system", Content: system + " Output JSON matching this schema: " + string(s)}, {Role: "user", Content: string(data)}}, s, llm.Options{ContextTokens: 16384, OutputTokens: 768, GenerationProfile: "bounded-grouping"})
-	m := metric{Phase: phase, Wall: time.Since(start).Seconds(), Stop: response.StopReason}
+	m := metric{Phase: phase, Wall: time.Since(start).Seconds(), Stop: safeStop(response.StopReason)}
 	if response.Availability.PromptEvalCount {
 		v := response.PromptEvalCount
 		m.Input = &v
@@ -68,9 +68,12 @@ func invoke(ctx context.Context, b llm.OptionsBackend, phase, system string, pay
 		return errors.New("backend_failure")
 	}
 	if response.StopReason != "completed" {
-		return fmt.Errorf("stop_%s", response.StopReason)
+		return fmt.Errorf("stop_%s", safeStop(response.StopReason))
 	}
-	return strictCandidateJSON([]byte(response.Content), out)
+	if strictCandidateJSON([]byte(response.Content), out) != nil {
+		return errors.New("invalid_json")
+	}
+	return nil
 }
 func partition(ids []string, membership map[string]string) ([][]string, error) {
 	if len(ids) != len(membership) {
@@ -197,6 +200,7 @@ func run(f fixture, arch string, b llm.OptionsBackend) observation {
 }
 func main() {
 	arch := flag.String("architecture", "semantic-ir", "semantic-ir or raw-global")
+	reverse := flag.Bool("reverse", false, "reverse file presentation; no gold changes")
 	filter := flag.String("fixture", "contract-independent-6", "fixture name")
 	helper := flag.String("helper", "", "explicit measured local helper")
 	cache := flag.String("cache", "", "existing pinned model store")
@@ -214,6 +218,11 @@ func main() {
 	for _, f := range append(append(contractFixtures(), fixtures()...), holdouts()...) {
 		if f.Name == *filter {
 			found = true
+			if *reverse {
+				for i, j := 0, len(f.Files)-1; i < j; i, j = i+1, j-1 {
+					f.Files[i], f.Files[j] = f.Files[j], f.Files[i]
+				}
+			}
 			if *arch == "baseline" {
 				json.NewEncoder(os.Stdout).Encode(baseline(f, b))
 			} else {
@@ -277,4 +286,13 @@ func strictCandidateJSON(data []byte, target any) error {
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
 	return decoder.Decode(target)
+}
+
+func safeStop(s string) string {
+	switch s {
+	case "completed", "max_tokens", "timeout", "cancelled", "grammar_failure", "internal_error", "context_overflow":
+		return s
+	default:
+		return "unknown"
+	}
 }
