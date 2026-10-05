@@ -37,3 +37,11 @@ func TestInvalidMembershipAndDuplicateJSON(t *testing.T) {
 		}
 	}
 }
+
+func TestIncompleteBatchStopsBeforeGlobal(t *testing.T) {
+	b := &failingBackend{}
+	o := run(contractFixtures()[1], "batch-ir", b)
+	if b.calls != 1 || o.Complete || len(o.Groups) != 0 || o.Exact != nil {
+		t.Fatal("partial batch accepted")
+	}
+}
