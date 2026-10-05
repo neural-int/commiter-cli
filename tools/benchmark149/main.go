@@ -334,6 +334,7 @@ func main() {
 	globalProfile := flag.String("global-profile", "", "explicit experimental global generation profile")
 	groupModel := flag.String("group-model", "", "existing pinned grouping-only model")
 	groupRevision := flag.String("group-revision", "", "full grouping model revision")
+	groupCache := flag.String("group-cache", "", "optional separate existing pinned grouping model store")
 	arch := flag.String("architecture", "semantic-ir", "semantic-ir or raw-global")
 	metadata := flag.Bool("metadata", false, "final metadata and authoritative validation; Japanese summaries")
 	reverse := flag.Bool("reverse", false, "reverse file presentation; no gold changes")
@@ -355,7 +356,11 @@ func main() {
 		candidate := base
 		profile := *globalProfile
 		if *groupModel != "" {
-			gp, e := (mlxmodel.Store{Root: *cache}).Ready(mlxmodel.Spec{Repo: *groupModel, Revision: *groupRevision, Quantization: "4bit"})
+			root := *cache
+			if *groupCache != "" {
+				root = *groupCache
+			}
+			gp, e := (mlxmodel.Store{Root: root}).Ready(mlxmodel.Spec{Repo: *groupModel, Revision: *groupRevision, Quantization: "4bit"})
 			if e != nil {
 				panic("grouping model must already be cached and pinned")
 			}

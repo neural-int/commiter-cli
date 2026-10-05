@@ -28,7 +28,7 @@ python3 tools/benchmark149/prepare_helper.py mlx-helper /tmp/new-experiment-help
 
 Go observerは公開合成fixtureのmodule `fixture`とfull before/after diffを対象にしたprototypeである。Go type checkerや汎用module resolver、partial Git diffからのfull source収集は実装していない。解決できないsymbolを推測しない。soft relation、test-pass、graph componentを不可逆なcommit boundaryにしない。
 
-`-reverse`はincoming file順だけを反転する。`-global-profile bounded-global-contract`はGemma native1024/output1536、`bounded-routed-grouping`はnative0/output1536で、`-group-model` / `-group-revision`の保存済みcheckpointをgroupingだけへ割り当てる。metadataは元のGemma/profileを使う。暗黙fallbackはない。routingモデルの固定revisionはenvironment-routing.json参照。
+`-reverse`はincoming file順だけを反転する。`-global-profile bounded-global-contract`はGemma native1024/output1536、`bounded-routed-grouping`はnative0/output1536で、`-group-model` / `-group-revision`の保存済みcheckpointをgroupingだけへ割り当てる。`-group-cache`を明示するとgrouping checkpointだけ別の既存pinned storeを使用できる。base Gemma cacheの移動や複製は不要。metadataは元のGemma/profileを使う。暗黙fallbackはない。routingモデルの固定revisionはenvironment-routing.json参照。
 
 N<=16、context16K、per-call120秒、grouping-only全fixture600秒、最大N+1calls、repair/retry0。各方式の実callsはJSONLへ記録する。最終JSONをstrict decodeし、duplicate key、unknown/missing selected ID、unknown group、unresolved、non-completed stopを拒否する。停止時のFM/FSはnullで、部分割当を正解として数えない。structural validationだけで意味的正解を保証しない。
 
