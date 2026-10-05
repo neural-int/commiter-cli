@@ -145,12 +145,16 @@ func run(f fixture, arch string, b llm.OptionsBackend) observation {
 	return runContext(context.Background(), f, arch, b)
 }
 func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBackend) observation {
-	if arch == "canonical-contracts" {
+	if arch == "canonical-contracts" || arch == "observed-contracts" {
 		c, restore, e := canonicalFixture(f)
 		if e != nil {
 			return observation{Fixture: f.Name, Architecture: arch, Files: len(f.Files), Unresolved: true, Reason: e.Error()}
 		}
-		o := runContext(parent, c, "declaration-facts", b)
+		inner := "declaration-facts"
+		if arch == "observed-contracts" {
+			inner = "contract-output"
+		}
+		o := runContext(parent, c, inner, b)
 		o.Architecture = arch
 		for i := range o.Groups {
 			for j := range o.Groups[i] {
@@ -164,6 +168,9 @@ func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBac
 			o.FS = &fs
 		}
 		return o
+	}
+	if arch == "contract-output" {
+		return observedContractRun(parent, f, b)
 	}
 	start := time.Now()
 	o := observation{Fixture: f.Name, Architecture: arch, Files: len(f.Files), Unresolved: true}
@@ -312,7 +319,7 @@ func main() {
 	helper := flag.String("helper", "", "explicit measured local helper")
 	cache := flag.String("cache", "", "existing pinned model store")
 	flag.Parse()
-	if *arch != "semantic-ir" && *arch != "raw-global" && *arch != "baseline" && *arch != "batch-ir" && *arch != "grounded-facts" && *arch != "contract-facts" && *arch != "assertion-facts" && *arch != "canonical-contracts" {
+	if *arch != "semantic-ir" && *arch != "raw-global" && *arch != "baseline" && *arch != "batch-ir" && *arch != "grounded-facts" && *arch != "contract-facts" && *arch != "assertion-facts" && *arch != "canonical-contracts" && *arch != "observed-contracts" {
 		panic("unknown architecture")
 	}
 	v := config.Defaults().Values
@@ -338,7 +345,7 @@ func main() {
 		b = &groupingBackend{Group: candidate, Base: base, Profile: profile, Output: 1536}
 	}
 	found := false
-	for _, f := range append(append(append(contractFixtures(), fixtures()...), holdouts()...), holdout16(), sharedCalleeGuardrail()) {
+	for _, f := range append(append(append(contractFixtures(), fixtures()...), holdouts()...), holdout16(), sharedCalleeGuardrail(), contractHoldout()) {
 		if f.Name == *filter {
 			found = true
 			if *reverse {
