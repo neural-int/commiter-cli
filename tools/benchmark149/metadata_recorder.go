@@ -20,7 +20,7 @@ func (c *metadataRecorder) ChatWithOptions(ctx context.Context, m []llm.Message,
 	defer cancel()
 	start := time.Now()
 	r, e := c.Backend.ChatWithOptions(callCtx, m, s, o)
-	v := metric{Phase: o.GenerationProfile, Wall: time.Since(start).Seconds(), Stop: safeStop(r.StopReason)}
+	v := metric{Model: r.Model, Phase: o.GenerationProfile, Wall: time.Since(start).Seconds(), Stop: safeStop(r.StopReason)}
 	if r.Availability.PromptEvalCount {
 		x := r.PromptEvalCount
 		v.Input = &x

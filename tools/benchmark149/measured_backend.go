@@ -42,6 +42,13 @@ func (b *measuredBackend) ChatWithOptions(ctx context.Context, m []llm.Message, 
 	stdout := &cappedOutput{Limit: mlx.DefaultMaxResponseBytes}
 	command.Stdout = stdout
 	if err = command.Run(); err != nil {
+		if ctx.Err() != nil {
+			stop := "cancelled"
+			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+				stop = "timeout"
+			}
+			return llm.Response{StopReason: stop}, ctx.Err()
+		}
 		return llm.Response{}, errors.New("experimental helper process failed")
 	}
 	var response struct {

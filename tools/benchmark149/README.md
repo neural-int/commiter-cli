@@ -1,18 +1,39 @@
-# Issue149 exploration
+# Issue149 architecture exploration
 
-本番code/default/model/backendを変更せず、保存済みpinned modelと計測用helperのみ使用する。modelの取得処理は含めない。goldはpayloadへ渡さない。semantic IR、raw response、prompt、native thoughtはRAMのみ。stdoutはfixture名、numeric telemetry、stop分類、固定selected IDsのgroupingだけ。
+本番planner/default/model/backendを変更せず、保存済みpinned checkpointと計測用helper copyのみ使用する。model取得処理は含めない。goldはmodel payloadへ渡さない。prompt、IR、raw response、native thoughtはRAMのみ。stdoutにはfixture名、数値telemetry、stop分類、固定selected IDのgrouping、最終validation結果だけを出力する。Git mutationは行わない。
 
 ```sh
 go build -o /tmp/benchmark149 ./tools/benchmark149
-/tmp/benchmark149 -architecture semantic-ir -fixture contract-independent-6 \
+python3 tools/benchmark149/prepare_helper.py mlx-helper /tmp/new-experiment-helper
+# 既存のlocked dependencies/build cacheを再利用してhelperをbuildする。
+/tmp/benchmark149 -architecture assertion-facts -fixture contract-independent-6 \
   -helper /path/to/instrumented/commiter-mlx-helper \
   -cache /path/to/existing/mlx-models
 ```
 
-`baseline`は現行ThreePhaseGeneratorのStage1をそのまま実行し、検証済みgroupingがcategory入力へ渡った時点で計測を止める。metadata成功・plan成功には数えない。`raw-global`はIRを経由しない全体判断の診断用対照。
+`prepare_helper.py`のdestinationは新規ディレクトリを指定する。production helperは変更しない。実測に使ったhelper source/binary hashは`docs/benchmarks/issue-149/environment*.json`に記録する。現在のscriptはIteration10までのexperimental profilesとcached revisionsを許可するため、初期iterationの再現には対応commitのscriptを使用する。
 
-N<=16、per-call120秒、whole-fixture600秒、N+1calls、repair/retry0。モデルの完成stop、strict JSONとselected IDの全件一意割当を確認。unknown/missing IDやunresolvedで部分planを返さない。本ツールはplanを生成せず、Git mutationもしない。IRの事実忠実性やsemantic正解をJSON schemaだけで保証しない。
+| architecture | semantic responsibility |
+| --- | --- |
+| baseline | 現行ThreePhaseGenerator。既定はStage1のgroupingを確認後categoryの直前で停止 |
+| semantic-ir | per-fileのbefore/after/changed-contract/symbolをmodel抽出し、全体へ渡す |
+| batch-ir | 最大4fileのkeyed extractionを全体へ渡す |
+| raw-global | 圧縮なしの全file raw diffを1callで比較する診断対照 |
+| grounded-facts | hostが変更前後のliteralを観測し、soft graphと全体判断へ渡す |
+| contract-facts | Go ASTのunique caller/callee観測を追加 |
+| assertion-facts | 対応testのinputと期待条件観測を追加 |
+| canonical-contracts | source/path順とmodel IDをhostで固定し、宣言・定数・関数body観測も追加 |
 
-既使用contract/controlled fixtureと独立評価holdoutを分ける。holdoutは24b166bで初回結果確認前に固定した著者定義の合成要求で、実利用者判断のgoldやproduction精度分布ではない。採用に用いたら以後fresh holdoutに戻さない。
+Go observerは公開合成fixtureのmodule `fixture`とfull before/after diffを対象にしたprototypeである。Go type checkerや汎用module resolver、partial Git diffからのfull source収集は実装していない。解決できないsymbolを推測しない。soft relation、test-pass、graph componentを不可逆なcommit boundaryにしない。
 
-helperの数値instrumentationは#146の計測用コピーを再利用し、binary hashをenvironment.jsonへ保存。出力tokensにはnative thought/channelを含む。wallには毎callのmodel loadを含み、fixture構築、build、Git収集を含まない。初回推論と契約testは一部並行し、熱/CPUを隔離したlatency評価ではない。
+`-reverse`はincoming file順だけを反転する。`-global-profile bounded-global-contract`はGemma native1024/output1536、`bounded-routed-grouping`はnative0/output1536で、`-group-model` / `-group-revision`の保存済みcheckpointをgroupingだけへ割り当てる。metadataは元のGemma/profileを使う。暗黙fallbackはない。routingモデルの固定revisionはenvironment-routing.json参照。
+
+N<=16、context16K、per-call120秒、grouping-only全fixture600秒、最大N+1calls、repair/retry0。各方式の実callsはJSONLへ記録する。最終JSONをstrict decodeし、duplicate key、unknown/missing selected ID、unknown group、unresolved、non-completed stopを拒否する。停止時のFM/FSはnullで、部分割当を正解として数えない。structural validationだけで意味的正解を保証しない。
+
+`-metadata`を明示した場合だけ、completeなglobal grouping後にcurrent Japanese category/text契約を使用し、最大4groupずつ生成して`planning.Validate()`をauthoritative gateとする。4fileのwhole cycleは現行120秒、5〜16fileはexperimental240秒。失格candidateにmetadataを実行して採用扱いすることはない。metadata含む4file比較はIteration10のserialized結果を参照する。
+
+既使用contract/controlled fixtureと独立評価holdoutを区別する。holdout6は24b166bで初回結果確認前に固定した著者定義の合成要求で、実利用のgoldやproduction精度分布ではない。holdout16には5つの既使用purposeと3つの追加purposeを含み、全部をfreshと呼ばない。採用に用いたfixtureをfresh holdoutへ戻さない。
+
+input tokensはhelperのinput.text.tokens.size、outputはinfo.generationTokenCountで実測し、native thought/channelも含む。nullは取得不能であり0ではない。wallには各callのmodel loadを含み、fixture構築/build/Git収集は含まない。初期の一部はhost tests/buildと並行。Iteration10のinitial full4は別model推論とも並行したためlatency比較から除外し、原記録を保持してserialized比較を追加した。熱やCPUを隔離したproduction latency評価ではない。
+
+入力監査testは、同じ観測入力と異なる著者partitionを比較する識別可能性の検査である。counterfactual goldをmodelへ送信しない。runtime boundary testは公開cross12 fixtureの5中間状態だけをtemporary directoryで実行する。利用者repositoryの任意コードを実行する機能ではない。両監査はmodel精度の測定ではなく、観測入力・test-passだけでは著者の変更目的を一意に証明できない範囲を記録する。

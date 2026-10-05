@@ -466,6 +466,9 @@ func fullCycle(f fixture, arch string, b llm.OptionsBackend) observation {
 			reason = "invalid_final_plan"
 		}
 	}
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+		reason = "metadata_timeout"
+	}
 	o.PlanStop = reason
 	o.Wall = time.Since(start).Seconds()
 	return o

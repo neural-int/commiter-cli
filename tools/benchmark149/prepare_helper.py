@@ -62,7 +62,10 @@ def prepare(source, destination):
     text = replace_once(text, 'modelID == "mlx-community/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2" else {', '(modelID == "mlx-community/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2" || (profile == "bounded-routed-grouping" && ['
         '"mlx-community/Qwen3.5-4B-MLX-4bit@32f3e8ecf65426fc3306969496342d504bfa13f3",'
         '"mlx-community/Phi-4-mini-instruct-4bit@ac1c269cb4222a4e136a3d09edad301056c1f36a",'
-        '"ibm-granite/granite-4.2-3b-q4-mlx@0c6f39b1827afd5eb2c1c3b13751929857434953"'
+        '"ibm-granite/granite-4.2-3b-q4-mlx@0c6f39b1827afd5eb2c1c3b13751929857434953",'
+        '"mlx-community/NVIDIA-Nemotron-3-Nano-4B-4bit@c4d79ba1901d99806ef757642a552acebb851a35",'
+        '"mlx-community/Ministral-3-3B-Instruct-2512-4bit@a962dcb09eee4169c890e544c9eb938f1113fdee",'
+        '"mlx-community/Ministral-3-3B-Reasoning-2512-4bit@2cd2087aad40c28747f8ede17851de6035f12b16"'
         '].contains(modelID))) else {')
     text = replace_once(text, 'let nativeLimit = profile == "bounded-grouping" ? 512 : (profile == "bounded-category" ? 384 : 0)', 'let nativeLimit = profile == "bounded-global-contract" ? 1024 : (profile == "bounded-grouping" ? 512 : (profile == "bounded-category" ? 384 : 0))')
     text = replace_once(text, 'let budget = profile == "bounded-category" ? 512 : 768', 'let budget = (profile == "bounded-global-contract" || profile == "bounded-routed-grouping") ? 1536 : (profile == "bounded-category" ? 512 : 768)')
