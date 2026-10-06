@@ -1,0 +1,33 @@
+{
+  "original_helper_source_sha256": "ba2e6629dd9f7002d6b647050dac4b36622008d4d23c9a64a7df2cf2a6958201",
+  "instrumented_helper_source_sha256": "2d5e0c036cfbb2e76d1d30deea37ac9ffc88b00847b89d7b294a07e8fd86ebd3",
+  "global_profiles": {
+    "bounded-global-contract": {
+      "native": 1024,
+      "output": 1536
+    },
+    "bounded-routed-grouping": {
+      "native": 0,
+      "output": 1536
+    }
+  },
+  "measurement": "input.text.tokens.size and info.generationTokenCount; output includes native thought and channel tokens",
+  "helper_binary_sha256": "016b706cacbbe39315b80fc68f4e82fa29e732afc3e371652c670d24ae3550c4",
+  "build": "swift build -c release --skip-update --disable-automatic-resolution; existing APFS-cloned build cache",
+  "helper_tests": {
+    "command": "swift test -c release --skip-update --disable-automatic-resolution",
+    "passed": 24,
+    "suites": 3
+  },
+  "acquisition": {
+    "human_approved": true,
+    "model": "mlx-community/Qwen3-8B-4bit",
+    "revision": "545dc4251c05440727734bcd94334791f6ab0192",
+    "bytes": 4623782544,
+    "files": 9,
+    "started": true,
+    "completion_evidence": "iteration-14-model-install.json",
+    "ready": true,
+    "acquisition_timeout_seconds": 7200
+  }
+}
