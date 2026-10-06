@@ -428,7 +428,7 @@ func main() {
 		b = &groupingBackend{Group: candidate, Base: base, Profile: profile, Output: 1536}
 	}
 	found := false
-	for _, f := range append(append(append(contractFixtures(), fixtures()...), holdouts()...), holdout16(), sharedCalleeGuardrail(), contractHoldout()) {
+	for _, f := range append(append(append(contractFixtures(), fixtures()...), holdouts()...), holdout16(), sharedCalleeGuardrail(), contractHoldout(), wireHoldout()) {
 		if f.Name == *filter {
 			found = true
 			if *reverse {

@@ -1,0 +1,7 @@
+# Iteration34事前登録: H23新独立wire contract評価
+
+H23 source/task/schema/generator/route/budgetはcommit b1b703dで固定。新fixture holdout-event-field-and-duration-unit-8を推論前に定義。eventsのJSON field trace_id→correlation_idをproducer/consumerとtestで統一する4filesと、独立したmetricsのelapsed_us→elapsed_ms変換をproducer/consumerとtestで統一する4files。goldは2groups各4files。共通source呼出なし、観測されたwire field/単位のbefore/after対応が根拠。fixture名/goldはmodel入力外。expiry/cents/limit定数とは別behavior。
+
+before/after Go testsと候補包含診断をLLM0で先に実行。期待groupは推論結果から変更しない。候補に正解がなくてもfree assignmentは許し、generatorルールを追加しない。gold包含の診断結果だけで候補内容を調整しない。
+
+その後固定Qwen3-8B revision545dc4251c05440727734bcd94334791f6ab0192/native0/output1536/context16K/call120秒/whole600秒/temp0/top_p1/top_k0/seed144/retry0/repair0で1call/1回。失敗時は保存して棄却、同holdoutをtuning後のfreshと扱わない。通過時のみrange/baseline/order/metadata/Validateへ。追加取得/依存/production変更なし。

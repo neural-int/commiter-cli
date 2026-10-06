@@ -76,3 +76,18 @@ func TestH19FullCoverageDiagnostic(t *testing.T) {
 		fmt.Println(string(data))
 	}
 }
+
+func TestWireHoldoutCandidateDiagnostic(t *testing.T) {
+	f := wireHoldout()
+	candidates, err := partitionCandidates(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	contained := false
+	for _, c := range candidates {
+		exact, _, _ := quality(c.Groups, f.Expected)
+		contained = contained || exact
+	}
+	data, _ := json.Marshal(map[string]any{"fixture": f.Name, "files": len(f.Files), "candidates": candidates, "gold_contained": contained, "backend_calls": 0})
+	fmt.Println(string(data))
+}
