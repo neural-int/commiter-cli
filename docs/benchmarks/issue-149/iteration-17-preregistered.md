@@ -1,0 +1,7 @@
+# Iteration17事前登録: synthetic runtime相互作用の前提検証
+
+モデル推論前の観測情報調査。contract-cross-boundary-12とshared-callee-independent-6について、既存ASTが観測したsource caller/callee参照と対応test呼出しのliteral引数を使う。callee/callerのbefore/before、after/before、before/after、after/afterの4snapshotを各1回実行。他sourceはbefore、testは実行せず観測呼出し値のみをJSONに記録。期待値やgoldから実行入力を生成しない。同じtest呼出しはbefore/after間でdeduplicateする。
+
+実行はrepository定義の上記2synthetic fixtureのみ、Go標準機能、literal引数、no dependency/network。各go run30秒/whole300秒。実行失敗/unsupportedは観測成功と混同せず停止。任意の収集済みrepository codeを実行しない。runtime結果はsoft evidence候補で、dependencyやjoint changeをhard grouping境界にしない。
+
+今回はmodel calls=0。追加情報が観測できた場合のみ、runtime evidenceをglobalへ渡す次のarchitectureを別途事前登録する。資格試験/holdout/metadata/productionは今回実行しない。値・実行数・wallを保存し、意味的partitionの正しさは実行だけでは証明しない。
