@@ -1,0 +1,7 @@
+# Iteration21事前登録: causal contrast情報と取得済み8B route
+
+H14はH13 contrast-recordsの入力・host observer/分類・global prompt/schema/canonicalization/validationを固定し、groupingだけQwen3-8B-4bit@545dc4251c05440727734bcd94334791f6ab0192へrouteする。Iteration14 H9にはなかった4snapshot値とcontrastを同modelが消費できるかを比較する。parameter数を採用根拠にしない。追加取得/dependency/production変更なし。
+
+native0/output1536/context16K/call120秒/whole600秒、temperature0/top_p1/top_k0/seed144、repair/retry0、observer probe32/sample128/step1024/depth16/int絶対値2^26/string4096bytes。任意code実行なし。metadataは既存Gemmaを維持し、final grouping後のみ。
+
+weak16/cross12/shared-callee independent6を各1回、同時推論せず測定。3case全てexact/FM0/FS0/completeの場合のみ未推論protocol8を1回。それも通過した場合のみrange/regression/order/metadata/Validateへ進む。いずれか失敗なら反復調整で資格を取り直さず、残るarchitecture/task境界またはcapabilityの限界を監査する。実tokens/calls/wall/stopとobserver metricsを独立記録する。
