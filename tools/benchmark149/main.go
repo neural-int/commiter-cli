@@ -152,7 +152,7 @@ func run(f fixture, arch string, b llm.OptionsBackend) observation {
 	return runContext(context.Background(), f, arch, b)
 }
 func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBackend) observation {
-	if arch == "canonical-contracts" || arch == "observed-contracts" || arch == "observed-anchors" || arch == "contract-records" || arch == "semantic-records" || arch == "interaction-records" || arch == "contrast-records" || arch == "purpose-records" || arch == "discovery-records" {
+	if arch == "canonical-contracts" || arch == "observed-contracts" || arch == "observed-anchors" || arch == "contract-records" || arch == "semantic-records" || arch == "interaction-records" || arch == "contrast-records" || arch == "purpose-records" || arch == "discovery-records" || arch == "candidate-records" {
 		c, restore, e := canonicalFixture(f)
 		if e != nil {
 			return observation{Fixture: f.Name, Architecture: arch, Files: len(f.Files), Unresolved: true, Reason: e.Error()}
@@ -182,6 +182,9 @@ func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBac
 		if arch == "discovery-records" {
 			inner = "discovery-assignment"
 		}
+		if arch == "candidate-records" {
+			inner = "candidate-selection"
+		}
 		o := runContext(parent, c, inner, b)
 		o.Architecture = arch
 		for i := range o.Groups {
@@ -207,6 +210,9 @@ func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBac
 			o.FS = &fs
 		}
 		return o
+	}
+	if arch == "candidate-selection" {
+		return candidateSelectionRun(parent, f, b)
 	}
 	if arch == "discovery-assignment" {
 		return anchorRepresentationRun(parent, f, b, true, false, true, true, true, true)
@@ -380,7 +386,7 @@ func main() {
 	helper := flag.String("helper", "", "explicit measured local helper")
 	cache := flag.String("cache", "", "existing pinned model store")
 	flag.Parse()
-	if *arch != "semantic-ir" && *arch != "raw-global" && *arch != "baseline" && *arch != "batch-ir" && *arch != "grounded-facts" && *arch != "contract-facts" && *arch != "assertion-facts" && *arch != "canonical-contracts" && *arch != "observed-contracts" && *arch != "observed-anchors" && *arch != "contract-records" && *arch != "semantic-records" && *arch != "interaction-records" && *arch != "contrast-records" && *arch != "purpose-records" && *arch != "discovery-records" {
+	if *arch != "semantic-ir" && *arch != "raw-global" && *arch != "baseline" && *arch != "batch-ir" && *arch != "grounded-facts" && *arch != "contract-facts" && *arch != "assertion-facts" && *arch != "canonical-contracts" && *arch != "observed-contracts" && *arch != "observed-anchors" && *arch != "contract-records" && *arch != "semantic-records" && *arch != "interaction-records" && *arch != "contrast-records" && *arch != "purpose-records" && *arch != "discovery-records" && *arch != "candidate-records" {
 		panic("unknown architecture")
 	}
 	v := config.Defaults().Values

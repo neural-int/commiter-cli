@@ -1,0 +1,5 @@
+# Iteration27事前登録: H19 complete partition candidates
+
+Iteration26で固定した最大4familyを実装。singleton、observed assertion source/test component、同component+source caller/callee component、all-files。gold/fixture名/期待group数は生成に使用しない。canonical lexicographic順で重複除去し最大4。soft relationは候補生成用であり最終must-linkにしない。
+
+最初にweak16/cross12/guardrailをLLM0で候補包含診断。全包含時だけ、元contract/calls/assertions/snapshot/contrast全件を保持したcandidate ID/unresolved selectionをfixed Qwen3-8B/native0で各1call。fixed revision545dc4251c05440727734bcd94334791f6ab0192、output1536/context16K/call120秒/whole600秒、temp0/top_p1/top_k0/seed144、repair/retry0。unknown/invalid/unresolvedは拒否。欠落時はgold追加/rule調整なしでgenerator不足を報告。全qualification通過のみfresh protocol8以降。追加取得/依存/production変更なし。
