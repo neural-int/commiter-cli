@@ -1,0 +1,5 @@
+# Iteration29事前登録: 固定candidate generatorの全fixture包含診断
+
+Iteration28 Next Stepsに従い既存contract/controlled/holdout/guardrail/protocol fixture全体をLLM0で包含診断。generator/候補数/観測規則/gold固定。欠落しても候補手動追加・rule tuningしない。protocol8はmodel未推論だが、今回generator評価に使用した後はcandidate generatorの未使用holdoutとは扱わない。
+
+先頭all-files選択の位置依存は今回のLLM0では特定しない。候補欠落がある場合、順序変更でgenerator不足は修復できないため追加推論は行わず、包含とselector双方の棄却根拠を監査へ加える。次仮説/再開prerequisiteの根拠を整理する。追加取得/依存/production変更なし。

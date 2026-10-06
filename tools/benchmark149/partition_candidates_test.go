@@ -59,3 +59,20 @@ func TestSelectionRejectsUnknownAndUnresolved(t *testing.T) {
 		t.Fatal("valid selection rejected")
 	}
 }
+
+func TestH19FullCoverageDiagnostic(t *testing.T) {
+	all := append(append(append(contractFixtures(), fixtures()...), holdouts()...), holdout16(), sharedCalleeGuardrail(), contractHoldout())
+	for _, f := range all {
+		candidates, err := partitionCandidates(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+		contained := false
+		for _, c := range candidates {
+			exact, _, _ := quality(c.Groups, f.Expected)
+			contained = contained || exact
+		}
+		data, _ := json.Marshal(map[string]any{"fixture": f.Name, "files": len(f.Files), "candidate_count": len(candidates), "gold_contained": contained, "backend_calls": 0})
+		fmt.Println(string(data))
+	}
+}
