@@ -1,0 +1,7 @@
+# Iteration24事前登録: purpose taskと固定8B route
+
+H17はIteration23 Next Stepsに従いH15 purpose-records/native0の入力、task、schema、canonicalization、host gatesを固定し、grouping-only modelを取得済みmlx-community/Qwen3-8B-4bit@545dc4251c05440727734bcd94334791f6ab0192にする。比較対象はIteration22のnative0 Gemma。同taskで未評価のcheckpoint組合せを確認し、Iteration23とのmodel単独比較とはしない。
+
+weak-edges-independent-16、contract-cross-boundary-12、shared-callee-independent-6を順に各1回。bounded-routed-grouping、native0/output1536/context16K/call120秒/whole600秒、temperature0/top_p1/top_k0/seed144、retry/repair0。固定helper SHA016b706cacbbe39315b80fc68f4e82fa29e732afc3e371652c670d24ae3550c4。追加取得、dependency/code/production変更なし。観測値はsoft evidence、unknown/invalid/partial/timeoutは拒否。goldはmodel入力外。raw思考/IR/promptを保存しない。
+
+3case全てexact/FM0/FS0/completeの場合のみ未推論protocol8を評価。それも通過すればrange/regression/order/metadata/Validateへ進む。失敗時は試験済みfamily、既存Issue evidence、利用可能capability、合理的未検証候補を棚卸しし、追加仮説の根拠または再開prerequisiteを明文化する。同taskの予算/prompt/seed/order sweepはしない。有限の失敗を普遍的不可能性とは扱わない。
