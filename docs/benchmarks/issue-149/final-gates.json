@@ -1,0 +1,44 @@
+{
+  "verification_branch": "Candidate not found",
+  "issue_checkboxes": 16,
+  "gates": [
+    {
+      "command": "go test ./...",
+      "exit_code": 0,
+      "log_sha256": "23b0e1747f9343d027c311e322829617417524018ed7391b613368f99db8b8ca",
+      "log_path": "/tmp/issue149-final-go-test.log"
+    },
+    {
+      "command": "go vet ./...",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_path": "/tmp/issue149-final-go-vet.log"
+    },
+    {
+      "command": "go build ./...; go build -o /tmp/issue149-final-commiter ./cmd/commiter",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_path": "/tmp/issue149-final-go-build.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s .github/scripts/release-notes -p 'test_*.py'",
+      "exit_code": 0,
+      "log_sha256": "cd617e6a88b8510c4eeffcf4b2ee2c15c74b1eb46bfed9e4ca9f985227f73a56",
+      "log_path": "/tmp/issue149-final-python.log"
+    },
+    {
+      "command": "swift test --package-path /tmp/issue149-qwen8-helper --scratch-path /tmp/issue149-qwen8-helper/.build/out --skip-update --disable-automatic-resolution",
+      "exit_code": 0,
+      "log_sha256": "77dcb40c1320c2f57a54d7e6841756091a2f392f73c53c1d1ce8c2b6df8a8697",
+      "log_path": "/tmp/issue149-final-swift.log"
+    }
+  ],
+  "python_tests": 25,
+  "swift_tests": 24,
+  "swift_suites": 3,
+  "diff_check": "pass",
+  "production_changes": false,
+  "new_dependencies": false,
+  "obsolete_tests": "no feature/test removals; none required",
+  "new_tests_review": "observer oracle, fail-closed, schema/ID, fixture validity and measurement diagnostics; no adoption claim from diagnostic test pass"
+}
