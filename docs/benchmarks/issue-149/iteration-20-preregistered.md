@@ -1,0 +1,7 @@
+# Iteration20事前登録: 観測値のcontrast導出をhostへ分離
+
+H13 contrast-recordsはH12の全情報と4snapshot値を維持し、その等否によるeffect_at_observed_inputをhostで計算する。四値全てknown/支持scalar/異なるsnapshot IDの場合だけ、no_effect/joint_only_effect/caller_only_effect/callee_only_effect/other_combination_effectに分類。欠落/重複/unknown/非有限float/不支持値はunknown。これは有限の観測入力の事実で、same purposeやcommit境界を意味しない。hard union、局所final grouping、gold/fixture名の入力はしない。
+
+System prompt/schema/canonicalization/host gate/model/seedをH12から維持し、分類フィールドのみ追加。固定Gemma 475b9088d29754a3379866cf5aeb6b41acd313c2、native0/output1536/context16K/call120秒/whole600秒、temperature0/top_p1/top_k0/seed144、repair/retry0。observerはprobe32/sample128、step1024/depth16/int絶対値2^26/string4096bytes。任意コードの外部実行なし。
+
+weak16/cross12/shared-callee independent6を各1回、順番に測定。全3case exact/FM0/FS0/completeの場合のみ未推論protocol8を1回。それも通過した場合のみrange/regression/order/metadata/Validateへ進む。失敗時はprompt/seed/order調整や同条件反復で資格を取り直さない。実tokens/calls/wall/stopとobserver metricsを独立に記録。

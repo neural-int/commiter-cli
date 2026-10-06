@@ -29,6 +29,7 @@ type interactionFact struct {
 	Function  string          `json:"observed_function"`
 	Arguments []string        `json:"observed_arguments"`
 	Snapshots []snapshotValue `json:"snapshots"`
+	Contrast  string          `json:"effect_at_observed_input,omitempty"`
 }
 
 // Observed inputs come from test syntax, never expected values or gold groups.

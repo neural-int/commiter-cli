@@ -151,7 +151,7 @@ func run(f fixture, arch string, b llm.OptionsBackend) observation {
 	return runContext(context.Background(), f, arch, b)
 }
 func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBackend) observation {
-	if arch == "canonical-contracts" || arch == "observed-contracts" || arch == "observed-anchors" || arch == "contract-records" || arch == "semantic-records" || arch == "interaction-records" {
+	if arch == "canonical-contracts" || arch == "observed-contracts" || arch == "observed-anchors" || arch == "contract-records" || arch == "semantic-records" || arch == "interaction-records" || arch == "contrast-records" {
 		c, restore, e := canonicalFixture(f)
 		if e != nil {
 			return observation{Fixture: f.Name, Architecture: arch, Files: len(f.Files), Unresolved: true, Reason: e.Error()}
@@ -171,6 +171,9 @@ func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBac
 		}
 		if arch == "interaction-records" {
 			inner = "interaction-assignment"
+		}
+		if arch == "contrast-records" {
+			inner = "contrast-assignment"
 		}
 		o := runContext(parent, c, inner, b)
 		o.Architecture = arch
@@ -198,14 +201,17 @@ func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBac
 		}
 		return o
 	}
+	if arch == "contrast-assignment" {
+		return anchorRepresentationRun(parent, f, b, true, false, true, true)
+	}
 	if arch == "interaction-assignment" {
-		return anchorRepresentationRun(parent, f, b, true, false, true)
+		return anchorRepresentationRun(parent, f, b, true, false, true, false)
 	}
 	if arch == "delta-assignment" {
-		return anchorRepresentationRun(parent, f, b, true, true, false)
+		return anchorRepresentationRun(parent, f, b, true, true, false, false)
 	}
 	if arch == "record-assignment" {
-		return anchorRepresentationRun(parent, f, b, true, false, false)
+		return anchorRepresentationRun(parent, f, b, true, false, false, false)
 	}
 	if arch == "anchor-assignment" {
 		return observedAnchorRun(parent, f, b)
@@ -361,7 +367,7 @@ func main() {
 	helper := flag.String("helper", "", "explicit measured local helper")
 	cache := flag.String("cache", "", "existing pinned model store")
 	flag.Parse()
-	if *arch != "semantic-ir" && *arch != "raw-global" && *arch != "baseline" && *arch != "batch-ir" && *arch != "grounded-facts" && *arch != "contract-facts" && *arch != "assertion-facts" && *arch != "canonical-contracts" && *arch != "observed-contracts" && *arch != "observed-anchors" && *arch != "contract-records" && *arch != "semantic-records" && *arch != "interaction-records" {
+	if *arch != "semantic-ir" && *arch != "raw-global" && *arch != "baseline" && *arch != "batch-ir" && *arch != "grounded-facts" && *arch != "contract-facts" && *arch != "assertion-facts" && *arch != "canonical-contracts" && *arch != "observed-contracts" && *arch != "observed-anchors" && *arch != "contract-records" && *arch != "semantic-records" && *arch != "interaction-records" && *arch != "contrast-records" {
 		panic("unknown architecture")
 	}
 	v := config.Defaults().Values
