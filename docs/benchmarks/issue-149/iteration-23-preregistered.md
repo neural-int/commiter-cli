@@ -1,0 +1,7 @@
+# Iteration23事前登録: purpose判断と既存bounded deliberation contract
+
+H16はH15のpurpose-records入力/task/output schema/canonicalization/host gatesを固定し、既存bounded-global-contractで生成する。native0直接出力と異なり、enable_thinking=true、bounded native1024とfinal JSON grammarを持つ。native効果だけの分離実験ではなく、generation contractと新taskの組合せ試験。H7はcanonical declaration IRであり、今回のcaller/test/4snapshot/contrast/purpose判断とは異なる。予算増加自体を採用根拠にしない。
+
+helper source/pinは変更なし。fixed Gemma 475b9088d29754a3379866cf5aeb6b41acd313c2、native上限1024、native/channel/finalを含むtotal output1536、context16Kでprompt+output1536を予約、call120秒/whole600秒、temperature0/top_p1/top_k0/seed144、repair/retry0。native失敗、final JSON不正、途中stopは拒否。observer上限とunknown/partial拒否は従前。raw native思考/IR/promptを保存せず実tokens/stop/wallを記録。
+
+weak16/cross12/shared-callee independent6を各1回、順次実行。3case全てexact/FM0/FS0/completeの場合のみ未推論protocol8を1回。それも通過した場合のみrange/regression/order/metadata/Validateへ進む。失敗なら同taskの予算sweep/反復調整で資格を取り直さず、capability/architecture残余を監査する。同profile一つへ固定し、追加モデル取得/dependency/production変更なし。
