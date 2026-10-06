@@ -1,0 +1,7 @@
+# Iteration15事前登録: contract単位の観測record
+
+H10: hostが既存AST観測のcallee file IDとfunction symbolを一意に照合し、変更前後contractに対応testの引数・期待条件とcaller参照を配置する。global modelがflat一覧から関連を再構成する負担を減らせるかを検証する。対応が未知・不一致のassertion/callはunassociatedとして保持し、全file/evidenceを入力に残す。gold・fixture名を入力しない。参照をhard unionにせず、global anchor出力と既存complete/fail-closed gateを維持する。
+
+H9から入力representationのみ変更。system prompt、schema、canonicalization、host gate、native0/output1536/context16K/call120秒/whole600秒、temperature0/top_p1/top_k0/seed144、repair/retry0を維持する。groupingは固定Gemma 475b9088d29754a3379866cf5aeb6b41acd313c2。H9 Gemma weak16 exact/cross12 FS24が直接の対照。8Bのmodel変更とrepresentation変更を混ぜない。
+
+weak-edges-independent-16とcontract-cross-boundary-12を各1回、順番に実行。両方exact/FM0/FS0/completeの場合のみ未推論holdout-protocol-and-health-8を1回。それも通過した場合のみ各range/regression/order/final metadata/Validateへ進む。いずれか失敗なら再調整による資格取り直しをせず、観測結果から次の判断をする。実tokens/calls/stop/wallとsemantic指標を独立記録する。
