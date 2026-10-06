@@ -70,6 +70,9 @@ func observedAnchorRun(parent context.Context, f fixture, b llm.OptionsBackend) 
 	return anchorRepresentationRun(parent, f, b, false, false, false, false, false, false)
 }
 func anchorRepresentationRun(parent context.Context, f fixture, b llm.OptionsBackend, records, semantic, runtime, contrast, purpose, discovery bool) observation {
+	return anchorRepresentationWithProposals(parent, f, b, records, semantic, runtime, contrast, purpose, discovery, false)
+}
+func anchorRepresentationWithProposals(parent context.Context, f fixture, b llm.OptionsBackend, records, semantic, runtime, contrast, purpose, discovery, proposals bool) observation {
 	start := time.Now()
 	o := observation{Fixture: f.Name, Architecture: "anchor-assignment", Files: len(f.Files), Unresolved: true}
 	ctx, cancel := context.WithTimeout(parent, 600*time.Second)
@@ -119,6 +122,15 @@ func anchorRepresentationRun(parent context.Context, f fixture, b llm.OptionsBac
 		}
 		payload["observed_snapshot_values"] = interactions
 		payload["snapshot_scope"] = "bounded pure AST observer at literal test inputs; other sources before; unknown is not false or zero; values are soft evidence, not required grouping or proof for all inputs"
+	}
+	if proposals {
+		candidates, err := partitionCandidates(f)
+		if err != nil {
+			o.Reason = err.Error()
+			return finish()
+		}
+		payload["host_proposed_partitions"] = candidates
+		payload["proposal_role"] = "optional complete alternatives derived from soft syntax observations; not correct by construction; you may ignore, split, merge or create a partition absent from these proposals; final G-ID assignment is free"
 	}
 	if discovery {
 		candidates, err := discoverPurposes(ctx, payload, facts, b, &o.Calls)
