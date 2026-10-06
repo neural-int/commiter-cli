@@ -1,0 +1,7 @@
+# Iteration28事前登録: H20 candidate selectionと既存Gemma
+
+Iteration27 Next Stepsに従い、candidate-recordsのgenerator/input/task/schema/canonical順/host gatesを固定し、全caseを既存Gemma mlx-community/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2へgrouping-only routeする。weak16/cross12/guardrail各1call・1回、順次。前回Qwen8のcross12改善と今回taskの未評価checkpoint組合せを測る。case別routing/fallbackなし。
+
+bounded-routed-grouping/native0/output1536/context16K/call120秒/whole600秒、temp0/top_p1/top_k0/seed144/retry0/repair0、helper SHA016b706cacbbe39315b80fc68f4e82fa29e732afc3e371652c670d24ae3550c4。候補は最大4、unknown/invalid/unresolved/timeoutは拒否。観測はsoft evidence、goldは入力外。追加取得/依存/code/production変更なし。
+
+3case全てexact/FM0/FS0/completeの時のみ未推論protocol8へ1回。その後range/baseline/order/metadata/Validate。失敗ならgenerator包含/selector失敗を分離し、auditへ追加して合理的残余または具体的再開prerequisiteを判定する。同task wording/予算sweepやgold候補追加は行わない。
