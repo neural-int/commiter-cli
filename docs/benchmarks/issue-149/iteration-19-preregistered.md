@@ -1,0 +1,7 @@
+# Iteration19事前登録: 副作用なし観測値とglobal assignment
+
+H12 interaction-recordsはH10の全file/contract/test/callerを維持し、既存ASTで観測したsource caller/calleeと対応testのliteral引数から、4snapshot値を限定observerで生成してsoft evidenceへ加える。fixture名/gold/期待groupを入力せず、値からhard unionやlocal boundaryを作らない。未対応はknown=false、値なし。未知はfalse/zeroと同一視しない。probeがないfileもglobalへ残す。
+
+source最大16、probe最大32/snapshot最大128。各snapshot step1024/depth16、整数絶対値2^26/string4096bytes上限。whole600秒、global1call/native0/output1536/context16K/call120秒。固定Gemma 475b9088d29754a3379866cf5aeb6b41acd313c2、temperature0/top_p1/top_k0/seed144、repair/retry0。AST解析だけで外部process/file/env/networkコードは実行しない。support外はunknown、budget/cancellationはpartial assignmentなしで停止する。observer wall/probes/samples/unknownと実LLM tokens/calls/wall/stopを別々に記録する。
+
+weak16/cross12/shared-callee-independent-6を各1回、順次実行。3case全てexact/FM0/FS0/completeの場合のみ未推論fresh protocol8を1回。それも通過した場合のみrange/regression/order/metadata/Validateへ進む。失敗した場合は同条件反復やprompt/seed/order tuningによる資格取り直しを行わない。global prompt/schema/canonicalization/host gateはH10のまま。

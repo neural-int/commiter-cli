@@ -29,25 +29,26 @@ type metric struct {
 	Stop   string  `json:"stop"`
 }
 type observation struct {
-	Fixture       string     `json:"fixture"`
-	Architecture  string     `json:"architecture"`
-	Files         int        `json:"files"`
-	Exact         *bool      `json:"exact"`
-	FM            *int       `json:"false_merge_pairs"`
-	FS            *int       `json:"false_split_pairs"`
-	Complete      bool       `json:"complete_assignment"`
-	Unresolved    bool       `json:"unresolved"`
-	Reason        string     `json:"reason,omitempty"`
-	Groups        [][]string `json:"groups,omitempty"`
-	Calls         []metric   `json:"calls"`
-	Wall          float64    `json:"wall_seconds"`
-	DraftComplete *bool      `json:"draft_complete_assignment,omitempty"`
-	DraftExact    *bool      `json:"draft_exact,omitempty"`
-	DraftFM       *int       `json:"draft_false_merge_pairs,omitempty"`
-	DraftFS       *int       `json:"draft_false_split_pairs,omitempty"`
-	DraftGroups   [][]string `json:"-"`
-	PlanValid     *bool      `json:"plan_valid,omitempty"`
-	PlanStop      string     `json:"plan_stop,omitempty"`
+	Fixture       string           `json:"fixture"`
+	Architecture  string           `json:"architecture"`
+	Files         int              `json:"files"`
+	Exact         *bool            `json:"exact"`
+	FM            *int             `json:"false_merge_pairs"`
+	FS            *int             `json:"false_split_pairs"`
+	Complete      bool             `json:"complete_assignment"`
+	Unresolved    bool             `json:"unresolved"`
+	Reason        string           `json:"reason,omitempty"`
+	Groups        [][]string       `json:"groups,omitempty"`
+	Calls         []metric         `json:"calls"`
+	Wall          float64          `json:"wall_seconds"`
+	DraftComplete *bool            `json:"draft_complete_assignment,omitempty"`
+	DraftExact    *bool            `json:"draft_exact,omitempty"`
+	DraftFM       *int             `json:"draft_false_merge_pairs,omitempty"`
+	DraftFS       *int             `json:"draft_false_split_pairs,omitempty"`
+	DraftGroups   [][]string       `json:"-"`
+	PlanValid     *bool            `json:"plan_valid,omitempty"`
+	PlanStop      string           `json:"plan_stop,omitempty"`
+	Observer      *observerMetrics `json:"pure_observer,omitempty"`
 }
 
 func shape(props map[string]any) map[string]any {
@@ -150,7 +151,7 @@ func run(f fixture, arch string, b llm.OptionsBackend) observation {
 	return runContext(context.Background(), f, arch, b)
 }
 func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBackend) observation {
-	if arch == "canonical-contracts" || arch == "observed-contracts" || arch == "observed-anchors" || arch == "contract-records" || arch == "semantic-records" {
+	if arch == "canonical-contracts" || arch == "observed-contracts" || arch == "observed-anchors" || arch == "contract-records" || arch == "semantic-records" || arch == "interaction-records" {
 		c, restore, e := canonicalFixture(f)
 		if e != nil {
 			return observation{Fixture: f.Name, Architecture: arch, Files: len(f.Files), Unresolved: true, Reason: e.Error()}
@@ -167,6 +168,9 @@ func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBac
 		}
 		if arch == "semantic-records" {
 			inner = "delta-assignment"
+		}
+		if arch == "interaction-records" {
+			inner = "interaction-assignment"
 		}
 		o := runContext(parent, c, inner, b)
 		o.Architecture = arch
@@ -194,11 +198,14 @@ func runContext(parent context.Context, f fixture, arch string, b llm.OptionsBac
 		}
 		return o
 	}
+	if arch == "interaction-assignment" {
+		return anchorRepresentationRun(parent, f, b, true, false, true)
+	}
 	if arch == "delta-assignment" {
-		return anchorRepresentationRun(parent, f, b, true, true)
+		return anchorRepresentationRun(parent, f, b, true, true, false)
 	}
 	if arch == "record-assignment" {
-		return anchorRepresentationRun(parent, f, b, true, false)
+		return anchorRepresentationRun(parent, f, b, true, false, false)
 	}
 	if arch == "anchor-assignment" {
 		return observedAnchorRun(parent, f, b)
@@ -354,7 +361,7 @@ func main() {
 	helper := flag.String("helper", "", "explicit measured local helper")
 	cache := flag.String("cache", "", "existing pinned model store")
 	flag.Parse()
-	if *arch != "semantic-ir" && *arch != "raw-global" && *arch != "baseline" && *arch != "batch-ir" && *arch != "grounded-facts" && *arch != "contract-facts" && *arch != "assertion-facts" && *arch != "canonical-contracts" && *arch != "observed-contracts" && *arch != "observed-anchors" && *arch != "contract-records" && *arch != "semantic-records" {
+	if *arch != "semantic-ir" && *arch != "raw-global" && *arch != "baseline" && *arch != "batch-ir" && *arch != "grounded-facts" && *arch != "contract-facts" && *arch != "assertion-facts" && *arch != "canonical-contracts" && *arch != "observed-contracts" && *arch != "observed-anchors" && *arch != "contract-records" && *arch != "semantic-records" && *arch != "interaction-records" {
 		panic("unknown architecture")
 	}
 	v := config.Defaults().Values
