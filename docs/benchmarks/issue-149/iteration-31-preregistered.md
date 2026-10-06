@@ -1,0 +1,7 @@
+# Iteration31事前登録: H22 global pair taskと固定8B
+
+Iteration30 Next Stepsに従いglobal-pair-recordsの全観測input/pair schema/host gatesを固定し、取得済みQwen3-8B-4bit@545dc4251c05440727734bcd94334791f6ab0192でweak16/cross12/guardrail各1call・1回順次。既存独立分離/候補比較の改善観測を持つcheckpointで候補制限のないglobal boundary taskを測る。
+
+bounded-routed-grouping/native0/output1536/context16K/call120秒/whole600秒、temp0/top_p1/top_k0/seed144/retry0/repair0、helper固定SHA016b706cacbbe39315b80fc68f4e82fa29e732afc3e371652c670d24ae3550c4。最大16file120pair。timeout/invalid/unknown/missing/U/矛盾はpartitionなし。予算sweep/case別routing/recoveryなし。
+
+全資格通過時のみ新未使用独立評価を事前固定。失敗時はH21/H22をfamily監査へ追加し、合理的残余と具体的再開prerequisiteを評価。追加取得/依存/code/production変更なし。
