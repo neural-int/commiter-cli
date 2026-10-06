@@ -1,0 +1,9 @@
+# Iteration16事前登録: 根拠付き意味delta抽出とglobal assignment
+
+H11はH10の観測recordを最大4record単位で意味抽出し、E-IDごとの具体的before/after behaviorのみ出力する。groupingは抽出段階では禁止。根拠E-ID全件照合、未知/重複/欠落、空text、160文字超、unresolvedを拒否する。元の観測recordと全selected fileはglobalへ残し、provisional deltaやbatchをhard boundaryにしない。意味内容の正しさはhost照合で証明されないため、最終semantic qualityをgoldに対して独立評価する。
+
+raw per-file IRだったH1との差は、抽出根拠を観測contract・一意に対応するtest引数/期待条件・callerへ変更し、元の観測をglobalに残す点。globalで抽象化とassignmentを同時に行ったH8/H10との差は、grouping権限のない独立抽出段階を設ける点。
+
+fixed Gemma 475b9088d29754a3379866cf5aeb6b41acd313c2、全call native0/output1536/context16K/call120秒、whole600秒、temperature0/top_p1/top_k0/seed144、repair/retry0。selected最大16、evidence最大32、抽出最大8call+global1call。全callを順次実行。既存anchor schema/prompt/canonicalization/complete/fail-closedを維持。費用増加と途中停止を結果へ記録する。
+
+weak16/cross12各1回。双方exact/FM0/FS0/completeの場合のみ未推論fresh protocol8を1回。それも通過した場合のみrange/regression/order/metadata/Validateへ進む。失敗した場合は同条件反復・prompt/seed/order調整による資格取り直しをしない。
