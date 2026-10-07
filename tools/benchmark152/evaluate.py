@@ -63,16 +63,17 @@ def history(record):
         return dict(relations=evidence,commits=len(hashes),absence='unknown_never_default_merge'),time.perf_counter()-start
 
 
-def payload(record,graph_executable,mode):
+def payload(record,graph_executable,mode,symbol_executable=None):
     start=time.perf_counter()
     units=[];gold_for={}
     # Gold exists only in this evaluation map, excluded from model request.
     fg={fid:i for i,g in enumerate(record['Gold']) for fid in g}
     for f in record['Files']:
-        extracted=extract(f['Before'].encode(),f['After'].encode(),f['ID'])
+        symbols=json.loads(subprocess.run([symbol_executable],input=f['After'].encode(),capture_output=True,check=True).stdout) if symbol_executable else []
+        extracted=extract(f['Before'].encode(),f['After'].encode(),f['ID'],symbols)
         for u in extracted:
             uid=f'U{len(units)+1:03}'
-            units.append(dict(id=uid,source_unit_id=u['id'],file=f['ID'],old_span=u['old_span'],new_span=u['new_span'],before=u['before'],after=u['after']))
+            units.append(dict(id=uid,source_unit_id=u['id'],file=f['ID'],old_span=u['old_span'],new_span=u['new_span'],symbols=u['symbols'],before=u['before'],after=u['after']))
             gold_for[uid]=fg[f['ID']]
     if not 1<=len(units)<=32: raise ValueError('unit_budget')
     selected=[dict(id=f['ID'],path=f['Path'],before=f['Before'],after=f['After']) for f in record['Files']]
@@ -115,26 +116,34 @@ def invoke(data,helper,model_path):
     groups=[f'G{i+1:03}' for i in range(len(ids))]
     schema=dict(type='object',properties=dict(membership=dict(type='object',properties={i:dict(type='string',enum=groups) for i in ids},required=ids,additionalProperties=False),unresolved=dict(type='boolean')),required=['membership','unresolved'],additionalProperties=False)
     system='Assign every selected change unit to one semantic commit intent. Group by changed purpose, not directory or syntax connectivity. A shared dependency or historical co-change is soft evidence and never proves shared intent. Unchanged repository files are context only and must not be assigned. Preserve independent changes. If the evidence cannot determine a complete coherent assignment, set unresolved true. Output JSON matching the supplied schema.'
+    # The registered native0 helper does not enforce the request schema.
+    # Its schema is therefore supplied to the model, as in benchmark149.invoke.
+    system += ' Output JSON matching this schema: ' + json.dumps(schema,sort_keys=True)
     request=dict(schema=schema,messages=[dict(role='system',content=system),dict(role='user',content=json.dumps(data,sort_keys=True))],context_tokens=16384,output_tokens=1536,model=MODEL+'@'+REVISION,model_path=model_path,generation_profile='bounded-routed-grouping')
     start=time.perf_counter()
     try:
         p=subprocess.run([helper],input=(json.dumps(request)+'\n').encode(),capture_output=True,timeout=120)
     except subprocess.TimeoutExpired:
         return None,dict(stop='timeout',wall_seconds=time.perf_counter()-start,input_tokens=None,output_tokens=None)
-    meta=dict(stop='helper_failure',wall_seconds=time.perf_counter()-start,input_tokens=None,output_tokens=None)
+    meta=dict(validation_reason='helper_failure',stop='helper_failure',wall_seconds=time.perf_counter()-start,input_tokens=None,output_tokens=None)
     if p.returncode: return None,meta
     try:
         response=json.loads(p.stdout,object_pairs_hook=strict)
         meta.update(stop=response.get('stop_reason','unknown'),input_tokens=response.get('benchmark_input_tokens'),output_tokens=response.get('benchmark_output_tokens'))
         if meta['stop']!='completed' or not response.get('ok'): return None,meta
         answer=json.loads(response.get('generated_json',''),object_pairs_hook=strict)
-        return validate(answer,ids),meta
-    except (ValueError,TypeError,KeyError):
-        meta['stop']='invalid_assignment_or_json';return None,meta
+        membership=validate(answer,ids)
+        meta['validation_reason']='accepted'
+        return membership,meta
+    except (ValueError,TypeError,KeyError) as err:
+        code=str(err)
+        allowed={'duplicate_json_key','invalid_schema','unresolved','invalid_assignment','invalid_group'}
+        meta['validation_reason']=code if code in allowed else 'invalid_json'
+        return None,meta
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--fixtures',required=True);parser.add_argument('--graph',required=True);parser.add_argument('--helper',required=True);parser.add_argument('--model-path',required=True);parser.add_argument('--output',required=True)
+    parser=argparse.ArgumentParser();parser.add_argument('--fixtures',required=True);parser.add_argument('--graph',required=True);parser.add_argument('--symbols',required=True);parser.add_argument('--helper',required=True);parser.add_argument('--model-path',required=True);parser.add_argument('--output',required=True)
     args=parser.parse_args()
     all_records=json.loads(pathlib.Path(args.fixtures).read_text())
     names=['same-directory-independent-5','cross-directory-single-intent-9','multiple-intents-boundary-12','shared-callee-independent-6']
@@ -145,7 +154,7 @@ def main():
         for r in records:
             # Sequential ablations; never run build/tests during local inference.
             for mode in ('A-only','repository','history'):
-                data,gold,extract_wall=payload(r,args.graph,mode)
+                data,gold,extract_wall=payload(r,args.graph,mode,args.symbols)
                 m,meta=invoke(data,args.helper,args.model_path)
                 exact,fm,fs=quality(m,gold) if m else (None,None,None)
                 row=dict(fixture=r['Name'],source=mode,files=len(r['Files']),units=len(gold),exact=exact,false_merge=fm,false_split=fs,complete=m is not None,unresolved=m is None,calls=1,membership=m,extraction_seconds=extract_wall,context_bytes=len(json.dumps(data).encode()),**meta)

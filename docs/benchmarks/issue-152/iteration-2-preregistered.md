@@ -1,0 +1,9 @@
+# B / Iteration 2 事前登録: contract修復後のsource ablation
+
+Iteration1共通失敗を最小1callで診断: native0 helperはGrammarSamplingStateを適用せず、モデルはmessagesからのみschemaを取得する。hostはrequest.schemaだけにschemaを置き、messagesでは「supplied schema」と述べるだけだった。diagnosticはroot_keys_valid=false/unresolved=false/expected_ids=5、host invalid_schema。input950/output138/wall14.724秒。raw prompt/responseは保存しない。
+
+修復はbenchmark149.invokeと同じmessagesへのschema追加、登録条件のAST annotation復元、backend stopとhost validation_reasonの分離だけ。helper/model/schema/gold/evidence/call budgetは変更しない。新3 regression testsでcontractを固定。
+
+Iteration1の6行を失敗記録として保持、現在のexperiment file/source/helper pinを別記。semantic品質比較は修復後の18callsだけで評価。qualification4caseは診断に使用済み。fresh2caseは未到達・未閲覧で、この固定修復後の最初の比較に使用する。各condition1回、retry/repair0、結果を見てprompt/ルール/モデルを変えない。Go/No-GoはIteration1事前登録の改善/回帰条件を維持。
+
+AST graphはstructural soft evidenceで、同一groupを強制しない。absence/newfile/rename/sparse historyの追加testsとcostを確認してからstage B gateを判断する。initial broken-input結果からmodel能力やevidence無効を結論しない。
