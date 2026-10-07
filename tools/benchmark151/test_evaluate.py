@@ -1,6 +1,6 @@
 import copy
 import unittest
-from evaluate import extract, reconstruct, stage_verify, MAX_BYTES
+from evaluate import extract, reconstruct, stage_verify, MAX_BYTES, MAX_UNITS
 
 class ChangeUnitContracts(unittest.TestCase):
     def test_repeat_lines_unicode_and_partial_reconstruction(self):
@@ -23,6 +23,16 @@ class ChangeUnitContracts(unittest.TestCase):
     def test_size_budget_fails_without_truncation(self):
         with self.assertRaisesRegex(ValueError, 'byte_budget'):
             extract(b'', b'x'*(MAX_BYTES+1), 'f')
+
+    def test_adjacent_and_multi_insert_delete_can_stage_separately(self):
+        for before, after in ((b'a\nb\n', b'c\nd\n'), (b'x\n', b'a\nb\nx\n'), (b'a\nb\nx\n', b'x\n')):
+            units = extract(before, after, 'f')
+            self.assertEqual(len(units), 2)
+            self.assertTrue(stage_verify(before, after, units))
+
+    def test_unit_budget_rejects_fragmentation(self):
+        after = b'x\n' * (MAX_UNITS+1)
+        with self.assertRaisesRegex(ValueError, 'unit_budget'): extract(b'', after, 'f')
 
     def test_binary_null_bytes_preserved_by_git(self):
         before, after = b'a\0b', b'c\0d'

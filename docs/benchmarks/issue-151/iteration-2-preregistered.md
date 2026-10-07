@@ -1,0 +1,7 @@
+# A / Iteration 2 事前登録
+
+Iteration1 Next Stepsに従い、line-diff opcode内をline edit単位に分割。old/new lineの対応は位置順、余った追加/削除は独立operationとする。semantic intentの主張はしない。再構築はbeforeのbyte spansと全unit sequenceを保持し任意subsetから中間blobを作る。これにより隣接line境界も保存する。gold/AST/nameは分割に使わない。
+
+同じ24ケースを回帰として再実行、adjacentは2units予測。same-lineは1atomic lineを維持しpartial line編集の限界を記録。旧14fixtureにsemantic predictionを行わない。coverageはopcodeから変更がない領域を挿入してafterとbyte一致する条件と、全unit old/new spansの一意coverageで評価。純extraction latencyを分離記録する。
+
+追加契約: mode/rename/symlink/binaryはwhole-operationとしてstage、textのcontent operationとmetadataの同時assignment/順序制約を必要とする。production stagingへ組み込むことは非目標。text line-unitの実測fragmentationと256unit budget停止を確認し、無制限のpartial staging能力を主張しない。

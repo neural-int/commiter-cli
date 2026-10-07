@@ -27,7 +27,16 @@ def extract(before, after, file_id, symbols=()):
         new_offsets.append(new_offsets[-1] + len(line))
     # No semantic labels or path/name rules participate in extraction.
     out = []
+    blocks = []
     for tag, i, j, k, l in difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes():
+        if tag == 'equal':
+            continue
+        # Preserve every selectable line edit; correspondence is positional,
+        # never a claim of shared intent. Extra additions/deletions remain units.
+        for offset in range(max(j-i, l-k)):
+            oi, ni = min(i+offset, j), min(k+offset, l)
+            blocks.append((tag, oi, min(oi+1, j), ni, min(ni+1, l)))
+    for tag, i, j, k, l in blocks:
         if tag == 'equal':
             continue
         start, end = old_offsets[i], old_offsets[j]
@@ -35,7 +44,7 @@ def extract(before, after, file_id, symbols=()):
         payload = b''.join(b[k:l])
         digest = hashlib.sha256(before + b'\0' + after).hexdigest()
         uid = hashlib.sha256(f'{file_id}:{digest}:{start}:{end}:{ns}:{ne}'.encode()).hexdigest()[:24]
-        out.append(dict(id=uid, file=file_id, source_digest=digest,
+        out.append(dict(id=uid, file=file_id, source_digest=digest, before_sha256=hashlib.sha256(before).hexdigest(),
                         old_span=[start, end], new_span=[ns, ne], kind=tag,
                         old_lines=[i, j], new_lines=[k, l],
                         before=base64.b64encode(before[start:end]).decode(),
@@ -52,6 +61,8 @@ def reconstruct(before, units, selected):
         raise ValueError('invalid_assignment')
     parts, cursor = [], 0
     for u in units:
+        if u['before_sha256'] != hashlib.sha256(before).hexdigest():
+            raise ValueError('snapshot_mismatch')
         start, end = u['old_span']
         if start < cursor or not cursor <= start <= end <= len(before):
             raise ValueError('overlap_or_range')
@@ -108,11 +119,14 @@ def main():
     for record in records:
         start = time.perf_counter()
         unit_count = size = changed_bytes = 0
+        extraction_wall = 0.0
         counts = []
         for f in record['Files']:
             before, after = f['Before'].encode(), f['After'].encode()
             symbols = json.loads(subprocess.run([args.symbols], input=after, capture_output=True, check=True).stdout)
+            extraction_start = time.perf_counter()
             units = extract(before, after, f['ID'], symbols)
+            extraction_wall += time.perf_counter() - extraction_start
             assert units == extract(before, after, f['ID'], symbols)
             assert reconstruct(before, units, [u['id'] for u in units]) == after
             assert reconstruct(before, units, []) == before
@@ -125,13 +139,13 @@ def main():
                          units_per_file=counts, complete=True, deterministic=True,
                          stage_forward_reverse=True, gold_representable=True,
                          file_gold_representable=True, changed_bytes=changed_bytes,
-                         representation_bytes=size, wall_seconds=time.perf_counter()-start,
+                         representation_bytes=size, extraction_seconds=extraction_wall, wall_seconds=time.perf_counter()-start,
                          calls=0, input_tokens=0, output_tokens=0,
                          exact=None, false_merge=None, false_split=None,
                          unresolved=None, semantic_prediction=False))
     synthetic = [
         ('one-file-two-intents', b'package x\nfunc A() int { return 1 }\n\nfunc B() int { return 2 }\n', b'package x\nfunc A() int { return 3 }\n\nfunc B() int { return 4 }\n', 2),
-        ('adjacent-edit', b'a\nb\n', b'c\nd\n', 1),
+        ('adjacent-edit', b'a\nb\n', b'c\nd\n', 2),
         ('same-line', b'a b\n', b'c d\n', 1),
         ('insert', b'a\nb\n', b'a\nz\nb\n', 1),
         ('delete', b'a\nb\n', b'a\n', 1),
@@ -147,7 +161,7 @@ def main():
         assert len(units) == expected
         assert stage_verify(before, after, units)
         rows.append(dict(fixture=name, files=1, units=len(units), complete=True,
-                         stage_forward_reverse=True, gold_representable=name not in ('adjacent-edit','same-line'),
+                         stage_forward_reverse=True, gold_representable=name != 'same-line',
                          file_gold_representable=name not in ('one-file-two-intents','adjacent-edit','same-line','crlf'),
                          wall_seconds=time.perf_counter()-start, calls=0,
                          semantic_prediction=False))
