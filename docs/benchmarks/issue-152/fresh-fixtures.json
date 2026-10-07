@@ -1,0 +1,174 @@
+[
+  {
+    "Name": "fresh152-unchanged-adapters-6",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "arith/scale.go",
+        "Before": "package arith\nfunc Scale(n int) int { return n * 2 }\n",
+        "After": "package arith\nfunc Scale(n int) int { return n * 3 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/alpha_test.go",
+        "Before": "package checks\nimport \"fixture/adapters\"\nfunc Alpha() bool { return adapters.West(2) == 4 }\n",
+        "After": "package checks\nimport \"fixture/adapters\"\nfunc Alpha() bool { return adapters.West(2) == 6 }\n"
+      },
+      {
+        "ID": "F003",
+        "Path": "text/suffix.go",
+        "Before": "package text\nfunc Suffix(s string) string { return s + \".old\" }\n",
+        "After": "package text\nfunc Suffix(s string) string { return s + \".new\" }\n"
+      },
+      {
+        "ID": "F004",
+        "Path": "checks/beta_test.go",
+        "Before": "package checks\nimport \"fixture/adapters\"\nfunc Beta() bool { return adapters.East(\"a\") == \"a.old\" }\n",
+        "After": "package checks\nimport \"fixture/adapters\"\nfunc Beta() bool { return adapters.East(\"a\") == \"a.new\" }\n"
+      },
+      {
+        "ID": "F005",
+        "Path": "limits/clamp.go",
+        "Before": "package limits\nfunc Clamp(n int) int { if n > 8 { return 8 }; return n }\n",
+        "After": "package limits\nfunc Clamp(n int) int { if n > 9 { return 9 }; return n }\n"
+      },
+      {
+        "ID": "F006",
+        "Path": "checks/gamma_test.go",
+        "Before": "package checks\nimport \"fixture/adapters\"\nfunc Gamma() bool { return adapters.North(10) == 8 }\n",
+        "After": "package checks\nimport \"fixture/adapters\"\nfunc Gamma() bool { return adapters.North(10) == 9 }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R001",
+        "Path": "adapters/wrappers.go",
+        "Content": "package adapters\nimport(\"fixture/arith\";\"fixture/text\";\"fixture/limits\")\nfunc West(n int) int { return arith.Scale(n) }\nfunc East(s string) string { return text.Suffix(s) }\nfunc North(n int) int { return limits.Clamp(n) }\n"
+      }
+    ],
+    "History": [
+      [
+        0,
+        2,
+        4
+      ],
+      [
+        1,
+        3,
+        5
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        2,
+        5
+      ]
+    ],
+    "Gold": [
+      [
+        "F001",
+        "F002"
+      ],
+      [
+        "F003",
+        "F004"
+      ],
+      [
+        "F005",
+        "F006"
+      ]
+    ]
+  },
+  {
+    "Name": "fresh152-common-helper-independent-6",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "labels/red.go",
+        "Before": "package labels\nimport \"fixture/common\"\nfunc Red(s string) string { return \"r:\" + common.Clean(s) }\n",
+        "After": "package labels\nimport \"fixture/common\"\nfunc Red(s string) string { return \"red:\" + common.Clean(s) }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "labels/red_test.go",
+        "Before": "package labels\nfunc CheckRed() bool { return Red(\"x\") == \"r:x\" }\n",
+        "After": "package labels\nfunc CheckRed() bool { return Red(\"x\") == \"red:x\" }\n"
+      },
+      {
+        "ID": "F003",
+        "Path": "labels/green.go",
+        "Before": "package labels\nimport \"fixture/common\"\nfunc Green(s string) string { return \"g:\" + common.Clean(s) }\n",
+        "After": "package labels\nimport \"fixture/common\"\nfunc Green(s string) string { return \"green:\" + common.Clean(s) }\n"
+      },
+      {
+        "ID": "F004",
+        "Path": "labels/green_test.go",
+        "Before": "package labels\nfunc CheckGreen() bool { return Green(\"x\") == \"g:x\" }\n",
+        "After": "package labels\nfunc CheckGreen() bool { return Green(\"x\") == \"green:x\" }\n"
+      },
+      {
+        "ID": "F005",
+        "Path": "labels/blue.go",
+        "Before": "package labels\nimport \"fixture/common\"\nfunc Blue(s string) string { return \"b:\" + common.Clean(s) }\n",
+        "After": "package labels\nimport \"fixture/common\"\nfunc Blue(s string) string { return \"blue:\" + common.Clean(s) }\n"
+      },
+      {
+        "ID": "F006",
+        "Path": "labels/blue_test.go",
+        "Before": "package labels\nfunc CheckBlue() bool { return Blue(\"x\") == \"b:x\" }\n",
+        "After": "package labels\nfunc CheckBlue() bool { return Blue(\"x\") == \"blue:x\" }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R001",
+        "Path": "common/clean.go",
+        "Content": "package common\nfunc Clean(s string) string { return s }\n"
+      }
+    ],
+    "History": [
+      [
+        0,
+        2,
+        4
+      ],
+      [
+        1,
+        3,
+        5
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        2,
+        5
+      ]
+    ],
+    "Gold": [
+      [
+        "F001",
+        "F002"
+      ],
+      [
+        "F003",
+        "F004"
+      ],
+      [
+        "F005",
+        "F006"
+      ]
+    ]
+  }
+]
