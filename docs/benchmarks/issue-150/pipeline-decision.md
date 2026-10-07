@@ -1,13 +1,13 @@
 ## 要約
 
-Issue #150 pipelineは **A GO → B NO-GO → C未着手**。production candidateなし、D必要性未立証。親Issue/Goal全達成には到達していない。独立評価の改善がないという定義済みgateに従い、現在の固定方式による研究pipelineを停止する。
+Issue #150 pipelineは **A: 表現能力の限定GO・親の既知failure改善未立証 → B: 補助評価NO-GO → C未着手**。production candidateなし、D必要性未立証。親Issue/Goal全達成には到達していない。Aの親条件が未立証であり、さらにBの補助評価も独立改善がないという定義済み停止条件に該当するため、現在の研究pipelineを停止する。
 
 ## 検証結果
 
 | stage | 専用新規worktree / branch | 結果 | 証拠 |
 |---|---|---|---|
-| A / #151 | issue-151-change-units / codex/issue-151-change-units | GO（限定representation） | 24cases、138files、141unitsのstage/reconstruction成功 |
-| B / #152 | issue-152-semantic-evidence / codex/issue-152-semantic-evidence | NO-GO（固定evidence設計） | 6cases × 3source = 18calls、independent2caseで改善なし |
+| A / #151 | issue-151-change-units / codex/issue-151-change-units | 子#151の表現能力GO・親#150条件未立証 | 24cases、138files、141unitsのstage/reconstruction成功 |
+| B / #152 | issue-152-semantic-evidence / codex/issue-152-semantic-evidence | NO-GO（補助評価・固定evidence設計） | 6cases × 3source = 18calls、independent2caseで改善なし |
 | C / #153 | 未作成 | 未着手 | B Go gate未達のため |
 | D | 未作成 | 必要性未立証 | Cを経たscorer-only bottleneckの証明なし |
 
@@ -31,13 +31,13 @@ Aの最終quality gatesはGo test -p1/vet/build、Python7tests、diff check成�
 
 Bのqualification集計でFS改善があっても、freshでは改善を再現できず別regressionが発生した。unchanged common helperの追加で12pairの誤統合を観測した。call/co-changeの構造的関連はshared semantic purposeを保証しない。モデルの内的理由やrepository/history一般の無効性は断定しない。
 
-AのGOはrepresentation能力の例で、既存#149 semantic ambiguityの解消やproduction4file上限拡大の証明ではない。Bのsource-gateを満たさずCへ進むと、未選定evidenceを前提にoptimizerを評価することになり依存契約に反する。DはCの結果からdedicated scorerの必要性が分離証明される場合に限るため、今回は切り出さない。
+AのGOは子#151のrepresentation能力に限定する。親#150の「既知#149 boundaryをfile-levelより適切に表現する」という条件は未立証。既存14caseではfile-onlyでもgoldを表現でき、128files全て1unitだった。B開始判断でこの親の追加条件の照合が不十分だったことを記録し、Bを親pipelineの正式Go通過後評価とは扱わず補助観測として保存する。元の測定/gold/子#151の構造的能力は維持し、parent-gate-audit.mdに判定の境界を明記した。Bのsource-gateを満たさずCへ進むと、未選定evidenceを前提にoptimizerを評価することになり依存契約に反する。DはCの結果からdedicated scorerの必要性が分離証明される場合に限るため、今回は切り出さない。
 
 親#150はA/B/C全段階、current production baseline comparison、C最終fresh holdout、最終partition品質の条件が未達。new-file/rename/sparse-history/実規模memory/cacheのB未検証項目も残る。これらを条件未発動として全達成へ書き換えたり、production candidateなしだけでGoalをcompleteにしたりしない。
 
 ## Next Steps
 
-- 現在の固定方式はB No-Goで停止する。追加budget/fixture-specific routing/wording/gold調整でgateを通さないため。
-- 再開には、boundedな新evidence仮説、既存observabilityに対して追加される情報/責務の根拠、未使用independent評価を必要とする。現方式の同じ入力/同じモデル反復だけを改善根拠にしないため。
+- 現在の固定方式はA親条件未立証/B補助評価No-Goで停止する。追加budget/fixture-specific routing/wording/gold調整でgateを通さないため。
+- 再開には、既知#149でfile granularityがboundary表現を妨げた具体的case、または親A gateを見直す明示的な判断が必要。A親条件が整理された後、boundedな新evidence仮説、既存observabilityに対して追加される情報/責務の根拠、未使用independent評価を必要とする。現方式の同じ入力/同じモデル反復だけを改善根拠にしないため。
 - parent/child Issue本文に報告の目次と停止理由を反映し、commit/pushとremote headを確認する。local測定・remote配送・Goal達成を区別するため。
 - production4file上限/default/Git mutation契約の変更やmergeは行わない。今回の研究gateからproduction採用の根拠は得られていないため。
