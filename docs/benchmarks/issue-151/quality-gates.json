@@ -1,0 +1,35 @@
+{
+  "initial_go_test": "failed: two helper-start waits under package concurrency",
+  "isolated_two_tests": "pass",
+  "settled": [
+    {
+      "command": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log_sha256": "22af178fa266b0dc79d3fdde68beda6c53f9e8fa27e164f8e066782b0ae31cbd"
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}
