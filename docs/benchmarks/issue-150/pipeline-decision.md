@@ -41,3 +41,7 @@ AのGOは子#151のrepresentation能力に限定する。親#150の「既知#149
 - 再開には、既知#149でfile granularityがboundary表現を妨げた具体的case、または親A gateを見直す明示的な判断が必要。A親条件が整理された後、boundedな新evidence仮説、既存observabilityに対して追加される情報/責務の根拠、未使用independent評価を必要とする。現方式の同じ入力/同じモデル反復だけを改善根拠にしないため。
 - parent/child Issue本文に報告の目次と停止理由を反映し、commit/pushとremote headを確認する。local測定・remote配送・Goal達成を区別するため。
 - production4file上限/default/Git mutation契約の変更やmergeは行わない。今回の研究gateからproduction採用の根拠は得られていないため。
+
+## Aチェックリストの範囲監査による補足
+
+[子#151の範囲監査](https://github.com/neural-int/commiter-cli/issues/151#issuecomment-6041328409)により、partial staging全範囲と既知failure boundary改善の2条件を未達へ訂正した。一部の構造的能力は確認済みだが子Issue全体は未達で、親A gate通過も未確定。過去の測定/gold/達成条件は維持する。人間へ、親gate対象の既知fixture名またはIssueコメントの入力を確認中。現在のfile-ID goldから未記録のfile内境界を作り替えたり、同一条件の推論反復でgateを通過させたりしない。追加model processは稼働しておらず、C/Dを開始しない。
