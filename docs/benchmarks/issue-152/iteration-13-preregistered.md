@@ -1,0 +1,3 @@
+# Call-path semantic counterexamples
+
+3件の独立仕様変更を固定する。direct caller/callee、未変更同package adapterを介した2hop caller/callee、shared callee。goldは評価側だけで使用する。既存relationsを変更せず対のTP/FP/FNを保存し、全snapshotのGo compileも確認する。call pathの存在からhard mergeを採用できるという仮説は、独立intent間の関係が1組でも出れば棄却する。モデル推論は不要。前回の使用済み3件で12正関係だった結果も保持する。

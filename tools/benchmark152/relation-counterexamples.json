@@ -1,0 +1,107 @@
+[
+  {
+    "Name": "direct-dependent-independent",
+    "Split": "independent-relation-counterexample",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/value.go",
+        "Before": "package calc\nfunc Base(n int) int { return n * 2 }\nfunc Public(n int) int { return Base(n) + 3 }\n",
+        "After": "package calc\nfunc Base(n int) int { return n * 4 }\nfunc Public(n int) int { return Base(n) + 5 }\n"
+      }
+    ],
+    "Repository": [],
+    "SymbolGold": [
+      {
+        "requirement": "Baseの係数変更",
+        "symbols": [
+          [
+            "F001",
+            "Base"
+          ]
+        ]
+      },
+      {
+        "requirement": "Publicの加算仕様変更",
+        "symbols": [
+          [
+            "F001",
+            "Public"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "two-hop-dependent-independent",
+    "Split": "independent-relation-counterexample",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/value.go",
+        "Before": "package calc\nfunc Base(n int) int { return n * 2 }\nfunc Public(n int) int { return Route(n) + 3 }\n",
+        "After": "package calc\nfunc Base(n int) int { return n * 4 }\nfunc Public(n int) int { return Route(n) + 5 }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R001",
+        "Path": "calc/routes.go",
+        "Content": "package calc\nfunc Route(n int) int { return Base(n) }\n"
+      }
+    ],
+    "SymbolGold": [
+      {
+        "requirement": "Baseの係数変更",
+        "symbols": [
+          [
+            "F001",
+            "Base"
+          ]
+        ]
+      },
+      {
+        "requirement": "Publicの加算仕様変更",
+        "symbols": [
+          [
+            "F001",
+            "Public"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "shared-callee-independent",
+    "Split": "independent-relation-counterexample",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/value.go",
+        "Before": "package calc\nfunc Shared(n int) int { return n }\nfunc Left(n int) int { return Shared(n) + 2 }\nfunc Right(n int) int { return Shared(n) + 3 }\n",
+        "After": "package calc\nfunc Shared(n int) int { return n }\nfunc Left(n int) int { return Shared(n) + 4 }\nfunc Right(n int) int { return Shared(n) + 5 }\n"
+      }
+    ],
+    "Repository": [],
+    "SymbolGold": [
+      {
+        "requirement": "Leftの加算仕様変更",
+        "symbols": [
+          [
+            "F001",
+            "Left"
+          ]
+        ]
+      },
+      {
+        "requirement": "Rightの加算仕様変更",
+        "symbols": [
+          [
+            "F001",
+            "Right"
+          ]
+        ]
+      }
+    ]
+  }
+]
