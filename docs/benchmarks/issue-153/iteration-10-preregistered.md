@@ -1,0 +1,3 @@
+## 固定条件
+
+詳細stageのみ2call。使用済みMaxUploadMiB/RetryAttemptsはwire回帰、未使用SessionMinutes6→8/WorkerSlots2→3は独立要件のauthor-defined synthetic。双方2atomを別groupとするgoldは評価側のみ。未使用ケースは初回refine判定を省略した詳細能力診断で、全pipeline/holdout成功と扱わない。messages8192byte以内、既存pinnedモデル/context16384/output1536/timeout120、再試行0。unresolved/不完全coverageは拒否。実例のunresolvedは保持して追加callしない。
