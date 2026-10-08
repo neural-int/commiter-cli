@@ -1,0 +1,154 @@
+[
+  {
+    "name": "fresh-six-file-behaviors",
+    "split": "used_failure_diagnostic",
+    "files": [
+      {
+        "id": "F001",
+        "path": "division.go",
+        "before": "package behavior\nfunc SafeRatio(n,d int) int { return n/d }\n",
+        "after": "package behavior\nfunc SafeRatio(n,d int) int { if d==0 { return 0 }; return n/d }\n",
+        "eval_intent": 0
+      },
+      {
+        "id": "F002",
+        "path": "division_test.go",
+        "before": "package behavior\nimport \"testing\"\nfunc TestSafeRatio(t *testing.T) { if SafeRatio(8,2)!=4 {t.Fatal(\"ratio\")} }\n",
+        "after": "package behavior\nimport \"testing\"\nfunc TestSafeRatio(t *testing.T) { if SafeRatio(8,2)!=4 || SafeRatio(8,0)!=0 {t.Fatal(\"ratio\")} }\n",
+        "eval_intent": 0
+      },
+      {
+        "id": "F003",
+        "path": "label.go",
+        "before": "package behavior\nimport \"strings\"\nfunc NormalLabel(s string) string { return strings.ToLower(s) }\n",
+        "after": "package behavior\nimport \"strings\"\nfunc NormalLabel(s string) string { return strings.ToLower(strings.TrimSpace(s)) }\n",
+        "eval_intent": 1
+      },
+      {
+        "id": "F004",
+        "path": "label_test.go",
+        "before": "package behavior\nimport \"testing\"\nfunc TestNormalLabel(t *testing.T) { if NormalLabel(\" A \")!=\" a \" {t.Fatal(\"label\")} }\n",
+        "after": "package behavior\nimport \"testing\"\nfunc TestNormalLabel(t *testing.T) { if NormalLabel(\" A \")!=\"a\" {t.Fatal(\"label\")} }\n",
+        "eval_intent": 1
+      },
+      {
+        "id": "F005",
+        "path": "upper.go",
+        "before": "package behavior\nfunc BoundLevel(n int) int { if n<0 {return 0}; return n }\n",
+        "after": "package behavior\nfunc BoundLevel(n int) int { if n<0 {return 0}; if n>100 {return 100}; return n }\n",
+        "eval_intent": 2
+      },
+      {
+        "id": "F006",
+        "path": "upper_test.go",
+        "before": "package behavior\nimport \"testing\"\nfunc TestBoundLevel(t *testing.T) { if BoundLevel(-1)!=0 || BoundLevel(101)!=101 {t.Fatal(\"level\")} }\n",
+        "after": "package behavior\nimport \"testing\"\nfunc TestBoundLevel(t *testing.T) { if BoundLevel(-1)!=0 || BoundLevel(101)!=100 {t.Fatal(\"level\")} }\n",
+        "eval_intent": 2
+      }
+    ],
+    "baseline_projection": [
+      "F001",
+      "F002",
+      "F003",
+      "F004"
+    ],
+    "baseline_projection_scope": "4file/2intent; full6 outside current production limit"
+  },
+  {
+    "name": "fee-rounding-and-wrap",
+    "split": "model_unused_synthetic",
+    "requirements": [
+      "Fee rounding is changed to ceiling independently of text wrapping.",
+      "Each changed expectation verifies its corresponding changed behavior."
+    ],
+    "files": [
+      {
+        "id": "F001",
+        "path": "fee.go",
+        "before": "package policy\nfunc Fee(n int) int { return n/100 }\n",
+        "after": "package policy\nfunc Fee(n int) int { return (n+99)/100 }\n",
+        "eval_intent": 0
+      },
+      {
+        "id": "F002",
+        "path": "fee_test.go",
+        "before": "package policy\nimport \"testing\"\nfunc TestFee(t *testing.T) { if Fee(101)!=1 {t.Fatal(\"fee\")} }\n",
+        "after": "package policy\nimport \"testing\"\nfunc TestFee(t *testing.T) { if Fee(101)!=2 {t.Fatal(\"fee\")} }\n",
+        "eval_intent": 0
+      },
+      {
+        "id": "F003",
+        "path": "wrap.go",
+        "before": "package policy\nfunc Wrap(s string) string { return \"(\"+s+\")\" }\n",
+        "after": "package policy\nfunc Wrap(s string) string { return \"{\"+s+\"}\" }\n",
+        "eval_intent": 1
+      },
+      {
+        "id": "F004",
+        "path": "wrap_test.go",
+        "before": "package policy\nimport \"testing\"\nfunc TestWrap(t *testing.T) { if Wrap(\"a\")!=\"(a)\" {t.Fatal(\"wrap\")} }\n",
+        "after": "package policy\nimport \"testing\"\nfunc TestWrap(t *testing.T) { if Wrap(\"a\")!=\"{a}\" {t.Fatal(\"wrap\")} }\n",
+        "eval_intent": 1
+      }
+    ]
+  },
+  {
+    "name": "same-call-independent-diagnostic",
+    "split": "model_unused_synthetic",
+    "requirements": [
+      "Negative-count handling changes independently of test failure wording.",
+      "The existing positive-input assertion and its expected value are unchanged."
+    ],
+    "files": [
+      {
+        "id": "F001",
+        "path": "count.go",
+        "before": "package policy\nfunc Count(n int) int { return n }\n",
+        "after": "package policy\nfunc Count(n int) int { if n<0 {return 0}; return n }\n",
+        "eval_intent": 0
+      },
+      {
+        "id": "F002",
+        "path": "count_test.go",
+        "before": "package policy\nimport \"testing\"\nfunc TestCount(t *testing.T) { if Count(3)!=3 {t.Fatal(\"count\")} }\n",
+        "after": "package policy\nimport \"testing\"\nfunc TestCount(t *testing.T) { if Count(3)!=3 {t.Fatal(\"unexpected positive count\")} }\n",
+        "eval_intent": 1
+      }
+    ]
+  },
+  {
+    "name": "shared-test-independent-assertions",
+    "split": "model_unused_synthetic",
+    "requirements": [
+      "Left increment and Right multiplier are independent behavior changes.",
+      "The two assertions share a test function, but each verifies only one changed behavior."
+    ],
+    "files": [
+      {
+        "id": "F001",
+        "path": "left.go",
+        "before": "package policy\nfunc Left(n int) int {return n+1}\n",
+        "after": "package policy\nfunc Left(n int) int {return n+2}\n",
+        "eval_intent": 0
+      },
+      {
+        "id": "F002",
+        "path": "right.go",
+        "before": "package policy\nfunc Right(n int) int {return n*2}\n",
+        "after": "package policy\nfunc Right(n int) int {return n*3}\n",
+        "eval_intent": 1
+      },
+      {
+        "id": "F003",
+        "path": "both_test.go",
+        "before": "package policy\nimport \"testing\"\nfunc TestBoth(t *testing.T) {\n if Left(2)!=3 {t.Fatal(\"left\")}\n // Keep both checks in one existing test.\n t.Log(\"checking right\")\n if Right(2)!=4 {t.Fatal(\"right\")}\n}\n",
+        "after": "package policy\nimport \"testing\"\nfunc TestBoth(t *testing.T) {\n if Left(2)!=4 {t.Fatal(\"left\")}\n // Keep both checks in one existing test.\n t.Log(\"checking right\")\n if Right(2)!=6 {t.Fatal(\"right\")}\n}\n",
+        "eval_intent": null,
+        "eval_line_intents": {
+          "4": 0,
+          "7": 1
+        }
+      }
+    ]
+  }
+]

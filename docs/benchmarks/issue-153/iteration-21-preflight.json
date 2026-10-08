@@ -1,0 +1,190 @@
+{
+  "calls": 0,
+  "fixture_sha256": "9d35816274c56cd5c2cbc0931678e801547562f93afe17e6989759ab2505b95e",
+  "helper_sha256": "3b50561e987fb166a794bbe7d6a6dd8aca00514a3619a391a523f001f8c64f80",
+  "model": "mlx-community/Qwen3-8B-4bit@545dc4251c05440727734bcd94334791f6ab0192",
+  "rows": [
+    {
+      "fixture": "fresh-six-file-behaviors",
+      "units": 6,
+      "gold": {
+        "U001": 0,
+        "U002": 1,
+        "U003": 2,
+        "U004": 2,
+        "U005": 1,
+        "U006": 0
+      },
+      "unit_order": [
+        {
+          "id": "U001",
+          "file": "F001",
+          "parent": "4c13120d8bf90b2a864d8a57"
+        },
+        {
+          "id": "U002",
+          "file": "F004",
+          "parent": "446ad7863ec24376026c8d2e"
+        },
+        {
+          "id": "U003",
+          "file": "F005",
+          "parent": "fa71327597f6a073306fa9a3"
+        },
+        {
+          "id": "U004",
+          "file": "F006",
+          "parent": "68f9549606c206aaab89549b"
+        },
+        {
+          "id": "U005",
+          "file": "F003",
+          "parent": "6d81d0027183f79c48ed57d2"
+        },
+        {
+          "id": "U006",
+          "file": "F002",
+          "parent": "d0378dabf82d86534ea1155d"
+        }
+      ],
+      "payload_sha256": "0d00773a98bcd29ea32608bf47d1608aab98e3bd939dab1d8b65a506bc93c604",
+      "states_passed": 8,
+      "staging": true
+    },
+    {
+      "fixture": "fee-rounding-and-wrap",
+      "units": 4,
+      "gold": {
+        "U001": 1,
+        "U002": 0,
+        "U003": 0,
+        "U004": 1
+      },
+      "unit_order": [
+        {
+          "id": "U001",
+          "file": "F004",
+          "parent": "3582a18b67dc432927ecc561"
+        },
+        {
+          "id": "U002",
+          "file": "F002",
+          "parent": "71b95ea15693f44d485dbac6"
+        },
+        {
+          "id": "U003",
+          "file": "F001",
+          "parent": "bcd529196cdb9093a9ebbf92"
+        },
+        {
+          "id": "U004",
+          "file": "F003",
+          "parent": "f44838fbe5f1f25ebdf9e25b"
+        }
+      ],
+      "payload_sha256": "c9e24cc5864831d8503d3d8d08dce72d4861c27e86b7f4ec1352ad51c50c2511",
+      "states_passed": 4,
+      "staging": true
+    },
+    {
+      "fixture": "same-call-independent-diagnostic",
+      "units": 2,
+      "gold": {
+        "U001": 0,
+        "U002": 1
+      },
+      "unit_order": [
+        {
+          "id": "U001",
+          "file": "F001",
+          "parent": "7cd23f1ac34c2caee2fb05e2"
+        },
+        {
+          "id": "U002",
+          "file": "F002",
+          "parent": "cf9a7ce70f3091d61007b633"
+        }
+      ],
+      "payload_sha256": "95be7dbbb88caf2827f9250097ee9992c35849ca68c4bda65e2e42fb4941ffb0",
+      "states_passed": 4,
+      "staging": true
+    },
+    {
+      "fixture": "shared-test-independent-assertions",
+      "units": 4,
+      "gold": {
+        "U001": 0,
+        "U002": 1,
+        "U003": 1,
+        "U004": 0
+      },
+      "unit_order": [
+        {
+          "id": "U001",
+          "file": "F003",
+          "parent": "2a27e890946b66c168ca7ec2"
+        },
+        {
+          "id": "U002",
+          "file": "F002",
+          "parent": "df720844205f5cbfaab45089"
+        },
+        {
+          "id": "U003",
+          "file": "F003",
+          "parent": "46b063932956e70d0729be21"
+        },
+        {
+          "id": "U004",
+          "file": "F001",
+          "parent": "53fa55dbd36cd62c65189f57"
+        }
+      ],
+      "payload_sha256": "b4d6df02bba686824a9cce3281f557557356a1ecee2058b952b5a6f8a9b485c4",
+      "states_passed": 4,
+      "staging": true
+    }
+  ],
+  "message_sizes": [
+    {
+      "fixture": "fresh-six-file-behaviors",
+      "condition": "original",
+      "message_bytes": 5885
+    },
+    {
+      "fixture": "fresh-six-file-behaviors",
+      "condition": "policy",
+      "message_bytes": 6431
+    },
+    {
+      "fixture": "fee-rounding-and-wrap",
+      "condition": "original",
+      "message_bytes": 3398
+    },
+    {
+      "fixture": "fee-rounding-and-wrap",
+      "condition": "policy",
+      "message_bytes": 3944
+    },
+    {
+      "fixture": "same-call-independent-diagnostic",
+      "condition": "original",
+      "message_bytes": 1893
+    },
+    {
+      "fixture": "same-call-independent-diagnostic",
+      "condition": "policy",
+      "message_bytes": 2439
+    },
+    {
+      "fixture": "shared-test-independent-assertions",
+      "condition": "original",
+      "message_bytes": 3656
+    },
+    {
+      "fixture": "shared-test-independent-assertions",
+      "condition": "policy",
+      "message_bytes": 4202
+    }
+  ]
+}
