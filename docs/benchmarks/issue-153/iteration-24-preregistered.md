@@ -1,0 +1,21 @@
+## 固定仮説
+
+iteration21の固定policyはbiased契約でだけ評価され、iteration23ではneutralが同一promptのscoreを変えることが確認された。neutral下で同じ固定policyがsource/assertionの統合と独立変更の分離を改善するか、未測の相互作用を一回比較する。新規C専用worktree issue-153-neutral-policy-interaction。新しい文言/例示/gold/追加evidenceなし。
+
+## 条件
+
+同一helper bc61461f860957780394650f8b46fab2b737f9931917d0194a0f736e671b41a4、両armともbounded-routed-grammar-neutral。Qwen3-8B revision545dc4251c05440727734bcd94334791f6ab0192、native0/temp0/topP1/topK0/seed144、context16384/output1536、120秒/call・960秒全体、8192bytes・8unit、retry0/repair0を保持。JSON/EOS/context/complete/tie/unresolvedのhard gateは維持。
+
+使用済みpolicy-fixtures.json SHA9d35816274c56cd5c2cbc0931678e801547562f93afe17e6989759ab2505b95eの4case。各1call×2arm、固定順case1/3 original→policy、case2/4 policy→original。元systemとa78a63b9で既に固定したPOLICYの追加だけを変える。goldは評価側のみ、user/schema/機械的上流acceptance/solverは同一。追加policyの内容は変更しない。全case原因診断で、fresh評価とは呼ばない。
+
+## 判定
+
+policyが全4case complete/exact/FM0/FS0、originalよりexact件数増、各caseのFM/FS/reject悪化なしを全て満たした場合だけ次の未使用評価を準備する。拒否は品質nullで保持し、accepted数が違うarmのFM/FSを全case比較へ読み替えない。原controlがiteration23と異なっても隠さず同binary/同profile内の対照を優先する。
+
+policy同値・部分改善のみ・reject/誤結合/誤分割残存・cost超過・その他gate不達なら、この固定policy候補の追加推論を終了する。結果を見て文言・score尺度・許容goldを調整しない。neutral/bias量やmodel名との総当たりへ移行しない。全通過でも使用済み診断だけで正式C/B/production GOやGoal完了にしない。
+
+## 事前証拠と次段階
+
+neutralの24合法/8不合法/8prompt replay、Metal smoke、元helperと依存の不変はiteration23 setupに保存済み。同一binaryを再利用し追加build/model/package/downloadなし。今回のmessage対照も同schema/user・policy一追加・8192bytes・gold除外を事前検査する。code/条件をcommit/pushしIssue登録後にモデルを呼ぶ。
+
+条件通過時は、新規専用worktreeで未使用の別作者または実repository入力と全段/旧回帰/同条件production比較へ進む。不達時は現score契約でのcriterion/decoder単独・相互作用の結果をまとめて停止条件を監査する。新しい意味能力/入力情報/責務差の独立根拠なしに同じ試行を続けない。A bounded GO/B No-Go/C正式未達/D未正当化/production4file/Goal未達を保持する。
