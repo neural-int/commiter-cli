@@ -1,0 +1,789 @@
+{
+  "model_calls": 0,
+  "records": [
+    {
+      "commit": "71f653b2f435ca3898cffe7097697aa59227a87e",
+      "row_span": [
+        1835,
+        1873
+      ],
+      "function": "TestParseBytesExactIntegers",
+      "source_syntax": [
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            1783,
+            2088
+          ],
+          "text": "tests := []struct {\n\t\tin  string\n\t\texp uint64\n\t}{\n\t\t{\"9007199254740993\", 9007199254740993},         // 2^53 + 1\n\t\t{\"9007199254740993B\", 9007199254740993},        // same, with suffix\n\t\t{\"18446744073709551615\", 18446744073709551615}, // math.MaxUint64\n\t\t{\"18446744073709551615 B\", 18446744073709551615},\n\t}",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2118,
+            2146
+          ],
+          "text": "got, err := ParseBytes(p.in)",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2152,
+            2162
+          ],
+          "text": "err != nil",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2152,
+            2162
+          ],
+          "text": "err != nil",
+          "kind": "failure_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2216,
+            2224
+          ],
+          "text": "continue",
+          "kind": "branch_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2234,
+            2246
+          ],
+          "text": "got != p.exp",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2234,
+            2246
+          ],
+          "text": "got != p.exp",
+          "kind": "failure_condition_syntax"
+        }
+      ],
+      "binding_status": "unverified",
+      "effect": null,
+      "obligation": "Validate version-specific argument definitions and path to failure predicate; syntactic proximity is insufficient."
+    },
+    {
+      "commit": "71f653b2f435ca3898cffe7097697aa59227a87e",
+      "row_span": [
+        1897,
+        1936
+      ],
+      "function": "TestParseBytesExactIntegers",
+      "source_syntax": [
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            1783,
+            2088
+          ],
+          "text": "tests := []struct {\n\t\tin  string\n\t\texp uint64\n\t}{\n\t\t{\"9007199254740993\", 9007199254740993},         // 2^53 + 1\n\t\t{\"9007199254740993B\", 9007199254740993},        // same, with suffix\n\t\t{\"18446744073709551615\", 18446744073709551615}, // math.MaxUint64\n\t\t{\"18446744073709551615 B\", 18446744073709551615},\n\t}",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2118,
+            2146
+          ],
+          "text": "got, err := ParseBytes(p.in)",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2152,
+            2162
+          ],
+          "text": "err != nil",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2152,
+            2162
+          ],
+          "text": "err != nil",
+          "kind": "failure_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2216,
+            2224
+          ],
+          "text": "continue",
+          "kind": "branch_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2234,
+            2246
+          ],
+          "text": "got != p.exp",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2234,
+            2246
+          ],
+          "text": "got != p.exp",
+          "kind": "failure_condition_syntax"
+        }
+      ],
+      "binding_status": "unverified",
+      "effect": null,
+      "obligation": "Validate version-specific argument definitions and path to failure predicate; syntactic proximity is insufficient."
+    },
+    {
+      "commit": "71f653b2f435ca3898cffe7097697aa59227a87e",
+      "row_span": [
+        1968,
+        2014
+      ],
+      "function": "TestParseBytesExactIntegers",
+      "source_syntax": [
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            1783,
+            2088
+          ],
+          "text": "tests := []struct {\n\t\tin  string\n\t\texp uint64\n\t}{\n\t\t{\"9007199254740993\", 9007199254740993},         // 2^53 + 1\n\t\t{\"9007199254740993B\", 9007199254740993},        // same, with suffix\n\t\t{\"18446744073709551615\", 18446744073709551615}, // math.MaxUint64\n\t\t{\"18446744073709551615 B\", 18446744073709551615},\n\t}",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2118,
+            2146
+          ],
+          "text": "got, err := ParseBytes(p.in)",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2152,
+            2162
+          ],
+          "text": "err != nil",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2152,
+            2162
+          ],
+          "text": "err != nil",
+          "kind": "failure_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2216,
+            2224
+          ],
+          "text": "continue",
+          "kind": "branch_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2234,
+            2246
+          ],
+          "text": "got != p.exp",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2234,
+            2246
+          ],
+          "text": "got != p.exp",
+          "kind": "failure_condition_syntax"
+        }
+      ],
+      "binding_status": "unverified",
+      "effect": null,
+      "obligation": "Validate version-specific argument definitions and path to failure predicate; syntactic proximity is insufficient."
+    },
+    {
+      "commit": "71f653b2f435ca3898cffe7097697aa59227a87e",
+      "row_span": [
+        2036,
+        2084
+      ],
+      "function": "TestParseBytesExactIntegers",
+      "source_syntax": [
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            1783,
+            2088
+          ],
+          "text": "tests := []struct {\n\t\tin  string\n\t\texp uint64\n\t}{\n\t\t{\"9007199254740993\", 9007199254740993},         // 2^53 + 1\n\t\t{\"9007199254740993B\", 9007199254740993},        // same, with suffix\n\t\t{\"18446744073709551615\", 18446744073709551615}, // math.MaxUint64\n\t\t{\"18446744073709551615 B\", 18446744073709551615},\n\t}",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2118,
+            2146
+          ],
+          "text": "got, err := ParseBytes(p.in)",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2152,
+            2162
+          ],
+          "text": "err != nil",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2152,
+            2162
+          ],
+          "text": "err != nil",
+          "kind": "failure_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2216,
+            2224
+          ],
+          "text": "continue",
+          "kind": "branch_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2234,
+            2246
+          ],
+          "text": "got != p.exp",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "TestParseBytesExactIntegers",
+          "span": [
+            2234,
+            2246
+          ],
+          "text": "got != p.exp",
+          "kind": "failure_condition_syntax"
+        }
+      ],
+      "binding_status": "unverified",
+      "effect": null,
+      "obligation": "Validate version-specific argument definitions and path to failure predicate; syntactic proximity is insufficient."
+    },
+    {
+      "commit": "192a02172ed4cef346e7f4d476182ea129101b97",
+      "row_span": [
+        3001,
+        3070
+      ],
+      "function": "toSnakeWithIgnore",
+      "source_syntax": [
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            2374,
+            3160
+          ],
+          "text": "cases := [][]string{\n\t\t{\"testCase\", \"test_case\"},\n\t\t{\"TestCase\", \"test_case\"},\n\t\t{\"Test Case\", \"test_case\"},\n\t\t{\" Test Case\", \"test_case\"},\n\t\t{\"Test Case \", \"test_case\"},\n\t\t{\" Test Case \", \"test_case\"},\n\t\t{\"test\", \"test\"},\n\t\t{\"test_case\", \"test_case\"},\n\t\t{\"Test\", \"test\"},\n\t\t{\"\", \"\"},\n\t\t{\"ManyManyWords\", \"many_many_words\"},\n\t\t{\"manyManyWords\", \"many_many_words\"},\n\t\t{\"AnyKind of_string\", \"any_kind_of_string\"},\n\t\t{\"numbers2and55with000\", \"numbers_2_and_55_with_000\"},\n\t\t{\"JSONData\", \"json_data\"},\n\t\t{\"AwesomeActivity.UserID\", \"awesome_activity.user_id\", \".\"},\n\t\t{\"AwesomeActivity.User.Id\", \"awesome_activity.user.id\", \".\"},\n\t\t{\"AwesomeUsername@Awesome.Com\", \"awesome_username@awesome.com\", \".@\"},\n\t\t{\"lets-ignore all.of dots-and-dashes\", \"lets-ignore_all.of_dots-and-dashes\", \".-\"},\n\t}",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3190,
+            3200
+          ],
+          "text": "in := i[0]",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3203,
+            3214
+          ],
+          "text": "out := i[1]",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3237,
+            3248
+          ],
+          "text": "ignore = \"\"",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3254,
+            3265
+          ],
+          "text": "len(i) == 3",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3271,
+            3284
+          ],
+          "text": "ignore = i[2]",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3291,
+            3330
+          ],
+          "text": "result := ToSnakeWithIgnore(in, ignore)",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3336,
+            3349
+          ],
+          "text": "result != out",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3336,
+            3349
+          ],
+          "text": "result != out",
+          "kind": "failure_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3355,
+            3365
+          ],
+          "text": "istr := \"\"",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3372,
+            3383
+          ],
+          "text": "len(i) == 3",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3390,
+            3423
+          ],
+          "text": "istr = \" ignoring '\" + i[2] + \"'\"",
+          "kind": "assignment_syntax"
+        }
+      ],
+      "binding_status": "unverified",
+      "effect": null,
+      "obligation": "Validate version-specific argument definitions and path to failure predicate; syntactic proximity is insufficient."
+    },
+    {
+      "commit": "192a02172ed4cef346e7f4d476182ea129101b97",
+      "row_span": [
+        3074,
+        3156
+      ],
+      "function": "toSnakeWithIgnore",
+      "source_syntax": [
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            2374,
+            3160
+          ],
+          "text": "cases := [][]string{\n\t\t{\"testCase\", \"test_case\"},\n\t\t{\"TestCase\", \"test_case\"},\n\t\t{\"Test Case\", \"test_case\"},\n\t\t{\" Test Case\", \"test_case\"},\n\t\t{\"Test Case \", \"test_case\"},\n\t\t{\" Test Case \", \"test_case\"},\n\t\t{\"test\", \"test\"},\n\t\t{\"test_case\", \"test_case\"},\n\t\t{\"Test\", \"test\"},\n\t\t{\"\", \"\"},\n\t\t{\"ManyManyWords\", \"many_many_words\"},\n\t\t{\"manyManyWords\", \"many_many_words\"},\n\t\t{\"AnyKind of_string\", \"any_kind_of_string\"},\n\t\t{\"numbers2and55with000\", \"numbers_2_and_55_with_000\"},\n\t\t{\"JSONData\", \"json_data\"},\n\t\t{\"AwesomeActivity.UserID\", \"awesome_activity.user_id\", \".\"},\n\t\t{\"AwesomeActivity.User.Id\", \"awesome_activity.user.id\", \".\"},\n\t\t{\"AwesomeUsername@Awesome.Com\", \"awesome_username@awesome.com\", \".@\"},\n\t\t{\"lets-ignore all.of dots-and-dashes\", \"lets-ignore_all.of_dots-and-dashes\", \".-\"},\n\t}",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3190,
+            3200
+          ],
+          "text": "in := i[0]",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3203,
+            3214
+          ],
+          "text": "out := i[1]",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3237,
+            3248
+          ],
+          "text": "ignore = \"\"",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3254,
+            3265
+          ],
+          "text": "len(i) == 3",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3271,
+            3284
+          ],
+          "text": "ignore = i[2]",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3291,
+            3330
+          ],
+          "text": "result := ToSnakeWithIgnore(in, ignore)",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3336,
+            3349
+          ],
+          "text": "result != out",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3336,
+            3349
+          ],
+          "text": "result != out",
+          "kind": "failure_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3355,
+            3365
+          ],
+          "text": "istr := \"\"",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3372,
+            3383
+          ],
+          "text": "len(i) == 3",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3390,
+            3423
+          ],
+          "text": "istr = \" ignoring '\" + i[2] + \"'\"",
+          "kind": "assignment_syntax"
+        }
+      ],
+      "binding_status": "unverified",
+      "effect": null,
+      "obligation": "Validate version-specific argument definitions and path to failure predicate; syntactic proximity is insufficient."
+    },
+    {
+      "commit": "a6b8dcde35569b34185fc011be4f0f41cf393f3d",
+      "row_span": [
+        2760,
+        2828
+      ],
+      "function": "toSnakeWithIgnore",
+      "source_syntax": [
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            2133,
+            2832
+          ],
+          "text": "cases := [][]string{\n\t\t{\"testCase\", \"test_case\"},\n\t\t{\"TestCase\", \"test_case\"},\n\t\t{\"Test Case\", \"test_case\"},\n\t\t{\" Test Case\", \"test_case\"},\n\t\t{\"Test Case \", \"test_case\"},\n\t\t{\" Test Case \", \"test_case\"},\n\t\t{\"test\", \"test\"},\n\t\t{\"test_case\", \"test_case\"},\n\t\t{\"Test\", \"test\"},\n\t\t{\"\", \"\"},\n\t\t{\"ManyManyWords\", \"many_many_words\"},\n\t\t{\"manyManyWords\", \"many_many_words\"},\n\t\t{\"AnyKind of_string\", \"any_kind_of_string\"},\n\t\t{\"numbers2and55with000\", \"numbers_2_and_55_with_000\"},\n\t\t{\"JSONData\", \"json_data\"},\n\t\t{\"AwesomeActivity.UserID\", \"awesome_activity.user_id\", \".\"},\n\t\t{\"AwesomeActivity.User.Id\", \"awesome_activity.user.id\", \".\"},\n\t\t{\"AwesomeUsername@Awesome.Com\", \"awesome_username@awesome.com\", \"@\"},\n\t}",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            2862,
+            2872
+          ],
+          "text": "in := i[0]",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            2875,
+            2886
+          ],
+          "text": "out := i[1]",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            2911,
+            2922
+          ],
+          "text": "len(i) == 3",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            2928,
+            2944
+          ],
+          "text": "ignore = i[2][0]",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            2951,
+            2990
+          ],
+          "text": "result := ToSnakeWithIgnore(in, ignore)",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            2996,
+            3009
+          ],
+          "text": "result != out",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            2996,
+            3009
+          ],
+          "text": "result != out",
+          "kind": "failure_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3015,
+            3025
+          ],
+          "text": "istr := \"\"",
+          "kind": "assignment_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3032,
+            3043
+          ],
+          "text": "len(i) == 3",
+          "kind": "control_condition_syntax"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "function": "toSnakeWithIgnore",
+          "span": [
+            3050,
+            3083
+          ],
+          "text": "istr = \" ignoring '\" + i[2] + \"'\"",
+          "kind": "assignment_syntax"
+        }
+      ],
+      "binding_status": "unverified",
+      "effect": null,
+      "obligation": "Validate version-specific argument definitions and path to failure predicate; syntactic proximity is insufficient."
+    }
+  ]
+}

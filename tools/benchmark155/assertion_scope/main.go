@@ -58,10 +58,17 @@ func main() {
 				}
 				add(fn, "function")
 				ast.Inspect(fn.Body, func(n ast.Node) bool {
+					if a, ok := n.(*ast.AssignStmt); ok {
+						add(a, "assignment_syntax")
+					}
+					if b, ok := n.(*ast.BranchStmt); ok {
+						add(b, "branch_syntax")
+					}
 					branch, ok := n.(*ast.IfStmt)
 					if !ok {
 						return true
 					}
+					add(branch.Cond, "control_condition_syntax")
 					failure := false
 					ast.Inspect(branch.Body, func(x ast.Node) bool {
 						call, ok := x.(*ast.CallExpr)
