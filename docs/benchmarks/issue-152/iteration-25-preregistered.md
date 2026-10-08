@@ -1,0 +1,5 @@
+# Symbol-history comparison
+
+未使用identity3件の5file/4intent、adapter routingは既存templateと同一であり同作者synthetic派生として明記。scheduleはgoldを参照せずselected identity順から固定する。separateは各symbolを独立に変更/revert、batchは全symbol一括変更/revert、sparseは最初のsymbolだけ変更/revert。いずれもHEADはfixture Beforeへ戻る。初期commitはunknown。これらは歴史的な相関の正例を意図してgoldへ合わせないguardrailで、履歴の有効性全体を否定する証拠にはしない。
+
+A-only対照は共通repository graphと空history container、追加条件は実symbol履歴集計。メタデータ同一で観測だけ異なる。3件6call、既存model/context16384/output1536/timeout120、repairなし。fresh exact増加、FM/FS非悪化を候補条件にする。new/rename/legacy/memory/cache等全B条件は別に未達を保持。
