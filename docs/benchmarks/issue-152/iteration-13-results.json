@@ -1,0 +1,96 @@
+[
+  {
+    "fixture": "direct-dependent-independent",
+    "relations": [],
+    "true_positive": 0,
+    "false_positive": 0,
+    "false_negative": 0,
+    "compile_checks": [
+      {
+        "state": "before",
+        "exit_code": 0,
+        "output": "?   \tfixture/calc\t[no test files]\n"
+      },
+      {
+        "state": "after",
+        "exit_code": 0,
+        "output": "?   \tfixture/calc\t[no test files]\n"
+      },
+      {
+        "state": "first-only",
+        "exit_code": 0,
+        "output": "?   \tfixture/calc\t[no test files]\n"
+      },
+      {
+        "state": "second-only",
+        "exit_code": 0,
+        "output": "?   \tfixture/calc\t[no test files]\n"
+      }
+    ]
+  },
+  {
+    "fixture": "two-hop-dependent-independent",
+    "relations": [
+      {
+        "from_unit": "U002",
+        "to_unit": "U001",
+        "hops": 2,
+        "kind": "soft_directed_call_path"
+      }
+    ],
+    "true_positive": 0,
+    "false_positive": 1,
+    "false_negative": 0,
+    "compile_checks": [
+      {
+        "state": "before",
+        "exit_code": 0,
+        "output": "?   \tfixture/calc\t[no test files]\n"
+      },
+      {
+        "state": "after",
+        "exit_code": 0,
+        "output": "?   \tfixture/calc\t[no test files]\n"
+      },
+      {
+        "state": "first-only",
+        "exit_code": 0,
+        "output": "?   \tfixture/calc\t[no test files]\n"
+      },
+      {
+        "state": "second-only",
+        "exit_code": 0,
+        "output": "?   \tfixture/calc\t[no test files]\n"
+      }
+    ]
+  },
+  {
+    "fixture": "shared-callee-independent",
+    "relations": [],
+    "true_positive": 0,
+    "false_positive": 0,
+    "false_negative": 0,
+    "compile_checks": [
+      {
+        "state": "before",
+        "exit_code": 0,
+        "output": "?   \tfixture/calc\t[no test files]\n"
+      },
+      {
+        "state": "after",
+        "exit_code": 0,
+        "output": "?   \tfixture/calc\t[no test files]\n"
+      },
+      {
+        "state": "first-only",
+        "exit_code": 0,
+        "output": "?   \tfixture/calc\t[no test files]\n"
+      },
+      {
+        "state": "second-only",
+        "exit_code": 0,
+        "output": "?   \tfixture/calc\t[no test files]\n"
+      }
+    ]
+  }
+]
