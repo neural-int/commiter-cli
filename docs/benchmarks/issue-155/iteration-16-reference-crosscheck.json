@@ -1,0 +1,789 @@
+{
+  "model_calls": 0,
+  "scope": "hand-authored ASCII reference model, bounded64 bytes, explicit map; not an independent Go runtime oracle",
+  "rows": [
+    {
+      "commit": "d7993fd391266682cdd3408618e54058f8044f5c",
+      "input": "CONSTANT_CASE",
+      "function": "ToCamel",
+      "before": "CONSTANTCASE",
+      "after": "ConstantCase",
+      "trace_before": [
+        {
+          "index": 0,
+          "input": "C",
+          "branch": "keep",
+          "output": "C",
+          "cap_next": false
+        },
+        {
+          "index": 1,
+          "input": "O",
+          "branch": "keep",
+          "output": "CO",
+          "cap_next": false
+        },
+        {
+          "index": 2,
+          "input": "N",
+          "branch": "keep",
+          "output": "CON",
+          "cap_next": false
+        },
+        {
+          "index": 3,
+          "input": "S",
+          "branch": "keep",
+          "output": "CONS",
+          "cap_next": false
+        },
+        {
+          "index": 4,
+          "input": "T",
+          "branch": "keep",
+          "output": "CONST",
+          "cap_next": false
+        },
+        {
+          "index": 5,
+          "input": "A",
+          "branch": "keep",
+          "output": "CONSTA",
+          "cap_next": false
+        },
+        {
+          "index": 6,
+          "input": "N",
+          "branch": "keep",
+          "output": "CONSTAN",
+          "cap_next": false
+        },
+        {
+          "index": 7,
+          "input": "T",
+          "branch": "keep",
+          "output": "CONSTANT",
+          "cap_next": false
+        },
+        {
+          "index": 8,
+          "input": "_",
+          "branch": "keep",
+          "output": "CONSTANT",
+          "cap_next": true
+        },
+        {
+          "index": 9,
+          "input": "C",
+          "branch": "keep",
+          "output": "CONSTANTC",
+          "cap_next": false
+        },
+        {
+          "index": 10,
+          "input": "A",
+          "branch": "keep",
+          "output": "CONSTANTCA",
+          "cap_next": false
+        },
+        {
+          "index": 11,
+          "input": "S",
+          "branch": "keep",
+          "output": "CONSTANTCAS",
+          "cap_next": false
+        },
+        {
+          "index": 12,
+          "input": "E",
+          "branch": "keep",
+          "output": "CONSTANTCASE",
+          "cap_next": false
+        }
+      ],
+      "trace_after": [
+        {
+          "index": 0,
+          "input": "C",
+          "branch": "keep",
+          "output": "C",
+          "cap_next": false
+        },
+        {
+          "index": 1,
+          "input": "O",
+          "branch": "lower_repeated_capital",
+          "output": "Co",
+          "cap_next": false
+        },
+        {
+          "index": 2,
+          "input": "N",
+          "branch": "lower_repeated_capital",
+          "output": "Con",
+          "cap_next": false
+        },
+        {
+          "index": 3,
+          "input": "S",
+          "branch": "lower_repeated_capital",
+          "output": "Cons",
+          "cap_next": false
+        },
+        {
+          "index": 4,
+          "input": "T",
+          "branch": "lower_repeated_capital",
+          "output": "Const",
+          "cap_next": false
+        },
+        {
+          "index": 5,
+          "input": "A",
+          "branch": "lower_repeated_capital",
+          "output": "Consta",
+          "cap_next": false
+        },
+        {
+          "index": 6,
+          "input": "N",
+          "branch": "lower_repeated_capital",
+          "output": "Constan",
+          "cap_next": false
+        },
+        {
+          "index": 7,
+          "input": "T",
+          "branch": "lower_repeated_capital",
+          "output": "Constant",
+          "cap_next": false
+        },
+        {
+          "index": 8,
+          "input": "_",
+          "branch": "keep",
+          "output": "Constant",
+          "cap_next": true
+        },
+        {
+          "index": 9,
+          "input": "C",
+          "branch": "keep",
+          "output": "ConstantC",
+          "cap_next": false
+        },
+        {
+          "index": 10,
+          "input": "A",
+          "branch": "lower_repeated_capital",
+          "output": "ConstantCa",
+          "cap_next": false
+        },
+        {
+          "index": 11,
+          "input": "S",
+          "branch": "lower_repeated_capital",
+          "output": "ConstantCas",
+          "cap_next": false
+        },
+        {
+          "index": 12,
+          "input": "E",
+          "branch": "lower_repeated_capital",
+          "output": "ConstantCase",
+          "cap_next": false
+        }
+      ],
+      "status": "bounded_reference_agrees",
+      "runtime_measurement": null
+    },
+    {
+      "commit": "d7993fd391266682cdd3408618e54058f8044f5c",
+      "input": "CONSTANT_CASE",
+      "function": "ToLowerCamel",
+      "before": "cONSTANTCASE",
+      "after": "constantCase",
+      "trace_before": [
+        {
+          "index": 0,
+          "input": "C",
+          "branch": "lower_initial",
+          "output": "c",
+          "cap_next": false
+        },
+        {
+          "index": 1,
+          "input": "O",
+          "branch": "keep",
+          "output": "cO",
+          "cap_next": false
+        },
+        {
+          "index": 2,
+          "input": "N",
+          "branch": "keep",
+          "output": "cON",
+          "cap_next": false
+        },
+        {
+          "index": 3,
+          "input": "S",
+          "branch": "keep",
+          "output": "cONS",
+          "cap_next": false
+        },
+        {
+          "index": 4,
+          "input": "T",
+          "branch": "keep",
+          "output": "cONST",
+          "cap_next": false
+        },
+        {
+          "index": 5,
+          "input": "A",
+          "branch": "keep",
+          "output": "cONSTA",
+          "cap_next": false
+        },
+        {
+          "index": 6,
+          "input": "N",
+          "branch": "keep",
+          "output": "cONSTAN",
+          "cap_next": false
+        },
+        {
+          "index": 7,
+          "input": "T",
+          "branch": "keep",
+          "output": "cONSTANT",
+          "cap_next": false
+        },
+        {
+          "index": 8,
+          "input": "_",
+          "branch": "keep",
+          "output": "cONSTANT",
+          "cap_next": true
+        },
+        {
+          "index": 9,
+          "input": "C",
+          "branch": "keep",
+          "output": "cONSTANTC",
+          "cap_next": false
+        },
+        {
+          "index": 10,
+          "input": "A",
+          "branch": "keep",
+          "output": "cONSTANTCA",
+          "cap_next": false
+        },
+        {
+          "index": 11,
+          "input": "S",
+          "branch": "keep",
+          "output": "cONSTANTCAS",
+          "cap_next": false
+        },
+        {
+          "index": 12,
+          "input": "E",
+          "branch": "keep",
+          "output": "cONSTANTCASE",
+          "cap_next": false
+        }
+      ],
+      "trace_after": [
+        {
+          "index": 0,
+          "input": "C",
+          "branch": "lower_initial",
+          "output": "c",
+          "cap_next": false
+        },
+        {
+          "index": 1,
+          "input": "O",
+          "branch": "lower_repeated_capital",
+          "output": "co",
+          "cap_next": false
+        },
+        {
+          "index": 2,
+          "input": "N",
+          "branch": "lower_repeated_capital",
+          "output": "con",
+          "cap_next": false
+        },
+        {
+          "index": 3,
+          "input": "S",
+          "branch": "lower_repeated_capital",
+          "output": "cons",
+          "cap_next": false
+        },
+        {
+          "index": 4,
+          "input": "T",
+          "branch": "lower_repeated_capital",
+          "output": "const",
+          "cap_next": false
+        },
+        {
+          "index": 5,
+          "input": "A",
+          "branch": "lower_repeated_capital",
+          "output": "consta",
+          "cap_next": false
+        },
+        {
+          "index": 6,
+          "input": "N",
+          "branch": "lower_repeated_capital",
+          "output": "constan",
+          "cap_next": false
+        },
+        {
+          "index": 7,
+          "input": "T",
+          "branch": "lower_repeated_capital",
+          "output": "constant",
+          "cap_next": false
+        },
+        {
+          "index": 8,
+          "input": "_",
+          "branch": "keep",
+          "output": "constant",
+          "cap_next": true
+        },
+        {
+          "index": 9,
+          "input": "C",
+          "branch": "keep",
+          "output": "constantC",
+          "cap_next": false
+        },
+        {
+          "index": 10,
+          "input": "A",
+          "branch": "lower_repeated_capital",
+          "output": "constantCa",
+          "cap_next": false
+        },
+        {
+          "index": 11,
+          "input": "S",
+          "branch": "lower_repeated_capital",
+          "output": "constantCas",
+          "cap_next": false
+        },
+        {
+          "index": 12,
+          "input": "E",
+          "branch": "lower_repeated_capital",
+          "output": "constantCase",
+          "cap_next": false
+        }
+      ],
+      "status": "bounded_reference_agrees",
+      "runtime_measurement": null
+    },
+    {
+      "commit": "692d1b89fed27aadf9d3ea07717014dffe558ede",
+      "input": "some string",
+      "function": "ToLowerCamel",
+      "before": "someString",
+      "after": "someString",
+      "trace_before": [
+        {
+          "index": 0,
+          "input": "s",
+          "branch": "keep",
+          "output": "s",
+          "cap_next": false
+        },
+        {
+          "index": 1,
+          "input": "o",
+          "branch": "keep",
+          "output": "so",
+          "cap_next": false
+        },
+        {
+          "index": 2,
+          "input": "m",
+          "branch": "keep",
+          "output": "som",
+          "cap_next": false
+        },
+        {
+          "index": 3,
+          "input": "e",
+          "branch": "keep",
+          "output": "some",
+          "cap_next": false
+        },
+        {
+          "index": 4,
+          "input": " ",
+          "branch": "keep",
+          "output": "some",
+          "cap_next": true
+        },
+        {
+          "index": 5,
+          "input": "s",
+          "branch": "capitalize",
+          "output": "someS",
+          "cap_next": false
+        },
+        {
+          "index": 6,
+          "input": "t",
+          "branch": "keep",
+          "output": "someSt",
+          "cap_next": false
+        },
+        {
+          "index": 7,
+          "input": "r",
+          "branch": "keep",
+          "output": "someStr",
+          "cap_next": false
+        },
+        {
+          "index": 8,
+          "input": "i",
+          "branch": "keep",
+          "output": "someStri",
+          "cap_next": false
+        },
+        {
+          "index": 9,
+          "input": "n",
+          "branch": "keep",
+          "output": "someStrin",
+          "cap_next": false
+        },
+        {
+          "index": 10,
+          "input": "g",
+          "branch": "keep",
+          "output": "someString",
+          "cap_next": false
+        }
+      ],
+      "trace_after": [
+        {
+          "index": 0,
+          "input": "s",
+          "branch": "keep",
+          "output": "s",
+          "cap_next": false
+        },
+        {
+          "index": 1,
+          "input": "o",
+          "branch": "keep",
+          "output": "so",
+          "cap_next": false
+        },
+        {
+          "index": 2,
+          "input": "m",
+          "branch": "keep",
+          "output": "som",
+          "cap_next": false
+        },
+        {
+          "index": 3,
+          "input": "e",
+          "branch": "keep",
+          "output": "some",
+          "cap_next": false
+        },
+        {
+          "index": 4,
+          "input": " ",
+          "branch": "keep",
+          "output": "some",
+          "cap_next": true
+        },
+        {
+          "index": 5,
+          "input": "s",
+          "branch": "capitalize",
+          "output": "someS",
+          "cap_next": false
+        },
+        {
+          "index": 6,
+          "input": "t",
+          "branch": "keep",
+          "output": "someSt",
+          "cap_next": false
+        },
+        {
+          "index": 7,
+          "input": "r",
+          "branch": "keep",
+          "output": "someStr",
+          "cap_next": false
+        },
+        {
+          "index": 8,
+          "input": "i",
+          "branch": "keep",
+          "output": "someStri",
+          "cap_next": false
+        },
+        {
+          "index": 9,
+          "input": "n",
+          "branch": "keep",
+          "output": "someStrin",
+          "cap_next": false
+        },
+        {
+          "index": 10,
+          "input": "g",
+          "branch": "keep",
+          "output": "someString",
+          "cap_next": false
+        }
+      ],
+      "status": "bounded_reference_agrees",
+      "runtime_measurement": null
+    },
+    {
+      "commit": "692d1b89fed27aadf9d3ea07717014dffe558ede",
+      "input": " some string",
+      "function": "ToLowerCamel",
+      "before": "SomeString",
+      "after": "someString",
+      "trace_before": [
+        {
+          "index": 0,
+          "input": " ",
+          "branch": "keep",
+          "output": "",
+          "cap_next": true
+        },
+        {
+          "index": 1,
+          "input": "s",
+          "branch": "capitalize",
+          "output": "S",
+          "cap_next": false
+        },
+        {
+          "index": 2,
+          "input": "o",
+          "branch": "keep",
+          "output": "So",
+          "cap_next": false
+        },
+        {
+          "index": 3,
+          "input": "m",
+          "branch": "keep",
+          "output": "Som",
+          "cap_next": false
+        },
+        {
+          "index": 4,
+          "input": "e",
+          "branch": "keep",
+          "output": "Some",
+          "cap_next": false
+        },
+        {
+          "index": 5,
+          "input": " ",
+          "branch": "keep",
+          "output": "Some",
+          "cap_next": true
+        },
+        {
+          "index": 6,
+          "input": "s",
+          "branch": "capitalize",
+          "output": "SomeS",
+          "cap_next": false
+        },
+        {
+          "index": 7,
+          "input": "t",
+          "branch": "keep",
+          "output": "SomeSt",
+          "cap_next": false
+        },
+        {
+          "index": 8,
+          "input": "r",
+          "branch": "keep",
+          "output": "SomeStr",
+          "cap_next": false
+        },
+        {
+          "index": 9,
+          "input": "i",
+          "branch": "keep",
+          "output": "SomeStri",
+          "cap_next": false
+        },
+        {
+          "index": 10,
+          "input": "n",
+          "branch": "keep",
+          "output": "SomeStrin",
+          "cap_next": false
+        },
+        {
+          "index": 11,
+          "input": "g",
+          "branch": "keep",
+          "output": "SomeString",
+          "cap_next": false
+        }
+      ],
+      "trace_after": [
+        {
+          "index": 0,
+          "input": "s",
+          "branch": "keep",
+          "output": "s",
+          "cap_next": false
+        },
+        {
+          "index": 1,
+          "input": "o",
+          "branch": "keep",
+          "output": "so",
+          "cap_next": false
+        },
+        {
+          "index": 2,
+          "input": "m",
+          "branch": "keep",
+          "output": "som",
+          "cap_next": false
+        },
+        {
+          "index": 3,
+          "input": "e",
+          "branch": "keep",
+          "output": "some",
+          "cap_next": false
+        },
+        {
+          "index": 4,
+          "input": " ",
+          "branch": "keep",
+          "output": "some",
+          "cap_next": true
+        },
+        {
+          "index": 5,
+          "input": "s",
+          "branch": "capitalize",
+          "output": "someS",
+          "cap_next": false
+        },
+        {
+          "index": 6,
+          "input": "t",
+          "branch": "keep",
+          "output": "someSt",
+          "cap_next": false
+        },
+        {
+          "index": 7,
+          "input": "r",
+          "branch": "keep",
+          "output": "someStr",
+          "cap_next": false
+        },
+        {
+          "index": 8,
+          "input": "i",
+          "branch": "keep",
+          "output": "someStri",
+          "cap_next": false
+        },
+        {
+          "index": 9,
+          "input": "n",
+          "branch": "keep",
+          "output": "someStrin",
+          "cap_next": false
+        },
+        {
+          "index": 10,
+          "input": "g",
+          "branch": "keep",
+          "output": "someString",
+          "cap_next": false
+        }
+      ],
+      "status": "bounded_reference_agrees",
+      "runtime_measurement": null
+    },
+    {
+      "commit": "692d1b89fed27aadf9d3ea07717014dffe558ede",
+      "input": "some string",
+      "function": "ToSnake",
+      "status": "effect_only_unchanged_source_path",
+      "value_checked": false,
+      "runtime_measurement": null
+    },
+    {
+      "commit": "692d1b89fed27aadf9d3ea07717014dffe558ede",
+      "input": " some string",
+      "function": "ToSnake",
+      "status": "effect_only_unchanged_source_path",
+      "value_checked": false,
+      "runtime_measurement": null
+    }
+  ],
+  "state_counterexamples": [
+    {
+      "input": "CONSTANT_CASE",
+      "init_case": true,
+      "state": {
+        "CONSTANT_CASE": "same"
+      },
+      "before": "Same",
+      "after": "Same",
+      "origin": "constructed_state_counterexample",
+      "meaning": "previous default-state changed reference becomes unchanged; effect is not determined if state is unspecified"
+    },
+    {
+      "input": "CONSTANT_CASE",
+      "init_case": false,
+      "state": {
+        "CONSTANT_CASE": "same"
+      },
+      "before": "same",
+      "after": "same",
+      "origin": "constructed_state_counterexample",
+      "meaning": "previous default-state changed reference becomes unchanged; effect is not determined if state is unspecified"
+    },
+    {
+      "input": " some string",
+      "init_case": false,
+      "state": {
+        " some string": "same",
+        "some string": "same"
+      },
+      "before": "same",
+      "after": "same",
+      "origin": "constructed_state_counterexample",
+      "meaning": "previous default-state changed reference becomes unchanged; effect is not determined if state is unspecified"
+    }
+  ]
+}

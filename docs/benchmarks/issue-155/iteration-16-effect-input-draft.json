@@ -1,0 +1,446 @@
+{
+  "bundles": [
+    {
+      "files": [
+        {
+          "id": "F001",
+          "path": "acronyms.go",
+          "before": "package strcase\n\nvar uppercaseAcronym = map[string]string{\n\t\"ID\": \"id\",\n}\n\n// ConfigureAcronym allows you to add additional words which will be considered acronyms\nfunc ConfigureAcronym(key, val string) {\n\tuppercaseAcronym[key] = val\n}\n",
+          "after": "package strcase\n\nvar uppercaseAcronym = map[string]string{\n\t\"ID\": \"id\",\n}\n\n// ConfigureAcronym allows you to add additional words which will be considered acronyms\nfunc ConfigureAcronym(key, val string) {\n\tuppercaseAcronym[key] = val\n}\n"
+        },
+        {
+          "id": "F002",
+          "path": "camel.go",
+          "before": "/*\n * The MIT License (MIT)\n *\n * Copyright (c) 2015 Ian Coleman\n * Copyright (c) 2018 Ma_124, <github.com/Ma124>\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, Subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or Substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\n\npackage strcase\n\nimport (\n\t\"strings\"\n)\n\n// Converts a string to CamelCase\nfunc toCamelInitCase(s string, initCase bool) string {\n\ts = strings.TrimSpace(s)\n\tif s == \"\" {\n\t\treturn s\n\t}\n\tif a, ok := uppercaseAcronym[s]; ok {\n\t\ts = a\n\t}\n\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t}\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}\n\n// ToCamel converts a string to CamelCase\nfunc ToCamel(s string) string {\n\treturn toCamelInitCase(s, true)\n}\n\n// ToLowerCamel converts a string to lowerCamelCase\nfunc ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}\n",
+          "after": "/*\n * The MIT License (MIT)\n *\n * Copyright (c) 2015 Ian Coleman\n * Copyright (c) 2018 Ma_124, <github.com/Ma124>\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, Subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or Substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\n\npackage strcase\n\nimport (\n\t\"strings\"\n)\n\n// Converts a string to CamelCase\nfunc toCamelInitCase(s string, initCase bool) string {\n\ts = strings.TrimSpace(s)\n\tif s == \"\" {\n\t\treturn s\n\t}\n\ta, hasAcronym := uppercaseAcronym[s]\n\tif hasAcronym {\n\t\ts = a\n\t}\n\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tprevIsCap := false\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t} else if prevIsCap && vIsCap && !hasAcronym {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\t\tprevIsCap = vIsCap\n\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}\n\n// ToCamel converts a string to CamelCase\nfunc ToCamel(s string) string {\n\treturn toCamelInitCase(s, true)\n}\n\n// ToLowerCamel converts a string to lowerCamelCase\nfunc ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}\n"
+        },
+        {
+          "id": "F003",
+          "path": "camel_test.go",
+          "before": "/*\n * The MIT License (MIT)\n *\n * Copyright (c) 2015 Ian Coleman\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, Subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or Substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\n\npackage strcase\n\nimport (\n\t\"testing\"\n)\n\nfunc toCamel(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"test_case\", \"TestCase\"},\n\t\t{\"test.case\", \"TestCase\"},\n\t\t{\"test\", \"Test\"},\n\t\t{\"TestCase\", \"TestCase\"},\n\t\t{\" test  case \", \"TestCase\"},\n\t\t{\"\", \"\"},\n\t\t{\"many_many_words\", \"ManyManyWords\"},\n\t\t{\"AnyKind of_string\", \"AnyKindOfString\"},\n\t\t{\"odd-fix\", \"OddFix\"},\n\t\t{\"numbers2And55with000\", \"Numbers2And55With000\"},\n\t\t{\"ID\", \"Id\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToCamel(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToCamel(t *testing.T) {\n\ttoCamel(t)\n}\n\nfunc BenchmarkToCamel(b *testing.B) {\n\tbenchmarkCamelTest(b, toCamel)\n}\n\nfunc toLowerCamel(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"foo-bar\", \"fooBar\"},\n\t\t{\"TestCase\", \"testCase\"},\n\t\t{\"\", \"\"},\n\t\t{\"AnyKind of_string\", \"anyKindOfString\"},\n\t\t{\"AnyKind.of-string\", \"anyKindOfString\"},\n\t\t{\"ID\", \"id\"},\n\t\t{\"some string\", \"someString\"},\n\t\t{\" some string\", \"someString\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToLowerCamel(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToLowerCamel(t *testing.T) {\n\ttoLowerCamel(t)\n}\n\nfunc TestCustomAcronymsToCamel(t *testing.T) {\n\ttests := []struct {\n\t\tname         string\n\t\tacronymKey   string\n\t\tacronymValue string\n\t\texpected     string\n\t}{\n\t\t{\n\t\t\tname:         \"API Custom Acronym\",\n\t\t\tacronymKey:   \"API\",\n\t\t\tacronymValue: \"api\",\n\t\t\texpected:     \"Api\",\n\t\t},\n\t\t{\n\t\t\tname:         \"ABCDACME Custom Acroynm\",\n\t\t\tacronymKey:   \"ABCDACME\",\n\t\t\tacronymValue: \"AbcdAcme\",\n\t\t\texpected:     \"AbcdAcme\",\n\t\t},\n\t\t{\n\t\t\tname:         \"PostgreSQL Custom Acronym\",\n\t\t\tacronymKey:   \"PostgreSQL\",\n\t\t\tacronymValue: \"PostgreSQL\",\n\t\t\texpected:     \"PostgreSQL\",\n\t\t},\n\t}\n\tfor _, test := range tests {\n\t\tt.Run(test.name, func(t *testing.T) {\n\t\t\tConfigureAcronym(test.acronymKey, test.acronymValue)\n\t\t\tif result := ToCamel(test.acronymKey); result != test.expected {\n\t\t\t\tt.Errorf(\"expected custom acronym result %s, got %s\", test.expected, result)\n\t\t\t}\n\t\t})\n\t}\n}\n\nfunc TestCustomAcronymsToLowerCamel(t *testing.T) {\n\ttests := []struct {\n\t\tname         string\n\t\tacronymKey   string\n\t\tacronymValue string\n\t\texpected     string\n\t}{\n\t\t{\n\t\t\tname:         \"API Custom Acronym\",\n\t\t\tacronymKey:   \"API\",\n\t\t\tacronymValue: \"api\",\n\t\t\texpected:     \"api\",\n\t\t},\n\t\t{\n\t\t\tname:         \"ABCDACME Custom Acroynm\",\n\t\t\tacronymKey:   \"ABCDACME\",\n\t\t\tacronymValue: \"AbcdAcme\",\n\t\t\texpected:     \"abcdAcme\",\n\t\t},\n\t\t{\n\t\t\tname:         \"PostgreSQL Custom Acronym\",\n\t\t\tacronymKey:   \"PostgreSQL\",\n\t\t\tacronymValue: \"PostgreSQL\",\n\t\t\texpected:     \"postgreSQL\",\n\t\t},\n\t}\n\tfor _, test := range tests {\n\t\tt.Run(test.name, func(t *testing.T) {\n\t\t\tConfigureAcronym(test.acronymKey, test.acronymValue)\n\t\t\tif result := ToLowerCamel(test.acronymKey); result != test.expected {\n\t\t\t\tt.Errorf(\"expected custom acronym result %s, got %s\", test.expected, result)\n\t\t\t}\n\t\t})\n\t}\n}\n\nfunc BenchmarkToLowerCamel(b *testing.B) {\n\tbenchmarkCamelTest(b, toLowerCamel)\n}\n\nfunc benchmarkCamelTest(b *testing.B, fn func(testing.TB)) {\n\tfor n := 0; n < b.N; n++ {\n\t\tfn(b)\n\t}\n}\n",
+          "after": "/*\n * The MIT License (MIT)\n *\n * Copyright (c) 2015 Ian Coleman\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, Subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or Substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\n\npackage strcase\n\nimport (\n\t\"testing\"\n)\n\nfunc toCamel(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"test_case\", \"TestCase\"},\n\t\t{\"test.case\", \"TestCase\"},\n\t\t{\"test\", \"Test\"},\n\t\t{\"TestCase\", \"TestCase\"},\n\t\t{\" test  case \", \"TestCase\"},\n\t\t{\"\", \"\"},\n\t\t{\"many_many_words\", \"ManyManyWords\"},\n\t\t{\"AnyKind of_string\", \"AnyKindOfString\"},\n\t\t{\"odd-fix\", \"OddFix\"},\n\t\t{\"numbers2And55with000\", \"Numbers2And55With000\"},\n\t\t{\"ID\", \"Id\"},\n\t\t{\"CONSTANT_CASE\", \"ConstantCase\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToCamel(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToCamel(t *testing.T) {\n\ttoCamel(t)\n}\n\nfunc BenchmarkToCamel(b *testing.B) {\n\tbenchmarkCamelTest(b, toCamel)\n}\n\nfunc toLowerCamel(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"foo-bar\", \"fooBar\"},\n\t\t{\"TestCase\", \"testCase\"},\n\t\t{\"\", \"\"},\n\t\t{\"AnyKind of_string\", \"anyKindOfString\"},\n\t\t{\"AnyKind.of-string\", \"anyKindOfString\"},\n\t\t{\"ID\", \"id\"},\n\t\t{\"some string\", \"someString\"},\n\t\t{\" some string\", \"someString\"},\n\t\t{\"CONSTANT_CASE\", \"constantCase\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToLowerCamel(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToLowerCamel(t *testing.T) {\n\ttoLowerCamel(t)\n}\n\nfunc TestCustomAcronymsToCamel(t *testing.T) {\n\ttests := []struct {\n\t\tname         string\n\t\tacronymKey   string\n\t\tacronymValue string\n\t\texpected     string\n\t}{\n\t\t{\n\t\t\tname:         \"API Custom Acronym\",\n\t\t\tacronymKey:   \"API\",\n\t\t\tacronymValue: \"api\",\n\t\t\texpected:     \"Api\",\n\t\t},\n\t\t{\n\t\t\tname:         \"ABCDACME Custom Acroynm\",\n\t\t\tacronymKey:   \"ABCDACME\",\n\t\t\tacronymValue: \"AbcdAcme\",\n\t\t\texpected:     \"AbcdAcme\",\n\t\t},\n\t\t{\n\t\t\tname:         \"PostgreSQL Custom Acronym\",\n\t\t\tacronymKey:   \"PostgreSQL\",\n\t\t\tacronymValue: \"PostgreSQL\",\n\t\t\texpected:     \"PostgreSQL\",\n\t\t},\n\t}\n\tfor _, test := range tests {\n\t\tt.Run(test.name, func(t *testing.T) {\n\t\t\tConfigureAcronym(test.acronymKey, test.acronymValue)\n\t\t\tif result := ToCamel(test.acronymKey); result != test.expected {\n\t\t\t\tt.Errorf(\"expected custom acronym result %s, got %s\", test.expected, result)\n\t\t\t}\n\t\t})\n\t}\n}\n\nfunc TestCustomAcronymsToLowerCamel(t *testing.T) {\n\ttests := []struct {\n\t\tname         string\n\t\tacronymKey   string\n\t\tacronymValue string\n\t\texpected     string\n\t}{\n\t\t{\n\t\t\tname:         \"API Custom Acronym\",\n\t\t\tacronymKey:   \"API\",\n\t\t\tacronymValue: \"api\",\n\t\t\texpected:     \"api\",\n\t\t},\n\t\t{\n\t\t\tname:         \"ABCDACME Custom Acroynm\",\n\t\t\tacronymKey:   \"ABCDACME\",\n\t\t\tacronymValue: \"AbcdAcme\",\n\t\t\texpected:     \"abcdAcme\",\n\t\t},\n\t\t{\n\t\t\tname:         \"PostgreSQL Custom Acronym\",\n\t\t\tacronymKey:   \"PostgreSQL\",\n\t\t\tacronymValue: \"PostgreSQL\",\n\t\t\texpected:     \"postgreSQL\",\n\t\t},\n\t}\n\tfor _, test := range tests {\n\t\tt.Run(test.name, func(t *testing.T) {\n\t\t\tConfigureAcronym(test.acronymKey, test.acronymValue)\n\t\t\tif result := ToLowerCamel(test.acronymKey); result != test.expected {\n\t\t\t\tt.Errorf(\"expected custom acronym result %s, got %s\", test.expected, result)\n\t\t\t}\n\t\t})\n\t}\n}\n\nfunc BenchmarkToLowerCamel(b *testing.B) {\n\tbenchmarkCamelTest(b, toLowerCamel)\n}\n\nfunc benchmarkCamelTest(b *testing.B, fn func(testing.TB)) {\n\tfor n := 0; n < b.N; n++ {\n\t\tfn(b)\n\t}\n}\n"
+        },
+        {
+          "id": "F099",
+          "path": "snake.go",
+          "before": "/*\n * The MIT License (MIT)\n *\n * Copyright (c) 2015 Ian Coleman\n * Copyright (c) 2018 Ma_124, <github.com/Ma124>\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, Subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or Substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\n\npackage strcase\n\nimport (\n\t\"strings\"\n)\n\n// ToSnake converts a string to snake_case\nfunc ToSnake(s string) string {\n\treturn ToDelimited(s, '_')\n}\n\nfunc ToSnakeWithIgnore(s string, ignore string) string {\n\treturn ToScreamingDelimited(s, '_', ignore, false)\n}\n\n// ToScreamingSnake converts a string to SCREAMING_SNAKE_CASE\nfunc ToScreamingSnake(s string) string {\n\treturn ToScreamingDelimited(s, '_', \"\", true)\n}\n\n// ToKebab converts a string to kebab-case\nfunc ToKebab(s string) string {\n\treturn ToDelimited(s, '-')\n}\n\n// ToScreamingKebab converts a string to SCREAMING-KEBAB-CASE\nfunc ToScreamingKebab(s string) string {\n\treturn ToScreamingDelimited(s, '-', \"\", true)\n}\n\n// ToDelimited converts a string to delimited.snake.case\n// (in this case `delimiter = '.'`)\nfunc ToDelimited(s string, delimiter uint8) string {\n\treturn ToScreamingDelimited(s, delimiter, \"\", false)\n}\n\n// ToScreamingDelimited converts a string to SCREAMING.DELIMITED.SNAKE.CASE\n// (in this case `delimiter = '.'; screaming = true`)\n// or delimited.snake.case\n// (in this case `delimiter = '.'; screaming = false`)\nfunc ToScreamingDelimited(s string, delimiter uint8, ignore string, screaming bool) string {\n\ts = strings.TrimSpace(s)\n\tn := strings.Builder{}\n\tn.Grow(len(s) + 2) // nominal 2 bytes of extra space for inserted delimiters\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif vIsLow && screaming {\n\t\t\tv += 'A'\n\t\t\tv -= 'a'\n\t\t} else if vIsCap && !screaming {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\n\t\t// treat acronyms as words, eg for JSONData -> JSON is a whole word\n\t\tif i+1 < len(s) {\n\t\t\tnext := s[i+1]\n\t\t\tvIsNum := v >= '0' && v <= '9'\n\t\t\tnextIsCap := next >= 'A' && next <= 'Z'\n\t\t\tnextIsLow := next >= 'a' && next <= 'z'\n\t\t\tnextIsNum := next >= '0' && next <= '9'\n\t\t\t// add underscore if next letter case type is changed\n\t\t\tif (vIsCap && (nextIsLow || nextIsNum)) || (vIsLow && (nextIsCap || nextIsNum)) || (vIsNum && (nextIsCap || nextIsLow)) {\n\t\t\t\tprevIgnore := ignore != \"\" && i > 0 && strings.ContainsAny(string(s[i-1]), ignore)\n\t\t\t\tif !prevIgnore {\n\t\t\t\t\tif vIsCap && nextIsLow {\n\t\t\t\t\t\tif prevIsCap := i > 0 && s[i-1] >= 'A' && s[i-1] <= 'Z'; prevIsCap {\n\t\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\tn.WriteByte(v)\n\t\t\t\t\tif vIsLow || vIsNum || nextIsNum {\n\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t}\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tif (v == ' ' || v == '_' || v == '-' || v == '.') && !strings.ContainsAny(string(v), ignore) {\n\t\t\t// replace space/underscore/hyphen/dot with delimiter\n\t\t\tn.WriteByte(delimiter)\n\t\t} else {\n\t\t\tn.WriteByte(v)\n\t\t}\n\t}\n\n\treturn n.String()\n}\n",
+          "after": "/*\n * The MIT License (MIT)\n *\n * Copyright (c) 2015 Ian Coleman\n * Copyright (c) 2018 Ma_124, <github.com/Ma124>\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, Subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or Substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\n\npackage strcase\n\nimport (\n\t\"strings\"\n)\n\n// ToSnake converts a string to snake_case\nfunc ToSnake(s string) string {\n\treturn ToDelimited(s, '_')\n}\n\nfunc ToSnakeWithIgnore(s string, ignore string) string {\n\treturn ToScreamingDelimited(s, '_', ignore, false)\n}\n\n// ToScreamingSnake converts a string to SCREAMING_SNAKE_CASE\nfunc ToScreamingSnake(s string) string {\n\treturn ToScreamingDelimited(s, '_', \"\", true)\n}\n\n// ToKebab converts a string to kebab-case\nfunc ToKebab(s string) string {\n\treturn ToDelimited(s, '-')\n}\n\n// ToScreamingKebab converts a string to SCREAMING-KEBAB-CASE\nfunc ToScreamingKebab(s string) string {\n\treturn ToScreamingDelimited(s, '-', \"\", true)\n}\n\n// ToDelimited converts a string to delimited.snake.case\n// (in this case `delimiter = '.'`)\nfunc ToDelimited(s string, delimiter uint8) string {\n\treturn ToScreamingDelimited(s, delimiter, \"\", false)\n}\n\n// ToScreamingDelimited converts a string to SCREAMING.DELIMITED.SNAKE.CASE\n// (in this case `delimiter = '.'; screaming = true`)\n// or delimited.snake.case\n// (in this case `delimiter = '.'; screaming = false`)\nfunc ToScreamingDelimited(s string, delimiter uint8, ignore string, screaming bool) string {\n\ts = strings.TrimSpace(s)\n\tn := strings.Builder{}\n\tn.Grow(len(s) + 2) // nominal 2 bytes of extra space for inserted delimiters\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif vIsLow && screaming {\n\t\t\tv += 'A'\n\t\t\tv -= 'a'\n\t\t} else if vIsCap && !screaming {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\n\t\t// treat acronyms as words, eg for JSONData -> JSON is a whole word\n\t\tif i+1 < len(s) {\n\t\t\tnext := s[i+1]\n\t\t\tvIsNum := v >= '0' && v <= '9'\n\t\t\tnextIsCap := next >= 'A' && next <= 'Z'\n\t\t\tnextIsLow := next >= 'a' && next <= 'z'\n\t\t\tnextIsNum := next >= '0' && next <= '9'\n\t\t\t// add underscore if next letter case type is changed\n\t\t\tif (vIsCap && (nextIsLow || nextIsNum)) || (vIsLow && (nextIsCap || nextIsNum)) || (vIsNum && (nextIsCap || nextIsLow)) {\n\t\t\t\tprevIgnore := ignore != \"\" && i > 0 && strings.ContainsAny(string(s[i-1]), ignore)\n\t\t\t\tif !prevIgnore {\n\t\t\t\t\tif vIsCap && nextIsLow {\n\t\t\t\t\t\tif prevIsCap := i > 0 && s[i-1] >= 'A' && s[i-1] <= 'Z'; prevIsCap {\n\t\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\tn.WriteByte(v)\n\t\t\t\t\tif vIsLow || vIsNum || nextIsNum {\n\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t}\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tif (v == ' ' || v == '_' || v == '-' || v == '.') && !strings.ContainsAny(string(v), ignore) {\n\t\t\t// replace space/underscore/hyphen/dot with delimiter\n\t\t\tn.WriteByte(delimiter)\n\t\t} else {\n\t\t\tn.WriteByte(v)\n\t\t}\n\t}\n\n\treturn n.String()\n}\n"
+        }
+      ],
+      "observations": [
+        {
+          "id": "Q001",
+          "function": "ToCamel",
+          "arguments": [
+            "CONSTANT_CASE"
+          ],
+          "initial_state": {
+            "uppercaseAcronym": {
+              "ID": "id"
+            },
+            "outside_mutation": false
+          },
+          "assertion_source": {
+            "input": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                1567,
+                1582
+              ],
+              "text": "\"CONSTANT_CASE\""
+            },
+            "expected": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                1584,
+                1598
+              ],
+              "text": "\"ConstantCase\""
+            },
+            "call": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                1670,
+                1681
+              ],
+              "text": "ToCamel(in)"
+            }
+          }
+        },
+        {
+          "id": "Q002",
+          "function": "ToLowerCamel",
+          "arguments": [
+            "CONSTANT_CASE"
+          ],
+          "initial_state": {
+            "uppercaseAcronym": {
+              "ID": "id"
+            },
+            "outside_mutation": false
+          },
+          "assertion_source": {
+            "input": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2177,
+                2192
+              ],
+              "text": "\"CONSTANT_CASE\""
+            },
+            "expected": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2194,
+                2208
+              ],
+              "text": "\"constantCase\""
+            },
+            "call": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2280,
+                2296
+              ],
+              "text": "ToLowerCamel(in)"
+            }
+          }
+        },
+        {
+          "id": "Q003",
+          "function": "ToCamel",
+          "arguments": [
+            "CONSTANT_CASE"
+          ],
+          "initial_state": {
+            "uppercaseAcronym": null,
+            "outside_mutation": "unspecified"
+          },
+          "assertion_source": {
+            "input": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                1567,
+                1582
+              ],
+              "text": "\"CONSTANT_CASE\""
+            },
+            "expected": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                1584,
+                1598
+              ],
+              "text": "\"ConstantCase\""
+            },
+            "call": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                1670,
+                1681
+              ],
+              "text": "ToCamel(in)"
+            }
+          }
+        },
+        {
+          "id": "Q004",
+          "function": "ToLowerCamel",
+          "arguments": [
+            "CONSTANT_CASE"
+          ],
+          "initial_state": {
+            "uppercaseAcronym": null,
+            "outside_mutation": "unspecified"
+          },
+          "assertion_source": {
+            "input": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2177,
+                2192
+              ],
+              "text": "\"CONSTANT_CASE\""
+            },
+            "expected": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2194,
+                2208
+              ],
+              "text": "\"constantCase\""
+            },
+            "call": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2280,
+                2296
+              ],
+              "text": "ToLowerCamel(in)"
+            }
+          }
+        }
+      ],
+      "task_scope": "Effect on concrete return observation under specified initial state; not commit intent or final groups"
+    },
+    {
+      "files": [
+        {
+          "id": "F001",
+          "path": "acronyms.go",
+          "before": "package strcase\n\nvar uppercaseAcronym = map[string]string{\n\t\"ID\": \"id\",\n}\n",
+          "after": "package strcase\n\nvar uppercaseAcronym = map[string]string{\n\t\"ID\": \"id\",\n}\n"
+        },
+        {
+          "id": "F002",
+          "path": "camel.go",
+          "before": "/*\n * The MIT License (MIT)\n *\n * Copyright (c) 2015 Ian Coleman\n * Copyright (c) 2018 Ma_124, <github.com/Ma124>\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, Subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or Substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\n\npackage strcase\n\nimport (\n\t\"strings\"\n)\n\n// Converts a string to CamelCase\nfunc toCamelInitCase(s string, initCase bool) string {\n\tif s == \"\" {\n\t\treturn s\n\t}\n\tif a, ok := uppercaseAcronym[s]; ok {\n\t\ts = a\n\t}\n\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t}\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}\n\n// ToCamel converts a string to CamelCase\nfunc ToCamel(s string) string {\n\treturn toCamelInitCase(s, true)\n}\n\n// ToLowerCamel converts a string to lowerCamelCase\nfunc ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}\n",
+          "after": "/*\n * The MIT License (MIT)\n *\n * Copyright (c) 2015 Ian Coleman\n * Copyright (c) 2018 Ma_124, <github.com/Ma124>\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, Subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or Substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\n\npackage strcase\n\nimport (\n\t\"strings\"\n)\n\n// Converts a string to CamelCase\nfunc toCamelInitCase(s string, initCase bool) string {\n\ts = strings.TrimSpace(s)\n\tif s == \"\" {\n\t\treturn s\n\t}\n\tif a, ok := uppercaseAcronym[s]; ok {\n\t\ts = a\n\t}\n\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t}\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}\n\n// ToCamel converts a string to CamelCase\nfunc ToCamel(s string) string {\n\treturn toCamelInitCase(s, true)\n}\n\n// ToLowerCamel converts a string to lowerCamelCase\nfunc ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}\n"
+        },
+        {
+          "id": "F003",
+          "path": "camel_test.go",
+          "before": "/*\n * The MIT License (MIT)\n *\n * Copyright (c) 2015 Ian Coleman\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, Subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or Substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\n\npackage strcase\n\nimport (\n\t\"testing\"\n)\n\nfunc toCamel(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"test_case\", \"TestCase\"},\n\t\t{\"test.case\", \"TestCase\"},\n\t\t{\"test\", \"Test\"},\n\t\t{\"TestCase\", \"TestCase\"},\n\t\t{\" test  case \", \"TestCase\"},\n\t\t{\"\", \"\"},\n\t\t{\"many_many_words\", \"ManyManyWords\"},\n\t\t{\"AnyKind of_string\", \"AnyKindOfString\"},\n\t\t{\"odd-fix\", \"OddFix\"},\n\t\t{\"numbers2And55with000\", \"Numbers2And55With000\"},\n\t\t{\"ID\", \"Id\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToCamel(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToCamel(t *testing.T) {\n\ttoCamel(t)\n}\n\nfunc BenchmarkToCamel(b *testing.B) {\n\tbenchmarkCamelTest(b, toCamel)\n}\n\nfunc toLowerCamel(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"foo-bar\", \"fooBar\"},\n\t\t{\"TestCase\", \"testCase\"},\n\t\t{\"\", \"\"},\n\t\t{\"AnyKind of_string\", \"anyKindOfString\"},\n\t\t{\"AnyKind.of-string\", \"anyKindOfString\"},\n\t\t{\"ID\", \"id\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToLowerCamel(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToLowerCamel(t *testing.T) {\n\ttoLowerCamel(t)\n}\n\nfunc BenchmarkToLowerCamel(b *testing.B) {\n\tbenchmarkCamelTest(b, toLowerCamel)\n}\n\nfunc benchmarkCamelTest(b *testing.B, fn func(testing.TB)) {\n\tfor n := 0; n < b.N; n++ {\n\t\tfn(b)\n\t}\n}\n",
+          "after": "/*\n * The MIT License (MIT)\n *\n * Copyright (c) 2015 Ian Coleman\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, Subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or Substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\n\npackage strcase\n\nimport (\n\t\"testing\"\n)\n\nfunc toCamel(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"test_case\", \"TestCase\"},\n\t\t{\"test.case\", \"TestCase\"},\n\t\t{\"test\", \"Test\"},\n\t\t{\"TestCase\", \"TestCase\"},\n\t\t{\" test  case \", \"TestCase\"},\n\t\t{\"\", \"\"},\n\t\t{\"many_many_words\", \"ManyManyWords\"},\n\t\t{\"AnyKind of_string\", \"AnyKindOfString\"},\n\t\t{\"odd-fix\", \"OddFix\"},\n\t\t{\"numbers2And55with000\", \"Numbers2And55With000\"},\n\t\t{\"ID\", \"Id\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToCamel(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToCamel(t *testing.T) {\n\ttoCamel(t)\n}\n\nfunc BenchmarkToCamel(b *testing.B) {\n\tbenchmarkCamelTest(b, toCamel)\n}\n\nfunc toLowerCamel(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"foo-bar\", \"fooBar\"},\n\t\t{\"TestCase\", \"testCase\"},\n\t\t{\"\", \"\"},\n\t\t{\"AnyKind of_string\", \"anyKindOfString\"},\n\t\t{\"AnyKind.of-string\", \"anyKindOfString\"},\n\t\t{\"ID\", \"id\"},\n\t\t{\"some string\", \"someString\"},\n\t\t{\" some string\", \"someString\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToLowerCamel(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToLowerCamel(t *testing.T) {\n\ttoLowerCamel(t)\n}\n\nfunc BenchmarkToLowerCamel(b *testing.B) {\n\tbenchmarkCamelTest(b, toLowerCamel)\n}\n\nfunc benchmarkCamelTest(b *testing.B, fn func(testing.TB)) {\n\tfor n := 0; n < b.N; n++ {\n\t\tfn(b)\n\t}\n}\n"
+        },
+        {
+          "id": "F004",
+          "path": "snake_test.go",
+          "before": "/*\n * The MIT License (MIT)\n *\n * Copyright (c) 2015 Ian Coleman\n * Copyright (c) 2018 Ma_124, <github.com/Ma124>\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, Subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or Substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\n\npackage strcase\n\nimport (\n\t\"testing\"\n)\n\nfunc toSnake(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"testCase\", \"test_case\"},\n\t\t{\"TestCase\", \"test_case\"},\n\t\t{\"Test Case\", \"test_case\"},\n\t\t{\" Test Case\", \"test_case\"},\n\t\t{\"Test Case \", \"test_case\"},\n\t\t{\" Test Case \", \"test_case\"},\n\t\t{\"test\", \"test\"},\n\t\t{\"test_case\", \"test_case\"},\n\t\t{\"Test\", \"test\"},\n\t\t{\"\", \"\"},\n\t\t{\"ManyManyWords\", \"many_many_words\"},\n\t\t{\"manyManyWords\", \"many_many_words\"},\n\t\t{\"AnyKind of_string\", \"any_kind_of_string\"},\n\t\t{\"numbers2and55with000\", \"numbers_2_and_55_with_000\"},\n\t\t{\"JSONData\", \"json_data\"},\n\t\t{\"userID\", \"user_id\"},\n\t\t{\"AAAbbb\", \"aa_abbb\"},\n\t\t{\"1A2\", \"1_a_2\"},\n\t\t{\"A1B\", \"a_1_b\"},\n\t\t{\"A1A2A3\", \"a_1_a_2_a_3\"},\n\t\t{\"A1 A2 A3\", \"a_1_a_2_a_3\"},\n\t\t{\"AB1AB2AB3\", \"ab_1_ab_2_ab_3\"},\n\t\t{\"AB1 AB2 AB3\", \"ab_1_ab_2_ab_3\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToSnake(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToSnake(t *testing.T) { toSnake(t) }\n\nfunc BenchmarkToSnake(b *testing.B) {\n\tbenchmarkSnakeTest(b, toSnake)\n}\n\nfunc toSnakeWithIgnore(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"testCase\", \"test_case\"},\n\t\t{\"TestCase\", \"test_case\"},\n\t\t{\"Test Case\", \"test_case\"},\n\t\t{\" Test Case\", \"test_case\"},\n\t\t{\"Test Case \", \"test_case\"},\n\t\t{\" Test Case \", \"test_case\"},\n\t\t{\"test\", \"test\"},\n\t\t{\"test_case\", \"test_case\"},\n\t\t{\"Test\", \"test\"},\n\t\t{\"\", \"\"},\n\t\t{\"ManyManyWords\", \"many_many_words\"},\n\t\t{\"manyManyWords\", \"many_many_words\"},\n\t\t{\"AnyKind of_string\", \"any_kind_of_string\"},\n\t\t{\"numbers2and55with000\", \"numbers_2_and_55_with_000\"},\n\t\t{\"JSONData\", \"json_data\"},\n\t\t{\"AwesomeActivity.UserID\", \"awesome_activity.user_id\", \".\"},\n\t\t{\"AwesomeActivity.User.Id\", \"awesome_activity.user.id\", \".\"},\n\t\t{\"AwesomeUsername@Awesome.Com\", \"awesome_username@awesome.com\", \"@\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tvar ignore uint8\n\t\tif len(i) == 3 {\n\t\t\tignore = i[2][0]\n\t\t}\n\t\tresult := ToSnakeWithIgnore(in, ignore)\n\t\tif result != out {\n\t\t\tistr := \"\"\n\t\t\tif len(i) == 3 {\n\t\t\t\tistr = \" ignoring '\" + i[2] + \"'\"\n\t\t\t}\n\t\t\ttb.Errorf(\"%q (%q != %q%s)\", in, result, out, istr)\n\t\t}\n\t}\n}\n\nfunc TestToSnakeWithIgnore(t *testing.T) { toSnakeWithIgnore(t) }\n\nfunc BenchmarkToSnakeWithIgnore(b *testing.B) {\n\tbenchmarkSnakeTest(b, toSnakeWithIgnore)\n}\n\nfunc toDelimited(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"testCase\", \"test@case\"},\n\t\t{\"TestCase\", \"test@case\"},\n\t\t{\"Test Case\", \"test@case\"},\n\t\t{\" Test Case\", \"test@case\"},\n\t\t{\"Test Case \", \"test@case\"},\n\t\t{\" Test Case \", \"test@case\"},\n\t\t{\"test\", \"test\"},\n\t\t{\"test_case\", \"test@case\"},\n\t\t{\"Test\", \"test\"},\n\t\t{\"\", \"\"},\n\t\t{\"ManyManyWords\", \"many@many@words\"},\n\t\t{\"manyManyWords\", \"many@many@words\"},\n\t\t{\"AnyKind of_string\", \"any@kind@of@string\"},\n\t\t{\"numbers2and55with000\", \"numbers@2@and@55@with@000\"},\n\t\t{\"JSONData\", \"json@data\"},\n\t\t{\"userID\", \"user@id\"},\n\t\t{\"AAAbbb\", \"aa@abbb\"},\n\t\t{\"test-case\", \"test@case\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToDelimited(in, '@')\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToDelimited(t *testing.T) { toDelimited(t) }\n\nfunc BenchmarkToDelimited(b *testing.B) {\n\tbenchmarkSnakeTest(b, toDelimited)\n}\n\nfunc toScreamingSnake(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"testCase\", \"TEST_CASE\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToScreamingSnake(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToScreamingSnake(t *testing.T) { toScreamingSnake(t) }\n\nfunc BenchmarkToScreamingSnake(b *testing.B) {\n\tbenchmarkSnakeTest(b, toScreamingSnake)\n}\n\nfunc toKebab(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"testCase\", \"test-case\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToKebab(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToKebab(t *testing.T) { toKebab(t) }\n\nfunc BenchmarkToKebab(b *testing.B) {\n\tbenchmarkSnakeTest(b, toKebab)\n}\n\nfunc toScreamingKebab(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"testCase\", \"TEST-CASE\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToScreamingKebab(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToScreamingKebab(t *testing.T) { toScreamingKebab(t) }\n\nfunc BenchmarkToScreamingKebab(b *testing.B) {\n\tbenchmarkSnakeTest(b, toScreamingKebab)\n}\n\nfunc toScreamingDelimited(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"testCase\", \"TEST.CASE\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToScreamingDelimited(in, '.', 0, true)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToScreamingDelimited(t *testing.T) { toScreamingDelimited(t) }\n\nfunc BenchmarkToScreamingDelimited(b *testing.B) {\n\tbenchmarkSnakeTest(b, toScreamingDelimited)\n}\n\nfunc toScreamingDelimitedWithIgnore(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"AnyKind of_string\", \"ANY.KIND OF.STRING\", \".\", \" \"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tdelimiter := i[2][0]\n\t\tignore := i[3][0]\n\t\tresult := ToScreamingDelimited(in, delimiter, ignore, true)\n\t\tif result != out {\n\t\t\tistr := \"\"\n\t\t\tif len(i) == 4 {\n\t\t\t\tistr = \" ignoring '\" + i[3] + \"'\"\n\t\t\t}\n\t\t\ttb.Errorf(\"%q (%q != %q%s)\", in, result, out, istr)\n\t\t}\n\t}\n}\n\nfunc TestToScreamingDelimitedWithIgnore(t *testing.T) { toScreamingDelimitedWithIgnore(t) }\n\nfunc BenchmarkToScreamingDelimitedWithIgnore(b *testing.B) {\n\tbenchmarkSnakeTest(b, toScreamingDelimitedWithIgnore)\n}\n\nfunc benchmarkSnakeTest(b *testing.B, fn func(testing.TB)) {\n\tfor n := 0; n < b.N; n++ {\n\t\tfn(b)\n\t}\n}\n",
+          "after": "/*\n * The MIT License (MIT)\n *\n * Copyright (c) 2015 Ian Coleman\n * Copyright (c) 2018 Ma_124, <github.com/Ma124>\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, Subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or Substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\n\npackage strcase\n\nimport (\n\t\"testing\"\n)\n\nfunc toSnake(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"testCase\", \"test_case\"},\n\t\t{\"TestCase\", \"test_case\"},\n\t\t{\"Test Case\", \"test_case\"},\n\t\t{\" Test Case\", \"test_case\"},\n\t\t{\"Test Case \", \"test_case\"},\n\t\t{\" Test Case \", \"test_case\"},\n\t\t{\"test\", \"test\"},\n\t\t{\"test_case\", \"test_case\"},\n\t\t{\"Test\", \"test\"},\n\t\t{\"\", \"\"},\n\t\t{\"ManyManyWords\", \"many_many_words\"},\n\t\t{\"manyManyWords\", \"many_many_words\"},\n\t\t{\"AnyKind of_string\", \"any_kind_of_string\"},\n\t\t{\"numbers2and55with000\", \"numbers_2_and_55_with_000\"},\n\t\t{\"JSONData\", \"json_data\"},\n\t\t{\"userID\", \"user_id\"},\n\t\t{\"AAAbbb\", \"aa_abbb\"},\n\t\t{\"1A2\", \"1_a_2\"},\n\t\t{\"A1B\", \"a_1_b\"},\n\t\t{\"A1A2A3\", \"a_1_a_2_a_3\"},\n\t\t{\"A1 A2 A3\", \"a_1_a_2_a_3\"},\n\t\t{\"AB1AB2AB3\", \"ab_1_ab_2_ab_3\"},\n\t\t{\"AB1 AB2 AB3\", \"ab_1_ab_2_ab_3\"},\n\t\t{\"some string\", \"some_string\"},\n\t\t{\" some string\", \"some_string\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToSnake(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToSnake(t *testing.T) { toSnake(t) }\n\nfunc BenchmarkToSnake(b *testing.B) {\n\tbenchmarkSnakeTest(b, toSnake)\n}\n\nfunc toSnakeWithIgnore(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"testCase\", \"test_case\"},\n\t\t{\"TestCase\", \"test_case\"},\n\t\t{\"Test Case\", \"test_case\"},\n\t\t{\" Test Case\", \"test_case\"},\n\t\t{\"Test Case \", \"test_case\"},\n\t\t{\" Test Case \", \"test_case\"},\n\t\t{\"test\", \"test\"},\n\t\t{\"test_case\", \"test_case\"},\n\t\t{\"Test\", \"test\"},\n\t\t{\"\", \"\"},\n\t\t{\"ManyManyWords\", \"many_many_words\"},\n\t\t{\"manyManyWords\", \"many_many_words\"},\n\t\t{\"AnyKind of_string\", \"any_kind_of_string\"},\n\t\t{\"numbers2and55with000\", \"numbers_2_and_55_with_000\"},\n\t\t{\"JSONData\", \"json_data\"},\n\t\t{\"AwesomeActivity.UserID\", \"awesome_activity.user_id\", \".\"},\n\t\t{\"AwesomeActivity.User.Id\", \"awesome_activity.user.id\", \".\"},\n\t\t{\"AwesomeUsername@Awesome.Com\", \"awesome_username@awesome.com\", \"@\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tvar ignore uint8\n\t\tif len(i) == 3 {\n\t\t\tignore = i[2][0]\n\t\t}\n\t\tresult := ToSnakeWithIgnore(in, ignore)\n\t\tif result != out {\n\t\t\tistr := \"\"\n\t\t\tif len(i) == 3 {\n\t\t\t\tistr = \" ignoring '\" + i[2] + \"'\"\n\t\t\t}\n\t\t\ttb.Errorf(\"%q (%q != %q%s)\", in, result, out, istr)\n\t\t}\n\t}\n}\n\nfunc TestToSnakeWithIgnore(t *testing.T) { toSnakeWithIgnore(t) }\n\nfunc BenchmarkToSnakeWithIgnore(b *testing.B) {\n\tbenchmarkSnakeTest(b, toSnakeWithIgnore)\n}\n\nfunc toDelimited(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"testCase\", \"test@case\"},\n\t\t{\"TestCase\", \"test@case\"},\n\t\t{\"Test Case\", \"test@case\"},\n\t\t{\" Test Case\", \"test@case\"},\n\t\t{\"Test Case \", \"test@case\"},\n\t\t{\" Test Case \", \"test@case\"},\n\t\t{\"test\", \"test\"},\n\t\t{\"test_case\", \"test@case\"},\n\t\t{\"Test\", \"test\"},\n\t\t{\"\", \"\"},\n\t\t{\"ManyManyWords\", \"many@many@words\"},\n\t\t{\"manyManyWords\", \"many@many@words\"},\n\t\t{\"AnyKind of_string\", \"any@kind@of@string\"},\n\t\t{\"numbers2and55with000\", \"numbers@2@and@55@with@000\"},\n\t\t{\"JSONData\", \"json@data\"},\n\t\t{\"userID\", \"user@id\"},\n\t\t{\"AAAbbb\", \"aa@abbb\"},\n\t\t{\"test-case\", \"test@case\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToDelimited(in, '@')\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToDelimited(t *testing.T) { toDelimited(t) }\n\nfunc BenchmarkToDelimited(b *testing.B) {\n\tbenchmarkSnakeTest(b, toDelimited)\n}\n\nfunc toScreamingSnake(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"testCase\", \"TEST_CASE\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToScreamingSnake(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToScreamingSnake(t *testing.T) { toScreamingSnake(t) }\n\nfunc BenchmarkToScreamingSnake(b *testing.B) {\n\tbenchmarkSnakeTest(b, toScreamingSnake)\n}\n\nfunc toKebab(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"testCase\", \"test-case\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToKebab(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToKebab(t *testing.T) { toKebab(t) }\n\nfunc BenchmarkToKebab(b *testing.B) {\n\tbenchmarkSnakeTest(b, toKebab)\n}\n\nfunc toScreamingKebab(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"testCase\", \"TEST-CASE\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToScreamingKebab(in)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToScreamingKebab(t *testing.T) { toScreamingKebab(t) }\n\nfunc BenchmarkToScreamingKebab(b *testing.B) {\n\tbenchmarkSnakeTest(b, toScreamingKebab)\n}\n\nfunc toScreamingDelimited(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"testCase\", \"TEST.CASE\"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tresult := ToScreamingDelimited(in, '.', 0, true)\n\t\tif result != out {\n\t\t\ttb.Errorf(\"%q (%q != %q)\", in, result, out)\n\t\t}\n\t}\n}\n\nfunc TestToScreamingDelimited(t *testing.T) { toScreamingDelimited(t) }\n\nfunc BenchmarkToScreamingDelimited(b *testing.B) {\n\tbenchmarkSnakeTest(b, toScreamingDelimited)\n}\n\nfunc toScreamingDelimitedWithIgnore(tb testing.TB) {\n\tcases := [][]string{\n\t\t{\"AnyKind of_string\", \"ANY.KIND OF.STRING\", \".\", \" \"},\n\t}\n\tfor _, i := range cases {\n\t\tin := i[0]\n\t\tout := i[1]\n\t\tdelimiter := i[2][0]\n\t\tignore := i[3][0]\n\t\tresult := ToScreamingDelimited(in, delimiter, ignore, true)\n\t\tif result != out {\n\t\t\tistr := \"\"\n\t\t\tif len(i) == 4 {\n\t\t\t\tistr = \" ignoring '\" + i[3] + \"'\"\n\t\t\t}\n\t\t\ttb.Errorf(\"%q (%q != %q%s)\", in, result, out, istr)\n\t\t}\n\t}\n}\n\nfunc TestToScreamingDelimitedWithIgnore(t *testing.T) { toScreamingDelimitedWithIgnore(t) }\n\nfunc BenchmarkToScreamingDelimitedWithIgnore(b *testing.B) {\n\tbenchmarkSnakeTest(b, toScreamingDelimitedWithIgnore)\n}\n\nfunc benchmarkSnakeTest(b *testing.B, fn func(testing.TB)) {\n\tfor n := 0; n < b.N; n++ {\n\t\tfn(b)\n\t}\n}\n"
+        },
+        {
+          "id": "F099",
+          "path": "snake.go",
+          "before": "/*\n * The MIT License (MIT)\n *\n * Copyright (c) 2015 Ian Coleman\n * Copyright (c) 2018 Ma_124, <github.com/Ma124>\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, Subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or Substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\n\npackage strcase\n\nimport (\n\t\"strings\"\n)\n\n// ToSnake converts a string to snake_case\nfunc ToSnake(s string) string {\n\treturn ToDelimited(s, '_')\n}\n\nfunc ToSnakeWithIgnore(s string, ignore uint8) string {\n\treturn ToScreamingDelimited(s, '_', ignore, false)\n}\n\n// ToScreamingSnake converts a string to SCREAMING_SNAKE_CASE\nfunc ToScreamingSnake(s string) string {\n\treturn ToScreamingDelimited(s, '_', 0, true)\n}\n\n// ToKebab converts a string to kebab-case\nfunc ToKebab(s string) string {\n\treturn ToDelimited(s, '-')\n}\n\n// ToScreamingKebab converts a string to SCREAMING-KEBAB-CASE\nfunc ToScreamingKebab(s string) string {\n\treturn ToScreamingDelimited(s, '-', 0, true)\n}\n\n// ToDelimited converts a string to delimited.snake.case\n// (in this case `delimiter = '.'`)\nfunc ToDelimited(s string, delimiter uint8) string {\n\treturn ToScreamingDelimited(s, delimiter, 0, false)\n}\n\n// ToScreamingDelimited converts a string to SCREAMING.DELIMITED.SNAKE.CASE\n// (in this case `delimiter = '.'; screaming = true`)\n// or delimited.snake.case\n// (in this case `delimiter = '.'; screaming = false`)\nfunc ToScreamingDelimited(s string, delimiter uint8, ignore uint8, screaming bool) string {\n\tn := strings.Builder{}\n\tn.Grow(len(s) + 2) // nominal 2 bytes of extra space for inserted delimiters\n\tstart := true\n\tspaces := 0\n\tfor i, v := range []byte(s) {\n\t\tif v == ' ' {\n\t\t\tspaces++\n\t\t\tcontinue\n\t\t} else if start {\n\t\t\tstart = false\n\t\t\tspaces = 0\n\t\t} else {\n\t\t\tfor ; spaces > 0; spaces-- {\n\t\t\t\tif ignore == ' ' {\n\t\t\t\t\tn.WriteByte(' ')\n\t\t\t\t} else {\n\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif vIsLow && screaming {\n\t\t\tv += 'A'\n\t\t\tv -= 'a'\n\t\t} else if vIsCap && !screaming {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\n\t\t// treat acronyms as words, eg for JSONData -> JSON is a whole word\n\t\tif i+1 < len(s) {\n\t\t\tnext := s[i+1]\n\t\t\tvIsNum := v >= '0' && v <= '9'\n\t\t\tnextIsCap := next >= 'A' && next <= 'Z'\n\t\t\tnextIsLow := next >= 'a' && next <= 'z'\n\t\t\tnextIsNum := next >= '0' && next <= '9'\n\t\t\t// add underscore if next letter case type is changed\n\t\t\tif (vIsCap && (nextIsLow || nextIsNum)) || (vIsLow && (nextIsCap || nextIsNum)) || (vIsNum && (nextIsCap || nextIsLow)) {\n\t\t\t\tif prevIgnore := ignore > 0 && i > 0 && s[i-1] == ignore; !prevIgnore {\n\t\t\t\t\tif vIsCap && nextIsLow {\n\t\t\t\t\t\tif prevIsCap := i > 0 && s[i-1] >= 'A' && s[i-1] <= 'Z'; prevIsCap {\n\t\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\tn.WriteByte(v)\n\t\t\t\t\tif vIsLow || vIsNum || nextIsNum {\n\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t}\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tif (v == ' ' || v == '_' || v == '-') && uint8(v) != ignore {\n\t\t\t// replace space/underscore/hyphen with delimiter\n\t\t\tn.WriteByte(delimiter)\n\t\t} else {\n\t\t\tn.WriteByte(v)\n\t\t}\n\t}\n\n\treturn n.String()\n}\n",
+          "after": "/*\n * The MIT License (MIT)\n *\n * Copyright (c) 2015 Ian Coleman\n * Copyright (c) 2018 Ma_124, <github.com/Ma124>\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, Subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or Substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\n\npackage strcase\n\nimport (\n\t\"strings\"\n)\n\n// ToSnake converts a string to snake_case\nfunc ToSnake(s string) string {\n\treturn ToDelimited(s, '_')\n}\n\nfunc ToSnakeWithIgnore(s string, ignore uint8) string {\n\treturn ToScreamingDelimited(s, '_', ignore, false)\n}\n\n// ToScreamingSnake converts a string to SCREAMING_SNAKE_CASE\nfunc ToScreamingSnake(s string) string {\n\treturn ToScreamingDelimited(s, '_', 0, true)\n}\n\n// ToKebab converts a string to kebab-case\nfunc ToKebab(s string) string {\n\treturn ToDelimited(s, '-')\n}\n\n// ToScreamingKebab converts a string to SCREAMING-KEBAB-CASE\nfunc ToScreamingKebab(s string) string {\n\treturn ToScreamingDelimited(s, '-', 0, true)\n}\n\n// ToDelimited converts a string to delimited.snake.case\n// (in this case `delimiter = '.'`)\nfunc ToDelimited(s string, delimiter uint8) string {\n\treturn ToScreamingDelimited(s, delimiter, 0, false)\n}\n\n// ToScreamingDelimited converts a string to SCREAMING.DELIMITED.SNAKE.CASE\n// (in this case `delimiter = '.'; screaming = true`)\n// or delimited.snake.case\n// (in this case `delimiter = '.'; screaming = false`)\nfunc ToScreamingDelimited(s string, delimiter uint8, ignore uint8, screaming bool) string {\n\tn := strings.Builder{}\n\tn.Grow(len(s) + 2) // nominal 2 bytes of extra space for inserted delimiters\n\tstart := true\n\tspaces := 0\n\tfor i, v := range []byte(s) {\n\t\tif v == ' ' {\n\t\t\tspaces++\n\t\t\tcontinue\n\t\t} else if start {\n\t\t\tstart = false\n\t\t\tspaces = 0\n\t\t} else {\n\t\t\tfor ; spaces > 0; spaces-- {\n\t\t\t\tif ignore == ' ' {\n\t\t\t\t\tn.WriteByte(' ')\n\t\t\t\t} else {\n\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif vIsLow && screaming {\n\t\t\tv += 'A'\n\t\t\tv -= 'a'\n\t\t} else if vIsCap && !screaming {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\n\t\t// treat acronyms as words, eg for JSONData -> JSON is a whole word\n\t\tif i+1 < len(s) {\n\t\t\tnext := s[i+1]\n\t\t\tvIsNum := v >= '0' && v <= '9'\n\t\t\tnextIsCap := next >= 'A' && next <= 'Z'\n\t\t\tnextIsLow := next >= 'a' && next <= 'z'\n\t\t\tnextIsNum := next >= '0' && next <= '9'\n\t\t\t// add underscore if next letter case type is changed\n\t\t\tif (vIsCap && (nextIsLow || nextIsNum)) || (vIsLow && (nextIsCap || nextIsNum)) || (vIsNum && (nextIsCap || nextIsLow)) {\n\t\t\t\tif prevIgnore := ignore > 0 && i > 0 && s[i-1] == ignore; !prevIgnore {\n\t\t\t\t\tif vIsCap && nextIsLow {\n\t\t\t\t\t\tif prevIsCap := i > 0 && s[i-1] >= 'A' && s[i-1] <= 'Z'; prevIsCap {\n\t\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\tn.WriteByte(v)\n\t\t\t\t\tif vIsLow || vIsNum || nextIsNum {\n\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t}\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tif (v == ' ' || v == '_' || v == '-') && uint8(v) != ignore {\n\t\t\t// replace space/underscore/hyphen with delimiter\n\t\t\tn.WriteByte(delimiter)\n\t\t} else {\n\t\t\tn.WriteByte(v)\n\t\t}\n\t}\n\n\treturn n.String()\n}\n"
+        }
+      ],
+      "observations": [
+        {
+          "id": "Q001",
+          "function": "ToLowerCamel",
+          "arguments": [
+            "some string"
+          ],
+          "initial_state": {
+            "uppercaseAcronym": {
+              "ID": "id"
+            },
+            "outside_mutation": false
+          },
+          "assertion_source": {
+            "input": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2073,
+                2086
+              ],
+              "text": "\"some string\""
+            },
+            "expected": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2088,
+                2100
+              ],
+              "text": "\"someString\""
+            },
+            "call": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2206,
+                2222
+              ],
+              "text": "ToLowerCamel(in)"
+            }
+          }
+        },
+        {
+          "id": "Q002",
+          "function": "ToLowerCamel",
+          "arguments": [
+            " some string"
+          ],
+          "initial_state": {
+            "uppercaseAcronym": {
+              "ID": "id"
+            },
+            "outside_mutation": false
+          },
+          "assertion_source": {
+            "input": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2106,
+                2120
+              ],
+              "text": "\" some string\""
+            },
+            "expected": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2122,
+                2134
+              ],
+              "text": "\"someString\""
+            },
+            "call": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2206,
+                2222
+              ],
+              "text": "ToLowerCamel(in)"
+            }
+          }
+        },
+        {
+          "id": "Q003",
+          "function": "ToSnake",
+          "arguments": [
+            "some string"
+          ],
+          "initial_state": {
+            "uppercaseAcronym": {
+              "ID": "id"
+            },
+            "outside_mutation": false
+          },
+          "assertion_source": {
+            "input": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                1988,
+                2001
+              ],
+              "text": "\"some string\""
+            },
+            "expected": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                2003,
+                2016
+              ],
+              "text": "\"some_string\""
+            },
+            "call": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                2123,
+                2134
+              ],
+              "text": "ToSnake(in)"
+            }
+          }
+        },
+        {
+          "id": "Q004",
+          "function": "ToSnake",
+          "arguments": [
+            " some string"
+          ],
+          "initial_state": {
+            "uppercaseAcronym": {
+              "ID": "id"
+            },
+            "outside_mutation": false
+          },
+          "assertion_source": {
+            "input": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                2022,
+                2036
+              ],
+              "text": "\" some string\""
+            },
+            "expected": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                2038,
+                2051
+              ],
+              "text": "\"some_string\""
+            },
+            "call": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                2123,
+                2134
+              ],
+              "text": "ToSnake(in)"
+            }
+          }
+        },
+        {
+          "id": "Q005",
+          "function": "ToLowerCamel",
+          "arguments": [
+            " some string"
+          ],
+          "initial_state": {
+            "uppercaseAcronym": null,
+            "outside_mutation": "unspecified"
+          },
+          "assertion_source": {
+            "input": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2106,
+                2120
+              ],
+              "text": "\" some string\""
+            },
+            "expected": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2122,
+                2134
+              ],
+              "text": "\"someString\""
+            },
+            "call": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2206,
+                2222
+              ],
+              "text": "ToLowerCamel(in)"
+            }
+          }
+        }
+      ],
+      "task_scope": "Effect on concrete return observation under specified initial state; not commit intent or final groups"
+    }
+  ],
+  "model_calls": 0,
+  "status": "draft_not_preregistered"
+}
