@@ -1,0 +1,56 @@
+[
+  {
+    "sha": "0e97ed3b537927cb4afea366bc4cc36f6eb37e75",
+    "parents": [
+      "d55c313874fe007c6aaecc68211b6c7c7fc84aad"
+    ],
+    "files": [
+      {
+        "path": "uuid.go",
+        "status": "modified",
+        "patch": "@@ -47,18 +47,40 @@ var (\n \tpoolMu      sync.Mutex\n \tpoolPos     = randPoolSize     // protected with poolMu\n \tpool        [randPoolSize]byte // protected with poolMu\n+\n+\tErrInvalidUUIDFormat      = errors.New(\"invalid UUID format\")\n+\tErrInvalidBracketedFormat = errors.New(\"invalid bracketed UUID format\")\n )\n \n+type URNPrefixError struct { prefix string }\n+\n+func (e URNPrefixError) Error() string {\n+\treturn fmt.Sprintf(\"invalid urn prefix: %q\", e.prefix)\n+}\n+\n+func (e URNPrefixError) Is(target error) bool {\n+\t_, ok := target.(URNPrefixError)\n+\treturn ok\n+}\n+\n+var ErrInvalidURNPrefix = URNPrefixError{}\n+\n type invalidLengthError struct{ len int }\n \n func (err invalidLengthError) Error() string {\n \treturn fmt.Sprintf(\"invalid UUID length: %d\", err.len)\n }\n \n+func (e invalidLengthError) Is(target error) bool {\n+\t_, ok := target.(invalidLengthError)\n+\treturn ok\n+}\n+\n+var ErrInvalidLength = invalidLengthError{}\n+\n // IsInvalidLengthError is matcher function for custom error invalidLengthError\n func IsInvalidLengthError(err error) bool {\n-\t_, ok := err.(invalidLengthError)\n-\treturn ok\n+\treturn errors.Is(err, ErrInvalidLength)\n }\n \n // Parse decodes s into a UUID or returns an error if it cannot be parsed.  Both\n@@ -79,7 +101,7 @@ func Parse(s string) (UUID, error) {\n \t// urn:uuid:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n \tcase 36 + 9:\n \t\tif !strings.EqualFold(s[:9], \"urn:uuid:\") {\n-\t\t\treturn uuid, fmt.Errorf(\"invalid urn prefix: %q\", s[:9])\n+\t\t\treturn uuid, URNPrefixError{s[:9]}\n \t\t}\n \t\ts = s[9:]\n \n@@ -93,7 +115,7 @@ func Parse(s string) (UUID, error) {\n \t\tfor i := range uuid {\n \t\t\tuuid[i], ok = xtob(s[i*2], s[i*2+1])\n \t\t\tif !ok {\n-\t\t\t\treturn uuid, errors.New(\"invalid UUID format\")\n+\t\t\t\treturn uuid, ErrInvalidUUIDFormat\n \t\t\t}\n \t\t}\n \t\treturn uuid, nil\n@@ -103,7 +125,8 @@ func Parse(s string) (UUID, error) {\n \t// s is now at least 36 bytes long\n \t// it must be of the form  xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n \tif s[8] != '-' || s[13] != '-' || s[18] != '-' || s[23] != '-' {\n-\t\treturn uuid, errors.New(\"invalid UUID format\")\n+\t\treturn uuid, ErrInvalidUUIDFormat\n+\n \t}\n \tfor i, x := range [16]int{\n \t\t0, 2, 4, 6,\n@@ -114,7 +137,7 @@ func Parse(s string) (UUID, error) {\n \t} {\n \t\tv, ok := xtob(s[x], s[x+1])\n \t\tif !ok {\n-\t\t\treturn uuid, errors.New(\"invalid UUID format\")\n+\t\t\treturn uuid, ErrInvalidUUIDFormat\n \t\t}\n \t\tuuid[i] = v\n \t}\n@@ -128,7 +151,7 @@ func ParseBytes(b []byte) (UUID, error) {\n \tcase 36: // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n \tcase 36 + 9: // urn:uuid:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n \t\tif !bytes.EqualFold(b[:9], []byte(\"urn:uuid:\")) {\n-\t\t\treturn uuid, fmt.Errorf(\"invalid urn prefix: %q\", b[:9])\n+\t\t\treturn uuid, URNPrefixError{string(b[:9])}\n \t\t}\n \t\tb = b[9:]\n \tcase 36 + 2: // {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}\n@@ -138,7 +161,7 @@ func ParseBytes(b []byte) (UUID, error) {\n \t\tfor i := 0; i < 32; i += 2 {\n \t\t\tuuid[i/2], ok = xtob(b[i], b[i+1])\n \t\t\tif !ok {\n-\t\t\t\treturn uuid, errors.New(\"invalid UUID format\")\n+\t\t\t\treturn uuid, ErrInvalidUUIDFormat\n \t\t\t}\n \t\t}\n \t\treturn uuid, nil\n@@ -148,7 +171,7 @@ func ParseBytes(b []byte) (UUID, error) {\n \t// s is now at least 36 bytes long\n \t// it must be of the form  xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n \tif b[8] != '-' || b[13] != '-' || b[18] != '-' || b[23] != '-' {\n-\t\treturn uuid, errors.New(\"invalid UUID format\")\n+\t\treturn uuid, ErrInvalidUUIDFormat\n \t}\n \tfor i, x := range [16]int{\n \t\t0, 2, 4, 6,\n@@ -159,7 +182,7 @@ func ParseBytes(b []byte) (UUID, error) {\n \t} {\n \t\tv, ok := xtob(b[x], b[x+1])\n \t\tif !ok {\n-\t\t\treturn uuid, errors.New(\"invalid UUID format\")\n+\t\t\treturn uuid, ErrInvalidUUIDFormat\n \t\t}\n \t\tuuid[i] = v\n \t}\n@@ -205,14 +228,14 @@ func Validate(s string) error {\n \t// UUID with \"urn:uuid:\" prefix\n \tcase 36 + 9:\n \t\tif !strings.EqualFold(s[:9], \"urn:uuid:\") {\n-\t\t\treturn fmt.Errorf(\"invalid urn prefix: %q\", s[:9])\n+\t\t\treturn URNPrefixError{s[:9]}\n \t\t}\n \t\ts = s[9:]\n \n \t// UUID enclosed in braces\n \tcase 36 + 2:\n \t\tif s[0] != '{' || s[len(s)-1] != '}' {\n-\t\t\treturn fmt.Errorf(\"invalid bracketed UUID format\")\n+\t\t\treturn ErrInvalidBracketedFormat\n \t\t}\n \t\ts = s[1 : len(s)-1]\n \n@@ -221,7 +244,7 @@ func Validate(s string) error {\n \t\tfor i := 0; i < len(s); i += 2 {\n \t\t\t_, ok := xtob(s[i], s[i+1])\n \t\t\tif !ok {\n-\t\t\t\treturn errors.New(\"invalid UUID format\")\n+\t\t\t\treturn ErrInvalidUUIDFormat\n \t\t\t}\n \t\t}\n \n@@ -232,11 +255,11 @@ func Validate(s string) error {\n \t// Check for standard UUID format\n \tif len(s) == 36 {\n \t\tif s[8] != '-' || s[13] != '-' || s[18] != '-' || s[23] != '-' {\n-\t\t\treturn errors.New(\"invalid UUID format\")\n+\t\t\treturn ErrInvalidUUIDFormat\n \t\t}\n \t\tfor _, x := range []int{0, 2, 4, 6, 9, 11, 14, 16, 19, 21, 24, 26, 28, 30, 32, 34} {\n \t\t\tif _, ok := xtob(s[x], s[x+1]); !ok {\n-\t\t\t\treturn errors.New(\"invalid UUID format\")\n+\t\t\t\treturn ErrInvalidUUIDFormat\n \t\t\t}\n \t\t}\n \t}",
+        "changes": 53
+      },
+      {
+        "path": "uuid_test.go",
+        "status": "modified",
+        "patch": "@@ -569,7 +569,7 @@ func TestWrongLength(t *testing.T) {\n func TestIsWrongLength(t *testing.T) {\n \t_, err := Parse(\"12345\")\n \tif !IsInvalidLengthError(err) {\n-\t\tt.Errorf(\"expected error type is invalidLengthError\")\n+\t\tt.Errorf(\"IsInvalidLength returned incorrect type %T\", err)\n \t}\n }\n ",
+        "changes": 2
+      }
+    ]
+  },
+  {
+    "sha": "16939dafc37a38d2743810a8bdf60fdad6a0f3a3",
+    "parents": [
+      "016b199544692f745ffc8867b914129ecb47ef06"
+    ],
+    "files": [
+      {
+        "path": "uuid_test.go",
+        "status": "modified",
+        "patch": "@@ -896,3 +896,35 @@ func TestVersion7Monotonicity(t *testing.T) {\n \t\tu1 = u2\n \t}\n }\n+\n+type fakeRand struct{}\n+\n+func (g fakeRand) Read(bs []byte) (int, error) {\n+\tfor i, _ := range bs {\n+\t\tbs[i] = 0x88\n+\t}\n+\treturn len(bs), nil\n+}\n+\n+func TestVersion7MonotonicityStrict(t *testing.T) {\n+\ttimeNow = func() time.Time {\n+\t\treturn time.Date(2008, 8, 8, 8, 8, 8, 8, time.UTC)\n+\t}\n+\tdefer func() {\n+\t\ttimeNow = time.Now\n+\t}()\n+\n+\tSetRand(fakeRand{})\n+\tdefer SetRand(nil)\n+\n+\tlength := 100000 // > 3906\n+\tu1 := Must(NewV7()).String()\n+\tfor i := 0; i < length; i++ {\n+\t\tu2 := Must(NewV7()).String()\n+\t\tif u2 <= u1 {\n+\t\t\tt.Errorf(\"monotonicity failed at #%d: %s(next) < %s(before)\", i, u2, u1)\n+\t\t\tbreak\n+\t\t}\n+\t\tu1 = u2\n+\t}\n+}",
+        "changes": 32
+      }
+    ]
+  },
+  {
+    "sha": "a2b2b32373ff0b1a312b7fdf6d38a977099698a6",
+    "parents": [
+      "c58770eb495f55fe2ced6284f93c5158a62e53e3"
+    ],
+    "files": [
+      {
+        "path": "uuid_test.go",
+        "status": "modified",
+        "patch": "@@ -825,7 +825,7 @@ func TestVersion6(t *testing.T) {\n func TestVersion7(t *testing.T) {\n \tSetRand(nil)\n \tm := make(map[string]bool)\n-\tfor x := 1; x < 32; x++ {\n+\tfor x := 1; x < 128; x++ {\n \t\tuuid, err := NewV7()\n \t\tif err != nil {\n \t\t\tt.Fatalf(\"could not create UUID: %v\", err)\n@@ -874,20 +874,25 @@ func TestVersion7_pooled(t *testing.T) {\n func TestVersion7FromReader(t *testing.T) {\n \tmyString := \"8059ddhdle77cb52\"\n \tr := bytes.NewReader([]byte(myString))\n-\tr2 := bytes.NewReader([]byte(myString))\n-\tuuid1, err := NewV7FromReader(r)\n+\t_, err := NewV7FromReader(r)\n \tif err != nil {\n \t\tt.Errorf(\"failed generating UUID from a reader\")\n \t}\n \t_, err = NewV7FromReader(r)\n \tif err == nil {\n \t\tt.Errorf(\"expecting an error as reader has no more bytes. Got uuid. NewV7FromReader may not be using the provided reader\")\n \t}\n-\tuuid3, err := NewV7FromReader(r2)\n-\tif err != nil {\n-\t\tt.Errorf(\"failed generating UUID from a reader\")\n-\t}\n-\tif uuid1 != uuid3 {\n-\t\tt.Errorf(\"expected duplicates, got %q and %q\", uuid1, uuid3)\n+}\n+\n+func TestVersion7Monotonicity(t *testing.T) {\n+\tlength := 10000\n+\tu1 := Must(NewV7()).String()\n+\tfor i := 0; i < length; i++ {\n+\t\tu2 := Must(NewV7()).String()\n+\t\tif u2 <= u1 {\n+\t\t\tt.Errorf(\"monotonicity failed at #%d: %s(next) < %s(before)\", i, u2, u1)\n+\t\t\tbreak\n+\t\t}\n+\t\tu1 = u2\n \t}\n }",
+        "changes": 23
+      },
+      {
+        "path": "version7.go",
+        "status": "modified",
+        "patch": "@@ -44,15 +44,15 @@ func NewV7FromReader(r io.Reader) (UUID, error) {\n \n // makeV7 fill 48 bits time (uuid[0] - uuid[5]), set version b0111 (uuid[6])\n // uuid[8] already has the right version number (Variant is 10)\n-// see function  NewV7 and NewV7FromReader\n+// see function NewV7 and NewV7FromReader\n func makeV7(uuid []byte) {\n \t/*\n \t\t 0                   1                   2                   3\n \t\t 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1\n \t\t+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n \t\t|                           unix_ts_ms                          |\n \t\t+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n-\t\t|          unix_ts_ms           |  ver  |       rand_a          |\n+\t\t|          unix_ts_ms           |  ver  |  rand_a (12 bit seq)  |\n \t\t+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n \t\t|var|                        rand_b                             |\n \t\t+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n@@ -61,7 +61,7 @@ func makeV7(uuid []byte) {\n \t*/\n \t_ = uuid[15] // bounds check\n \n-\tt := timeNow().UnixMilli()\n+\tt, s := getV7Time()\n \n \tuuid[0] = byte(t >> 40)\n \tuuid[1] = byte(t >> 32)\n@@ -70,6 +70,35 @@ func makeV7(uuid []byte) {\n \tuuid[4] = byte(t >> 8)\n \tuuid[5] = byte(t)\n \n-\tuuid[6] = 0x70 | (uuid[6] & 0x0F)\n-\t// uuid[8] has already has right version\n+\tuuid[6] = 0x70 | (0x0F & byte(s>>8))\n+\tuuid[7] = byte(s)\n+}\n+\n+// lastV7time is the last last time we returned stored as:\n+//\n+//\t52 bits of time in milliseconds since epoch\n+//\t12 bits of (fractional nanoseconds) >> 8\n+var lastV7time int64\n+\n+const nanoPerMilli = 1000000\n+\n+// getV7Time returns the time in milliseconds and nanoseconds / 256.\n+// The returned (milli << 12 + seq) is guarenteed to be greater than\n+// (milli << 12 + seq) returned by any previous call to getV7Time.\n+func getV7Time() (milli, seq int64) {\n+\ttimeMu.Lock()\n+\tdefer timeMu.Unlock()\n+\n+\tnano := timeNow().UnixNano()\n+\tmilli = nano / nanoPerMilli\n+\t// Sequence number is between 0 and 3906 (nanoPerMilli>>8)\n+\tseq = (nano - milli*nanoPerMilli) >> 8\n+\tnow := milli<<12 + seq\n+\tif now <= lastV7time {\n+\t\tnow = lastV7time + 1\n+\t\tmilli = now >> 12\n+\t\tseq = now & 0xfff\n+\t}\n+\tlastV7time = now\n+\treturn milli, seq\n }",
+        "changes": 39
+      }
+    ]
+  }
+]
