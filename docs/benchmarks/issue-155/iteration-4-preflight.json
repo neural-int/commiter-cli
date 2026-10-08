@@ -1,0 +1,1394 @@
+{
+  "protocol": {
+    "model": "mlx-community/Qwen3-8B-4bit@545dc4251c05440727734bcd94334791f6ab0192",
+    "helper_sha256": "bc61461f860957780394650f8b46fab2b737f9931917d0194a0f736e671b41a4",
+    "factual_observer_sha256": "95bcfe1f43726f6aaa598ba162156f0f83cee1b6031549d11d9c24b7fd750055",
+    "context_tokens": 16384,
+    "output_tokens": 1536,
+    "generation_profile": "bounded-routed-grammar-neutral",
+    "native_thought_tokens": 0,
+    "temperature": 0,
+    "top_p": 1,
+    "top_k": 0,
+    "seed": 144,
+    "calls": 6,
+    "per_call_seconds": 120,
+    "total_seconds": 720,
+    "retries": 0,
+    "repairs": 0,
+    "max_message_bytes": 32768,
+    "gate": "all six host-valid: exact source-derived value/type/return path or correctly unknown; this permits a local-fact bridge audit only, not #155 bounded attribution GO",
+    "exclusions": "no final groups, no arbitrary execution, no stage B/C, no natural intent holdout or production adoption",
+    "responsibility_difference": "LLM emits exact values and return witnesses; host verifies facts and may derive local observation effects. #149 H5/H12/H10 text deltas/global grouping are not repeated.",
+    "source_sha256": {
+      "local_facts.py": "3552ceb7533e1bf0838231a4142638ad4b306bdbd7a0cc41e57e25abb7dc1a1c",
+      "local_measure.py": "260a7a3b4d2ee78f7959f8612333b96aed2c013f8604a207f7a29a77e4106ae0"
+    }
+  },
+  "rows": [
+    {
+      "name": "fee-wrap",
+      "split": "used_diagnostic",
+      "payload": {
+        "queries": {
+          "Q001": {
+            "query": {
+              "package": ".",
+              "function": "Fee",
+              "arguments": [
+                101
+              ]
+            }
+          },
+          "Q002": {
+            "query": {
+              "package": ".",
+              "function": "Wrap",
+              "arguments": [
+                "a"
+              ]
+            }
+          }
+        },
+        "source_context": [
+          {
+            "id": "484f69025a0befc7bf91d689",
+            "file": "F003",
+            "version": "after",
+            "kind": "function_source",
+            "function": "Wrap",
+            "span": [
+              15,
+              62
+            ],
+            "text": "func Wrap(s string) string { return \"{\"+s+\"}\" }",
+            "source_sha256": "9d9693913394cfc8ef9cadf2a2ba3829556925af441d2b836c3dc4ca19de3093"
+          },
+          {
+            "id": "91ee56ef3b89b6bdc7c1e798",
+            "file": "F001",
+            "version": "before",
+            "kind": "function_source",
+            "function": "Fee",
+            "span": [
+              15,
+              51
+            ],
+            "text": "func Fee(n int) int { return n/100 }",
+            "source_sha256": "e11ffc4baf2fd0979b41425f6131c121eb25f905ce71634fcd7f2d56d113df90"
+          },
+          {
+            "id": "eb39135c131a73e5aff95f51",
+            "file": "F001",
+            "version": "after",
+            "kind": "function_source",
+            "function": "Fee",
+            "span": [
+              15,
+              56
+            ],
+            "text": "func Fee(n int) int { return (n+99)/100 }",
+            "source_sha256": "7d58a052ae067e68b50fb3f378154f949ec911b5fc6852e4e8071360ac9b8914"
+          },
+          {
+            "id": "fecdd33d722ddffdeeabc542",
+            "file": "F003",
+            "version": "before",
+            "kind": "function_source",
+            "function": "Wrap",
+            "span": [
+              15,
+              62
+            ],
+            "text": "func Wrap(s string) string { return \"(\"+s+\")\" }",
+            "source_sha256": "0eb6fed351017e40205c510ee3ce5810efdb711df13547f411db9e9804b36c99"
+          }
+        ],
+        "witnesses": [
+          {
+            "id": "W001",
+            "file": "F003",
+            "version": "before",
+            "kind": "return",
+            "span": [
+              44,
+              60
+            ],
+            "text": "return \"(\"+s+\")\"",
+            "source_sha256": "0eb6fed351017e40205c510ee3ce5810efdb711df13547f411db9e9804b36c99"
+          },
+          {
+            "id": "W002",
+            "file": "F001",
+            "version": "before",
+            "kind": "return",
+            "span": [
+              37,
+              49
+            ],
+            "text": "return n/100",
+            "source_sha256": "e11ffc4baf2fd0979b41425f6131c121eb25f905ce71634fcd7f2d56d113df90"
+          },
+          {
+            "id": "W003",
+            "file": "F003",
+            "version": "after",
+            "kind": "return",
+            "span": [
+              44,
+              60
+            ],
+            "text": "return \"{\"+s+\"}\"",
+            "source_sha256": "9d9693913394cfc8ef9cadf2a2ba3829556925af441d2b836c3dc4ca19de3093"
+          },
+          {
+            "id": "W004",
+            "file": "F001",
+            "version": "after",
+            "kind": "return",
+            "span": [
+              37,
+              54
+            ],
+            "text": "return (n+99)/100",
+            "source_sha256": "7d58a052ae067e68b50fb3f378154f949ec911b5fc6852e4e8071360ac9b8914"
+          }
+        ]
+      },
+      "oracle": {
+        "Q001": {
+          "after": {
+            "known": true,
+            "kind": "int",
+            "value": 2,
+            "return_refs": [
+              "W004"
+            ]
+          },
+          "before": {
+            "known": true,
+            "kind": "int",
+            "value": 1,
+            "return_refs": [
+              "W002"
+            ]
+          }
+        },
+        "Q002": {
+          "after": {
+            "known": true,
+            "kind": "string",
+            "value": "{a}",
+            "return_refs": [
+              "W003"
+            ]
+          },
+          "before": {
+            "known": true,
+            "kind": "string",
+            "value": "(a)",
+            "return_refs": [
+              "W001"
+            ]
+          }
+        }
+      },
+      "query_origins": [
+        "observed_test_call",
+        "observed_test_call"
+      ],
+      "payload_sha256": "6b6be7f92183436b466bef4c696a47b6c43ff91ccb3ea863b7d4a6b7d351914e",
+      "message_bytes": 5481,
+      "source_provenance": {
+        "repository": null,
+        "commit": null,
+        "parent": null,
+        "snapshots": [
+          {
+            "file": "F001",
+            "path": "fee.go",
+            "before_sha256": "e11ffc4baf2fd0979b41425f6131c121eb25f905ce71634fcd7f2d56d113df90",
+            "after_sha256": "7d58a052ae067e68b50fb3f378154f949ec911b5fc6852e4e8071360ac9b8914"
+          },
+          {
+            "file": "F002",
+            "path": "fee_test.go",
+            "before_sha256": "26570e1192496e1d195fc89591702e4fa9258d3585b15600f15f3b6098ea34d1",
+            "after_sha256": "af4d0e3e253a4eb0dd29d9771b557742c858226f4a3d28fcef9de50e8ecc706f"
+          },
+          {
+            "file": "F003",
+            "path": "wrap.go",
+            "before_sha256": "0eb6fed351017e40205c510ee3ce5810efdb711df13547f411db9e9804b36c99",
+            "after_sha256": "9d9693913394cfc8ef9cadf2a2ba3829556925af441d2b836c3dc4ca19de3093"
+          },
+          {
+            "file": "F004",
+            "path": "wrap_test.go",
+            "before_sha256": "fc839fabe615029bbbd38f3acabee436808810cfb77fd08ccf590254a504a4b3",
+            "after_sha256": "d50a3d6b0bad0724d84234724c4778422ad48bc10a7355c7ae924d441d0f8c99"
+          }
+        ]
+      },
+      "queries": [
+        {
+          "package": ".",
+          "function": "Fee",
+          "arguments": [
+            101
+          ]
+        },
+        {
+          "package": ".",
+          "function": "Wrap",
+          "arguments": [
+            "a"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shared-left-right",
+      "split": "used_diagnostic",
+      "payload": {
+        "queries": {
+          "Q001": {
+            "query": {
+              "package": ".",
+              "function": "Left",
+              "arguments": [
+                2
+              ]
+            }
+          },
+          "Q002": {
+            "query": {
+              "package": ".",
+              "function": "Right",
+              "arguments": [
+                2
+              ]
+            }
+          }
+        },
+        "source_context": [
+          {
+            "id": "13e38e5f97f5cddcaa600e78",
+            "file": "F001",
+            "version": "after",
+            "kind": "function_source",
+            "function": "Left",
+            "span": [
+              15,
+              48
+            ],
+            "text": "func Left(n int) int {return n+2}",
+            "source_sha256": "1576b0afb151cd22b77885f88c54cdb770d197c7bd55f96e081f1a16dafd465d"
+          },
+          {
+            "id": "1d107bc0fa619d756395d4fb",
+            "file": "F002",
+            "version": "before",
+            "kind": "function_source",
+            "function": "Right",
+            "span": [
+              15,
+              49
+            ],
+            "text": "func Right(n int) int {return n*2}",
+            "source_sha256": "8a6da8c7ca0ec748c3a1f795cf489eb07507f853ff24e7ff1b14ab4a11ec50de"
+          },
+          {
+            "id": "67e2392d7581de95ae5533e0",
+            "file": "F002",
+            "version": "after",
+            "kind": "function_source",
+            "function": "Right",
+            "span": [
+              15,
+              49
+            ],
+            "text": "func Right(n int) int {return n*3}",
+            "source_sha256": "aa7dac4904297d794aad45d5e3b1d38d254d190a4a8c0036443c04f06630cea2"
+          },
+          {
+            "id": "ee22037e9ea155c03a2e05e7",
+            "file": "F001",
+            "version": "before",
+            "kind": "function_source",
+            "function": "Left",
+            "span": [
+              15,
+              48
+            ],
+            "text": "func Left(n int) int {return n+1}",
+            "source_sha256": "9f86177e497ca1ed3656108427173208d99fd62a6e88b60d165adf021e1c3389"
+          }
+        ],
+        "witnesses": [
+          {
+            "id": "W001",
+            "file": "F002",
+            "version": "after",
+            "kind": "return",
+            "span": [
+              38,
+              48
+            ],
+            "text": "return n*3",
+            "source_sha256": "aa7dac4904297d794aad45d5e3b1d38d254d190a4a8c0036443c04f06630cea2"
+          },
+          {
+            "id": "W002",
+            "file": "F001",
+            "version": "after",
+            "kind": "return",
+            "span": [
+              37,
+              47
+            ],
+            "text": "return n+2",
+            "source_sha256": "1576b0afb151cd22b77885f88c54cdb770d197c7bd55f96e081f1a16dafd465d"
+          },
+          {
+            "id": "W003",
+            "file": "F002",
+            "version": "before",
+            "kind": "return",
+            "span": [
+              38,
+              48
+            ],
+            "text": "return n*2",
+            "source_sha256": "8a6da8c7ca0ec748c3a1f795cf489eb07507f853ff24e7ff1b14ab4a11ec50de"
+          },
+          {
+            "id": "W004",
+            "file": "F001",
+            "version": "before",
+            "kind": "return",
+            "span": [
+              37,
+              47
+            ],
+            "text": "return n+1",
+            "source_sha256": "9f86177e497ca1ed3656108427173208d99fd62a6e88b60d165adf021e1c3389"
+          }
+        ]
+      },
+      "oracle": {
+        "Q001": {
+          "after": {
+            "known": true,
+            "kind": "int",
+            "value": 4,
+            "return_refs": [
+              "W002"
+            ]
+          },
+          "before": {
+            "known": true,
+            "kind": "int",
+            "value": 3,
+            "return_refs": [
+              "W004"
+            ]
+          }
+        },
+        "Q002": {
+          "after": {
+            "known": true,
+            "kind": "int",
+            "value": 6,
+            "return_refs": [
+              "W001"
+            ]
+          },
+          "before": {
+            "known": true,
+            "kind": "int",
+            "value": 4,
+            "return_refs": [
+              "W003"
+            ]
+          }
+        }
+      },
+      "query_origins": [
+        "observed_test_call",
+        "observed_test_call"
+      ],
+      "payload_sha256": "cbe9dc6213dd350f5843b2b47a27d0e23e6cb487c2853f3ea4215987ba87f470",
+      "message_bytes": 5375,
+      "source_provenance": {
+        "repository": null,
+        "commit": null,
+        "parent": null,
+        "snapshots": [
+          {
+            "file": "F001",
+            "path": "left.go",
+            "before_sha256": "9f86177e497ca1ed3656108427173208d99fd62a6e88b60d165adf021e1c3389",
+            "after_sha256": "1576b0afb151cd22b77885f88c54cdb770d197c7bd55f96e081f1a16dafd465d"
+          },
+          {
+            "file": "F002",
+            "path": "right.go",
+            "before_sha256": "8a6da8c7ca0ec748c3a1f795cf489eb07507f853ff24e7ff1b14ab4a11ec50de",
+            "after_sha256": "aa7dac4904297d794aad45d5e3b1d38d254d190a4a8c0036443c04f06630cea2"
+          },
+          {
+            "file": "F003",
+            "path": "both_test.go",
+            "before_sha256": "1c38c08d88543e8664d6ad3eac45bd48cf299f9acee6976ec0aaec702072e312",
+            "after_sha256": "c9dee47c842d0e2197cae290f53cb4f975c0fd59921a1416ba3c5c68b6980994"
+          }
+        ]
+      },
+      "queries": [
+        {
+          "package": ".",
+          "function": "Left",
+          "arguments": [
+            2
+          ]
+        },
+        {
+          "package": ".",
+          "function": "Right",
+          "arguments": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "count-observed-and-control",
+      "split": "used_diagnostic_plus_control",
+      "payload": {
+        "queries": {
+          "Q001": {
+            "query": {
+              "package": ".",
+              "function": "Count",
+              "arguments": [
+                3
+              ]
+            }
+          },
+          "Q002": {
+            "query": {
+              "package": ".",
+              "function": "Count",
+              "arguments": [
+                -1
+              ]
+            }
+          }
+        },
+        "source_context": [
+          {
+            "id": "1ad465b3f861fc4c15649b02",
+            "file": "F001",
+            "version": "before",
+            "kind": "function_source",
+            "function": "Count",
+            "span": [
+              15,
+              49
+            ],
+            "text": "func Count(n int) int { return n }",
+            "source_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3"
+          },
+          {
+            "id": "58cc25299255c15ac6f33f20",
+            "file": "F001",
+            "version": "after",
+            "kind": "function_source",
+            "function": "Count",
+            "span": [
+              15,
+              68
+            ],
+            "text": "func Count(n int) int { if n<0 {return 0}; return n }",
+            "source_sha256": "3cac3666017391ff611e35057fdc6e7f9101f5201cc69ea683b2e171271fcae2"
+          }
+        ],
+        "witnesses": [
+          {
+            "id": "W001",
+            "file": "F001",
+            "version": "after",
+            "kind": "return",
+            "span": [
+              47,
+              55
+            ],
+            "text": "return 0",
+            "source_sha256": "3cac3666017391ff611e35057fdc6e7f9101f5201cc69ea683b2e171271fcae2"
+          },
+          {
+            "id": "W002",
+            "file": "F001",
+            "version": "before",
+            "kind": "return",
+            "span": [
+              39,
+              47
+            ],
+            "text": "return n",
+            "source_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3"
+          },
+          {
+            "id": "W003",
+            "file": "F001",
+            "version": "after",
+            "kind": "return",
+            "span": [
+              58,
+              66
+            ],
+            "text": "return n",
+            "source_sha256": "3cac3666017391ff611e35057fdc6e7f9101f5201cc69ea683b2e171271fcae2"
+          },
+          {
+            "id": "W004",
+            "file": "F001",
+            "version": "after",
+            "kind": "condition",
+            "span": [
+              42,
+              45
+            ],
+            "text": "n<0",
+            "source_sha256": "3cac3666017391ff611e35057fdc6e7f9101f5201cc69ea683b2e171271fcae2"
+          }
+        ]
+      },
+      "oracle": {
+        "Q001": {
+          "after": {
+            "known": true,
+            "kind": "int",
+            "value": 3,
+            "return_refs": [
+              "W003"
+            ]
+          },
+          "before": {
+            "known": true,
+            "kind": "int",
+            "value": 3,
+            "return_refs": [
+              "W002"
+            ]
+          }
+        },
+        "Q002": {
+          "after": {
+            "known": true,
+            "kind": "int",
+            "value": 0,
+            "return_refs": [
+              "W001"
+            ]
+          },
+          "before": {
+            "known": true,
+            "kind": "int",
+            "value": -1,
+            "return_refs": [
+              "W002"
+            ]
+          }
+        }
+      },
+      "query_origins": [
+        "observed_test_call",
+        "constructed_negative_argument_control"
+      ],
+      "payload_sha256": "f6c82d369841888bbd7bf95cce817efc6ff4d64e51698c5dd04f8c6a6a053005",
+      "message_bytes": 4806,
+      "source_provenance": {
+        "repository": null,
+        "commit": null,
+        "parent": null,
+        "snapshots": [
+          {
+            "file": "F001",
+            "path": "count.go",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "after_sha256": "3cac3666017391ff611e35057fdc6e7f9101f5201cc69ea683b2e171271fcae2"
+          },
+          {
+            "file": "F002",
+            "path": "count_test.go",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "after_sha256": "aab07f43be2e2a307862899d32d3949f18d0e85a42991ff6a1f8c265901cf09d"
+          }
+        ]
+      },
+      "queries": [
+        {
+          "package": ".",
+          "function": "Count",
+          "arguments": [
+            3
+          ]
+        },
+        {
+          "package": ".",
+          "function": "Count",
+          "arguments": [
+            -1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "no-observation",
+      "split": "development_scope_probe",
+      "payload": {
+        "queries": {
+          "Q001": {
+            "query": null
+          }
+        },
+        "source_context": [
+          {
+            "id": "61fcdcad89d56e3399c0baf4",
+            "file": "F001",
+            "version": "before",
+            "kind": "function_source",
+            "function": "Value",
+            "span": [
+              14,
+              46
+            ],
+            "text": "func Value(n int) int {return n}",
+            "source_sha256": "6dc1cf8efc3d129bdab660f4c65bfbec4bc3466c0cea55346583a470b425182d"
+          },
+          {
+            "id": "a24bdb06b6262b8df24751ef",
+            "file": "F001",
+            "version": "after",
+            "kind": "function_source",
+            "function": "Value",
+            "span": [
+              14,
+              48
+            ],
+            "text": "func Value(n int) int {return n+1}",
+            "source_sha256": "46242ea192a7b4f6e2e807637ba73d682ec936c417a86ff531c24c02756b8f1e"
+          }
+        ],
+        "witnesses": [
+          {
+            "id": "W001",
+            "file": "F001",
+            "version": "before",
+            "kind": "return",
+            "span": [
+              37,
+              45
+            ],
+            "text": "return n",
+            "source_sha256": "6dc1cf8efc3d129bdab660f4c65bfbec4bc3466c0cea55346583a470b425182d"
+          },
+          {
+            "id": "W002",
+            "file": "F001",
+            "version": "after",
+            "kind": "return",
+            "span": [
+              37,
+              47
+            ],
+            "text": "return n+1",
+            "source_sha256": "46242ea192a7b4f6e2e807637ba73d682ec936c417a86ff531c24c02756b8f1e"
+          }
+        ]
+      },
+      "oracle": {
+        "Q001": {
+          "after": {
+            "known": false,
+            "kind": "unknown",
+            "value": null,
+            "return_refs": []
+          },
+          "before": {
+            "known": false,
+            "kind": "unknown",
+            "value": null,
+            "return_refs": []
+          }
+        }
+      },
+      "query_origins": [
+        "no_test_observation"
+      ],
+      "payload_sha256": "fb38e30f83e7abddb66f93190cf6acf667daa4f35cf32f9f819212c8411596e6",
+      "message_bytes": 3163,
+      "source_provenance": {
+        "repository": null,
+        "commit": null,
+        "parent": null,
+        "snapshots": [
+          {
+            "file": "F001",
+            "path": "value.go",
+            "before_sha256": "6dc1cf8efc3d129bdab660f4c65bfbec4bc3466c0cea55346583a470b425182d",
+            "after_sha256": "46242ea192a7b4f6e2e807637ba73d682ec936c417a86ff531c24c02756b8f1e"
+          }
+        ]
+      },
+      "queries": [
+        null
+      ]
+    },
+    {
+      "name": "missing-callee",
+      "split": "development_scope_probe",
+      "payload": {
+        "queries": {
+          "Q001": {
+            "query": {
+              "package": ".",
+              "function": "Opaque",
+              "arguments": [
+                3
+              ]
+            }
+          }
+        },
+        "source_context": [
+          {
+            "id": "1305c2ef75f7f4d485cbf948",
+            "file": "F001",
+            "version": "after",
+            "kind": "function_source",
+            "function": "Opaque",
+            "span": [
+              14,
+              59
+            ],
+            "text": "func Opaque(n int) int {return Delegate(n)+1}",
+            "source_sha256": "121ac6082d0fadd5e98178d5cbec583419fce32a25892dde3be18f18c8ed29a5"
+          },
+          {
+            "id": "e4045babaa93719311270387",
+            "file": "F001",
+            "version": "before",
+            "kind": "function_source",
+            "function": "Opaque",
+            "span": [
+              14,
+              57
+            ],
+            "text": "func Opaque(n int) int {return Delegate(n)}",
+            "source_sha256": "75c1c8314182f050bf02ef527e1f9994057afb20b9616a54b8ffe18c9be30e12"
+          }
+        ],
+        "witnesses": [
+          {
+            "id": "W001",
+            "file": "F001",
+            "version": "after",
+            "kind": "return",
+            "span": [
+              38,
+              58
+            ],
+            "text": "return Delegate(n)+1",
+            "source_sha256": "121ac6082d0fadd5e98178d5cbec583419fce32a25892dde3be18f18c8ed29a5"
+          },
+          {
+            "id": "W002",
+            "file": "F001",
+            "version": "before",
+            "kind": "return",
+            "span": [
+              38,
+              56
+            ],
+            "text": "return Delegate(n)",
+            "source_sha256": "75c1c8314182f050bf02ef527e1f9994057afb20b9616a54b8ffe18c9be30e12"
+          }
+        ]
+      },
+      "oracle": {
+        "Q001": {
+          "after": {
+            "known": false,
+            "kind": "unknown",
+            "value": null,
+            "return_refs": []
+          },
+          "before": {
+            "known": false,
+            "kind": "unknown",
+            "value": null,
+            "return_refs": []
+          }
+        }
+      },
+      "query_origins": [
+        "missing_source_control"
+      ],
+      "payload_sha256": "fff78bd5f22dc9437bf21f3e68040f2ea9df209897b610837000aea3d091b037",
+      "message_bytes": 3264,
+      "source_provenance": {
+        "repository": null,
+        "commit": null,
+        "parent": null,
+        "snapshots": [
+          {
+            "file": "F001",
+            "path": "opaque.go",
+            "before_sha256": "75c1c8314182f050bf02ef527e1f9994057afb20b9616a54b8ffe18c9be30e12",
+            "after_sha256": "121ac6082d0fadd5e98178d5cbec583419fce32a25892dde3be18f18c8ed29a5"
+          }
+        ]
+      },
+      "queries": [
+        {
+          "package": ".",
+          "function": "Opaque",
+          "arguments": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "public-uuid-compare",
+      "split": "real_source_constructed_argument_probe",
+      "payload": {
+        "queries": {
+          "Q001": {
+            "query": {
+              "package": ".",
+              "function": "Compare",
+              "arguments": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  2
+                ]
+              ]
+            }
+          },
+          "Q002": {
+            "query": {
+              "package": ".",
+              "function": "Compare",
+              "arguments": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  2
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  2
+                ]
+              ]
+            }
+          },
+          "Q003": {
+            "query": {
+              "package": ".",
+              "function": "Compare",
+              "arguments": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  2
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              ]
+            }
+          }
+        },
+        "source_context": [
+          {
+            "id": "0164cab59ece97ecad267acc",
+            "file": "F001",
+            "version": "after",
+            "kind": "function_source",
+            "function": "Compare",
+            "span": [
+              2061,
+              2126
+            ],
+            "text": "func Compare(a, b UUID) int {\n\treturn bytes.Compare(a[:], b[:])\n}",
+            "source_sha256": "4237eba5a7bc7934b938c9b0bce5fa502d832e5660de71cbef130582e517f89e"
+          },
+          {
+            "id": "05e4674c3413fcd324930609",
+            "file": "F001",
+            "version": "after",
+            "kind": "import_source",
+            "function": "\"io\"",
+            "span": [
+              190,
+              194
+            ],
+            "text": "\"io\"",
+            "source_sha256": "4237eba5a7bc7934b938c9b0bce5fa502d832e5660de71cbef130582e517f89e"
+          },
+          {
+            "id": "0f2f7ef1f09c4efbebaaea99",
+            "file": "F003",
+            "version": "before",
+            "kind": "type_source",
+            "function": "invalidLengthError",
+            "span": [
+              1111,
+              1147
+            ],
+            "text": "invalidLengthError struct{ len int }",
+            "source_sha256": "0edec8e34c6b6fe0db31b71a29069a09ed832e3fd04ee0175916b58f2b60e5c1"
+          },
+          {
+            "id": "37f9cc54b1dad9d78c58f4f5",
+            "file": "F001",
+            "version": "after",
+            "kind": "import_source",
+            "function": "\"bytes\"",
+            "span": [
+              181,
+              188
+            ],
+            "text": "\"bytes\"",
+            "source_sha256": "4237eba5a7bc7934b938c9b0bce5fa502d832e5660de71cbef130582e517f89e"
+          },
+          {
+            "id": "6384c2df42d0d4531b3b160c",
+            "file": "F003",
+            "version": "after",
+            "kind": "type_source",
+            "function": "Variant",
+            "span": [
+              481,
+              493
+            ],
+            "text": "Variant byte",
+            "source_sha256": "0edec8e34c6b6fe0db31b71a29069a09ed832e3fd04ee0175916b58f2b60e5c1"
+          },
+          {
+            "id": "6e2205dcc79a0f30bc104005",
+            "file": "F003",
+            "version": "before",
+            "kind": "type_source",
+            "function": "UUIDs",
+            "span": [
+              9370,
+              9382
+            ],
+            "text": "UUIDs []UUID",
+            "source_sha256": "0edec8e34c6b6fe0db31b71a29069a09ed832e3fd04ee0175916b58f2b60e5c1"
+          },
+          {
+            "id": "760879cd3d53459901083c80",
+            "file": "F003",
+            "version": "before",
+            "kind": "type_source",
+            "function": "Version",
+            "span": [
+              420,
+              432
+            ],
+            "text": "Version byte",
+            "source_sha256": "0edec8e34c6b6fe0db31b71a29069a09ed832e3fd04ee0175916b58f2b60e5c1"
+          },
+          {
+            "id": "9d2877b7550b5dc7190472c4",
+            "file": "F003",
+            "version": "after",
+            "kind": "type_source",
+            "function": "UUIDs",
+            "span": [
+              9370,
+              9382
+            ],
+            "text": "UUIDs []UUID",
+            "source_sha256": "0edec8e34c6b6fe0db31b71a29069a09ed832e3fd04ee0175916b58f2b60e5c1"
+          },
+          {
+            "id": "9ec4a21f19cc625b61237e50",
+            "file": "F003",
+            "version": "after",
+            "kind": "type_source",
+            "function": "Version",
+            "span": [
+              420,
+              432
+            ],
+            "text": "Version byte",
+            "source_sha256": "0edec8e34c6b6fe0db31b71a29069a09ed832e3fd04ee0175916b58f2b60e5c1"
+          },
+          {
+            "id": "a410c8dd74100785ed780bf7",
+            "file": "F003",
+            "version": "after",
+            "kind": "type_source",
+            "function": "invalidLengthError",
+            "span": [
+              1111,
+              1147
+            ],
+            "text": "invalidLengthError struct{ len int }",
+            "source_sha256": "0edec8e34c6b6fe0db31b71a29069a09ed832e3fd04ee0175916b58f2b60e5c1"
+          },
+          {
+            "id": "d5789ded547317419a9e5784",
+            "file": "F003",
+            "version": "after",
+            "kind": "type_source",
+            "function": "UUID",
+            "span": [
+              358,
+              371
+            ],
+            "text": "UUID [16]byte",
+            "source_sha256": "0edec8e34c6b6fe0db31b71a29069a09ed832e3fd04ee0175916b58f2b60e5c1"
+          },
+          {
+            "id": "dbd809ced7d47f8f73ede977",
+            "file": "F003",
+            "version": "before",
+            "kind": "type_source",
+            "function": "UUID",
+            "span": [
+              358,
+              371
+            ],
+            "text": "UUID [16]byte",
+            "source_sha256": "0edec8e34c6b6fe0db31b71a29069a09ed832e3fd04ee0175916b58f2b60e5c1"
+          },
+          {
+            "id": "f4f7c99b357cf4621b700b3e",
+            "file": "F003",
+            "version": "before",
+            "kind": "type_source",
+            "function": "Variant",
+            "span": [
+              481,
+              493
+            ],
+            "text": "Variant byte",
+            "source_sha256": "0edec8e34c6b6fe0db31b71a29069a09ed832e3fd04ee0175916b58f2b60e5c1"
+          }
+        ],
+        "witnesses": [
+          {
+            "id": "W001",
+            "file": "F001",
+            "version": "after",
+            "kind": "return",
+            "span": [
+              2092,
+              2124
+            ],
+            "text": "return bytes.Compare(a[:], b[:])",
+            "source_sha256": "4237eba5a7bc7934b938c9b0bce5fa502d832e5660de71cbef130582e517f89e"
+          }
+        ]
+      },
+      "oracle": {
+        "Q001": {
+          "after": {
+            "known": true,
+            "kind": "int",
+            "value": -1,
+            "return_refs": [
+              "W001"
+            ]
+          },
+          "before": {
+            "known": false,
+            "kind": "unknown",
+            "value": null,
+            "return_refs": []
+          }
+        },
+        "Q002": {
+          "after": {
+            "known": true,
+            "kind": "int",
+            "value": 0,
+            "return_refs": [
+              "W001"
+            ]
+          },
+          "before": {
+            "known": false,
+            "kind": "unknown",
+            "value": null,
+            "return_refs": []
+          }
+        },
+        "Q003": {
+          "after": {
+            "known": true,
+            "kind": "int",
+            "value": 1,
+            "return_refs": [
+              "W001"
+            ]
+          },
+          "before": {
+            "known": false,
+            "kind": "unknown",
+            "value": null,
+            "return_refs": []
+          }
+        }
+      },
+      "query_origins": [
+        "constructed_lexicographic_inputs",
+        "constructed_lexicographic_inputs",
+        "constructed_lexicographic_inputs"
+      ],
+      "payload_sha256": "9cbf93aef008b7b1a4e624aebabb35fb35d19ec24cf6ffded209a96fcac1dcea",
+      "message_bytes": 8439,
+      "source_provenance": {
+        "repository": "https://github.com/google/uuid",
+        "commit": "e8d82d30a3eb641530570da83295395651911778",
+        "parent": "53dda83ebe99c23d0e66c2472abdbf178097c3b8",
+        "snapshots": [
+          {
+            "file": "F001",
+            "path": "util.go",
+            "before_sha256": "755f50afafb13dd89ae6177da7eb6dc31ae650ece2f9ba52821021e9f8de044e",
+            "after_sha256": "4237eba5a7bc7934b938c9b0bce5fa502d832e5660de71cbef130582e517f89e"
+          },
+          {
+            "file": "F003",
+            "path": "uuid.go",
+            "before_sha256": "0edec8e34c6b6fe0db31b71a29069a09ed832e3fd04ee0175916b58f2b60e5c1",
+            "after_sha256": "0edec8e34c6b6fe0db31b71a29069a09ed832e3fd04ee0175916b58f2b60e5c1"
+          }
+        ]
+      },
+      "queries": [
+        {
+          "package": ".",
+          "function": "Compare",
+          "arguments": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ]
+          ]
+        },
+        {
+          "package": ".",
+          "function": "Compare",
+          "arguments": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ]
+          ]
+        },
+        {
+          "package": ".",
+          "function": "Compare",
+          "arguments": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}
