@@ -1,0 +1,129 @@
+[
+  {
+    "Name": "fresh-independent-table-driven-shared-assertion",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/values.go",
+        "Before": "package calc\nfunc North() int { return 4 }\nfunc South() int { return 8 }\n",
+        "After": "package calc\nfunc North() int { return 6 }\nfunc South() int { return 0 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/both_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestBoth(t *testing.T) {\n cases := []struct{ got, want int }{\n  {calc.North(), 4},\n  {calc.South(), 8},\n }\n for _, c := range cases {\n  if c.got != c.want { t.Fatal(\"value\") }\n }\n}\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestBoth(t *testing.T) {\n cases := []struct{ got, want int }{\n  {calc.North(), 6},\n  {calc.South(), 0},\n }\n for _, c := range cases {\n  if c.got != c.want { t.Fatal(\"value\") }\n }\n}\n"
+      }
+    ],
+    "Repository": [],
+    "Requirements": [
+      "Leftの値と対応するassertionを独立更新",
+      "Rightの値と対応するassertionを独立更新"
+    ],
+    "IntentEdits": [
+      [
+        [
+          "F001",
+          "return 4",
+          "return 6"
+        ],
+        [
+          "F002",
+          "{calc.North(), 4}",
+          "{calc.North(), 6}"
+        ]
+      ],
+      [
+        [
+          "F001",
+          "return 8",
+          "return 0"
+        ],
+        [
+          "F002",
+          "{calc.South(), 8}",
+          "{calc.South(), 0}"
+        ]
+      ]
+    ],
+    "Split": "independent"
+  },
+  {
+    "Name": "fresh-independent-compensating-values",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/values.go",
+        "Before": "package calc\nfunc North() int { return 4 }\nfunc South() int { return 8 }\n",
+        "After": "package calc\nfunc North() int { return 6 }\nfunc South() int { return 6 }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R001",
+        "Path": "calc/total_test.go",
+        "Content": "package calc\nimport \"testing\"\nfunc TestTotal(t *testing.T) { if North()+South()!=12 { t.Fatal(\"total\") } }\n"
+      }
+    ],
+    "Requirements": [
+      "Leftの外部公開値を独立変更",
+      "Rightの外部公開値を独立変更"
+    ],
+    "IntentEdits": [
+      [
+        [
+          "F001",
+          "return 4",
+          "return 6"
+        ]
+      ],
+      [
+        [
+          "F001",
+          "return 8",
+          "return 6"
+        ]
+      ]
+    ],
+    "Split": "independent"
+  },
+  {
+    "Name": "fresh-independent-comment-only-absence",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/value.go",
+        "Before": "package calc\n// policy x\n// theme u\nfunc Value() int { return 1 }\n",
+        "After": "package calc\n// policy y\n// theme v\nfunc Value() int { return 1 }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R001",
+        "Path": "calc/value_test.go",
+        "Content": "package calc\nimport \"testing\"\nfunc TestValue(t *testing.T) { if Value()!=1 { t.Fatal(\"value\") } }\n"
+      }
+    ],
+    "Requirements": [
+      "mode説明の独立修正",
+      "color説明の独立修正"
+    ],
+    "IntentEdits": [
+      [
+        [
+          "F001",
+          "policy x",
+          "policy y"
+        ]
+      ],
+      [
+        [
+          "F001",
+          "theme u",
+          "theme v"
+        ]
+      ]
+    ],
+    "Split": "independent"
+  }
+]
