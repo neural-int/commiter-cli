@@ -1,0 +1,19 @@
+## 要約
+
+変更を包含する最小expressionの呼出と局所変数の構文的定義参照を観測した。使用済み反例で兄弟引数の混同を除き、変数経由期待値からValue依存を取得できた。構文観測の成立でありB Goではない。
+
+## 検証結果
+
+新標準Go AST toolはbinary expressionとcall引数を観測rootとし、局所変数の単一LHS/RHS定義を最大8段辿る。source1MiB制限。多値定義や非対応宣言はpartial_unknown、包含expressionがなければ評価側unknown。diagnostic3atomはcalls空、variable assertion atomはValue。係数source atomはbinary expressionでcalls空。既存tool/gold/model結果変更なし、model call0。
+
+新AST回帰テストとbuild、Python6test、diff check成功。今回のfixtureは使用済みで独立holdoutへ転用しない。結果をiteration-18-results.jsonへ分離保存した。
+
+## 考察
+
+statement全体ではなく変更expressionをrootにすることで兄弟引数を含めず、構文的な初期定義参照でstatement境界を越えた依存を観測できる。しかしこれはflow-sensitive解析ではない。再代入、shadowing、branch、loop、alias、methodsを完全には検証していない。observed_syntacticはsemantic成立/安全なmergeを意味しない。初期定義だけでは到達定義を誤る可能性があり、この候補をproductionやC入力へ採用しない。
+
+## Next Steps
+
+- 新規専用worktreeで再代入/分岐の未使用反例を固定し、構文定義と到達定義の違いを検証する。単一定義を辿る方式のunsafeな既知扱いを防ぐため。
+- 非対応control flowはunknownへ落とすhost contractを、再現した失敗だけを根拠に最小実装する。完全解析や依存追加へ拡大しないため。
+- 対応範囲を固定してから未使用source/testおよび独立診断変更の共通container model比較を行う。B Go、history/new file/rename/cost未達とproduction4file制約を保持する。
