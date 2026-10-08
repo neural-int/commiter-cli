@@ -1,0 +1,19 @@
+## 要約
+
+固定symbol-touch窓の集計contractを検証した。co-changeと別変更を同時保存し、unknown eventを関係集計から除外する。履歴のないsymbolはunknown_sparse_history。semantic品質は未評価でB No-Goを維持する。
+
+## 検証結果
+
+前回実commit観測6件へ明示的unknown_merge1件を加えた7eventを集計した。mergeは実merge抽出ではなくhost statusの契約検証。初期/new snapshot/rename identity/mergeの4eventはunknownとして除外。Left touches2、Right1、New0。Left/Rightはcochange1・separate_touches1。Newの2関係はunknown_sparse_history。raw保存しgold/modelを使用しない。
+
+窓64event/現在symbol64で超過は停止。sorted symbol順で出力し、初期/merge/rename/missingの未知4件、個別変更2件、一括1件、housekeeping1件を使う回帰testでunknown4・cochange1・separate2を確認。既存と合わせPython8test、diff check成功。
+
+## 考察
+
+別々に変わった履歴と一緒に変わった履歴は併存する。current symbolへの対応は現段階では同名symbolの明示入力のみで、rename追跡や実repositoryのcommit scannerは未対応。unknown eventの多い窓を十分な履歴と見なせず、両symbolに観測があってもshared intentは保証しない。window boundsは集計サイズの上限でありscanning latency/memory/cache全体の証明ではない。
+
+## Next Steps
+
+- 新規専用worktreeで実repository scannerを最大64commit/64selected symbolへ制限し、parent数・rename・snapshot欠落をunknownへ分類する。現段階の明示event入力を実commit取得contractへ接続するため。
+- 未使用の同一file独立symbolとcross-file連動symbolを含むhistory scheduleをgoldから独立に固定する。観測の成功を一般化signalの成功へ転用しないため。
+- scannerの再生成一致とabsenceを確認後、共通containerのA-only/history比較を行う。B Go、C、production拡張は未達のまま保持する。
