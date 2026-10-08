@@ -1,0 +1,40 @@
+--- a/Sources/commiter-mlx-helper/CommiterMLXHelper.swift
++++ b/Sources/commiter-mlx-helper/CommiterMLXHelper.swift
+@@ -236,8 +236,8 @@
+             ? request.model!
+             : URL(filePath: modelPath).lastPathComponent
+         if let profile = request.generationProfile {
+-            guard ["bounded-grouping", "bounded-category", "bounded-text", "bounded-global-contract", "bounded-routed-grouping", "bounded-routed-grammar"].contains(profile),
+-                  (modelID == "mlx-community/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2" || ((profile == "bounded-routed-grouping" || profile == "bounded-routed-grammar") && ["mlx-community/Qwen3.5-4B-MLX-4bit@32f3e8ecf65426fc3306969496342d504bfa13f3","mlx-community/Phi-4-mini-instruct-4bit@ac1c269cb4222a4e136a3d09edad301056c1f36a","ibm-granite/granite-4.2-3b-q4-mlx@0c6f39b1827afd5eb2c1c3b13751929857434953","mlx-community/NVIDIA-Nemotron-3-Nano-4B-4bit@c4d79ba1901d99806ef757642a552acebb851a35","mlx-community/Ministral-3-3B-Instruct-2512-4bit@a962dcb09eee4169c890e544c9eb938f1113fdee","mlx-community/Ministral-3-3B-Reasoning-2512-4bit@2cd2087aad40c28747f8ede17851de6035f12b16","mlx-community/Qwen3-8B-4bit@545dc4251c05440727734bcd94334791f6ab0192"].contains(modelID))) else {
++            guard ["bounded-grouping", "bounded-category", "bounded-text", "bounded-global-contract", "bounded-routed-grouping", "bounded-routed-grammar", "bounded-routed-grammar-neutral"].contains(profile),
++                  (modelID == "mlx-community/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2" || ((profile == "bounded-routed-grouping" || profile == "bounded-routed-grammar" || profile == "bounded-routed-grammar-neutral") && ["mlx-community/Qwen3.5-4B-MLX-4bit@32f3e8ecf65426fc3306969496342d504bfa13f3","mlx-community/Phi-4-mini-instruct-4bit@ac1c269cb4222a4e136a3d09edad301056c1f36a","ibm-granite/granite-4.2-3b-q4-mlx@0c6f39b1827afd5eb2c1c3b13751929857434953","mlx-community/NVIDIA-Nemotron-3-Nano-4B-4bit@c4d79ba1901d99806ef757642a552acebb851a35","mlx-community/Ministral-3-3B-Instruct-2512-4bit@a962dcb09eee4169c890e544c9eb938f1113fdee","mlx-community/Ministral-3-3B-Reasoning-2512-4bit@2cd2087aad40c28747f8ede17851de6035f12b16","mlx-community/Qwen3-8B-4bit@545dc4251c05440727734bcd94334791f6ab0192"].contains(modelID))) else {
+                 throw HelperError.malformedRequest
+             }
+         }
+@@ -332,7 +332,7 @@
+ 
+     private static func generateBounded(_ request: Request, profile: String, schema: String, context: ModelContext, counts: BenchmarkCounts) async throws -> String {
+         let nativeLimit = profile == "bounded-global-contract" ? 1024 : (profile == "bounded-grouping" ? 512 : (profile == "bounded-category" ? 384 : 0))
+-        let budget = (profile == "bounded-global-contract" || profile == "bounded-routed-grouping" || profile == "bounded-routed-grammar") ? 1536 : (profile == "bounded-category" ? 512 : 768)
++        let budget = (profile == "bounded-global-contract" || profile == "bounded-routed-grouping" || profile == "bounded-routed-grammar" || profile == "bounded-routed-grammar-neutral") ? 1536 : (profile == "bounded-category" ? 512 : 768)
+         guard request.outputTokens == budget, request.contextTokens > 0, request.contextTokens <= 16384 else {
+             throw HelperError.malformedRequest
+         }
+@@ -362,7 +362,7 @@
+             nativeState = state
+             components = GenerationComponents(logitProcessorFactory: { NativeThoughtBudgetProcessor(state: state) })
+         }
+-        if profile == "bounded-routed-grammar" {
++        if profile == "bounded-routed-grammar" || profile == "bounded-routed-grammar-neutral" {
+             let vocab = TokenizerVocabExtractor.extractForGrammar(from: context.tokenizer)
+             let tokenizer = try GrammarTokenizer(vocab: vocab.vocab, vocabType: vocab.vocabType, eosTokenId: Int32(context.tokenizer.eosTokenId ?? 0))
+             let factory: @Sendable () throws -> GrammarConstraint = { try GrammarConstraint(tokenizer: tokenizer, jsonSchema: schema, fastForward: false) }
+@@ -372,7 +372,7 @@
+                 if let id = context.tokenizer.convertTokenToId(token) { stops.insert(id) }
+             }
+             let state = GrammarSamplingState(constraint: try factory(), vocabSize: tokenizer.vocabSize,
+-                eos: context.tokenizer.eosTokenId ?? 0, whitespace: WhitespaceTokenBias.compute(tokenizer: context.tokenizer).tokenIDs,
++                eos: context.tokenizer.eosTokenId ?? 0, whitespace: profile == "bounded-routed-grammar-neutral" ? [] : WhitespaceTokenBias.compute(tokenizer: context.tokenizer).tokenIDs,
+                 runtimeStopIDs: stops, unknownID: context.tokenizer.unknownTokenId, alignRuntimeStops: true, factory: factory)
+             grammarState = state
+             components = GenerationComponents(logitProcessorFactory: { GrammarSamplingProcessor(state: state) })

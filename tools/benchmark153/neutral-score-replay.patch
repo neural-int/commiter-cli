@@ -1,0 +1,19 @@
+--- a/Tests/BoundedGenerationTests/ScoreWireGrammarTests.swift
++++ b/Tests/BoundedGenerationTests/ScoreWireGrammarTests.swift
+@@ -50,7 +50,7 @@
+             }
+             for vector in item.vectors {
+                 let state = GrammarSamplingState(constraint: try factory(), vocabSize: grammarTokenizer.vocabSize, eos: eos,
+-                    whitespace: WhitespaceTokenBias.compute(tokenizer: tokenizer).tokenIDs,
++                    whitespace: [],
+                     runtimeStopIDs: Set(stopIDs).union([eos]), unknownID: tokenizer.unknownTokenId,
+                     alignRuntimeStops: true, factory: factory)
+                 let tokens = tokenizer.encode(text: vector.output, addSpecialTokens: false)
+@@ -74,6 +74,6 @@
+         }
+         let report: [String: Any] = ["cases":cases.count,"prompt_checks":promptPasses,"legal_replays_accepted":accepted,"illegal_replays_rejected":rejected,"model_calls":0,"weights_loaded":false,"vocab_size":grammarTokenizer.vocabSize,"eos":eos,"score_spelling_trace":spellingTrace,"legal_replay_trace":replayTrace]
+         let data = try JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted,.sortedKeys])
+-        try data.write(to: URL(fileURLWithPath: "/tmp/issue153-score-wire-result.json"))
++        try data.write(to: URL(fileURLWithPath: "/tmp/issue153-neutral-score-replay.json"))
+     }
+ }
