@@ -45,3 +45,24 @@ func TestUnavailableObservationIsExplicitAndInvalidIDsReject(t *testing.T) {
 		t.Fatal("duplicate accepted")
 	}
 }
+
+func TestContextFactsRetainTypeDeclarationsAndLocalCallNames(t *testing.T) {
+	old := "package sample\ntype Result struct { N int }\nfunc Adapter() Result { return Core() }\nfunc Core() Result { return Result{N:1} }\n"
+	next := "package sample\ntype Result struct { N int; Count int }\nfunc Adapter() Result { return Core() }\nfunc Core() Result { return Result{N:2} }\n"
+	result, err := Extract(Request{[]Snapshot{{"F1", "value.go", old, next}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	changedTypes, adapterCalls := 0, 0
+	for _, e := range result.Evidence {
+		if e.Kind == "type_source" && e.Function == "Result" && e.Changed {
+			changedTypes++
+		}
+		if e.Kind == "function_source" && e.Function == "Adapter" && len(e.Calls) == 1 && e.Calls[0] == "Core" && !e.Changed {
+			adapterCalls++
+		}
+	}
+	if changedTypes != 2 || adapterCalls != 2 {
+		t.Fatalf("types=%d calls=%d", changedTypes, adapterCalls)
+	}
+}

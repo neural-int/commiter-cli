@@ -1,0 +1,2623 @@
+{
+  "contract": {
+    "model_calls": 0,
+    "context_method": "changed_top_level_declarations_plus_one_same_package_plain_call_step_exact_text_dedup",
+    "max_context_payload_bytes": 16384,
+    "fixture_sha256": "3bd81b50c071c93777d431151553e333664e564e516a2eda3023fe792fd2bca3",
+    "observer_sha256": "d1bb04c6035c2ae6167232365595114104b8e9062710be9387dabd9e2086a07f",
+    "context_source_sha256": "ea3610e50974b13598d5f9a216763ba2f6c7f77346bda65a66a3a2143e48f851",
+    "gate": "Source/budget/provenance preflight only; attribution schema+message budget+holdout+numerical capability gate still required",
+    "prior_scan_scope": [
+      "docs/benchmarks/issue-149",
+      "docs/benchmarks/issue-151",
+      "docs/benchmarks/issue-152",
+      "docs/benchmarks/issue-153",
+      "tools/benchmark149",
+      "tools/benchmark151",
+      "tools/benchmark152",
+      "tools/benchmark153"
+    ]
+  },
+  "rows": [
+    {
+      "name": "fresh-six-file-behaviors",
+      "split": "used_diagnostic",
+      "commit": null,
+      "parent": null,
+      "full_snapshot_bytes": 1717,
+      "context_payload_bytes": 7391,
+      "within_context_byte_bound": true,
+      "context_sha256": "e57e2bee2469615bf17c16900ad781de9fb0bbe072ad369a1d489ec210f28c4b",
+      "context": {
+        "context": [
+          {
+            "id": "ad6cca177b038a663aee40c0",
+            "kind": "function_source",
+            "symbol": "SafeRatio",
+            "text": "func SafeRatio(n,d int) int { if d==0 { return 0 }; return n/d }",
+            "source_refs": [
+              {
+                "id": "e7389eb356479016cf1a7cc9",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  17,
+                  81
+                ],
+                "source_sha256": "8c48a197a87cc9c1baa6998d4ba36e0eeedfce595998d90030053b4c682140de"
+              }
+            ]
+          },
+          {
+            "id": "9151578678ec6cbf9a792a4b",
+            "kind": "function_source",
+            "symbol": "SafeRatio",
+            "text": "func SafeRatio(n,d int) int { return n/d }",
+            "source_refs": [
+              {
+                "id": "cc22e5ab3d9d06fe1576e58d",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  17,
+                  59
+                ],
+                "source_sha256": "cc36a1e2968c2660eb345c13c6d362ec977601a6c3f5296e24c7bf955fcc903d"
+              }
+            ]
+          },
+          {
+            "id": "6d7311b3829d85a60a84a428",
+            "kind": "function_source",
+            "symbol": "TestSafeRatio",
+            "text": "func TestSafeRatio(t *testing.T) { if SafeRatio(8,2)!=4 {t.Fatal(\"ratio\")} }",
+            "source_refs": [
+              {
+                "id": "0154dd4b8e461f3ba48d8bff",
+                "file": "F002",
+                "version": "before",
+                "span": [
+                  34,
+                  110
+                ],
+                "source_sha256": "d2381bfce261c1ab5c2e9764196e59e05cf235ba8cb27f427d5538e6de32f87e"
+              }
+            ]
+          },
+          {
+            "id": "a0219a4879ad62f95f28c06f",
+            "kind": "function_source",
+            "symbol": "TestSafeRatio",
+            "text": "func TestSafeRatio(t *testing.T) { if SafeRatio(8,2)!=4 || SafeRatio(8,0)!=0 {t.Fatal(\"ratio\")} }",
+            "source_refs": [
+              {
+                "id": "1ad625a1e8083a1c6e7c9f0a",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  34,
+                  131
+                ],
+                "source_sha256": "0b057b16dd0a9e0e3f7ef827114cd670e6e853760dbe0474fa3a2f65733b6b2c"
+              }
+            ]
+          },
+          {
+            "id": "1affa477e6594d7529c0995f",
+            "kind": "import_source",
+            "symbol": "\"testing\"",
+            "text": "\"testing\"",
+            "source_refs": [
+              {
+                "id": "095bc76c03776b7f48842d51",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  24,
+                  33
+                ],
+                "source_sha256": "0b057b16dd0a9e0e3f7ef827114cd670e6e853760dbe0474fa3a2f65733b6b2c"
+              },
+              {
+                "id": "472899e059f96ed88f745640",
+                "file": "F002",
+                "version": "before",
+                "span": [
+                  24,
+                  33
+                ],
+                "source_sha256": "d2381bfce261c1ab5c2e9764196e59e05cf235ba8cb27f427d5538e6de32f87e"
+              }
+            ]
+          },
+          {
+            "id": "801a10aa958ce8fa1b922874",
+            "kind": "function_source",
+            "symbol": "NormalLabel",
+            "text": "func NormalLabel(s string) string { return strings.ToLower(s) }",
+            "source_refs": [
+              {
+                "id": "7a3e63454410b200f8bfc13e",
+                "file": "F003",
+                "version": "before",
+                "span": [
+                  34,
+                  97
+                ],
+                "source_sha256": "57f1963ebe238587f3999e885750acbbd315e2b80a7f22364e6a6b48597a0557"
+              }
+            ]
+          },
+          {
+            "id": "ccee1d9fbfae878d0f66dd37",
+            "kind": "function_source",
+            "symbol": "NormalLabel",
+            "text": "func NormalLabel(s string) string { return strings.ToLower(strings.TrimSpace(s)) }",
+            "source_refs": [
+              {
+                "id": "4e1f134a53a2021de3821a77",
+                "file": "F003",
+                "version": "after",
+                "span": [
+                  34,
+                  116
+                ],
+                "source_sha256": "31709789637beb3920a745a4f25c02459aa5f5f3a47e993dab3c5887dafdba27"
+              }
+            ]
+          },
+          {
+            "id": "2c719ffa12d0bc5d5c0f185c",
+            "kind": "import_source",
+            "symbol": "\"strings\"",
+            "text": "\"strings\"",
+            "source_refs": [
+              {
+                "id": "4e028ea51a7e16fa46e8bb8a",
+                "file": "F003",
+                "version": "after",
+                "span": [
+                  24,
+                  33
+                ],
+                "source_sha256": "31709789637beb3920a745a4f25c02459aa5f5f3a47e993dab3c5887dafdba27"
+              },
+              {
+                "id": "5e5ca91960fe406accd51cc6",
+                "file": "F003",
+                "version": "before",
+                "span": [
+                  24,
+                  33
+                ],
+                "source_sha256": "57f1963ebe238587f3999e885750acbbd315e2b80a7f22364e6a6b48597a0557"
+              }
+            ]
+          },
+          {
+            "id": "b0f8d23f8e272c84fc19dbb7",
+            "kind": "function_source",
+            "symbol": "TestNormalLabel",
+            "text": "func TestNormalLabel(t *testing.T) { if NormalLabel(\" A \")!=\" a \" {t.Fatal(\"label\")} }",
+            "source_refs": [
+              {
+                "id": "afee1a06efcfb8f2bcdf3cb6",
+                "file": "F004",
+                "version": "before",
+                "span": [
+                  34,
+                  120
+                ],
+                "source_sha256": "478190a7c8d7eebabc7cad06323c2fbe7297b9ce9d5dac39c2c50345d371f0b1"
+              }
+            ]
+          },
+          {
+            "id": "cce70107006fa9cf2c799979",
+            "kind": "function_source",
+            "symbol": "TestNormalLabel",
+            "text": "func TestNormalLabel(t *testing.T) { if NormalLabel(\" A \")!=\"a\" {t.Fatal(\"label\")} }",
+            "source_refs": [
+              {
+                "id": "a5f1fc65055ad3c0db5a7a34",
+                "file": "F004",
+                "version": "after",
+                "span": [
+                  34,
+                  118
+                ],
+                "source_sha256": "7734f334ee8dd4599a70e544c837c1e4ae1518062076a797af2d1516c2650bf2"
+              }
+            ]
+          },
+          {
+            "id": "387a825314d94a0e397dfa2e",
+            "kind": "import_source",
+            "symbol": "\"testing\"",
+            "text": "\"testing\"",
+            "source_refs": [
+              {
+                "id": "f43cc0b191da894fe59b6d09",
+                "file": "F004",
+                "version": "after",
+                "span": [
+                  24,
+                  33
+                ],
+                "source_sha256": "7734f334ee8dd4599a70e544c837c1e4ae1518062076a797af2d1516c2650bf2"
+              },
+              {
+                "id": "fa22f9aa01d8ce76285d1b72",
+                "file": "F004",
+                "version": "before",
+                "span": [
+                  24,
+                  33
+                ],
+                "source_sha256": "478190a7c8d7eebabc7cad06323c2fbe7297b9ce9d5dac39c2c50345d371f0b1"
+              }
+            ]
+          },
+          {
+            "id": "f0c7699cb382bb13b5bf0c76",
+            "kind": "function_source",
+            "symbol": "BoundLevel",
+            "text": "func BoundLevel(n int) int { if n<0 {return 0}; if n>100 {return 100}; return n }",
+            "source_refs": [
+              {
+                "id": "3f2e4f023b70eef8caa60e89",
+                "file": "F005",
+                "version": "after",
+                "span": [
+                  17,
+                  98
+                ],
+                "source_sha256": "4b55b562a15894ef487940435d2dfda60e3ee819b95b762a8862a1cb8bc7a869"
+              }
+            ]
+          },
+          {
+            "id": "b1f9f6a0f173f7e8347bfc85",
+            "kind": "function_source",
+            "symbol": "BoundLevel",
+            "text": "func BoundLevel(n int) int { if n<0 {return 0}; return n }",
+            "source_refs": [
+              {
+                "id": "35ddf33fbd4a5595e229f8e4",
+                "file": "F005",
+                "version": "before",
+                "span": [
+                  17,
+                  75
+                ],
+                "source_sha256": "90241ab02e07794a99127d9482ab9eb66a08d4a6e387ea6435d334c09ac13b28"
+              }
+            ]
+          },
+          {
+            "id": "43e7778f49dc5d4e5a348fed",
+            "kind": "function_source",
+            "symbol": "TestBoundLevel",
+            "text": "func TestBoundLevel(t *testing.T) { if BoundLevel(-1)!=0 || BoundLevel(101)!=100 {t.Fatal(\"level\")} }",
+            "source_refs": [
+              {
+                "id": "a6c8b9b7869b5af7fffe7357",
+                "file": "F006",
+                "version": "after",
+                "span": [
+                  34,
+                  135
+                ],
+                "source_sha256": "1214f00ca9c92b63477b02f91f96c34e8c9ef37a832e4bf71623e64ab176b690"
+              }
+            ]
+          },
+          {
+            "id": "34d8a56d4ea627b57230cb07",
+            "kind": "function_source",
+            "symbol": "TestBoundLevel",
+            "text": "func TestBoundLevel(t *testing.T) { if BoundLevel(-1)!=0 || BoundLevel(101)!=101 {t.Fatal(\"level\")} }",
+            "source_refs": [
+              {
+                "id": "8814322ec11de4eddfbf5f57",
+                "file": "F006",
+                "version": "before",
+                "span": [
+                  34,
+                  135
+                ],
+                "source_sha256": "d05d6c548e6eabf2efefbc79546bee6add7d7588e20c000448ee31732cfbdf1a"
+              }
+            ]
+          },
+          {
+            "id": "88085e67bb2321b93e78ef39",
+            "kind": "import_source",
+            "symbol": "\"testing\"",
+            "text": "\"testing\"",
+            "source_refs": [
+              {
+                "id": "b99d3450fa7822343492848d",
+                "file": "F006",
+                "version": "before",
+                "span": [
+                  24,
+                  33
+                ],
+                "source_sha256": "d05d6c548e6eabf2efefbc79546bee6add7d7588e20c000448ee31732cfbdf1a"
+              },
+              {
+                "id": "c45b6796c16ecb45deda9b8d",
+                "file": "F006",
+                "version": "after",
+                "span": [
+                  24,
+                  33
+                ],
+                "source_sha256": "1214f00ca9c92b63477b02f91f96c34e8c9ef37a832e4bf71623e64ab176b690"
+              }
+            ]
+          }
+        ],
+        "anchors": [
+          {
+            "id": "783be53824b82ce53533cb15",
+            "file": "F002",
+            "version": "after",
+            "span": [
+              93,
+              110
+            ],
+            "text": "SafeRatio(8,0)!=0",
+            "source_sha256": "0b057b16dd0a9e0e3f7ef827114cd670e6e853760dbe0474fa3a2f65733b6b2c",
+            "condition_span": [
+              72,
+              110
+            ],
+            "context_id": "a0219a4879ad62f95f28c06f"
+          },
+          {
+            "id": "8b3c44395593c368b29bc1d5",
+            "file": "F006",
+            "version": "before",
+            "span": [
+              94,
+              114
+            ],
+            "text": "BoundLevel(101)!=101",
+            "source_sha256": "d05d6c548e6eabf2efefbc79546bee6add7d7588e20c000448ee31732cfbdf1a",
+            "condition_span": [
+              73,
+              114
+            ],
+            "context_id": "34d8a56d4ea627b57230cb07"
+          },
+          {
+            "id": "9297b5a9cef6d3ac3230c28b",
+            "file": "F004",
+            "version": "before",
+            "span": [
+              74,
+              99
+            ],
+            "text": "NormalLabel(\" A \")!=\" a \"",
+            "source_sha256": "478190a7c8d7eebabc7cad06323c2fbe7297b9ce9d5dac39c2c50345d371f0b1",
+            "condition_span": [
+              74,
+              99
+            ],
+            "context_id": "b0f8d23f8e272c84fc19dbb7"
+          },
+          {
+            "id": "e224d68836573bc0edc54750",
+            "file": "F004",
+            "version": "after",
+            "span": [
+              74,
+              97
+            ],
+            "text": "NormalLabel(\" A \")!=\"a\"",
+            "source_sha256": "7734f334ee8dd4599a70e544c837c1e4ae1518062076a797af2d1516c2650bf2",
+            "condition_span": [
+              74,
+              97
+            ],
+            "context_id": "cce70107006fa9cf2c799979"
+          },
+          {
+            "id": "ff2f12690667a0b897387a3b",
+            "file": "F006",
+            "version": "after",
+            "span": [
+              94,
+              114
+            ],
+            "text": "BoundLevel(101)!=100",
+            "source_sha256": "1214f00ca9c92b63477b02f91f96c34e8c9ef37a832e4bf71623e64ab176b690",
+            "condition_span": [
+              73,
+              114
+            ],
+            "context_id": "43e7778f49dc5d4e5a348fed"
+          }
+        ],
+        "unresolved_calls": []
+      },
+      "deterministic": true,
+      "prior_test_symbol_hits": {
+        "TestSafeRatio": [
+          "docs/benchmarks/issue-153/iteration-17-partial-validation.json",
+          "docs/benchmarks/issue-153/iteration-18-projection-diffs.json",
+          "tools/benchmark153/multifile_fixture.py",
+          "tools/benchmark153/multifile-fixture.json",
+          "tools/benchmark153/policy-fixtures.json"
+        ],
+        "TestNormalLabel": [
+          "docs/benchmarks/issue-153/iteration-17-partial-validation.json",
+          "docs/benchmarks/issue-153/iteration-18-projection-diffs.json",
+          "tools/benchmark153/multifile_fixture.py",
+          "tools/benchmark153/multifile-fixture.json",
+          "tools/benchmark153/policy-fixtures.json"
+        ],
+        "TestBoundLevel": [
+          "docs/benchmarks/issue-153/iteration-17-partial-validation.json",
+          "tools/benchmark153/multifile_fixture.py",
+          "tools/benchmark153/multifile-fixture.json",
+          "tools/benchmark153/policy-fixtures.json"
+        ]
+      },
+      "model_calls": 0,
+      "holdout_certified": false,
+      "semantic_quality": null
+    },
+    {
+      "name": "fee-rounding-and-wrap",
+      "split": "used_diagnostic",
+      "commit": null,
+      "parent": null,
+      "full_snapshot_bytes": 916,
+      "context_payload_bytes": 4554,
+      "within_context_byte_bound": true,
+      "context_sha256": "f8b09c99903becefa433ec143a1c99689c8656a04594255b2a974e754bace9d4",
+      "context": {
+        "context": [
+          {
+            "id": "0bbac42912da6569038fad23",
+            "kind": "function_source",
+            "symbol": "Fee",
+            "text": "func Fee(n int) int { return (n+99)/100 }",
+            "source_refs": [
+              {
+                "id": "eb39135c131a73e5aff95f51",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  15,
+                  56
+                ],
+                "source_sha256": "7d58a052ae067e68b50fb3f378154f949ec911b5fc6852e4e8071360ac9b8914"
+              }
+            ]
+          },
+          {
+            "id": "bd785f0fe76c85b909d409a5",
+            "kind": "function_source",
+            "symbol": "Fee",
+            "text": "func Fee(n int) int { return n/100 }",
+            "source_refs": [
+              {
+                "id": "91ee56ef3b89b6bdc7c1e798",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  15,
+                  51
+                ],
+                "source_sha256": "e11ffc4baf2fd0979b41425f6131c121eb25f905ce71634fcd7f2d56d113df90"
+              }
+            ]
+          },
+          {
+            "id": "d10744ff04b2d978a6b619bb",
+            "kind": "function_source",
+            "symbol": "TestFee",
+            "text": "func TestFee(t *testing.T) { if Fee(101)!=1 {t.Fatal(\"fee\")} }",
+            "source_refs": [
+              {
+                "id": "32dbacc7dda61bfffc467a2f",
+                "file": "F002",
+                "version": "before",
+                "span": [
+                  32,
+                  94
+                ],
+                "source_sha256": "26570e1192496e1d195fc89591702e4fa9258d3585b15600f15f3b6098ea34d1"
+              }
+            ]
+          },
+          {
+            "id": "52b4766a381481d5058b0e32",
+            "kind": "function_source",
+            "symbol": "TestFee",
+            "text": "func TestFee(t *testing.T) { if Fee(101)!=2 {t.Fatal(\"fee\")} }",
+            "source_refs": [
+              {
+                "id": "dacdbac5cd2d0b8e2d5ddaff",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  32,
+                  94
+                ],
+                "source_sha256": "af4d0e3e253a4eb0dd29d9771b557742c858226f4a3d28fcef9de50e8ecc706f"
+              }
+            ]
+          },
+          {
+            "id": "f1b36591e5890989512be202",
+            "kind": "import_source",
+            "symbol": "\"testing\"",
+            "text": "\"testing\"",
+            "source_refs": [
+              {
+                "id": "5b6868bbd69633fda5e5b582",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "af4d0e3e253a4eb0dd29d9771b557742c858226f4a3d28fcef9de50e8ecc706f"
+              },
+              {
+                "id": "81d677a975048d723353c4f3",
+                "file": "F002",
+                "version": "before",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "26570e1192496e1d195fc89591702e4fa9258d3585b15600f15f3b6098ea34d1"
+              }
+            ]
+          },
+          {
+            "id": "8f9444165380be2bcd54ca63",
+            "kind": "function_source",
+            "symbol": "Wrap",
+            "text": "func Wrap(s string) string { return \"(\"+s+\")\" }",
+            "source_refs": [
+              {
+                "id": "fecdd33d722ddffdeeabc542",
+                "file": "F003",
+                "version": "before",
+                "span": [
+                  15,
+                  62
+                ],
+                "source_sha256": "0eb6fed351017e40205c510ee3ce5810efdb711df13547f411db9e9804b36c99"
+              }
+            ]
+          },
+          {
+            "id": "6f7909e44e89a9483121af05",
+            "kind": "function_source",
+            "symbol": "Wrap",
+            "text": "func Wrap(s string) string { return \"{\"+s+\"}\" }",
+            "source_refs": [
+              {
+                "id": "484f69025a0befc7bf91d689",
+                "file": "F003",
+                "version": "after",
+                "span": [
+                  15,
+                  62
+                ],
+                "source_sha256": "9d9693913394cfc8ef9cadf2a2ba3829556925af441d2b836c3dc4ca19de3093"
+              }
+            ]
+          },
+          {
+            "id": "b7eb579507bcdb69fd95a5ac",
+            "kind": "function_source",
+            "symbol": "TestWrap",
+            "text": "func TestWrap(t *testing.T) { if Wrap(\"a\")!=\"(a)\" {t.Fatal(\"wrap\")} }",
+            "source_refs": [
+              {
+                "id": "81984990a91c25110bca5a5e",
+                "file": "F004",
+                "version": "before",
+                "span": [
+                  32,
+                  101
+                ],
+                "source_sha256": "fc839fabe615029bbbd38f3acabee436808810cfb77fd08ccf590254a504a4b3"
+              }
+            ]
+          },
+          {
+            "id": "4d3f36401db2ab94fe3bfd65",
+            "kind": "function_source",
+            "symbol": "TestWrap",
+            "text": "func TestWrap(t *testing.T) { if Wrap(\"a\")!=\"{a}\" {t.Fatal(\"wrap\")} }",
+            "source_refs": [
+              {
+                "id": "4a75d573a2dc5f149af922f7",
+                "file": "F004",
+                "version": "after",
+                "span": [
+                  32,
+                  101
+                ],
+                "source_sha256": "d50a3d6b0bad0724d84234724c4778422ad48bc10a7355c7ae924d441d0f8c99"
+              }
+            ]
+          },
+          {
+            "id": "a45f1d720f7f2a36153ee72a",
+            "kind": "import_source",
+            "symbol": "\"testing\"",
+            "text": "\"testing\"",
+            "source_refs": [
+              {
+                "id": "3fa544652b657f80991aeff5",
+                "file": "F004",
+                "version": "after",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "d50a3d6b0bad0724d84234724c4778422ad48bc10a7355c7ae924d441d0f8c99"
+              },
+              {
+                "id": "5e9e7cf82e8fc360ddc81d9f",
+                "file": "F004",
+                "version": "before",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "fc839fabe615029bbbd38f3acabee436808810cfb77fd08ccf590254a504a4b3"
+              }
+            ]
+          }
+        ],
+        "anchors": [
+          {
+            "id": "2e33d396564bdd6b69d9f3cb",
+            "file": "F004",
+            "version": "after",
+            "span": [
+              65,
+              81
+            ],
+            "text": "Wrap(\"a\")!=\"{a}\"",
+            "source_sha256": "d50a3d6b0bad0724d84234724c4778422ad48bc10a7355c7ae924d441d0f8c99",
+            "condition_span": [
+              65,
+              81
+            ],
+            "context_id": "4d3f36401db2ab94fe3bfd65"
+          },
+          {
+            "id": "767390b9584ac828cb9e132e",
+            "file": "F004",
+            "version": "before",
+            "span": [
+              65,
+              81
+            ],
+            "text": "Wrap(\"a\")!=\"(a)\"",
+            "source_sha256": "fc839fabe615029bbbd38f3acabee436808810cfb77fd08ccf590254a504a4b3",
+            "condition_span": [
+              65,
+              81
+            ],
+            "context_id": "b7eb579507bcdb69fd95a5ac"
+          },
+          {
+            "id": "7bf4cf392583477ac815359e",
+            "file": "F002",
+            "version": "before",
+            "span": [
+              64,
+              75
+            ],
+            "text": "Fee(101)!=1",
+            "source_sha256": "26570e1192496e1d195fc89591702e4fa9258d3585b15600f15f3b6098ea34d1",
+            "condition_span": [
+              64,
+              75
+            ],
+            "context_id": "d10744ff04b2d978a6b619bb"
+          },
+          {
+            "id": "8ccb5f3ee4fd33add23ae37c",
+            "file": "F002",
+            "version": "after",
+            "span": [
+              64,
+              75
+            ],
+            "text": "Fee(101)!=2",
+            "source_sha256": "af4d0e3e253a4eb0dd29d9771b557742c858226f4a3d28fcef9de50e8ecc706f",
+            "condition_span": [
+              64,
+              75
+            ],
+            "context_id": "52b4766a381481d5058b0e32"
+          }
+        ],
+        "unresolved_calls": []
+      },
+      "deterministic": true,
+      "prior_test_symbol_hits": {
+        "TestWrap": [
+          "tools/benchmark153/policy_ablation.py",
+          "tools/benchmark153/policy-fixtures.json"
+        ],
+        "TestFee": [
+          "tools/benchmark153/policy_ablation.py",
+          "tools/benchmark153/policy-fixtures.json"
+        ]
+      },
+      "model_calls": 0,
+      "holdout_certified": false,
+      "semantic_quality": null
+    },
+    {
+      "name": "same-call-independent-diagnostic",
+      "split": "used_diagnostic",
+      "commit": null,
+      "parent": null,
+      "full_snapshot_bytes": 481,
+      "context_payload_bytes": 1812,
+      "within_context_byte_bound": true,
+      "context_sha256": "f6a61e01cd82501f590d2a579e62259fd76b37dbe012f398694ac1d8e5fc9f40",
+      "context": {
+        "context": [
+          {
+            "id": "991c2a9f6292277bebc798da",
+            "kind": "function_source",
+            "symbol": "Count",
+            "text": "func Count(n int) int { if n<0 {return 0}; return n }",
+            "source_refs": [
+              {
+                "id": "58cc25299255c15ac6f33f20",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  15,
+                  68
+                ],
+                "source_sha256": "3cac3666017391ff611e35057fdc6e7f9101f5201cc69ea683b2e171271fcae2"
+              }
+            ]
+          },
+          {
+            "id": "1ade290a94fcc3a9a588c14e",
+            "kind": "function_source",
+            "symbol": "Count",
+            "text": "func Count(n int) int { return n }",
+            "source_refs": [
+              {
+                "id": "1ad465b3f861fc4c15649b02",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  15,
+                  49
+                ],
+                "source_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3"
+              }
+            ]
+          },
+          {
+            "id": "964c2a4075303dc9d08ea196",
+            "kind": "function_source",
+            "symbol": "TestCount",
+            "text": "func TestCount(t *testing.T) { if Count(3)!=3 {t.Fatal(\"count\")} }",
+            "source_refs": [
+              {
+                "id": "82083880b3ee0011acdf9a55",
+                "file": "F002",
+                "version": "before",
+                "span": [
+                  32,
+                  98
+                ],
+                "source_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289"
+              }
+            ]
+          },
+          {
+            "id": "fe34395febf9714bb8fb3685",
+            "kind": "function_source",
+            "symbol": "TestCount",
+            "text": "func TestCount(t *testing.T) { if Count(3)!=3 {t.Fatal(\"unexpected positive count\")} }",
+            "source_refs": [
+              {
+                "id": "22b01387906514fcbe58995c",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  32,
+                  118
+                ],
+                "source_sha256": "aab07f43be2e2a307862899d32d3949f18d0e85a42991ff6a1f8c265901cf09d"
+              }
+            ]
+          },
+          {
+            "id": "c6214dfa9a5f178c5b8bbdc5",
+            "kind": "import_source",
+            "symbol": "\"testing\"",
+            "text": "\"testing\"",
+            "source_refs": [
+              {
+                "id": "146fae0dbdb7b0a76ddc9df0",
+                "file": "F002",
+                "version": "before",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289"
+              },
+              {
+                "id": "856ac97045964c16fc2e8f75",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "aab07f43be2e2a307862899d32d3949f18d0e85a42991ff6a1f8c265901cf09d"
+              }
+            ]
+          }
+        ],
+        "anchors": [],
+        "unresolved_calls": []
+      },
+      "deterministic": true,
+      "prior_test_symbol_hits": {
+        "TestCount": [
+          "docs/benchmarks/issue-153/iteration-21-preregistered.md",
+          "tools/benchmark153/policy_ablation.py",
+          "tools/benchmark153/policy-fixtures.json"
+        ]
+      },
+      "model_calls": 0,
+      "holdout_certified": false,
+      "semantic_quality": null
+    },
+    {
+      "name": "shared-test-independent-assertions",
+      "split": "used_diagnostic",
+      "commit": null,
+      "parent": null,
+      "full_snapshot_bytes": 817,
+      "context_payload_bytes": 3596,
+      "within_context_byte_bound": true,
+      "context_sha256": "9a2789bfb65747b42c6c7fe862b0b4746058e72ba3b9127e80449b06847c6b6a",
+      "context": {
+        "context": [
+          {
+            "id": "c6760be90e8b0b5a0f953eb8",
+            "kind": "function_source",
+            "symbol": "Left",
+            "text": "func Left(n int) int {return n+1}",
+            "source_refs": [
+              {
+                "id": "ee22037e9ea155c03a2e05e7",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  15,
+                  48
+                ],
+                "source_sha256": "9f86177e497ca1ed3656108427173208d99fd62a6e88b60d165adf021e1c3389"
+              }
+            ]
+          },
+          {
+            "id": "e530c02964b047794c3f835d",
+            "kind": "function_source",
+            "symbol": "Left",
+            "text": "func Left(n int) int {return n+2}",
+            "source_refs": [
+              {
+                "id": "13e38e5f97f5cddcaa600e78",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  15,
+                  48
+                ],
+                "source_sha256": "1576b0afb151cd22b77885f88c54cdb770d197c7bd55f96e081f1a16dafd465d"
+              }
+            ]
+          },
+          {
+            "id": "53f77da777559bef55c7f5e3",
+            "kind": "function_source",
+            "symbol": "Right",
+            "text": "func Right(n int) int {return n*2}",
+            "source_refs": [
+              {
+                "id": "1d107bc0fa619d756395d4fb",
+                "file": "F002",
+                "version": "before",
+                "span": [
+                  15,
+                  49
+                ],
+                "source_sha256": "8a6da8c7ca0ec748c3a1f795cf489eb07507f853ff24e7ff1b14ab4a11ec50de"
+              }
+            ]
+          },
+          {
+            "id": "f2fa4d8fe1160ee528d79614",
+            "kind": "function_source",
+            "symbol": "Right",
+            "text": "func Right(n int) int {return n*3}",
+            "source_refs": [
+              {
+                "id": "67e2392d7581de95ae5533e0",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  15,
+                  49
+                ],
+                "source_sha256": "aa7dac4904297d794aad45d5e3b1d38d254d190a4a8c0036443c04f06630cea2"
+              }
+            ]
+          },
+          {
+            "id": "4c6cde6c5580fdf31c23c465",
+            "kind": "function_source",
+            "symbol": "TestBoth",
+            "text": "func TestBoth(t *testing.T) {\n if Left(2)!=3 {t.Fatal(\"left\")}\n // Keep both checks in one existing test.\n t.Log(\"checking right\")\n if Right(2)!=4 {t.Fatal(\"right\")}\n}",
+            "source_refs": [
+              {
+                "id": "0149548c2f12486732751fb0",
+                "file": "F003",
+                "version": "before",
+                "span": [
+                  32,
+                  199
+                ],
+                "source_sha256": "1c38c08d88543e8664d6ad3eac45bd48cf299f9acee6976ec0aaec702072e312"
+              }
+            ]
+          },
+          {
+            "id": "2383000090e5ee68e20d3584",
+            "kind": "function_source",
+            "symbol": "TestBoth",
+            "text": "func TestBoth(t *testing.T) {\n if Left(2)!=4 {t.Fatal(\"left\")}\n // Keep both checks in one existing test.\n t.Log(\"checking right\")\n if Right(2)!=6 {t.Fatal(\"right\")}\n}",
+            "source_refs": [
+              {
+                "id": "ead0c3456b6d146c28c523c9",
+                "file": "F003",
+                "version": "after",
+                "span": [
+                  32,
+                  199
+                ],
+                "source_sha256": "c9dee47c842d0e2197cae290f53cb4f975c0fd59921a1416ba3c5c68b6980994"
+              }
+            ]
+          },
+          {
+            "id": "774684a6de737f6deeac9d91",
+            "kind": "import_source",
+            "symbol": "\"testing\"",
+            "text": "\"testing\"",
+            "source_refs": [
+              {
+                "id": "2ff2c5d989c5781e05a95cbd",
+                "file": "F003",
+                "version": "before",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "1c38c08d88543e8664d6ad3eac45bd48cf299f9acee6976ec0aaec702072e312"
+              },
+              {
+                "id": "863e8a94afedc2ea7a1f154f",
+                "file": "F003",
+                "version": "after",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "c9dee47c842d0e2197cae290f53cb4f975c0fd59921a1416ba3c5c68b6980994"
+              }
+            ]
+          }
+        ],
+        "anchors": [
+          {
+            "id": "2ac0eb40d8af2662bfde8c70",
+            "file": "F003",
+            "version": "after",
+            "span": [
+              167,
+              178
+            ],
+            "text": "Right(2)!=6",
+            "source_sha256": "c9dee47c842d0e2197cae290f53cb4f975c0fd59921a1416ba3c5c68b6980994",
+            "condition_span": [
+              167,
+              178
+            ],
+            "context_id": "2383000090e5ee68e20d3584"
+          },
+          {
+            "id": "71167636670299dd4c37db83",
+            "file": "F003",
+            "version": "after",
+            "span": [
+              66,
+              76
+            ],
+            "text": "Left(2)!=4",
+            "source_sha256": "c9dee47c842d0e2197cae290f53cb4f975c0fd59921a1416ba3c5c68b6980994",
+            "condition_span": [
+              66,
+              76
+            ],
+            "context_id": "2383000090e5ee68e20d3584"
+          },
+          {
+            "id": "e24ac75912cdd3762e2d2baa",
+            "file": "F003",
+            "version": "before",
+            "span": [
+              66,
+              76
+            ],
+            "text": "Left(2)!=3",
+            "source_sha256": "1c38c08d88543e8664d6ad3eac45bd48cf299f9acee6976ec0aaec702072e312",
+            "condition_span": [
+              66,
+              76
+            ],
+            "context_id": "4c6cde6c5580fdf31c23c465"
+          },
+          {
+            "id": "e7835d935c3b0cb39c69842f",
+            "file": "F003",
+            "version": "before",
+            "span": [
+              167,
+              178
+            ],
+            "text": "Right(2)!=4",
+            "source_sha256": "1c38c08d88543e8664d6ad3eac45bd48cf299f9acee6976ec0aaec702072e312",
+            "condition_span": [
+              167,
+              178
+            ],
+            "context_id": "4c6cde6c5580fdf31c23c465"
+          }
+        ],
+        "unresolved_calls": []
+      },
+      "deterministic": true,
+      "prior_test_symbol_hits": {
+        "TestBoth": [
+          "docs/benchmarks/issue-152/iteration-7-results.json",
+          "docs/benchmarks/issue-152/iteration-8-probes.json",
+          "docs/benchmarks/issue-152/iteration-6-results.json",
+          "docs/benchmarks/issue-152/iteration-5-preregistered.md",
+          "docs/benchmarks/issue-152/iteration-5-results.json",
+          "docs/benchmarks/issue-152/iteration-5-report.md",
+          "docs/benchmarks/issue-153/iteration-24-report.md",
+          "docs/benchmarks/issue-153/iteration-23-report.md",
+          "docs/benchmarks/issue-153/iteration-21-preregistered.md",
+          "docs/benchmarks/issue-153/iteration-21-report.md",
+          "tools/benchmark152/joint-independent.json",
+          "tools/benchmark152/impact-fresh.json",
+          "tools/benchmark152/impact-independent.json",
+          "tools/benchmark152/impact-ablation.json",
+          "tools/benchmark152/assertion-independent.json",
+          "tools/benchmark153/policy_ablation.py",
+          "tools/benchmark153/policy-fixtures.json"
+        ]
+      },
+      "model_calls": 0,
+      "holdout_certified": false,
+      "semantic_quality": null
+    },
+    {
+      "name": "same-line-two-conditions",
+      "split": "development_scope_probe",
+      "commit": null,
+      "parent": null,
+      "full_snapshot_bytes": 314,
+      "context_payload_bytes": 2561,
+      "within_context_byte_bound": true,
+      "context_sha256": "03f3af5d0632083c2ccd299414045f17fa54f31ade3df2061bf804f1663c8106",
+      "context": {
+        "context": [
+          {
+            "id": "733d4638d9acff4d5027a1ca",
+            "kind": "function_source",
+            "symbol": "TestPair",
+            "text": "func TestPair(t *testing.T) { if Left(2)!=3 || Right(2)!=4 {t.Fatal(\"日本語\")} }",
+            "source_refs": [
+              {
+                "id": "7e4c07b57d12ef5414354384",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  31,
+                  114
+                ],
+                "source_sha256": "9e58a81aac7efbe82f6d6cc9415ee51ac731dead7cef7d5dd1026baf70808ba8"
+              }
+            ]
+          },
+          {
+            "id": "3111ca72106a2d8109a6a375",
+            "kind": "function_source",
+            "symbol": "TestPair",
+            "text": "func TestPair(t *testing.T) { if Left(2)!=4 || Right(2)!=6 {t.Fatal(\"日本語\")} }",
+            "source_refs": [
+              {
+                "id": "f1c3c7cc98a668b173cd436a",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  31,
+                  114
+                ],
+                "source_sha256": "451207f6dabaf4906a71844a13f65d3c3b0c30846595a103ffa7dd198bbf6306"
+              }
+            ]
+          },
+          {
+            "id": "d350b95c4bbcf28691f8db72",
+            "kind": "import_source",
+            "symbol": "\"testing\"",
+            "text": "\"testing\"",
+            "source_refs": [
+              {
+                "id": "19d7c22e929339765b3dad83",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  21,
+                  30
+                ],
+                "source_sha256": "9e58a81aac7efbe82f6d6cc9415ee51ac731dead7cef7d5dd1026baf70808ba8"
+              },
+              {
+                "id": "bc6374a7d2a4b62c72066e22",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  21,
+                  30
+                ],
+                "source_sha256": "451207f6dabaf4906a71844a13f65d3c3b0c30846595a103ffa7dd198bbf6306"
+              }
+            ]
+          }
+        ],
+        "anchors": [
+          {
+            "id": "3a0771dd6981304c9a9c8c8b",
+            "file": "F001",
+            "version": "before",
+            "span": [
+              78,
+              89
+            ],
+            "text": "Right(2)!=4",
+            "source_sha256": "9e58a81aac7efbe82f6d6cc9415ee51ac731dead7cef7d5dd1026baf70808ba8",
+            "condition_span": [
+              64,
+              89
+            ],
+            "context_id": "733d4638d9acff4d5027a1ca"
+          },
+          {
+            "id": "41e5c6b972aa853dfeb01d9f",
+            "file": "F001",
+            "version": "after",
+            "span": [
+              64,
+              74
+            ],
+            "text": "Left(2)!=4",
+            "source_sha256": "451207f6dabaf4906a71844a13f65d3c3b0c30846595a103ffa7dd198bbf6306",
+            "condition_span": [
+              64,
+              89
+            ],
+            "context_id": "3111ca72106a2d8109a6a375"
+          },
+          {
+            "id": "545ebbdf30d9ecdb13d13a2d",
+            "file": "F001",
+            "version": "before",
+            "span": [
+              64,
+              74
+            ],
+            "text": "Left(2)!=3",
+            "source_sha256": "9e58a81aac7efbe82f6d6cc9415ee51ac731dead7cef7d5dd1026baf70808ba8",
+            "condition_span": [
+              64,
+              89
+            ],
+            "context_id": "733d4638d9acff4d5027a1ca"
+          },
+          {
+            "id": "a3cf0950a691f44a4bd311fc",
+            "file": "F001",
+            "version": "after",
+            "span": [
+              78,
+              89
+            ],
+            "text": "Right(2)!=6",
+            "source_sha256": "451207f6dabaf4906a71844a13f65d3c3b0c30846595a103ffa7dd198bbf6306",
+            "condition_span": [
+              64,
+              89
+            ],
+            "context_id": "3111ca72106a2d8109a6a375"
+          }
+        ],
+        "unresolved_calls": [
+          {
+            "source": "7e4c07b57d12ef5414354384",
+            "name": "Left",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "7e4c07b57d12ef5414354384",
+            "name": "Right",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "f1c3c7cc98a668b173cd436a",
+            "name": "Left",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "f1c3c7cc98a668b173cd436a",
+            "name": "Right",
+            "status": "not_in_selected_snapshots"
+          }
+        ]
+      },
+      "deterministic": true,
+      "prior_test_symbol_hits": {
+        "TestPair": []
+      },
+      "model_calls": 0,
+      "holdout_certified": false,
+      "semantic_quality": null
+    },
+    {
+      "name": "no-test-observation",
+      "split": "development_scope_probe",
+      "commit": null,
+      "parent": null,
+      "full_snapshot_bytes": 170,
+      "context_payload_bytes": 651,
+      "within_context_byte_bound": true,
+      "context_sha256": "b2d0db8111b6ff911de61f888df249b12646237e924c9c4d63c1d19fc7511184",
+      "context": {
+        "context": [
+          {
+            "id": "f50ec756f3bc0f9792f0656d",
+            "kind": "function_source",
+            "symbol": "Value",
+            "text": "func Value(n int) int { return n }",
+            "source_refs": [
+              {
+                "id": "44962ac82784291996f910f3",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  14,
+                  48
+                ],
+                "source_sha256": "a9b64038103ca2ff3749c46e48b4944c7d9e9037067aba061ce45370d7ec160b"
+              }
+            ]
+          },
+          {
+            "id": "18d9349b5436f75ef271933e",
+            "kind": "function_source",
+            "symbol": "Value",
+            "text": "func Value(n int) int { return n+1 }",
+            "source_refs": [
+              {
+                "id": "7c99e72ffbed576176a3f564",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  14,
+                  50
+                ],
+                "source_sha256": "4bfcb553b6596c5cb0e3f49e5c829d8b286ad7bc73e5d1db55ab3faa6cce46de"
+              }
+            ]
+          }
+        ],
+        "anchors": [],
+        "unresolved_calls": []
+      },
+      "deterministic": true,
+      "prior_test_symbol_hits": {},
+      "model_calls": 0,
+      "holdout_certified": false,
+      "semantic_quality": null
+    },
+    {
+      "name": "8092acd2",
+      "split": "provisional_real_candidate",
+      "commit": "8092acd2886ba95ee8032518da6c1fcb67481e3b",
+      "parent": "e53eb7385428da731c43421ff9cb1ed0d81de5ac",
+      "full_snapshot_bytes": 38501,
+      "context_payload_bytes": 15402,
+      "within_context_byte_bound": true,
+      "context_sha256": "03fcd09fb13b159375dbe3a49e9e06f52522b1e23c66de68fe5ab2e2b51044e5",
+      "context": {
+        "context": [
+          {
+            "id": "88fa3ed226756e4e1ee53ae4",
+            "kind": "function_source",
+            "symbol": "BuildGraph",
+            "text": "func BuildGraph(changes []gitstate.Change, extracted Result) (CandidateGraph, error) {\n\tgraph := CandidateGraph{\n\t\tNodes:        make([]CandidateNode, 0, len(changes)),\n\t\tEdges:        []Relation{},\n\t\tForward:      make(map[string][]string, len(changes)),\n\t\tReverse:      make(map[string][]string, len(changes)),\n\t\tComponents:   []CandidateComponent{},\n\t\tObservations: cloneObservations(extracted.Observations),\n\t\tHints:        cloneHints(extracted.Hints),\n\t}\n\tnodeIndex := make(map[string]int, len(changes))\n\tfor _, change := range changes {\n\t\tif change.ID == \"\" {\n\t\t\treturn CandidateGraph{}, errors.New(\"candidate graph input has an empty file ID\")\n\t\t}\n\t\tif _, exists := nodeIndex[change.ID]; exists {\n\t\t\treturn CandidateGraph{}, errors.New(\"candidate graph input has duplicate file IDs\")\n\t\t}\n\t\tnodeIndex[change.ID] = len(graph.Nodes)\n\t\tgraph.Nodes = append(graph.Nodes, CandidateNode{\n\t\t\tFileID:  change.ID,\n\t\t\tOldPath: clonePath(change.OldPath),\n\t\t\tNewPath: clonePath(change.NewPath),\n\t\t\tRenamed: change.Status == \"renamed\",\n\t\t})\n\t\tgraph.Forward[change.ID] = []string{}\n\t\tgraph.Reverse[change.ID] = []string{}\n\t}\n\tsort.Slice(graph.Nodes, func(i, j int) bool { return graph.Nodes[i].FileID < graph.Nodes[j].FileID })\n\tfor index, node := range graph.Nodes {\n\t\tnodeIndex[node.FileID] = index\n\t}\n\tsort.Slice(graph.Observations, func(i, j int) bool { return observationLess(graph.Observations[i], graph.Observations[j]) })\n\tsort.Slice(graph.Hints, func(i, j int) bool { return hintLess(graph.Hints[i], graph.Hints[j]) })\n\tfor _, observation := range graph.Observations {\n\t\tif _, exists := nodeIndex[observation.SourceID]; !exists {\n\t\t\treturn CandidateGraph{}, fmt.Errorf(\"candidate graph observation references missing file ID %s\", observation.SourceID)\n\t\t}\n\t\tfor _, candidateID := range observation.CandidateIDs {\n\t\t\tif _, exists := nodeIndex[candidateID]; !exists {\n\t\t\t\treturn CandidateGraph{}, fmt.Errorf(\"candidate graph observation references missing candidate file ID %s\", candidateID)\n\t\t\t}\n\t\t}\n\t}\n\tfor _, hint := range graph.Hints {\n\t\tfor _, fileID := range hint.FileIDs {\n\t\t\tif _, exists := nodeIndex[fileID]; !exists {\n\t\t\t\treturn CandidateGraph{}, fmt.Errorf(\"candidate graph hint references missing file ID %s\", fileID)\n\t\t\t}\n\t\t}\n\t}\n\tpruned := make(map[string]ReductionReason)\n\tfor _, relation := range extracted.Relations {\n\t\tsource, sourceExists := nodeIndex[relation.SourceID]\n\t\t_, targetExists := nodeIndex[relation.TargetID]\n\t\tif !sourceExists || !targetExists {\n\t\t\treturn CandidateGraph{}, fmt.Errorf(\"candidate graph relation references missing node %s -> %s\", relation.SourceID, relation.TargetID)\n\t\t}\n\t\tif relation.Kind == GitRename && relation.SourceID == relation.TargetID {\n\t\t\tgraph.Nodes[source].Renamed = true\n\t\t\taddReductionReason(pruned, GitRename, \"rename_retained_as_single_node_metadata\")\n\t\t\tcontinue\n\t\t}\n\t\tif relation.Kind == PathProximity {\n\t\t\taddReductionReason(pruned, PathProximity, \"path_proximity_is_auxiliary_evidence\")\n\t\t\tcontinue\n\t\t}\n\t\tif relation.SourceID == relation.TargetID {\n\t\t\taddReductionReason(pruned, relation.Kind, \"self_relation_does_not_connect_component\")\n\t\t\tcontinue\n\t\t}\n\t\tgraph.Edges = append(graph.Edges, relation)\n\t\tgraph.Forward[relation.SourceID] = appendUnique(graph.Forward[relation.SourceID], relation.TargetID)\n\t\tgraph.Reverse[relation.TargetID] = appendUnique(graph.Reverse[relation.TargetID], relation.SourceID)\n\t}\n\tsort.Slice(graph.Edges, func(i, j int) bool { return relationLess(graph.Edges[i], graph.Edges[j]) })\n\tfor fileID := range graph.Forward {\n\t\tsort.Strings(graph.Forward[fileID])\n\t\tsort.Strings(graph.Reverse[fileID])\n\t}\n\tgraph.Components = candidateComponents(graph.Nodes, graph.Edges)\n\tgraph.ReductionReasons = make([]ReductionReason, 0, len(pruned))\n\tfor _, reason := range pruned {\n\t\tgraph.ReductionReasons = append(graph.ReductionReasons, reason)\n\t}\n\tsort.Slice(graph.ReductionReasons, func(i, j int) bool {\n\t\tif graph.ReductionReasons[i].Kind != graph.ReductionReasons[j].Kind {\n\t\t\treturn graph.ReductionReasons[i].Kind < graph.ReductionReasons[j].Kind\n\t\t}\n\t\treturn graph.ReductionReasons[i].Reason < graph.ReductionReasons[j].Reason\n\t})\n\tgraph.Statistics = graphStatistics(graph)\n\treturn graph, nil\n}",
+            "source_refs": [
+              {
+                "id": "0d98a6977136c66548bc7205",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  2348,
+                  6529
+                ],
+                "source_sha256": "c4f4ffeffcf930d7579a79ba427eb2db9f93fc4929c0949165535e1b14addc95"
+              }
+            ]
+          },
+          {
+            "id": "8fc045bd9a723d4b6ae5b5a9",
+            "kind": "function_source",
+            "symbol": "graphStatistics",
+            "text": "func graphStatistics(graph CandidateGraph) GraphStatistics {\n\tstats := GraphStatistics{\n\t\tNodeCount:             len(graph.Nodes),\n\t\tEdgeCount:             len(graph.Edges),\n\t\tEdgesByKind:           make(map[Kind]int),\n\t\tObservationCount:      len(graph.Observations),\n\t\tObservationsByKind:    make(map[Kind]int),\n\t\tObservationsByOutcome: make(map[Outcome]int),\n\t\tComponentCount:        len(graph.Components),\n\t\tAuxiliaryHintCount:    len(graph.Hints),\n\t}\n\tfor _, edge := range graph.Edges {\n\t\tstats.EdgesByKind[edge.Kind]++\n\t}\n\tfor _, observation := range graph.Observations {\n\t\tstats.ObservationsByKind[observation.Kind]++\n\t\tstats.ObservationsByOutcome[observation.Outcome]++\n\t}\n\tn := int64(stats.NodeCount)\n\tstats.DensePairBaseline = n * (n - 1) / 2\n\tfor _, component := range graph.Components {\n\t\tn := int64(len(component.FileIDs))\n\t\tstats.CandidatePairCount += n * (n - 1) / 2\n\t}\n\tstats.ReducedPairCount = stats.DensePairBaseline - stats.CandidatePairCount\n\tif stats.ReducedPairCount > 0 {\n\t\tstats.PairReductionReason = \"no_evidence_path_between_candidate_components\"\n\t}\n\treturn stats\n}",
+            "source_refs": [
+              {
+                "id": "523f693a3a71b70c762107a0",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  10280,
+                  11371
+                ],
+                "source_sha256": "c4f4ffeffcf930d7579a79ba427eb2db9f93fc4929c0949165535e1b14addc95"
+              }
+            ]
+          },
+          {
+            "id": "9339337b4a4d3580245e5920",
+            "kind": "function_source",
+            "symbol": "graphStatistics",
+            "text": "func graphStatistics(graph CandidateGraph) GraphStatistics {\n\tstats := GraphStatistics{\n\t\tNodeCount:             len(graph.Nodes),\n\t\tEdgeCount:             len(graph.Edges),\n\t\tObservationCount:      len(graph.Observations),\n\t\tObservationsByKind:    make(map[Kind]int),\n\t\tObservationsByOutcome: make(map[Outcome]int),\n\t\tComponentCount:        len(graph.Components),\n\t\tAuxiliaryHintCount:    len(graph.Hints),\n\t}\n\tfor _, observation := range graph.Observations {\n\t\tstats.ObservationsByKind[observation.Kind]++\n\t\tstats.ObservationsByOutcome[observation.Outcome]++\n\t}\n\tn := int64(stats.NodeCount)\n\tstats.DensePairBaseline = n * (n - 1) / 2\n\tfor _, component := range graph.Components {\n\t\tn := int64(len(component.FileIDs))\n\t\tstats.CandidatePairCount += n * (n - 1) / 2\n\t}\n\tstats.ReducedPairCount = stats.DensePairBaseline - stats.CandidatePairCount\n\tif stats.ReducedPairCount > 0 {\n\t\tstats.PairReductionReason = \"no_evidence_path_between_candidate_components\"\n\t}\n\treturn stats\n}",
+            "source_refs": [
+              {
+                "id": "b9cf040ed44b54b64443e134",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  10218,
+                  11192
+                ],
+                "source_sha256": "3beeaca4cc1de6ce6e8aac238dd50714dfd4836b8c772014826dbd943eb8a53d"
+              }
+            ]
+          },
+          {
+            "id": "a649ee3f3b5765fda87ac958",
+            "kind": "import_source",
+            "symbol": "\"errors\"",
+            "text": "\"errors\"",
+            "source_refs": [
+              {
+                "id": "20532d9166a74eb926a2ae2a",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  28,
+                  36
+                ],
+                "source_sha256": "3beeaca4cc1de6ce6e8aac238dd50714dfd4836b8c772014826dbd943eb8a53d"
+              },
+              {
+                "id": "dbc94da54d0e3edd012f6e08",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  28,
+                  36
+                ],
+                "source_sha256": "c4f4ffeffcf930d7579a79ba427eb2db9f93fc4929c0949165535e1b14addc95"
+              }
+            ]
+          },
+          {
+            "id": "9915a7e5c12355ea8cbfdbdf",
+            "kind": "import_source",
+            "symbol": "\"fmt\"",
+            "text": "\"fmt\"",
+            "source_refs": [
+              {
+                "id": "5810544f97bb59081f445623",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  38,
+                  43
+                ],
+                "source_sha256": "c4f4ffeffcf930d7579a79ba427eb2db9f93fc4929c0949165535e1b14addc95"
+              },
+              {
+                "id": "9ec9a17e643093ffc25664f6",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  38,
+                  43
+                ],
+                "source_sha256": "3beeaca4cc1de6ce6e8aac238dd50714dfd4836b8c772014826dbd943eb8a53d"
+              }
+            ]
+          },
+          {
+            "id": "ea3a3352b1c6efecf7bb8d7c",
+            "kind": "import_source",
+            "symbol": "\"github.com/natsuki0413/commiter-cli/internal/gitstate\"",
+            "text": "\"github.com/natsuki0413/commiter-cli/internal/gitstate\"",
+            "source_refs": [
+              {
+                "id": "18a0c8768041987c8dc453c7",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  65,
+                  120
+                ],
+                "source_sha256": "3beeaca4cc1de6ce6e8aac238dd50714dfd4836b8c772014826dbd943eb8a53d"
+              },
+              {
+                "id": "1dc05c5e6570b856d225917c",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  65,
+                  120
+                ],
+                "source_sha256": "c4f4ffeffcf930d7579a79ba427eb2db9f93fc4929c0949165535e1b14addc95"
+              }
+            ]
+          },
+          {
+            "id": "9ea28f86b1a67260cc1451fb",
+            "kind": "import_source",
+            "symbol": "\"sort\"",
+            "text": "\"sort\"",
+            "source_refs": [
+              {
+                "id": "06bc4b2811ab3888b4d5fcd3",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  45,
+                  51
+                ],
+                "source_sha256": "c4f4ffeffcf930d7579a79ba427eb2db9f93fc4929c0949165535e1b14addc95"
+              },
+              {
+                "id": "790800f36290ec0841134b20",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  45,
+                  51
+                ],
+                "source_sha256": "3beeaca4cc1de6ce6e8aac238dd50714dfd4836b8c772014826dbd943eb8a53d"
+              }
+            ]
+          },
+          {
+            "id": "682756674e4fa56ecc0bd933",
+            "kind": "import_source",
+            "symbol": "\"strings\"",
+            "text": "\"strings\"",
+            "source_refs": [
+              {
+                "id": "20b7e66f802ac6b49a5a22c4",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  53,
+                  62
+                ],
+                "source_sha256": "3beeaca4cc1de6ce6e8aac238dd50714dfd4836b8c772014826dbd943eb8a53d"
+              },
+              {
+                "id": "a9436c9d38a3776825840121",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  53,
+                  62
+                ],
+                "source_sha256": "c4f4ffeffcf930d7579a79ba427eb2db9f93fc4929c0949165535e1b14addc95"
+              }
+            ]
+          },
+          {
+            "id": "84981cf367f76386f3523283",
+            "kind": "type_source",
+            "symbol": "GraphStatistics",
+            "text": "GraphStatistics struct {\n\tNodeCount             int             `json:\"node_count\"`\n\tEdgeCount             int             `json:\"edge_count\"`\n\tEdgesByKind           map[Kind]int    `json:\"edges_by_kind\"`\n\tObservationCount      int             `json:\"observation_count\"`\n\tObservationsByKind    map[Kind]int    `json:\"observations_by_kind\"`\n\tObservationsByOutcome map[Outcome]int `json:\"observations_by_outcome\"`\n\tComponentCount        int             `json:\"component_count\"`\n\tDensePairBaseline     int64           `json:\"dense_pair_baseline\"`\n\tCandidatePairCount    int64           `json:\"candidate_pair_count\"`\n\tReducedPairCount      int64           `json:\"reduced_pair_count\"`\n\tPairReductionReason   string          `json:\"pair_reduction_reason,omitempty\"`\n\tAuxiliaryHintCount    int             `json:\"auxiliary_hint_count\"`\n}",
+            "source_refs": [
+              {
+                "id": "6e5488febff8d397f03f910f",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  553,
+                  1383
+                ],
+                "source_sha256": "c4f4ffeffcf930d7579a79ba427eb2db9f93fc4929c0949165535e1b14addc95"
+              }
+            ]
+          },
+          {
+            "id": "462f6fe961fe8b73c3b59fb9",
+            "kind": "type_source",
+            "symbol": "GraphStatistics",
+            "text": "GraphStatistics struct {\n\tNodeCount             int             `json:\"node_count\"`\n\tEdgeCount             int             `json:\"edge_count\"`\n\tObservationCount      int             `json:\"observation_count\"`\n\tObservationsByKind    map[Kind]int    `json:\"observations_by_kind\"`\n\tObservationsByOutcome map[Outcome]int `json:\"observations_by_outcome\"`\n\tComponentCount        int             `json:\"component_count\"`\n\tDensePairBaseline     int64           `json:\"dense_pair_baseline\"`\n\tCandidatePairCount    int64           `json:\"candidate_pair_count\"`\n\tReducedPairCount      int64           `json:\"reduced_pair_count\"`\n\tPairReductionReason   string          `json:\"pair_reduction_reason,omitempty\"`\n\tAuxiliaryHintCount    int             `json:\"auxiliary_hint_count\"`\n}",
+            "source_refs": [
+              {
+                "id": "2bc63bcfd42b8e6ab1ca29c1",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  553,
+                  1321
+                ],
+                "source_sha256": "3beeaca4cc1de6ce6e8aac238dd50714dfd4836b8c772014826dbd943eb8a53d"
+              }
+            ]
+          },
+          {
+            "id": "d76acefdd7ce6179973615fd",
+            "kind": "function_source",
+            "symbol": "TestGraphStatisticsCountEdgesByKind",
+            "text": "func TestGraphStatisticsCountEdgesByKind(t *testing.T) {\n\tchanges := []gitstate.Change{\n\t\t{ID: \"F001\", Status: \"modified\"},\n\t\t{ID: \"F002\", Status: \"modified\"},\n\t\t{ID: \"F003\", Status: \"modified\"},\n\t\t{ID: \"F004\", Status: \"modified\"},\n\t}\n\tresult := Result{Relations: []Relation{\n\t\t{SourceID: \"F001\", TargetID: \"F002\", Kind: DirectImport, Class: Soft, Reason: \"observed_import_path\"},\n\t\t{SourceID: \"F002\", TargetID: \"F003\", Kind: DirectImport, Class: Soft, Reason: \"observed_import_path\"},\n\t\t{SourceID: \"F003\", TargetID: \"F004\", Kind: SourceTest, Class: Soft, Reason: \"matching_test_path\"},\n\t}}\n\n\tgraph, err := BuildGraph(changes, result)\n\tif err != nil {\n\t\tt.Fatal(err)\n\t}\n\twant := map[Kind]int{DirectImport: 2, SourceTest: 1}\n\tif !reflect.DeepEqual(graph.Statistics.EdgesByKind, want) {\n\t\tt.Fatalf(\"edge counts by kind = %#v, want %#v\", graph.Statistics.EdgesByKind, want)\n\t}\n}",
+            "source_refs": [
+              {
+                "id": "35ff4bffdf407dcef4c148aa",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  1528,
+                  2403
+                ],
+                "source_sha256": "7b488f25a459477cadf3aa93841ee5c3aa30206a4fc3b3af2daf429040429b41"
+              }
+            ]
+          },
+          {
+            "id": "80453e9029b896e8c5f07948",
+            "kind": "import_source",
+            "symbol": "\"github.com/natsuki0413/commiter-cli/internal/gitstate\"",
+            "text": "\"github.com/natsuki0413/commiter-cli/internal/gitstate\"",
+            "source_refs": [
+              {
+                "id": "40e1bd99201349cc8d85d6fb",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  51,
+                  106
+                ],
+                "source_sha256": "7b488f25a459477cadf3aa93841ee5c3aa30206a4fc3b3af2daf429040429b41"
+              }
+            ]
+          },
+          {
+            "id": "b0636d78e0891977da836fab",
+            "kind": "import_source",
+            "symbol": "\"reflect\"",
+            "text": "\"reflect\"",
+            "source_refs": [
+              {
+                "id": "53861f5211d8faae215c6d16",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  28,
+                  37
+                ],
+                "source_sha256": "7b488f25a459477cadf3aa93841ee5c3aa30206a4fc3b3af2daf429040429b41"
+              }
+            ]
+          },
+          {
+            "id": "3a0721582a086d52e8838368",
+            "kind": "import_source",
+            "symbol": "\"testing\"",
+            "text": "\"testing\"",
+            "source_refs": [
+              {
+                "id": "56126ed9ad299d0328775723",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  39,
+                  48
+                ],
+                "source_sha256": "7b488f25a459477cadf3aa93841ee5c3aa30206a4fc3b3af2daf429040429b41"
+              }
+            ]
+          }
+        ],
+        "anchors": [
+          {
+            "id": "af32ad5af855c2e717327ab4",
+            "file": "F002",
+            "version": "after",
+            "span": [
+              2256,
+              2310
+            ],
+            "text": "!reflect.DeepEqual(graph.Statistics.EdgesByKind, want)",
+            "source_sha256": "7b488f25a459477cadf3aa93841ee5c3aa30206a4fc3b3af2daf429040429b41",
+            "condition_span": [
+              2256,
+              2310
+            ],
+            "context_id": "d76acefdd7ce6179973615fd"
+          },
+          {
+            "id": "b13fee12b8abb175620635ee",
+            "file": "F002",
+            "version": "after",
+            "span": [
+              2167,
+              2177
+            ],
+            "text": "err != nil",
+            "source_sha256": "7b488f25a459477cadf3aa93841ee5c3aa30206a4fc3b3af2daf429040429b41",
+            "condition_span": [
+              2167,
+              2177
+            ],
+            "context_id": "d76acefdd7ce6179973615fd"
+          }
+        ],
+        "unresolved_calls": [
+          {
+            "source": "523f693a3a71b70c762107a0",
+            "name": "int64",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "523f693a3a71b70c762107a0",
+            "name": "len",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "523f693a3a71b70c762107a0",
+            "name": "make",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "b9cf040ed44b54b64443e134",
+            "name": "int64",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "b9cf040ed44b54b64443e134",
+            "name": "len",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "b9cf040ed44b54b64443e134",
+            "name": "make",
+            "status": "not_in_selected_snapshots"
+          }
+        ]
+      },
+      "deterministic": true,
+      "prior_test_symbol_hits": {
+        "TestGraphStatisticsCountEdgesByKind": []
+      },
+      "model_calls": 0,
+      "holdout_certified": false,
+      "semantic_quality": null
+    },
+    {
+      "name": "c643154b",
+      "split": "provisional_real_candidate",
+      "commit": "c643154b0498e5d441efdb864a6cee26e3deb2e0",
+      "parent": "df4297d87c836c2861a024ddeee7a420d446c4eb",
+      "full_snapshot_bytes": 59490,
+      "context_payload_bytes": 39409,
+      "within_context_byte_bound": false,
+      "context_sha256": "d3bf168946454c3aa0c75656189971d9c91c77b77e9358e13c06c5d11a579842",
+      "context": {
+        "context": [
+          {
+            "id": "54ac2b55ce8a5a625b54531c",
+            "kind": "function_source",
+            "symbol": "Extract",
+            "text": "func Extract(files []File) (Result, error) {\n\tresult := Result{Relations: []Relation{}, Observations: []Observation{}, Hints: []Hint{}}\n\tbyID := make(map[string]File, len(files))\n\tbyPath := make(map[string]string, len(files))\n\tfor _, file := range files {\n\t\tid := file.Change.ID\n\t\tif id == \"\" {\n\t\t\treturn Result{}, errors.New(\"relation input has an empty file ID\")\n\t\t}\n\t\tif _, exists := byID[id]; exists {\n\t\t\treturn Result{}, errors.New(\"relation input has duplicate file IDs\")\n\t\t}\n\t\tbyID[id] = file\n\t\tif p := currentPath(file.Change); p != \"\" {\n\t\t\tif _, exists := byPath[p]; exists {\n\t\t\t\tbyPath[p] = \"\" // An ambiguous path must never resolve to one file.\n\t\t\t} else {\n\t\t\t\tbyPath[p] = id\n\t\t\t}\n\t\t}\n\t}\n\tordered := append([]File(nil), files...)\n\tsort.Slice(ordered, func(i, j int) bool { return ordered[i].Change.ID < ordered[j].Change.ID })\n\tfor _, file := range ordered {\n\t\tchange := file.Change\n\t\tp := currentPath(change)\n\t\tif change.Status == \"renamed\" && validPath(change.OldPath) != \"\" && validPath(change.NewPath) != \"\" && *change.OldPath != *change.NewPath {\n\t\t\tresult.Relations = append(result.Relations, Relation{change.ID, change.ID, GitRename, Hard, \"git_reported_rename\", Evidence{\"git_paths\", *change.OldPath, *change.NewPath}, nil})\n\t\t}\n\t\tif p == \"\" {\n\t\t\tcontinue\n\t\t}\n\t\tfor _, candidate := range sourceCandidates(p) {\n\t\t\tif target := byPath[candidate]; target != \"\" && target != change.ID {\n\t\t\t\tresult.Relations = append(result.Relations, Relation{change.ID, target, SourceTest, Soft, \"matching_test_path\", Evidence{\"test_source_paths\", p, candidate}, nil})\n\t\t\t} else {\n\t\t\t\tresult.Observations = append(result.Observations, Observation{change.ID, SourceTest, Unresolved, \"matching_source_not_in_changed_file_set\", Evidence{\"test_source_paths\", p, candidate}, nil})\n\t\t\t}\n\t\t}\n\t\tfor _, observed := range importObservations(file) {\n\t\t\tevidence := Evidence{\"import_path\", observed.spec, observed.kind}\n\t\t\tif !observed.supported {\n\t\t\t\tresult.Observations = append(result.Observations, Observation{change.ID, DirectImport, Unsupported, observed.reason, evidence, nil})\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\ttarget, outcome, candidates, reason := resolveImport(p, observed.spec, byPath)\n\t\t\tif outcome == Matched && target != change.ID {\n\t\t\t\tresult.Relations = append(result.Relations, Relation{change.ID, target, DirectImport, Soft, \"observed_import_path\", evidence, nil})\n\t\t\t} else if outcome != Matched {\n\t\t\t\tresult.Observations = append(result.Observations, Observation{change.ID, DirectImport, outcome, reason, evidence, candidates})\n\t\t\t}\n\t\t}\n\t}\n\tdeclarations := make(map[string][]string)\n\tfor _, file := range ordered {\n\t\tfor _, evidence := range file.Evidence {\n\t\t\tif evidence.Name != \"\" && syntax.IsDeclaration(evidence.Kind) {\n\t\t\t\tdeclarations[evidence.Name] = appendUnique(declarations[evidence.Name], file.Change.ID)\n\t\t\t}\n\t\t}\n\t}\n\tfor _, file := range ordered {\n\t\tfor _, symbol := range referencedIdentifiers(file) {\n\t\t\ttargets := declarations[symbol]\n\t\t\tif len(targets) == 1 && targets[0] != file.Change.ID {\n\t\t\t\tresult.Relations = append(result.Relations, Relation{file.Change.ID, targets[0], ChangedIdentifier, Soft, \"identifier_name_matches_changed_declaration\", Evidence{\"identifier_name\", symbol, \"\"}, nil})\n\t\t\t} else if len(targets) > 1 {\n\t\t\t\tresult.Observations = append(result.Observations, Observation{file.Change.ID, ChangedIdentifier, Ambiguous, \"identifier_name_matches_multiple_changed_declarations\", Evidence{\"identifier_name\", symbol, \"\"}, append([]string(nil), targets...)})\n\t\t\t}\n\t\t}\n\t}\n\tdirectoryMembers := make(map[string][]string)\n\tfor _, file := range ordered {\n\t\tfilePath := currentPath(file.Change)\n\t\tif filePath == \"\" {\n\t\t\tcontinue\n\t\t}\n\t\tdir := path.Dir(filePath)\n\t\tdirectoryMembers[dir] = append(directoryMembers[dir], file.Change.ID)\n\t}\n\tresult.Relations = append(result.Relations, manifestLockRelations(ordered)...)\n\tfor dir, members := range directoryMembers {\n\t\tif len(members) > 1 {\n\t\t\tresult.Hints = append(result.Hints, Hint{Kind: PathProximity, Evidence: Evidence{\"directory\", dir, \"\"}, FileIDs: members})\n\t\t}\n\t}\n\tsort.Slice(result.Hints, func(i, j int) bool { return result.Hints[i].Evidence.Value < result.Hints[j].Evidence.Value })\n\tsort.Slice(result.Relations, func(i, j int) bool {\n\t\ta, b := result.Relations[i], result.Relations[j]\n\t\tif a.SourceID != b.SourceID {\n\t\t\treturn a.SourceID < b.SourceID\n\t\t}\n\t\tif a.TargetID != b.TargetID {\n\t\t\treturn a.TargetID < b.TargetID\n\t\t}\n\t\tif a.Kind != b.Kind {\n\t\t\treturn a.Kind < b.Kind\n\t\t}\n\t\tif a.Reason != b.Reason {\n\t\t\treturn a.Reason < b.Reason\n\t\t}\n\t\tif a.Evidence.Type != b.Evidence.Type {\n\t\t\treturn a.Evidence.Type < b.Evidence.Type\n\t\t}\n\t\tif a.Evidence.Value != b.Evidence.Value {\n\t\t\treturn a.Evidence.Value < b.Evidence.Value\n\t\t}\n\t\treturn a.Evidence.Related < b.Evidence.Related\n\t})\n\tunique := result.Relations[:0]\n\tfor _, value := range result.Relations {\n\t\tif len(unique) == 0 || unique[len(unique)-1] != value {\n\t\t\tunique = append(unique, value)\n\t\t}\n\t}\n\tresult.Relations = unique\n\tsort.Slice(result.Observations, func(i, j int) bool {\n\t\ta, b := result.Observations[i], result.Observations[j]\n\t\tif a.SourceID != b.SourceID {\n\t\t\treturn a.SourceID < b.SourceID\n\t\t}\n\t\tif a.Kind != b.Kind {\n\t\t\treturn a.Kind < b.Kind\n\t\t}\n\t\tif a.Outcome != b.Outcome {\n\t\t\treturn a.Outcome < b.Outcome\n\t\t}\n\t\tif a.Reason != b.Reason {\n\t\t\treturn a.Reason < b.Reason\n\t\t}\n\t\tif a.Evidence.Type != b.Evidence.Type {\n\t\t\treturn a.Evidence.Type < b.Evidence.Type\n\t\t}\n\t\tif a.Evidence.Value != b.Evidence.Value {\n\t\t\treturn a.Evidence.Value < b.Evidence.Value\n\t\t}\n\t\tif a.Evidence.Related != b.Evidence.Related {\n\t\t\treturn a.Evidence.Related < b.Evidence.Related\n\t\t}\n\t\treturn strings.Join(a.CandidateIDs, \"\\x00\") < strings.Join(b.CandidateIDs, \"\\x00\")\n\t})\n\tresult.Observations = uniqueObservations(result.Observations)\n\treturn result, nil\n}",
+            "source_refs": [
+              {
+                "id": "9ec903a240bf3efa9bac75f8",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  3516,
+                  9299
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              }
+            ]
+          },
+          {
+            "id": "7ceb17d78b673ef27cb843e3",
+            "kind": "function_source",
+            "symbol": "Extract",
+            "text": "func Extract(files []File) (Result, error) {\n\tresult := Result{Relations: []Relation{}, Observations: []Observation{}, Hints: []Hint{}}\n\tbyID := make(map[string]File, len(files))\n\tbyPath := make(map[string]string, len(files))\n\tfor _, file := range files {\n\t\tid := file.Change.ID\n\t\tif id == \"\" {\n\t\t\treturn Result{}, errors.New(\"relation input has an empty file ID\")\n\t\t}\n\t\tif _, exists := byID[id]; exists {\n\t\t\treturn Result{}, errors.New(\"relation input has duplicate file IDs\")\n\t\t}\n\t\tbyID[id] = file\n\t\tif p := currentPath(file.Change); p != \"\" {\n\t\t\tif _, exists := byPath[p]; exists {\n\t\t\t\tbyPath[p] = \"\" // An ambiguous path must never resolve to one file.\n\t\t\t} else {\n\t\t\t\tbyPath[p] = id\n\t\t\t}\n\t\t}\n\t}\n\tordered := append([]File(nil), files...)\n\tsort.Slice(ordered, func(i, j int) bool { return ordered[i].Change.ID < ordered[j].Change.ID })\n\tfor _, file := range ordered {\n\t\tchange := file.Change\n\t\tp := currentPath(change)\n\t\tif change.Status == \"renamed\" && validPath(change.OldPath) != \"\" && validPath(change.NewPath) != \"\" && *change.OldPath != *change.NewPath {\n\t\t\tresult.Relations = append(result.Relations, Relation{change.ID, change.ID, GitRename, Hard, \"git_reported_rename\", Evidence{\"git_paths\", *change.OldPath, *change.NewPath}, nil})\n\t\t}\n\t\tif p == \"\" {\n\t\t\tcontinue\n\t\t}\n\t\tfor _, candidate := range sourceCandidates(p) {\n\t\t\tif target := byPath[candidate]; target != \"\" && target != change.ID {\n\t\t\t\tresult.Relations = append(result.Relations, Relation{change.ID, target, SourceTest, Soft, \"matching_test_path\", Evidence{\"test_source_paths\", p, candidate}, nil})\n\t\t\t} else {\n\t\t\t\tresult.Observations = append(result.Observations, Observation{change.ID, SourceTest, Unresolved, \"matching_source_not_in_changed_file_set\", Evidence{\"test_source_paths\", p, candidate}, nil})\n\t\t\t}\n\t\t}\n\t\tfor _, observed := range importObservations(file) {\n\t\t\tevidence := Evidence{\"import_path\", observed.spec, observed.kind}\n\t\t\tif !observed.supported {\n\t\t\t\tresult.Observations = append(result.Observations, Observation{change.ID, DirectImport, Unsupported, observed.reason, evidence, nil})\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\ttarget, outcome, candidates, reason := resolveImport(p, observed.spec, byPath)\n\t\t\tif outcome == Matched && target != change.ID {\n\t\t\t\tresult.Relations = append(result.Relations, Relation{change.ID, target, DirectImport, Soft, \"observed_import_path\", evidence, nil})\n\t\t\t} else if outcome != Matched {\n\t\t\t\tresult.Observations = append(result.Observations, Observation{change.ID, DirectImport, outcome, reason, evidence, candidates})\n\t\t\t}\n\t\t}\n\t}\n\tdeclarations := make(map[string][]string)\n\tfor _, file := range ordered {\n\t\tfor _, evidence := range file.Evidence {\n\t\t\tif evidence.Name != \"\" && syntax.IsDeclaration(evidence.Kind) {\n\t\t\t\tdeclarations[evidence.Name] = appendUnique(declarations[evidence.Name], file.Change.ID)\n\t\t\t}\n\t\t}\n\t}\n\tfor _, file := range ordered {\n\t\tfor _, symbol := range referencedIdentifiers(file) {\n\t\t\ttargets := declarations[symbol]\n\t\t\tif len(targets) == 1 && targets[0] != file.Change.ID {\n\t\t\t\tresult.Relations = append(result.Relations, Relation{file.Change.ID, targets[0], ChangedIdentifier, Soft, \"identifier_name_matches_changed_declaration\", Evidence{\"identifier_name\", symbol, \"\"}, nil})\n\t\t\t} else if len(targets) > 1 {\n\t\t\t\tresult.Observations = append(result.Observations, Observation{file.Change.ID, ChangedIdentifier, Ambiguous, \"identifier_name_matches_multiple_changed_declarations\", Evidence{\"identifier_name\", symbol, \"\"}, append([]string(nil), targets...)})\n\t\t\t}\n\t\t}\n\t}\n\tdirectoryMembers := make(map[string][]string)\n\tfor _, file := range ordered {\n\t\tfilePath := currentPath(file.Change)\n\t\tif filePath == \"\" {\n\t\t\tcontinue\n\t\t}\n\t\tif dir := path.Dir(filePath); dir != \".\" {\n\t\t\tdirectoryMembers[dir] = append(directoryMembers[dir], file.Change.ID)\n\t\t}\n\t}\n\tresult.Relations = append(result.Relations, manifestLockRelations(ordered)...)\n\tfor dir, members := range directoryMembers {\n\t\tif len(members) > 1 {\n\t\t\tresult.Hints = append(result.Hints, Hint{Kind: PathProximity, Evidence: Evidence{\"directory\", dir, \"\"}, FileIDs: members})\n\t\t}\n\t}\n\tsort.Slice(result.Hints, func(i, j int) bool { return result.Hints[i].Evidence.Value < result.Hints[j].Evidence.Value })\n\tsort.Slice(result.Relations, func(i, j int) bool {\n\t\ta, b := result.Relations[i], result.Relations[j]\n\t\tif a.SourceID != b.SourceID {\n\t\t\treturn a.SourceID < b.SourceID\n\t\t}\n\t\tif a.TargetID != b.TargetID {\n\t\t\treturn a.TargetID < b.TargetID\n\t\t}\n\t\tif a.Kind != b.Kind {\n\t\t\treturn a.Kind < b.Kind\n\t\t}\n\t\tif a.Reason != b.Reason {\n\t\t\treturn a.Reason < b.Reason\n\t\t}\n\t\tif a.Evidence.Type != b.Evidence.Type {\n\t\t\treturn a.Evidence.Type < b.Evidence.Type\n\t\t}\n\t\tif a.Evidence.Value != b.Evidence.Value {\n\t\t\treturn a.Evidence.Value < b.Evidence.Value\n\t\t}\n\t\treturn a.Evidence.Related < b.Evidence.Related\n\t})\n\tunique := result.Relations[:0]\n\tfor _, value := range result.Relations {\n\t\tif len(unique) == 0 || unique[len(unique)-1] != value {\n\t\t\tunique = append(unique, value)\n\t\t}\n\t}\n\tresult.Relations = unique\n\tsort.Slice(result.Observations, func(i, j int) bool {\n\t\ta, b := result.Observations[i], result.Observations[j]\n\t\tif a.SourceID != b.SourceID {\n\t\t\treturn a.SourceID < b.SourceID\n\t\t}\n\t\tif a.Kind != b.Kind {\n\t\t\treturn a.Kind < b.Kind\n\t\t}\n\t\tif a.Outcome != b.Outcome {\n\t\t\treturn a.Outcome < b.Outcome\n\t\t}\n\t\tif a.Reason != b.Reason {\n\t\t\treturn a.Reason < b.Reason\n\t\t}\n\t\tif a.Evidence.Type != b.Evidence.Type {\n\t\t\treturn a.Evidence.Type < b.Evidence.Type\n\t\t}\n\t\tif a.Evidence.Value != b.Evidence.Value {\n\t\t\treturn a.Evidence.Value < b.Evidence.Value\n\t\t}\n\t\tif a.Evidence.Related != b.Evidence.Related {\n\t\t\treturn a.Evidence.Related < b.Evidence.Related\n\t\t}\n\t\treturn strings.Join(a.CandidateIDs, \"\\x00\") < strings.Join(b.CandidateIDs, \"\\x00\")\n\t})\n\tresult.Observations = uniqueObservations(result.Observations)\n\treturn result, nil\n}",
+            "source_refs": [
+              {
+                "id": "5b9c10c2320e097f0dbdd736",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  3516,
+                  9321
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              }
+            ]
+          },
+          {
+            "id": "39c76e889b3f7756c102010e",
+            "kind": "function_source",
+            "symbol": "appendUnique",
+            "text": "func appendUnique(values []string, value string) []string {\n\tfor _, existing := range values {\n\t\tif existing == value {\n\t\t\treturn values\n\t\t}\n\t}\n\treturn append(values, value)\n}",
+            "source_refs": [
+              {
+                "id": "884c48f62a41377245861de6",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  16853,
+                  17028
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              },
+              {
+                "id": "e30f68d4380d9f8e422e717e",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  17013,
+                  17188
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              }
+            ]
+          },
+          {
+            "id": "b71ebbac2dcfdbe30901f622",
+            "kind": "function_source",
+            "symbol": "currentPath",
+            "text": "func currentPath(change gitstate.Change) string {\n\tif p := validPath(change.NewPath); p != \"\" {\n\t\treturn p\n\t}\n\treturn validPath(change.OldPath)\n}",
+            "source_refs": [
+              {
+                "id": "4bcb7043211b778e89724137",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  9631,
+                  9776
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              },
+              {
+                "id": "7a8d9bbadfe01f5e149881b3",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  9609,
+                  9754
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              }
+            ]
+          },
+          {
+            "id": "7c7c438a1892681b7afe1e6d",
+            "kind": "function_source",
+            "symbol": "importObservations",
+            "text": "func importObservations(file File) []importObservation {\n\tif file.Change.Binary || file.Change.Opaque || file.Change.WorktreeKind != \"file\" || len(file.Content) == 0 {\n\t\treturn nil\n\t}\n\tanalysis := syntax.Analyze(syntax.Input{\n\t\tLanguage: file.Change.Language,\n\t\tContent:  file.Content,\n\t\tHunks:    []syntax.Hunk{{StartLine: 1, EndLine: strings.Count(string(file.Content), \"\\n\") + 1}},\n\t})\n\tif analysis.Mode != syntax.ModeStructural {\n\t\treturn []importObservation{{kind: \"source_file\", spec: currentPath(file.Change), supported: false, reason: \"syntax_evidence_unavailable\"}}\n\t}\n\tbySpec := make(map[string]importObservation)\n\tfor _, evidence := range analysis.Evidence {\n\t\tif (evidence.Role != \"import\" && evidence.Kind != \"use_declaration\") || evidence.EndByte <= evidence.StartByte || int(evidence.EndByte) > len(file.Content) {\n\t\t\tcontinue\n\t\t}\n\t\tspan := strings.TrimSpace(string(file.Content[evidence.StartByte:evidence.EndByte]))\n\t\tvar target string\n\t\tsupported := true\n\t\tswitch evidence.Kind {\n\t\tcase \"import_spec\":\n\t\t\tif match := quotedImport.FindStringSubmatch(span); len(match) == 2 {\n\t\t\t\ttarget = match[1]\n\t\t\t}\n\t\tcase \"import_statement\":\n\t\t\tfor _, pattern := range []*regexp.Regexp{fromImport, sideEffectImport, cssImport} {\n\t\t\t\tif match := pattern.FindStringSubmatch(span); len(match) == 2 {\n\t\t\t\t\ttarget = match[1]\n\t\t\t\t\tbreak\n\t\t\t\t}\n\t\t\t}\n\t\tcase \"import_from_statement\":\n\t\t\tif match := pythonFrom.FindStringSubmatch(span); len(match) == 2 {\n\t\t\t\ttarget = match[1]\n\t\t\t}\n\t\tcase \"use_declaration\":\n\t\t\tsupported = false\n\t\tdefault:\n\t\t\tsupported = false\n\t\t}\n\t\tif target == \"\" && supported {\n\t\t\tsupported = false\n\t\t}\n\t\treason := \"\"\n\t\tif !supported {\n\t\t\treason = \"import_syntax_not_supported\"\n\t\t\tif evidence.Kind == \"use_declaration\" {\n\t\t\t\treason = \"module_resolution_not_available\"\n\t\t\t}\n\t\t}\n\t\tkey := target\n\t\tif key == \"\" {\n\t\t\tkey = span\n\t\t}\n\t\tprevious, exists := bySpec[key]\n\t\tif !exists || (!previous.supported && supported) {\n\t\t\tbySpec[key] = importObservation{spec: key, kind: evidence.Kind, supported: supported, reason: reason}\n\t\t}\n\t}\n\tresult := make([]importObservation, 0, len(bySpec))\n\tfor _, observed := range bySpec {\n\t\tresult = append(result, observed)\n\t}\n\tsort.Slice(result, func(i, j int) bool {\n\t\tif result[i].spec != result[j].spec {\n\t\t\treturn result[i].spec < result[j].spec\n\t\t}\n\t\treturn result[i].kind < result[j].kind\n\t})\n\treturn result\n}",
+            "source_refs": [
+              {
+                "id": "487f84c2c2b49bb05395e52f",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  10352,
+                  12708
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              }
+            ]
+          },
+          {
+            "id": "573e81ee1c8f9afab4159107",
+            "kind": "function_source",
+            "symbol": "importObservations",
+            "text": "func importObservations(file File) []importObservation {\n\tif file.Change.Binary || file.Change.Opaque || file.Change.WorktreeKind != \"file\" || len(file.Content) == 0 {\n\t\treturn nil\n\t}\n\tanalysis := syntax.Analyze(syntax.Input{\n\t\tLanguage: file.Change.Language,\n\t\tContent:  file.Content,\n\t\tHunks:    []syntax.Hunk{{StartLine: 1, EndLine: strings.Count(string(file.Content), \"\\n\") + 1}},\n\t})\n\tif analysis.Mode != syntax.ModeStructural {\n\t\treturn []importObservation{{kind: \"source_file\", spec: currentPath(file.Change), supported: false, reason: \"syntax_evidence_unavailable\"}}\n\t}\n\tbySpec := make(map[string]importObservation)\n\tfor _, evidence := range analysis.Evidence {\n\t\tif evidence.Role != \"import\" || evidence.EndByte <= evidence.StartByte || int(evidence.EndByte) > len(file.Content) {\n\t\t\tcontinue\n\t\t}\n\t\tspan := strings.TrimSpace(string(file.Content[evidence.StartByte:evidence.EndByte]))\n\t\tvar target string\n\t\tsupported := true\n\t\tswitch evidence.Kind {\n\t\tcase \"import_spec\":\n\t\t\tif match := quotedImport.FindStringSubmatch(span); len(match) == 2 {\n\t\t\t\ttarget = match[1]\n\t\t\t}\n\t\tcase \"import_statement\":\n\t\t\tfor _, pattern := range []*regexp.Regexp{fromImport, sideEffectImport, cssImport} {\n\t\t\t\tif match := pattern.FindStringSubmatch(span); len(match) == 2 {\n\t\t\t\t\ttarget = match[1]\n\t\t\t\t\tbreak\n\t\t\t\t}\n\t\t\t}\n\t\tcase \"import_from_statement\":\n\t\t\tif match := pythonFrom.FindStringSubmatch(span); len(match) == 2 {\n\t\t\t\ttarget = match[1]\n\t\t\t}\n\t\tdefault:\n\t\t\tsupported = false\n\t\t}\n\t\tif target == \"\" && supported {\n\t\t\tsupported = false\n\t\t}\n\t\treason := \"\"\n\t\tif !supported {\n\t\t\treason = \"import_syntax_not_supported\"\n\t\t}\n\t\tkey := target\n\t\tif key == \"\" {\n\t\t\tkey = span\n\t\t}\n\t\tprevious, exists := bySpec[key]\n\t\tif !exists || (!previous.supported && supported) {\n\t\t\tbySpec[key] = importObservation{spec: key, kind: evidence.Kind, supported: supported, reason: reason}\n\t\t}\n\t}\n\tresult := make([]importObservation, 0, len(bySpec))\n\tfor _, observed := range bySpec {\n\t\tresult = append(result, observed)\n\t}\n\tsort.Slice(result, func(i, j int) bool {\n\t\tif result[i].spec != result[j].spec {\n\t\t\treturn result[i].spec < result[j].spec\n\t\t}\n\t\treturn result[i].kind < result[j].kind\n\t})\n\treturn result\n}",
+            "source_refs": [
+              {
+                "id": "aa0a5804e8b4b05969b4fad1",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  10374,
+                  12548
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              }
+            ]
+          },
+          {
+            "id": "331f5cc17e6bd5e62dc3873a",
+            "kind": "function_source",
+            "symbol": "manifestLockRelations",
+            "text": "func manifestLockRelations(files []File) []Relation {\n\tbyDirectory := make(map[string]map[string][]string)\n\tfor _, file := range files {\n\t\tfilePath := currentPath(file.Change)\n\t\tif filePath == \"\" {\n\t\t\tcontinue\n\t\t}\n\t\tdir, name := path.Dir(filePath), path.Base(filePath)\n\t\tif byDirectory[dir] == nil {\n\t\t\tbyDirectory[dir] = make(map[string][]string)\n\t\t}\n\t\tbyDirectory[dir][name] = append(byDirectory[dir][name], file.Change.ID)\n\t}\n\tdirectories := make([]string, 0, len(byDirectory))\n\tfor dir := range byDirectory {\n\t\tdirectories = append(directories, dir)\n\t}\n\tsort.Strings(directories)\n\tvar relations []Relation\n\tfor _, dir := range directories {\n\t\tfilesByName := byDirectory[dir]\n\t\tfor manifest, locks := range manifestLocks {\n\t\t\tfor _, manifestID := range filesByName[manifest] {\n\t\t\t\tfor _, lock := range locks {\n\t\t\t\t\tfor _, lockID := range filesByName[lock] {\n\t\t\t\t\t\trelations = append(relations, Relation{manifestID, lockID, ManifestLock, Soft, \"known_manifest_lock_pair\", Evidence{\"manifest_lock_pair\", manifest, lock}, nil})\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\treturn relations\n}",
+            "source_refs": [
+              {
+                "id": "8b5a35e4d08f7ebdbc14b2d6",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  15939,
+                  17011
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              },
+              {
+                "id": "fab0e336068f282141815b93",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  15779,
+                  16851
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              }
+            ]
+          },
+          {
+            "id": "c0d76a35658e3c4f185b7e49",
+            "kind": "function_source",
+            "symbol": "referencedIdentifiers",
+            "text": "func referencedIdentifiers(file File) []string {\n\tvar result []string\n\tfor _, evidence := range file.Evidence {\n\t\tif evidence.Kind != \"identifier\" && evidence.Kind != \"type_identifier\" && evidence.Kind != \"property_identifier\" {\n\t\t\tcontinue\n\t\t}\n\t\tif evidence.EndByte <= evidence.StartByte || int(evidence.EndByte) > len(file.Content) {\n\t\t\tcontinue\n\t\t}\n\t\tvalue := string(file.Content[evidence.StartByte:evidence.EndByte])\n\t\tif isIdentifier(value) {\n\t\t\tresult = appendUnique(result, value)\n\t\t}\n\t}\n\treturn result\n}",
+            "source_refs": [
+              {
+                "id": "7cfde53f950abd2939ce3690",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  14918,
+                  15429
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              },
+              {
+                "id": "ccdf3c753dce8597e729aa09",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  14758,
+                  15269
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              }
+            ]
+          },
+          {
+            "id": "7569f144a0f5c38ca8176f6a",
+            "kind": "function_source",
+            "symbol": "resolveImport",
+            "text": "func resolveImport(importer, spec string, byPath map[string]string) (string, Outcome, []string, string) {\n\tvar candidates []string\n\tswitch {\n\tcase strings.HasPrefix(spec, \"./\") || strings.HasPrefix(spec, \"../\"):\n\t\textensions := importExtensions(path.Ext(importer))\n\t\tif len(extensions) == 0 {\n\t\t\treturn \"\", Unsupported, nil, \"importer_extension_not_supported\"\n\t\t}\n\t\tbase := path.Clean(path.Join(path.Dir(importer), spec))\n\t\tif base == \"..\" || strings.HasPrefix(base, \"../\") {\n\t\t\treturn \"\", Unresolved, nil, \"import_target_outside_repository\"\n\t\t}\n\t\tif ext := path.Ext(base); ext != \"\" {\n\t\t\tfor _, allowed := range extensions {\n\t\t\t\tif ext == allowed {\n\t\t\t\t\tcandidates = append(candidates, base)\n\t\t\t\t\tbreak\n\t\t\t\t}\n\t\t\t}\n\t\t} else {\n\t\t\tfor _, ext := range extensions {\n\t\t\t\tcandidates = append(candidates, base+ext, path.Join(base, \"index\"+ext))\n\t\t\t}\n\t\t}\n\tcase strings.HasPrefix(spec, \".\") && strings.HasSuffix(importer, \".py\"):\n\t\t// Python relative imports: one dot is the current package.\n\t\tdots := len(spec) - len(strings.TrimLeft(spec, \".\"))\n\t\tdir := path.Dir(importer)\n\t\tfor i := 1; i < dots; i++ {\n\t\t\tif dir == \".\" {\n\t\t\t\treturn \"\", Unresolved, nil, \"import_target_outside_repository\"\n\t\t\t}\n\t\t\tdir = path.Dir(dir)\n\t\t}\n\t\tmodule := strings.ReplaceAll(strings.TrimLeft(spec, \".\"), \".\", \"/\")\n\t\tbase := path.Join(dir, module)\n\t\tcandidates = []string{base + \".py\", path.Join(base, \"__init__.py\")}\n\tdefault:\n\t\t// Absolute package imports need module resolution, which is outside this extractor.\n\t\treturn \"\", Unsupported, nil, \"module_resolution_not_available\"\n\t}\n\tvar found []string\n\tfor _, candidate := range candidates {\n\t\tif id := byPath[candidate]; id != \"\" {\n\t\t\tfound = appendUnique(found, id)\n\t\t}\n\t}\n\tsort.Strings(found)\n\tswitch len(found) {\n\tcase 0:\n\t\treturn \"\", Unresolved, nil, \"target_not_in_changed_file_set\"\n\tcase 1:\n\t\treturn found[0], Matched, nil, \"\"\n\tdefault:\n\t\treturn \"\", Ambiguous, found, \"multiple_changed_targets_match_import\"\n\t}\n}",
+            "source_refs": [
+              {
+                "id": "68f0e7df84658d0b27ee2696",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  12550,
+                  14489
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              },
+              {
+                "id": "c2ad8c672b4d9f636aac4696",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  12710,
+                  14649
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              }
+            ]
+          },
+          {
+            "id": "6c44e454cff2735873dcb197",
+            "kind": "function_source",
+            "symbol": "sourceCandidates",
+            "text": "func sourceCandidates(p string) []string {\n\tdir, name := path.Split(p)\n\tinTestsDir := strings.HasSuffix(dir, \"__tests__/\")\n\tif inTestsDir {\n\t\tdir = strings.TrimSuffix(dir, \"__tests__/\")\n\t}\n\text := path.Ext(name)\n\tbase := strings.TrimSuffix(name, ext)\n\tfor _, suffix := range []string{\"_test\", \".test\", \".spec\"} {\n\t\tif strings.HasSuffix(base, suffix) {\n\t\t\treturn []string{dir + strings.TrimSuffix(base, suffix) + ext}\n\t\t}\n\t}\n\tif strings.HasPrefix(base, \"test_\") {\n\t\treturn []string{dir + strings.TrimPrefix(base, \"test_\") + ext}\n\t}\n\tif inTestsDir {\n\t\treturn []string{dir + name}\n\t}\n\treturn nil\n}",
+            "source_refs": [
+              {
+                "id": "29dde670823fd74eca893205",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  9756,
+                  10350
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              },
+              {
+                "id": "bccf06209954b481f557c8b8",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  9778,
+                  10372
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              }
+            ]
+          },
+          {
+            "id": "a471b972760500de2c5e4a04",
+            "kind": "function_source",
+            "symbol": "uniqueObservations",
+            "text": "func uniqueObservations(values []Observation) []Observation {\n\tif len(values) < 2 {\n\t\treturn values\n\t}\n\tunique := values[:0]\n\tfor _, value := range values {\n\t\tif len(unique) > 0 {\n\t\t\tprevious := unique[len(unique)-1]\n\t\t\tif previous.SourceID == value.SourceID && previous.Kind == value.Kind && previous.Outcome == value.Outcome && previous.Reason == value.Reason && previous.Evidence == value.Evidence && strings.Join(previous.CandidateIDs, \"\\x00\") == strings.Join(value.CandidateIDs, \"\\x00\") {\n\t\t\t\tcontinue\n\t\t\t}\n\t\t}\n\t\tunique = append(unique, value)\n\t}\n\treturn unique\n}",
+            "source_refs": [
+              {
+                "id": "68744a41ab706f0c49c0eba5",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  17190,
+                  17758
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              },
+              {
+                "id": "8557f1170366e92403b05ef7",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  17030,
+                  17598
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              }
+            ]
+          },
+          {
+            "id": "edb0437f71c560c2ba6256ce",
+            "kind": "function_source",
+            "symbol": "validPath",
+            "text": "func validPath(value *string) string {\n\tif value == nil || *value == \"\" || strings.HasPrefix(*value, \"/\") || strings.Contains(*value, \"\\\\\") {\n\t\treturn \"\"\n\t}\n\tclean := path.Clean(*value)\n\tif clean == \".\" || clean == \"..\" || strings.HasPrefix(clean, \"../\") || clean != *value {\n\t\treturn \"\"\n\t}\n\treturn clean\n}",
+            "source_refs": [
+              {
+                "id": "2473115f2f1d2c5976d6f5a8",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  9301,
+                  9607
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              },
+              {
+                "id": "e31a620e2c2e3dfc34b505dd",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  9323,
+                  9629
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              }
+            ]
+          },
+          {
+            "id": "de579fd346894c93faea597c",
+            "kind": "import_source",
+            "symbol": "\"errors\"",
+            "text": "\"errors\"",
+            "source_refs": [
+              {
+                "id": "8a0bb949939af5b0423943df",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  180,
+                  188
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              },
+              {
+                "id": "9bd003c683797729c357697b",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  180,
+                  188
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              }
+            ]
+          },
+          {
+            "id": "78ddf08e5fb3215bb2ffee73",
+            "kind": "import_source",
+            "symbol": "\"github.com/natsuki0413/commiter-cli/internal/gitstate\"",
+            "text": "\"github.com/natsuki0413/commiter-cli/internal/gitstate\"",
+            "source_refs": [
+              {
+                "id": "e86f06c4cca0415105926016",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  228,
+                  283
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              },
+              {
+                "id": "fadc76d0ed95e246d0cf2ec5",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  228,
+                  283
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              }
+            ]
+          },
+          {
+            "id": "79ac1496bbc9dfc76171bc7d",
+            "kind": "import_source",
+            "symbol": "\"github.com/natsuki0413/commiter-cli/internal/syntax\"",
+            "text": "\"github.com/natsuki0413/commiter-cli/internal/syntax\"",
+            "source_refs": [
+              {
+                "id": "2358179fc529db4666be36f3",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  285,
+                  338
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              },
+              {
+                "id": "7676073d90dafb0a64258d59",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  285,
+                  338
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              }
+            ]
+          },
+          {
+            "id": "264fa9d2e530ce0723054760",
+            "kind": "import_source",
+            "symbol": "\"path\"",
+            "text": "\"path\"",
+            "source_refs": [
+              {
+                "id": "06fd34912d1f912fcbf506c9",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  190,
+                  196
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              },
+              {
+                "id": "0b4d01605886d5e7964cd9e1",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  190,
+                  196
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              }
+            ]
+          },
+          {
+            "id": "4b02ea4b9d60ac3a89bbfc89",
+            "kind": "import_source",
+            "symbol": "\"regexp\"",
+            "text": "\"regexp\"",
+            "source_refs": [
+              {
+                "id": "16f4ae608c092e1ef456372b",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  198,
+                  206
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              },
+              {
+                "id": "6f87e46fbb24d08a7bc7aa44",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  198,
+                  206
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              }
+            ]
+          },
+          {
+            "id": "6dfd08fbc023a0c997ccd4b8",
+            "kind": "import_source",
+            "symbol": "\"sort\"",
+            "text": "\"sort\"",
+            "source_refs": [
+              {
+                "id": "1c798e05bb020caf7f46ccc2",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  208,
+                  214
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              },
+              {
+                "id": "a8d95c15b7b720f9f1ae7015",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  208,
+                  214
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              }
+            ]
+          },
+          {
+            "id": "756617a589c0335937c97aff",
+            "kind": "import_source",
+            "symbol": "\"strings\"",
+            "text": "\"strings\"",
+            "source_refs": [
+              {
+                "id": "6c861120b78bbb49f7987469",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  216,
+                  225
+                ],
+                "source_sha256": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9"
+              },
+              {
+                "id": "e352e9609079b520eed4476b",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  216,
+                  225
+                ],
+                "source_sha256": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+              }
+            ]
+          },
+          {
+            "id": "025405e16eae5750a57b0b02",
+            "kind": "function_source",
+            "symbol": "TestRootDirectoryProximityIsGrouped",
+            "text": "func TestRootDirectoryProximityIsGrouped(t *testing.T) {\n\tfiles := []File{\n\t\tfixture(\"F002\", \"b.go\", \"go\", \"\"),\n\t\tfixture(\"F001\", \"a.go\", \"go\", \"\"),\n\t}\n\tgot, err := Extract(files)\n\tif err != nil {\n\t\tt.Fatal(err)\n\t}\n\tif len(got.Relations) != 0 || !reflect.DeepEqual(got.Hints, []Hint{{Kind: PathProximity, Evidence: Evidence{Type: \"directory\", Value: \".\"}, FileIDs: []string{\"F001\", \"F002\"}}}) {\n\t\tt.Fatalf(\"root directory hint = %#v; relations = %#v\", got.Hints, got.Relations)\n\t}\n}",
+            "source_refs": [
+              {
+                "id": "480fe1234fca7a80bee1f82f",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  5490,
+                  5972
+                ],
+                "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37"
+              }
+            ]
+          },
+          {
+            "id": "26c2282216c65ebd3b3dc64d",
+            "kind": "function_source",
+            "symbol": "TestRustUseIsRecordedAsUnsupported",
+            "text": "func TestRustUseIsRecordedAsUnsupported(t *testing.T) {\n\tfiles := []File{fixture(\"F001\", \"src/lib.rs\", \"rust\", \"use crate::foo::Bar;\\n\")}\n\tgot, err := Extract(files)\n\tif err != nil {\n\t\tt.Fatal(err)\n\t}\n\twant := Observation{\n\t\tSourceID: \"F001\", Kind: DirectImport, Outcome: Unsupported,\n\t\tReason:   \"module_resolution_not_available\",\n\t\tEvidence: Evidence{Type: \"import_path\", Value: \"use crate::foo::Bar;\", Related: \"use_declaration\"},\n\t}\n\tif len(got.Relations) != 0 || !reflect.DeepEqual(got.Observations, []Observation{want}) {\n\t\tt.Fatalf(\"Rust use observations = %#v; relations = %#v\", got.Observations, got.Relations)\n\t}\n}",
+            "source_refs": [
+              {
+                "id": "3515d68b89d6b51c51192833",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  5974,
+                  6598
+                ],
+                "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37"
+              }
+            ]
+          },
+          {
+            "id": "9b2b20e98f178b3cfecd37a8",
+            "kind": "function_source",
+            "symbol": "fixture",
+            "text": "func fixture(id, p, language, content string) File {\n\tchange := gitstate.Change{ID: id, Status: \"modified\", NewPath: &p, Language: language, WorktreeKind: \"file\"}\n\tfile := File{Change: change, Content: []byte(content)}\n\tif content != \"\" {\n\t\tanalysis := syntax.Analyze(syntax.Input{Language: language, Content: file.Content, Hunks: []syntax.Hunk{{StartLine: 1, EndLine: strings.Count(content, \"\\n\")}}})\n\t\tfile.Evidence = analysis.Evidence\n\t}\n\treturn file\n}",
+            "source_refs": [
+              {
+                "id": "5ff17fe965533d505f737160",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  8469,
+                  8924
+                ],
+                "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37"
+              }
+            ]
+          },
+          {
+            "id": "10273754c52e5c90930a3caf",
+            "kind": "import_source",
+            "symbol": "\"fmt\"",
+            "text": "\"fmt\"",
+            "source_refs": [
+              {
+                "id": "3a7a6d3f8361abe81ee01249",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  28,
+                  33
+                ],
+                "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37"
+              }
+            ]
+          },
+          {
+            "id": "1c5a389eb9026644029a579e",
+            "kind": "import_source",
+            "symbol": "\"github.com/natsuki0413/commiter-cli/internal/gitstate\"",
+            "text": "\"github.com/natsuki0413/commiter-cli/internal/gitstate\"",
+            "source_refs": [
+              {
+                "id": "9c2bd0c0f22c0c49deaf7196",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  69,
+                  124
+                ],
+                "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37"
+              }
+            ]
+          },
+          {
+            "id": "46fa3ba8b1485290769f6579",
+            "kind": "import_source",
+            "symbol": "\"github.com/natsuki0413/commiter-cli/internal/syntax\"",
+            "text": "\"github.com/natsuki0413/commiter-cli/internal/syntax\"",
+            "source_refs": [
+              {
+                "id": "a1a2277811b38082809071ae",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  126,
+                  179
+                ],
+                "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37"
+              }
+            ]
+          },
+          {
+            "id": "791de643ff3eabe74e55b2d4",
+            "kind": "import_source",
+            "symbol": "\"reflect\"",
+            "text": "\"reflect\"",
+            "source_refs": [
+              {
+                "id": "5b97f717fc04e9391f3d26e6",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  35,
+                  44
+                ],
+                "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37"
+              }
+            ]
+          },
+          {
+            "id": "bbca19c2deca011d8283478d",
+            "kind": "import_source",
+            "symbol": "\"strings\"",
+            "text": "\"strings\"",
+            "source_refs": [
+              {
+                "id": "574e14540ecac038d04bd370",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  46,
+                  55
+                ],
+                "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37"
+              }
+            ]
+          },
+          {
+            "id": "8db8df6b00ba7418ca6145a7",
+            "kind": "import_source",
+            "symbol": "\"testing\"",
+            "text": "\"testing\"",
+            "source_refs": [
+              {
+                "id": "e970b5dff26449dff258ac5e",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  57,
+                  66
+                ],
+                "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37"
+              }
+            ]
+          }
+        ],
+        "anchors": [
+          {
+            "id": "335cff456cef15c8ed1a65c7",
+            "file": "F002",
+            "version": "after",
+            "span": [
+              5709,
+              5732
+            ],
+            "text": "len(got.Relations) != 0",
+            "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37",
+            "condition_span": [
+              5709,
+              5882
+            ],
+            "context_id": "025405e16eae5750a57b0b02"
+          },
+          {
+            "id": "4c51a79e3abb6a5e9d51f001",
+            "file": "F002",
+            "version": "after",
+            "span": [
+              6144,
+              6154
+            ],
+            "text": "err != nil",
+            "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37",
+            "condition_span": [
+              6144,
+              6154
+            ],
+            "context_id": "26c2282216c65ebd3b3dc64d"
+          },
+          {
+            "id": "52c9f750b6f29223dd398ab9",
+            "file": "F002",
+            "version": "after",
+            "span": [
+              6415,
+              6438
+            ],
+            "text": "len(got.Relations) != 0",
+            "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37",
+            "condition_span": [
+              6415,
+              6499
+            ],
+            "context_id": "26c2282216c65ebd3b3dc64d"
+          },
+          {
+            "id": "9322d3ad4f8c79cd55ee3591",
+            "file": "F002",
+            "version": "after",
+            "span": [
+              6442,
+              6499
+            ],
+            "text": "!reflect.DeepEqual(got.Observations, []Observation{want})",
+            "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37",
+            "condition_span": [
+              6415,
+              6499
+            ],
+            "context_id": "26c2282216c65ebd3b3dc64d"
+          },
+          {
+            "id": "aaa2aebb8e085d7c9d84df5d",
+            "file": "F002",
+            "version": "after",
+            "span": [
+              5736,
+              5882
+            ],
+            "text": "!reflect.DeepEqual(got.Hints, []Hint{{Kind: PathProximity, Evidence: Evidence{Type: \"directory\", Value: \".\"}, FileIDs: []string{\"F001\", \"F002\"}}})",
+            "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37",
+            "condition_span": [
+              5709,
+              5882
+            ],
+            "context_id": "025405e16eae5750a57b0b02"
+          },
+          {
+            "id": "c63be9ac7caaa8313e027e12",
+            "file": "F002",
+            "version": "after",
+            "span": [
+              5674,
+              5684
+            ],
+            "text": "err != nil",
+            "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37",
+            "condition_span": [
+              5674,
+              5684
+            ],
+            "context_id": "025405e16eae5750a57b0b02"
+          }
+        ],
+        "unresolved_calls": [
+          {
+            "source": "3515d68b89d6b51c51192833",
+            "name": "len",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "480fe1234fca7a80bee1f82f",
+            "name": "len",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "487f84c2c2b49bb05395e52f",
+            "name": "append",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "487f84c2c2b49bb05395e52f",
+            "name": "int",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "487f84c2c2b49bb05395e52f",
+            "name": "len",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "487f84c2c2b49bb05395e52f",
+            "name": "make",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "487f84c2c2b49bb05395e52f",
+            "name": "string",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "5b9c10c2320e097f0dbdd736",
+            "name": "append",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "5b9c10c2320e097f0dbdd736",
+            "name": "len",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "5b9c10c2320e097f0dbdd736",
+            "name": "make",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "9ec903a240bf3efa9bac75f8",
+            "name": "append",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "9ec903a240bf3efa9bac75f8",
+            "name": "len",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "9ec903a240bf3efa9bac75f8",
+            "name": "make",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "aa0a5804e8b4b05969b4fad1",
+            "name": "append",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "aa0a5804e8b4b05969b4fad1",
+            "name": "int",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "aa0a5804e8b4b05969b4fad1",
+            "name": "len",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "aa0a5804e8b4b05969b4fad1",
+            "name": "make",
+            "status": "not_in_selected_snapshots"
+          },
+          {
+            "source": "aa0a5804e8b4b05969b4fad1",
+            "name": "string",
+            "status": "not_in_selected_snapshots"
+          }
+        ]
+      },
+      "deterministic": true,
+      "prior_test_symbol_hits": {
+        "TestRustUseIsRecordedAsUnsupported": [],
+        "TestRootDirectoryProximityIsGrouped": []
+      },
+      "model_calls": 0,
+      "holdout_certified": false,
+      "semantic_quality": null
+    }
+  ]
+}

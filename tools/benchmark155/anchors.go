@@ -27,16 +27,17 @@ type Request struct {
 	Files []Snapshot `json:"files"`
 }
 type Evidence struct {
-	ID        string `json:"id"`
-	File      string `json:"file"`
-	Version   string `json:"version"`
-	Kind      string `json:"kind"`
-	Function  string `json:"function"`
-	Span      [2]int `json:"span"`
-	Text      string `json:"text"`
-	SourceSHA string `json:"source_sha256"`
-	Syntax    string `json:"syntax"`
-	Changed   bool   `json:"changed"`
+	ID        string   `json:"id"`
+	File      string   `json:"file"`
+	Version   string   `json:"version"`
+	Kind      string   `json:"kind"`
+	Function  string   `json:"function"`
+	Span      [2]int   `json:"span"`
+	Text      string   `json:"text"`
+	SourceSHA string   `json:"source_sha256"`
+	Syntax    string   `json:"syntax"`
+	Changed   bool     `json:"changed"`
+	Calls     []string `json:"calls,omitempty"`
 	// Parts of one || condition remain a single observed failure condition.
 	ConditionSpan [2]int `json:"condition_span"`
 }
@@ -108,10 +109,48 @@ func extractOne(file Snapshot, version, src string) ([]Evidence, Status) {
 	}
 	for _, decl := range tree.Decls {
 		fn, ok := decl.(*ast.FuncDecl)
-		if !ok || fn.Body == nil {
+		if !ok {
+			if gen, yes := decl.(*ast.GenDecl); yes {
+				for _, spec := range gen.Specs {
+					kind, name := "", ""
+					switch node := spec.(type) {
+					case *ast.TypeSpec:
+						kind, name = "type_source", node.Name.Name
+					case *ast.ValueSpec:
+						kind = "binding_source"
+						for _, id := range node.Names {
+							name += id.Name + ","
+						}
+					case *ast.ImportSpec:
+						kind, name = "import_source", node.Path.Value
+					}
+					if kind != "" {
+						out = append(out, observation(fs, src, file.ID, version, kind, name, spec, nil))
+					}
+				}
+			}
 			continue
 		}
-		out = append(out, observation(fs, src, file.ID, version, "function_source", fn.Name.Name, fn, nil))
+		if fn.Body == nil {
+			continue
+		}
+		item := observation(fs, src, file.ID, version, "function_source", fn.Name.Name, fn, nil)
+		if fn.Recv == nil {
+			callSet := map[string]bool{}
+			ast.Inspect(fn.Body, func(n ast.Node) bool {
+				if call, ok := n.(*ast.CallExpr); ok {
+					if id, plain := call.Fun.(*ast.Ident); plain && (id.Obj == nil || id.Obj.Kind == ast.Fun) {
+						callSet[id.Name] = true
+					}
+				}
+				return true
+			})
+			for name := range callSet {
+				item.Calls = append(item.Calls, name)
+			}
+			sort.Strings(item.Calls)
+		}
+		out = append(out, item)
 		if !strings.HasSuffix(file.Path, "_test.go") || !strings.HasPrefix(fn.Name.Name, "Test") || fn.Type.Params == nil {
 			continue
 		}
