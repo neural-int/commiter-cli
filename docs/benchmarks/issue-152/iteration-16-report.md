@@ -1,0 +1,19 @@
+## 要約
+
+固定source/test正例と診断文反例を、最小包含statementのAST位置情報で区別できた。期待値atomのstatementにはValue呼出、診断文3atomのstatementにはt.Logだけが含まれた。関数全体annotationより局所的な情報を観測できるが、B Goやsemantic grouping改善は未立証。
+
+## 検証結果
+
+標準Go ASTを使う独立観測toolを追加した。source1MiBで制限しparse失敗は停止、statement spanはbyte offset。各atomを包含する最小statementを観測し、見つからなければunknownとする。coupled source atomはcallなし、test assertion atomはValue/t.Fatal。独立source atomはcallなし、diagnostic3atomは各t.Logのみ。全6atomにscopeが見つかった。goldによる抽出分岐なし、既存relationは変更していない。
+
+新toolのAST回帰テスト、build、既存Python6test、diff check成功。model call0。既存fixtureを診断目的に使用し、未使用holdoutとして数えない。以前のFM/FS/model結果とgoldを変更していない。
+
+## 考察
+
+今回のFPはtest関数全体の呼出を診断文atomへ継承したためだった。statement位置情報はこのケースの無関係な呼出を識別する補助evidenceになり得る。ただし包含statementはlexical scopeで、同じifやreturnに複数intentがある場合もcallを含む。変数の定義と利用の別statement間の関係も追跡しない。この観測だけでrelation削除やhard mergeをproductionへ導入しない。
+
+## Next Steps
+
+- 新規専用worktreeで未使用のassertion/diagnostic混在、同一statement独立変更、変数を介すtest対応を事前固定する。局所位置による改善と欠落を同時に評価するため。
+- まずstatement観測のfalse-positive/false-negativeを測り、unknown semanticsを保持する。lexical一致を共有intentの保証と誤認しないため。
+- 識別情報が残る場合だけ同じcontainerでA-onlyとの固定model比較へ進む。C gate、新規file/rename/history/cost条件は未達のまま保持する。

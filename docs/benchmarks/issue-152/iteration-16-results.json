@@ -1,0 +1,139 @@
+[
+  {
+    "fixture": "test-assertion-coupled",
+    "units": [
+      {
+        "unit": "U001",
+        "file": "F001",
+        "span": [
+          48,
+          49
+        ],
+        "scope": {
+          "start": 37,
+          "end": 49,
+          "kind": "lexical_statement",
+          "calls": []
+        },
+        "status": "observed"
+      },
+      {
+        "unit": "U002",
+        "file": "F002",
+        "span": [
+          76,
+          77
+        ],
+        "scope": {
+          "start": 61,
+          "end": 100,
+          "kind": "lexical_statement",
+          "calls": [
+            "Value",
+            "t.Fatal"
+          ]
+        },
+        "status": "observed"
+      }
+    ],
+    "relations": [
+      {
+        "from_unit": "U002",
+        "to_unit": "U001",
+        "hops": 1,
+        "kind": "soft_directed_call_path"
+      }
+    ]
+  },
+  {
+    "fixture": "test-diagnostic-independent",
+    "units": [
+      {
+        "unit": "U001",
+        "file": "F001",
+        "span": [
+          48,
+          49
+        ],
+        "scope": {
+          "start": 37,
+          "end": 49,
+          "kind": "lexical_statement",
+          "calls": []
+        },
+        "status": "observed"
+      },
+      {
+        "unit": "U002",
+        "file": "F002",
+        "span": [
+          108,
+          109
+        ],
+        "scope": {
+          "start": 101,
+          "end": 124,
+          "kind": "lexical_statement",
+          "calls": [
+            "t.Log"
+          ]
+        },
+        "status": "observed"
+      },
+      {
+        "unit": "U003",
+        "file": "F002",
+        "span": [
+          109,
+          110
+        ],
+        "scope": {
+          "start": 101,
+          "end": 124,
+          "kind": "lexical_statement",
+          "calls": [
+            "t.Log"
+          ]
+        },
+        "status": "observed"
+      },
+      {
+        "unit": "U004",
+        "file": "F002",
+        "span": [
+          110,
+          111
+        ],
+        "scope": {
+          "start": 101,
+          "end": 124,
+          "kind": "lexical_statement",
+          "calls": [
+            "t.Log"
+          ]
+        },
+        "status": "observed"
+      }
+    ],
+    "relations": [
+      {
+        "from_unit": "U002",
+        "to_unit": "U001",
+        "hops": 1,
+        "kind": "soft_directed_call_path"
+      },
+      {
+        "from_unit": "U003",
+        "to_unit": "U001",
+        "hops": 1,
+        "kind": "soft_directed_call_path"
+      },
+      {
+        "from_unit": "U004",
+        "to_unit": "U001",
+        "hops": 1,
+        "kind": "soft_directed_call_path"
+      }
+    ]
+  }
+]
