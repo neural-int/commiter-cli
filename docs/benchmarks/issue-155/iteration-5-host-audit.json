@@ -1,0 +1,512 @@
+{
+  "model_calls": 0,
+  "rows": [
+    {
+      "name": "fee-wrap",
+      "split": "used_diagnostic",
+      "query_origins": [
+        "observed_test_call",
+        "observed_test_call"
+      ],
+      "units": 10,
+      "queries": 2,
+      "fact_deltas": {
+        "Q001": "observed_value_changed",
+        "Q002": "observed_value_changed"
+      },
+      "source_mapping_verified": true,
+      "intersections": [
+        {
+          "query": "Q001",
+          "version": "after",
+          "fact": {
+            "known": true,
+            "kind": "int",
+            "value": 2,
+            "return_refs": [
+              "W004"
+            ]
+          },
+          "return_source_intersections": [
+            {
+              "witness": "W004",
+              "changed_unit_intersections": [
+                "U001",
+                "U002",
+                "U003",
+                "U004",
+                "U005"
+              ]
+            }
+          ]
+        },
+        {
+          "query": "Q001",
+          "version": "before",
+          "fact": {
+            "known": true,
+            "kind": "int",
+            "value": 1,
+            "return_refs": [
+              "W002"
+            ]
+          },
+          "return_source_intersections": [
+            {
+              "witness": "W002",
+              "changed_unit_intersections": [
+                "U001",
+                "U002",
+                "U003",
+                "U004",
+                "U005"
+              ]
+            }
+          ]
+        },
+        {
+          "query": "Q002",
+          "version": "after",
+          "fact": {
+            "known": true,
+            "kind": "string",
+            "value": "{a}",
+            "return_refs": [
+              "W003"
+            ]
+          },
+          "return_source_intersections": [
+            {
+              "witness": "W003",
+              "changed_unit_intersections": [
+                "U007",
+                "U008"
+              ]
+            }
+          ]
+        },
+        {
+          "query": "Q002",
+          "version": "before",
+          "fact": {
+            "known": true,
+            "kind": "string",
+            "value": "(a)",
+            "return_refs": [
+              "W001"
+            ]
+          },
+          "return_source_intersections": [
+            {
+              "witness": "W001",
+              "changed_unit_intersections": [
+                "U007",
+                "U008"
+              ]
+            }
+          ]
+        }
+      ],
+      "semantic_attribution": null,
+      "commit_partition": null,
+      "warning": "Return overlap is syntax only. No overlap does not prove independence: conditions, arguments and callees can affect the return. Same observation does not prove shared intent."
+    },
+    {
+      "name": "shared-left-right",
+      "split": "used_diagnostic",
+      "query_origins": [
+        "observed_test_call",
+        "observed_test_call"
+      ],
+      "units": 4,
+      "queries": 2,
+      "fact_deltas": {
+        "Q001": "observed_value_changed",
+        "Q002": "observed_value_changed"
+      },
+      "source_mapping_verified": true,
+      "intersections": [
+        {
+          "query": "Q001",
+          "version": "after",
+          "fact": {
+            "known": true,
+            "kind": "int",
+            "value": 4,
+            "return_refs": [
+              "W002"
+            ]
+          },
+          "return_source_intersections": [
+            {
+              "witness": "W002",
+              "changed_unit_intersections": [
+                "U001"
+              ]
+            }
+          ]
+        },
+        {
+          "query": "Q001",
+          "version": "before",
+          "fact": {
+            "known": true,
+            "kind": "int",
+            "value": 3,
+            "return_refs": [
+              "W004"
+            ]
+          },
+          "return_source_intersections": [
+            {
+              "witness": "W004",
+              "changed_unit_intersections": [
+                "U001"
+              ]
+            }
+          ]
+        },
+        {
+          "query": "Q002",
+          "version": "after",
+          "fact": {
+            "known": true,
+            "kind": "int",
+            "value": 6,
+            "return_refs": [
+              "W001"
+            ]
+          },
+          "return_source_intersections": [
+            {
+              "witness": "W001",
+              "changed_unit_intersections": [
+                "U002"
+              ]
+            }
+          ]
+        },
+        {
+          "query": "Q002",
+          "version": "before",
+          "fact": {
+            "known": true,
+            "kind": "int",
+            "value": 4,
+            "return_refs": [
+              "W003"
+            ]
+          },
+          "return_source_intersections": [
+            {
+              "witness": "W003",
+              "changed_unit_intersections": [
+                "U002"
+              ]
+            }
+          ]
+        }
+      ],
+      "semantic_attribution": null,
+      "commit_partition": null,
+      "warning": "Return overlap is syntax only. No overlap does not prove independence: conditions, arguments and callees can affect the return. Same observation does not prove shared intent."
+    },
+    {
+      "name": "count-observed-and-control",
+      "split": "used_diagnostic_plus_control",
+      "query_origins": [
+        "observed_test_call",
+        "constructed_negative_argument_control"
+      ],
+      "units": 39,
+      "queries": 2,
+      "fact_deltas": {
+        "Q001": "observed_value_unchanged",
+        "Q002": "observed_value_changed"
+      },
+      "source_mapping_verified": true,
+      "intersections": [
+        {
+          "query": "Q001",
+          "version": "after",
+          "fact": {
+            "known": true,
+            "kind": "int",
+            "value": 3,
+            "return_refs": [
+              "W003"
+            ]
+          },
+          "return_source_intersections": [
+            {
+              "witness": "W003",
+              "changed_unit_intersections": []
+            }
+          ]
+        },
+        {
+          "query": "Q001",
+          "version": "before",
+          "fact": {
+            "known": true,
+            "kind": "int",
+            "value": 3,
+            "return_refs": [
+              "W002"
+            ]
+          },
+          "return_source_intersections": [
+            {
+              "witness": "W002",
+              "changed_unit_intersections": []
+            }
+          ]
+        },
+        {
+          "query": "Q002",
+          "version": "after",
+          "fact": {
+            "known": true,
+            "kind": "int",
+            "value": 0,
+            "return_refs": [
+              "W001"
+            ]
+          },
+          "return_source_intersections": [
+            {
+              "witness": "W001",
+              "changed_unit_intersections": [
+                "U009",
+                "U010",
+                "U011",
+                "U012",
+                "U013",
+                "U014",
+                "U015",
+                "U016"
+              ]
+            }
+          ]
+        },
+        {
+          "query": "Q002",
+          "version": "before",
+          "fact": {
+            "known": true,
+            "kind": "int",
+            "value": -1,
+            "return_refs": [
+              "W002"
+            ]
+          },
+          "return_source_intersections": [
+            {
+              "witness": "W002",
+              "changed_unit_intersections": []
+            }
+          ]
+        }
+      ],
+      "semantic_attribution": null,
+      "commit_partition": null,
+      "warning": "Return overlap is syntax only. No overlap does not prove independence: conditions, arguments and callees can affect the return. Same observation does not prove shared intent."
+    },
+    {
+      "name": "no-observation",
+      "split": "development_scope_probe",
+      "query_origins": [
+        "no_test_observation"
+      ],
+      "units": 2,
+      "queries": 1,
+      "fact_deltas": {
+        "Q001": "unknown"
+      },
+      "source_mapping_verified": true,
+      "intersections": [
+        {
+          "query": "Q001",
+          "version": "after",
+          "fact": {
+            "known": false,
+            "kind": "unknown",
+            "value": null,
+            "return_refs": []
+          },
+          "return_source_intersections": []
+        },
+        {
+          "query": "Q001",
+          "version": "before",
+          "fact": {
+            "known": false,
+            "kind": "unknown",
+            "value": null,
+            "return_refs": []
+          },
+          "return_source_intersections": []
+        }
+      ],
+      "semantic_attribution": null,
+      "commit_partition": null,
+      "warning": "Return overlap is syntax only. No overlap does not prove independence: conditions, arguments and callees can affect the return. Same observation does not prove shared intent."
+    },
+    {
+      "name": "missing-callee",
+      "split": "development_scope_probe",
+      "query_origins": [
+        "missing_source_control"
+      ],
+      "units": 2,
+      "queries": 1,
+      "fact_deltas": {
+        "Q001": "unknown"
+      },
+      "source_mapping_verified": true,
+      "intersections": [
+        {
+          "query": "Q001",
+          "version": "after",
+          "fact": {
+            "known": false,
+            "kind": "unknown",
+            "value": null,
+            "return_refs": []
+          },
+          "return_source_intersections": []
+        },
+        {
+          "query": "Q001",
+          "version": "before",
+          "fact": {
+            "known": false,
+            "kind": "unknown",
+            "value": null,
+            "return_refs": []
+          },
+          "return_source_intersections": []
+        }
+      ],
+      "semantic_attribution": null,
+      "commit_partition": null,
+      "warning": "Return overlap is syntax only. No overlap does not prove independence: conditions, arguments and callees can affect the return. Same observation does not prove shared intent."
+    },
+    {
+      "name": "public-uuid-compare",
+      "split": "real_source_constructed_argument_probe",
+      "query_origins": [
+        "constructed_lexicographic_inputs",
+        "constructed_lexicographic_inputs",
+        "constructed_lexicographic_inputs"
+      ],
+      "units": 6,
+      "queries": 3,
+      "fact_deltas": {
+        "Q001": "unknown",
+        "Q002": "unknown",
+        "Q003": "unknown"
+      },
+      "source_mapping_verified": true,
+      "intersections": [
+        {
+          "query": "Q001",
+          "version": "after",
+          "fact": {
+            "known": true,
+            "kind": "int",
+            "value": -1,
+            "return_refs": [
+              "W001"
+            ]
+          },
+          "return_source_intersections": [
+            {
+              "witness": "W001",
+              "changed_unit_intersections": [
+                "U005"
+              ]
+            }
+          ]
+        },
+        {
+          "query": "Q001",
+          "version": "before",
+          "fact": {
+            "known": false,
+            "kind": "unknown",
+            "value": null,
+            "return_refs": []
+          },
+          "return_source_intersections": []
+        },
+        {
+          "query": "Q002",
+          "version": "after",
+          "fact": {
+            "known": true,
+            "kind": "int",
+            "value": 0,
+            "return_refs": [
+              "W001"
+            ]
+          },
+          "return_source_intersections": [
+            {
+              "witness": "W001",
+              "changed_unit_intersections": [
+                "U005"
+              ]
+            }
+          ]
+        },
+        {
+          "query": "Q002",
+          "version": "before",
+          "fact": {
+            "known": false,
+            "kind": "unknown",
+            "value": null,
+            "return_refs": []
+          },
+          "return_source_intersections": []
+        },
+        {
+          "query": "Q003",
+          "version": "after",
+          "fact": {
+            "known": true,
+            "kind": "int",
+            "value": 1,
+            "return_refs": [
+              "W001"
+            ]
+          },
+          "return_source_intersections": [
+            {
+              "witness": "W001",
+              "changed_unit_intersections": [
+                "U005"
+              ]
+            }
+          ]
+        },
+        {
+          "query": "Q003",
+          "version": "before",
+          "fact": {
+            "known": false,
+            "kind": "unknown",
+            "value": null,
+            "return_refs": []
+          },
+          "return_source_intersections": []
+        }
+      ],
+      "semantic_attribution": null,
+      "commit_partition": null,
+      "warning": "Return overlap is syntax only. No overlap does not prove independence: conditions, arguments and callees can affect the return. Same observation does not prove shared intent."
+    }
+  ],
+  "scope": "Used diagnostics and constructed-input probes; not independent attribution holdout"
+}
