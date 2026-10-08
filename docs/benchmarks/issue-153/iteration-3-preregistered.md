@@ -1,0 +1,9 @@
+## 固定仮説と判定
+
+固定scorerが明示的な目的情報でもpositive/negative/unknownを区別できないという仮説を3callで診断する。positiveは閏日修正とその回帰test、negativeは閏日修正と独立した背景色変更、unknownは目的・参照情報がない数値変更。入力はscore-controls.jsonに固定する。
+
+positiveはscore>0、negativeはscore<0、unknownはunresolved拒否またはscore=0によるambiguous_optimum拒否を期待する。3/3をcontract弁別成立とする。期待値/nameはモデルに渡さない。明示purposeは診断専用入力で、runtime入力拡張や品質fixtureのgold漏洩として使用しない。
+
+evaluate.scoreをそのまま呼び、system/schema/model/revision/context16384/output1536/timeout120を変更しない。3call、再試行なし。unresolvedでは既存score実装がraw scoreを保存しない制約を保持し、拒否理由を記録する。全zeroはsolver tie拒否を成功したunknown診断として扱うが、品質FM/FS=0へ変換しない。
+
+3/3成立しても実fixtureでの品質成功やD開始条件を証明しない。negative失敗なら現候補の基本弁別未達を記録する。prompt/閾値を既知goldへ調整しない。

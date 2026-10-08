@@ -1,0 +1,61 @@
+[
+  {
+    "name": "positive",
+    "expected": "positive",
+    "data": {
+      "change_units": [
+        {
+          "id": "U001",
+          "purpose": "Fix rejection of valid leap-day dates in date validation.",
+          "before": "return day <= 28",
+          "after": "return day <= days_in_month(year, month)"
+        },
+        {
+          "id": "U002",
+          "purpose": "Add regression coverage for that same leap-day validation bug.",
+          "before": "assert validate_date(2024, 2, 28)",
+          "after": "assert validate_date(2024, 2, 29)"
+        }
+      ]
+    }
+  },
+  {
+    "name": "negative",
+    "expected": "negative",
+    "data": {
+      "change_units": [
+        {
+          "id": "U001",
+          "purpose": "Fix rejection of valid leap-day dates in date validation.",
+          "before": "return day <= 28",
+          "after": "return day <= days_in_month(year, month)"
+        },
+        {
+          "id": "U002",
+          "purpose": "Independently change the settings-page background color. This has no dependency on date validation.",
+          "before": "background: white",
+          "after": "background: beige"
+        }
+      ]
+    }
+  },
+  {
+    "name": "unknown",
+    "expected": "unknown",
+    "data": {
+      "change_units": [
+        {
+          "id": "U001",
+          "before": "value = 3",
+          "after": "value = 4"
+        },
+        {
+          "id": "U002",
+          "before": "value = 8",
+          "after": "value = 9"
+        }
+      ],
+      "context_status": "No file, symbol, dependency, requirement, or purpose information is available. The relationship between the changes is unknown."
+    }
+  }
+]
