@@ -4,7 +4,7 @@
 
 ## 検証結果
 
-新規C専用worktree issue-153-neutral-score-decodingで条件/patch/runnerを9bd599d5、setupをd02cbd01へモデル実行前に固定・push。#153事前6057447459、#150事前6057447936。独立helperをAPFS cloneして同一新binary内のbiased/neutralを比較。binary SHA bc61461f860957780394650f8b46fab2b737f9931917d0194a0f736e671b41a4、元helper SHA3b50561e...は保持。Package.resolved/GrammarSamplingStateソース同値、モデル/新package/downloadなし。
+新規C専用worktree issue-153-neutral-score-decodingで条件/patch/runnerを9bd599d5、setupをd02cbd01へモデル実行前に固定・push。#153事前6057447459、#150事前6057447936。独立helperをAPFS cloneして同一新binary内のbiased/neutralを比較。binary SHA bc61461f860957780394650f8b46fab2b737f9931917d0194a0f736e671b41a4、元helper SHA3b50561e...は保持。Package.resolved/GrammarSamplingStateソース同値、新しいモデル/packageの追加・downloadなし。
 
 neutralでも24合法/8不合法/8prompt replayが通過し、各合法replayの空白penalty0を確認。Metal smoke成功、selected Swift1test成功、Python構造10test/diff check成功。production source/default/manifest/Git mutation経路変更なし。
 
