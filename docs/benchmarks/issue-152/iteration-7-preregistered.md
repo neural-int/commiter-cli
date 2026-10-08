@@ -1,0 +1,7 @@
+# Joint test recoveryのbounded検査
+
+使用済みshared-test/table-driven2件と、新規compensating values/comment-only2件を固定。goldはrequirements/IntentEditsとして評価側のみ保持しprobeはFiles/Repositoryのみ読む。8unit上限で全2unit共同適用、baseline、各unit単独、allを実行する。90sec/probeを維持。allと同一のpairは再実行しない。
+
+単独双方がtest失敗し共同適用で回復する場合をsoft recovery evidenceとする。compensating valuesは異なる独立要求がaggregate testの値を相殺し得ることを検査する。comment-onlyは全状態でtestが成功し得るが、影響不在をdefault mergeへ変えない。
+
+共同test成功はsemantic intentの証明ではない。回帰2件の表現改善と新規2件のfalse-positive/absenceを記録する。これはB Go用の独立A-onlyモデル比較を代替しない。モデル呼出0。計測後にgoldやpredicateを合格目的で変更しない。

@@ -1,0 +1,174 @@
+[
+  {
+    "Name": "independent-shared-test-two-intents",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/values.go",
+        "Before": "package calc\nfunc Left() int { return 3 }\nfunc Right() int { return 7 }\n",
+        "After": "package calc\nfunc Left() int { return 5 }\nfunc Right() int { return 9 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/both_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestBoth(t *testing.T) {\n if calc.Left()!=3 { t.Fatal(\"left\") }\n if calc.Right()!=7 { t.Fatal(\"right\") }\n}\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestBoth(t *testing.T) {\n if calc.Left()!=5 { t.Fatal(\"left\") }\n if calc.Right()!=9 { t.Fatal(\"right\") }\n}\n"
+      }
+    ],
+    "Repository": [],
+    "Requirements": [
+      "Leftの値と対応するassertionを独立更新",
+      "Rightの値と対応するassertionを独立更新"
+    ],
+    "IntentEdits": [
+      [
+        [
+          "F001",
+          "return 3",
+          "return 5"
+        ],
+        [
+          "F002",
+          "Left()!=3",
+          "Left()!=5"
+        ]
+      ],
+      [
+        [
+          "F001",
+          "return 7",
+          "return 9"
+        ],
+        [
+          "F002",
+          "Right()!=7",
+          "Right()!=9"
+        ]
+      ]
+    ]
+  },
+  {
+    "Name": "independent-table-driven-shared-assertion",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/values.go",
+        "Before": "package calc\nfunc Left() int { return 3 }\nfunc Right() int { return 7 }\n",
+        "After": "package calc\nfunc Left() int { return 5 }\nfunc Right() int { return 9 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/both_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestBoth(t *testing.T) {\n cases := []struct{ got, want int }{\n  {calc.Left(), 3},\n  {calc.Right(), 7},\n }\n for _, c := range cases {\n  if c.got != c.want { t.Fatal(\"value\") }\n }\n}\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestBoth(t *testing.T) {\n cases := []struct{ got, want int }{\n  {calc.Left(), 5},\n  {calc.Right(), 9},\n }\n for _, c := range cases {\n  if c.got != c.want { t.Fatal(\"value\") }\n }\n}\n"
+      }
+    ],
+    "Repository": [],
+    "Requirements": [
+      "Leftの値と対応するassertionを独立更新",
+      "Rightの値と対応するassertionを独立更新"
+    ],
+    "IntentEdits": [
+      [
+        [
+          "F001",
+          "return 3",
+          "return 5"
+        ],
+        [
+          "F002",
+          "{calc.Left(), 3}",
+          "{calc.Left(), 5}"
+        ]
+      ],
+      [
+        [
+          "F001",
+          "return 7",
+          "return 9"
+        ],
+        [
+          "F002",
+          "{calc.Right(), 7}",
+          "{calc.Right(), 9}"
+        ]
+      ]
+    ]
+  },
+  {
+    "Name": "independent-compensating-values",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/values.go",
+        "Before": "package calc\nfunc Left() int { return 3 }\nfunc Right() int { return 7 }\n",
+        "After": "package calc\nfunc Left() int { return 5 }\nfunc Right() int { return 5 }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R001",
+        "Path": "calc/total_test.go",
+        "Content": "package calc\nimport \"testing\"\nfunc TestTotal(t *testing.T) { if Left()+Right()!=10 { t.Fatal(\"total\") } }\n"
+      }
+    ],
+    "Requirements": [
+      "Leftの外部公開値を独立変更",
+      "Rightの外部公開値を独立変更"
+    ],
+    "IntentEdits": [
+      [
+        [
+          "F001",
+          "return 3",
+          "return 5"
+        ]
+      ],
+      [
+        [
+          "F001",
+          "return 7",
+          "return 5"
+        ]
+      ]
+    ]
+  },
+  {
+    "Name": "independent-comment-only-absence",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/value.go",
+        "Before": "package calc\n// mode a\n// color c\nfunc Value() int { return 1 }\n",
+        "After": "package calc\n// mode b\n// color d\nfunc Value() int { return 1 }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R001",
+        "Path": "calc/value_test.go",
+        "Content": "package calc\nimport \"testing\"\nfunc TestValue(t *testing.T) { if Value()!=1 { t.Fatal(\"value\") } }\n"
+      }
+    ],
+    "Requirements": [
+      "mode説明の独立修正",
+      "color説明の独立修正"
+    ],
+    "IntentEdits": [
+      [
+        [
+          "F001",
+          "mode a",
+          "mode b"
+        ]
+      ],
+      [
+        [
+          "F001",
+          "color c",
+          "color d"
+        ]
+      ]
+    ]
+  }
+]
