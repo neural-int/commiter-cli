@@ -1,0 +1,5 @@
+# Test-impact pilot（B次仮説の最小検査）
+
+使用済みの5synthetic Go fixtureで、goldを利用せず各unit単独適用時のtest失敗名を抽出する。before/all-afterのtest成功と比較する。16unit、単独probe＋before/after、90sec/probeを上限。生成fixture以外のrepositoryコードは実行しない。
+
+同じ失敗test集合を持つunitがあるかを測る。ただし同じimpactは同じintentの証明ではなくsoft evidenceに限る。compile error/timeout/失敗test不明はunknown、default mergeしない。このpilotは使用済みデータでありB Go判定に使わない。方法の実行可能性を確認した後、未使用fixture・shared dependency/非behavior/absenceを固定してA-only比較へ進む。旧No-Goと65unit拒否は保存する。モデルbudgetを増やさず、LLM呼出なし。
