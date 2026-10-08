@@ -1,0 +1,46 @@
+{
+  "commit": "fd0428947c752766d936275f2d42caa10732993d",
+  "parent": "c643154b0498e5d441efdb864a6cee26e3deb2e0",
+  "files": [
+    {
+      "path": "internal/relation/extract.go",
+      "units": 146,
+      "reconstruction": true,
+      "staging": true
+    },
+    {
+      "path": "internal/relation/extract_test.go",
+      "units": 139,
+      "reconstruction": true,
+      "staging": true
+    }
+  ],
+  "states": [
+    {
+      "source_after": false,
+      "test_after": false,
+      "passed": true,
+      "output": "ok  \tgithub.com/natsuki0413/commiter-cli/internal/relation\t0.758s\n"
+    },
+    {
+      "source_after": false,
+      "test_after": true,
+      "passed": false,
+      "output": "--- FAIL: TestDirectImportUsesObservedSyntaxAndUniqueChangedTarget (0.00s)\n    extract_test.go:102: resolved import also reported unsupported: []relation.Observation{relation.Observation{SourceID:\"F001\", Kind:\"direct_import\", Outcome:\"unsupported\", Reason:\"import_syntax_not_supported\", Evidence:relation.Evidence{Type:\"import_path\", Value:\"helper\", Related:\"import_specifier\"}, CandidateIDs:[]string(nil)}, relation.Observation{SourceID:\"F001\", Kind:\"direct_import\", Outcome:\"unsupported\", Reason:\"import_syntax_not_supported\", Evidence:relation.Evidence{Type:\"import_path\", Value:\"{ helper }\", Related:\"import_clause\"}, CandidateIDs:[]string(nil)}}\nFAIL\nFAIL\tgithub.com/natsuki0413/commiter-cli/internal/relation\t0.516s\nFAIL\n"
+    },
+    {
+      "source_after": true,
+      "test_after": false,
+      "passed": true,
+      "output": "ok  \tgithub.com/natsuki0413/commiter-cli/internal/relation\t0.518s\n"
+    },
+    {
+      "source_after": true,
+      "test_after": true,
+      "passed": true,
+      "output": "ok  \tgithub.com/natsuki0413/commiter-cli/internal/relation\t0.543s\n"
+    }
+  ],
+  "model_calls": 0,
+  "semantic_gold": null
+}
