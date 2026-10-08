@@ -22,7 +22,8 @@ def score(data):
   if set(answer)!={'scores','unresolved'} or type(answer['unresolved']) is not bool:raise ValueError('invalid_schema')
   if answer['unresolved']:raise ValueError('unresolved')
   if not isinstance(answer['scores'],dict):raise ValueError('invalid_scores')
-  m,solver=partition(ids,answer['scores']);meta.update(validation_reason='accepted',scores=answer['scores'],solver=solver)
+  meta['scores']=answer['scores']
+  m,solver=partition(ids,answer['scores']);meta.update(validation_reason='accepted',solver=solver)
  except subprocess.TimeoutExpired:m=None;meta.update(stop='timeout',validation_reason='timeout')
  except (ValueError,TypeError,KeyError) as e:m=None;meta['validation_reason']=str(e)
  meta['wall_seconds']=time.perf_counter()-start
