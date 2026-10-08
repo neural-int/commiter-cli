@@ -1,0 +1,3 @@
+## 固定計測
+
+iteration8のmessages/schemaを変更せず3call。使用済みsynthetic2件はwire回帰、実例はコスト診断。context16384/output1536/timeout120、既存pinnedモデル、再試行0。refineはstage1形式合格として記録するが詳細未実装のためcompleteにはしない。unresolvedとbackend非完了は拒否。gold未認定の実例はexact/FM/FS=null。初回acceptの意味品質を全体commit品質へ転用しない。
