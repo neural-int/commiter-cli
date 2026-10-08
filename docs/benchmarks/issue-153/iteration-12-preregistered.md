@@ -1,0 +1,5 @@
+## 固定仮説
+
+benchmark helper別コピーにbounded-routed-grammarを追加。native thoughtなし、既存GrammarSamplingProcessorでschemaを生成時に強制。context16384/output1536/TokenBudget/telemetry/temp0/topP1/topK0/seed144を保持。model/prompt/schema/入力はiteration10と同一、使用済み2件をwire比較として2call再試行なし。形式違反減少とsemantic境界は別集計。source/patch hashを保存し、build後binary hashも記録。追加依存/production変更なし。
+
+build失敗は計測前setup失敗として保持しmodel実行しない。grammar未完了/timeout/unresolvedは拒否。前回回答のrepairではなく別generation profileの比較で、fresh holdoutとして扱わない。
