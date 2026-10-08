@@ -1,0 +1,49 @@
+{
+  "name": "separated",
+  "split": "independent",
+  "requirements": {
+    "R1": "timeoutを10から30へ変更する",
+    "R2": "upload_limitを1024から4096へ変更する"
+  },
+  "edits": {
+    "R1": [
+      [
+        "settings.py",
+        "return 10\n",
+        "return 30\n"
+      ]
+    ],
+    "R2": [
+      [
+        "settings.py",
+        "return 1024\n",
+        "return 4096\n"
+      ]
+    ]
+  },
+  "expected_states": [
+    {
+      "selected_intents": [],
+      "directory": "none"
+    },
+    {
+      "selected_intents": [
+        "R1"
+      ],
+      "directory": "R1"
+    },
+    {
+      "selected_intents": [
+        "R2"
+      ],
+      "directory": "R2"
+    },
+    {
+      "selected_intents": [
+        "R1",
+        "R2"
+      ],
+      "directory": "R1+R2"
+    }
+  ]
+}

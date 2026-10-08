@@ -1,0 +1,59 @@
+{
+  "name": "source-test",
+  "split": "development",
+  "requirements": {
+    "R1": "retry_limitを3から5へ変更する",
+    "R2": "page_sizeを20から50へ変更する"
+  },
+  "edits": {
+    "R1": [
+      [
+        "src/settings.py",
+        "return 3\n",
+        "return 5\n"
+      ],
+      [
+        "tests/test_first.py",
+        "== 3",
+        "== 5"
+      ]
+    ],
+    "R2": [
+      [
+        "src/settings.py",
+        "return 20\n",
+        "return 50\n"
+      ],
+      [
+        "tests/test_second.py",
+        "== 20",
+        "== 50"
+      ]
+    ]
+  },
+  "expected_states": [
+    {
+      "selected_intents": [],
+      "directory": "none"
+    },
+    {
+      "selected_intents": [
+        "R1"
+      ],
+      "directory": "R1"
+    },
+    {
+      "selected_intents": [
+        "R2"
+      ],
+      "directory": "R2"
+    },
+    {
+      "selected_intents": [
+        "R1",
+        "R2"
+      ],
+      "directory": "R1+R2"
+    }
+  ]
+}
