@@ -1,0 +1,148 @@
+[
+  {
+    "fixture": "test-assertion-coupled",
+    "true_positive": 1,
+    "false_positive": 0,
+    "false_negative": 0,
+    "evidence": {
+      "unit_relations": [
+        {
+          "from_unit": "U002",
+          "to_unit": "U001",
+          "hops": 1,
+          "kind": "soft_directed_call_path"
+        }
+      ],
+      "syntax_graph": {
+        "edges": [
+          {
+            "from": "F002",
+            "to": "F001",
+            "caller": "TestValue",
+            "callee": "Value"
+          }
+        ],
+        "files": 2,
+        "parse_unavailable": 0,
+        "semantics": "soft_syntactic_call_not_shared_intent",
+        "source_bytes": 155
+      },
+      "absence": "unknown_no_default_merge",
+      "unchanged_sources": [],
+      "max_hops": 2
+    },
+    "test_checks": [
+      {
+        "states": [
+          "Before",
+          "Before"
+        ],
+        "exit_code": 0,
+        "output": "ok  \tfixture/calc\t0.461s\n"
+      },
+      {
+        "states": [
+          "Before",
+          "After"
+        ],
+        "exit_code": 1,
+        "output": "--- FAIL: TestValue (0.00s)\n    value_test.go:3: invalid\nFAIL\nFAIL\tfixture/calc\t0.379s\nFAIL\n"
+      },
+      {
+        "states": [
+          "After",
+          "Before"
+        ],
+        "exit_code": 1,
+        "output": "--- FAIL: TestValue (0.00s)\n    value_test.go:3: invalid\nFAIL\nFAIL\tfixture/calc\t0.465s\nFAIL\n"
+      },
+      {
+        "states": [
+          "After",
+          "After"
+        ],
+        "exit_code": 0,
+        "output": "ok  \tfixture/calc\t0.364s\n"
+      }
+    ]
+  },
+  {
+    "fixture": "test-diagnostic-independent",
+    "true_positive": 0,
+    "false_positive": 3,
+    "false_negative": 3,
+    "evidence": {
+      "unit_relations": [
+        {
+          "from_unit": "U002",
+          "to_unit": "U001",
+          "hops": 1,
+          "kind": "soft_directed_call_path"
+        },
+        {
+          "from_unit": "U003",
+          "to_unit": "U001",
+          "hops": 1,
+          "kind": "soft_directed_call_path"
+        },
+        {
+          "from_unit": "U004",
+          "to_unit": "U001",
+          "hops": 1,
+          "kind": "soft_directed_call_path"
+        }
+      ],
+      "syntax_graph": {
+        "edges": [
+          {
+            "from": "F002",
+            "to": "F001",
+            "caller": "TestValue",
+            "callee": "Value"
+          }
+        ],
+        "files": 2,
+        "parse_unavailable": 0,
+        "semantics": "soft_syntactic_call_not_shared_intent",
+        "source_bytes": 179
+      },
+      "absence": "unknown_no_default_merge",
+      "unchanged_sources": [],
+      "max_hops": 2
+    },
+    "test_checks": [
+      {
+        "states": [
+          "Before",
+          "Before"
+        ],
+        "exit_code": 0,
+        "output": "ok  \tfixture/calc\t0.366s\n"
+      },
+      {
+        "states": [
+          "Before",
+          "After"
+        ],
+        "exit_code": 0,
+        "output": "ok  \tfixture/calc\t0.485s\n"
+      },
+      {
+        "states": [
+          "After",
+          "Before"
+        ],
+        "exit_code": 0,
+        "output": "ok  \tfixture/calc\t0.411s\n"
+      },
+      {
+        "states": [
+          "After",
+          "After"
+        ],
+        "exit_code": 0,
+        "output": "ok  \tfixture/calc\t0.460s\n"
+      }
+    ]
+  }
+]

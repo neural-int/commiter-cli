@@ -1,0 +1,21 @@
+## 要約
+
+source/testの型を区別しても、test関数内の独立診断文変更がproduction変更と関連付けられる反例を確認した。型だけをhard merge条件にする仮説は棄却する。B No-Goを保持する。
+
+## 検証結果
+
+730ee21で2件を事前固定した。coupled係数/assertion更新はTP1/FP0/FN0。独立係数/diagnostic更新はTP0/FP3/FN0だった。後者の診断文はinline atomに分解され、同じTestValue symbolを持つ各atomにValueへのrelationが出る。goldは抽出後の評価側のみ。graphとrelationsは変更していない。
+
+各2fileのbefore/after全4組合せ、合計8Go testを実行した。coupledはbefore両方/after両方成功、片方だけの2状態は期待値不一致で失敗。独立caseは全4状態成功。失敗もrawへ保存し、fixture修正/retryはしていない。model call0、既存Python6testとdiff check成功。
+
+## 考察
+
+source/testの関数単位call関係は、testのどこを変更したかを区別しない。今回のdiagnostic変更はValueを呼ぶassertionを変更しないが、全atomのsymbolがTestValueなので同じrelationを継承する。型だけの区別では同一関数内の関連・無関連変更を区別できない。共同test成功や失敗をhard intent条件にする案にも過去の相殺反例があり、それへ置き換えない。
+
+今回の2件はsyntheticで、関数単位relationの限界を確認するためのguardrail。B Go、実repository一般化、new file/rename/history/costを証明しない。production4file制限とC未着手は維持する。
+
+## Next Steps
+
+- 新規専用worktreeで、変更spanとcallを含むstatementの位置関係を観測する。今回のFPが関数全体へのannotationで生じたため、statement単位の局所関係に識別情報があるかを確認する。
+- まず固定2件でcall所属statementと変更spanを抽出し、未知/曖昧はunknownとして保存する。関係をhard mergeへ昇格せず、guardrailを確認してから未使用fixture比較へ進める。
+- generic AST位置情報のみを使い、fixture名やgoldから変更を分類しない。旧model結果やgoldを変更せず、新たなevidence sourceの効果を区別する。
