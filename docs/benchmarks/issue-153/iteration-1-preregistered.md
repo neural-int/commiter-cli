@@ -1,0 +1,9 @@
+# A-only C qualification
+
+ユーザーの2026-10-08指示でB GOを待たない限定C探索を承認。BはNo-Goを保持する。入力はA-only change_units/selected_file_contextのみ、repository/history containerも除く。
+
+使用済みnormalized-fixtures先頭2件（各5file/8unit）でdirect assignmentと全pair signed scoring→exact deterministic partitionを比較。使用済みqualificationであり独立holdoutに数えない。最大8unit/28pair、最大4140partition、外部依存なし。異なるsigned score objectiveの同点最適解はambiguousとしてfail closed。missing/unknown ID/invalid score/unresolved/backend非completedを拒否。goldは評価のみでcandidate/score/schemaへ渡さない。Git mutationなし。
+
+model/helper/context16384/output1536/timeout120を既存と固定。4call、retry/repairなし。LLM responsibilityとschemaの変更はarchitecture差として明示。direct baselineは同じsourceだがscore taskとsystemは異なるため、改善をoptimizerだけの因果効果とは呼ばない。
+
+exact改善、FM/FS非悪化、complete非悪化を次の未使用評価へ進むqualification条件とする。solver contract成功をsemantic成功と読み替えない。qualification不合格の場合、score品質・ambiguity・最適化を切り分けて記録し、この2件へパラメータを合わせない。production baseline/legacy range/final holdout/staging/source mapping/costは正式評価で別途必要。8unit外をsafe rejectする候補はスケーラブルproduction候補ではない。
