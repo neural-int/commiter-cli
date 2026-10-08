@@ -1,0 +1,1367 @@
+{
+  "contract_sha256": "baf921a65d4cd0a4d2bd73f908130038db07345814ae8e09e205bf023c4b4318",
+  "model_calls": 0,
+  "rows": [
+    {
+      "name": "fresh-six-file-behaviors",
+      "split": "used_diagnostic",
+      "input_sha256": "cf2d229c8532947199221cd7d685e83aae056d564eae69cc212787860a350046",
+      "file_count": 6,
+      "inline_atoms": 88,
+      "predicate_observations": 9,
+      "changed_predicates_before": 2,
+      "changed_predicates_after": 3,
+      "source_mapping_valid": true,
+      "reconstruction_valid": true,
+      "deterministic": true,
+      "evidence": [
+        {
+          "id": "0154dd4b8e461f3ba48d8bff",
+          "file": "F002",
+          "version": "before",
+          "kind": "function_source",
+          "function": "TestSafeRatio",
+          "span": [
+            34,
+            110
+          ],
+          "text": "func TestSafeRatio(t *testing.T) { if SafeRatio(8,2)!=4 {t.Fatal(\"ratio\")} }",
+          "source_sha256": "d2381bfce261c1ab5c2e9764196e59e05cf235ba8cb27f427d5538e6de32f87e",
+          "syntax": "func TestSafeRatio(t *testing.T) {\n\tif SafeRatio(8, 2) != 4 {\n\t\tt.Fatal(\"ratio\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            34,
+            110
+          ]
+        },
+        {
+          "id": "1ad625a1e8083a1c6e7c9f0a",
+          "file": "F002",
+          "version": "after",
+          "kind": "function_source",
+          "function": "TestSafeRatio",
+          "span": [
+            34,
+            131
+          ],
+          "text": "func TestSafeRatio(t *testing.T) { if SafeRatio(8,2)!=4 || SafeRatio(8,0)!=0 {t.Fatal(\"ratio\")} }",
+          "source_sha256": "0b057b16dd0a9e0e3f7ef827114cd670e6e853760dbe0474fa3a2f65733b6b2c",
+          "syntax": "func TestSafeRatio(t *testing.T) {\n\tif SafeRatio(8, 2) != 4 || SafeRatio(8, 0) != 0 {\n\t\tt.Fatal(\"ratio\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            34,
+            131
+          ]
+        },
+        {
+          "id": "35ddf33fbd4a5595e229f8e4",
+          "file": "F005",
+          "version": "before",
+          "kind": "function_source",
+          "function": "BoundLevel",
+          "span": [
+            17,
+            75
+          ],
+          "text": "func BoundLevel(n int) int { if n<0 {return 0}; return n }",
+          "source_sha256": "90241ab02e07794a99127d9482ab9eb66a08d4a6e387ea6435d334c09ac13b28",
+          "syntax": "func BoundLevel(n int) int {\n\tif n < 0 {\n\t\treturn 0\n\t}\n\treturn n\n}",
+          "changed": true,
+          "condition_span": [
+            17,
+            75
+          ]
+        },
+        {
+          "id": "3f2e4f023b70eef8caa60e89",
+          "file": "F005",
+          "version": "after",
+          "kind": "function_source",
+          "function": "BoundLevel",
+          "span": [
+            17,
+            98
+          ],
+          "text": "func BoundLevel(n int) int { if n<0 {return 0}; if n>100 {return 100}; return n }",
+          "source_sha256": "4b55b562a15894ef487940435d2dfda60e3ee819b95b762a8862a1cb8bc7a869",
+          "syntax": "func BoundLevel(n int) int {\n\tif n < 0 {\n\t\treturn 0\n\t}\n\tif n > 100 {\n\t\treturn 100\n\t}\n\treturn n\n}",
+          "changed": true,
+          "condition_span": [
+            17,
+            98
+          ]
+        },
+        {
+          "id": "3f9f2587ef09543b45c49a98",
+          "file": "F002",
+          "version": "before",
+          "kind": "failure_predicate",
+          "function": "TestSafeRatio",
+          "span": [
+            72,
+            89
+          ],
+          "text": "SafeRatio(8,2)!=4",
+          "source_sha256": "d2381bfce261c1ab5c2e9764196e59e05cf235ba8cb27f427d5538e6de32f87e",
+          "syntax": "SafeRatio(8, 2) != 4",
+          "changed": false,
+          "condition_span": [
+            72,
+            89
+          ]
+        },
+        {
+          "id": "4e1f134a53a2021de3821a77",
+          "file": "F003",
+          "version": "after",
+          "kind": "function_source",
+          "function": "NormalLabel",
+          "span": [
+            34,
+            116
+          ],
+          "text": "func NormalLabel(s string) string { return strings.ToLower(strings.TrimSpace(s)) }",
+          "source_sha256": "31709789637beb3920a745a4f25c02459aa5f5f3a47e993dab3c5887dafdba27",
+          "syntax": "func NormalLabel(s string) string {\n\treturn strings.ToLower(strings.TrimSpace(s))\n}",
+          "changed": true,
+          "condition_span": [
+            34,
+            116
+          ]
+        },
+        {
+          "id": "66b4b188b3d80220d6fdf09d",
+          "file": "F006",
+          "version": "before",
+          "kind": "failure_predicate",
+          "function": "TestBoundLevel",
+          "span": [
+            73,
+            90
+          ],
+          "text": "BoundLevel(-1)!=0",
+          "source_sha256": "d05d6c548e6eabf2efefbc79546bee6add7d7588e20c000448ee31732cfbdf1a",
+          "syntax": "BoundLevel(-1) != 0",
+          "changed": false,
+          "condition_span": [
+            73,
+            114
+          ]
+        },
+        {
+          "id": "783be53824b82ce53533cb15",
+          "file": "F002",
+          "version": "after",
+          "kind": "failure_predicate",
+          "function": "TestSafeRatio",
+          "span": [
+            93,
+            110
+          ],
+          "text": "SafeRatio(8,0)!=0",
+          "source_sha256": "0b057b16dd0a9e0e3f7ef827114cd670e6e853760dbe0474fa3a2f65733b6b2c",
+          "syntax": "SafeRatio(8, 0) != 0",
+          "changed": true,
+          "condition_span": [
+            72,
+            110
+          ]
+        },
+        {
+          "id": "7a3e63454410b200f8bfc13e",
+          "file": "F003",
+          "version": "before",
+          "kind": "function_source",
+          "function": "NormalLabel",
+          "span": [
+            34,
+            97
+          ],
+          "text": "func NormalLabel(s string) string { return strings.ToLower(s) }",
+          "source_sha256": "57f1963ebe238587f3999e885750acbbd315e2b80a7f22364e6a6b48597a0557",
+          "syntax": "func NormalLabel(s string) string {\n\treturn strings.ToLower(s)\n}",
+          "changed": true,
+          "condition_span": [
+            34,
+            97
+          ]
+        },
+        {
+          "id": "8814322ec11de4eddfbf5f57",
+          "file": "F006",
+          "version": "before",
+          "kind": "function_source",
+          "function": "TestBoundLevel",
+          "span": [
+            34,
+            135
+          ],
+          "text": "func TestBoundLevel(t *testing.T) { if BoundLevel(-1)!=0 || BoundLevel(101)!=101 {t.Fatal(\"level\")} }",
+          "source_sha256": "d05d6c548e6eabf2efefbc79546bee6add7d7588e20c000448ee31732cfbdf1a",
+          "syntax": "func TestBoundLevel(t *testing.T) {\n\tif BoundLevel(-1) != 0 || BoundLevel(101) != 101 {\n\t\tt.Fatal(\"level\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            34,
+            135
+          ]
+        },
+        {
+          "id": "8b3c44395593c368b29bc1d5",
+          "file": "F006",
+          "version": "before",
+          "kind": "failure_predicate",
+          "function": "TestBoundLevel",
+          "span": [
+            94,
+            114
+          ],
+          "text": "BoundLevel(101)!=101",
+          "source_sha256": "d05d6c548e6eabf2efefbc79546bee6add7d7588e20c000448ee31732cfbdf1a",
+          "syntax": "BoundLevel(101) != 101",
+          "changed": true,
+          "condition_span": [
+            73,
+            114
+          ]
+        },
+        {
+          "id": "9297b5a9cef6d3ac3230c28b",
+          "file": "F004",
+          "version": "before",
+          "kind": "failure_predicate",
+          "function": "TestNormalLabel",
+          "span": [
+            74,
+            99
+          ],
+          "text": "NormalLabel(\" A \")!=\" a \"",
+          "source_sha256": "478190a7c8d7eebabc7cad06323c2fbe7297b9ce9d5dac39c2c50345d371f0b1",
+          "syntax": "NormalLabel(\" A \") != \" a \"",
+          "changed": true,
+          "condition_span": [
+            74,
+            99
+          ]
+        },
+        {
+          "id": "a545804931cedb67fce34046",
+          "file": "F002",
+          "version": "after",
+          "kind": "failure_predicate",
+          "function": "TestSafeRatio",
+          "span": [
+            72,
+            89
+          ],
+          "text": "SafeRatio(8,2)!=4",
+          "source_sha256": "0b057b16dd0a9e0e3f7ef827114cd670e6e853760dbe0474fa3a2f65733b6b2c",
+          "syntax": "SafeRatio(8, 2) != 4",
+          "changed": false,
+          "condition_span": [
+            72,
+            110
+          ]
+        },
+        {
+          "id": "a5f1fc65055ad3c0db5a7a34",
+          "file": "F004",
+          "version": "after",
+          "kind": "function_source",
+          "function": "TestNormalLabel",
+          "span": [
+            34,
+            118
+          ],
+          "text": "func TestNormalLabel(t *testing.T) { if NormalLabel(\" A \")!=\"a\" {t.Fatal(\"label\")} }",
+          "source_sha256": "7734f334ee8dd4599a70e544c837c1e4ae1518062076a797af2d1516c2650bf2",
+          "syntax": "func TestNormalLabel(t *testing.T) {\n\tif NormalLabel(\" A \") != \"a\" {\n\t\tt.Fatal(\"label\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            34,
+            118
+          ]
+        },
+        {
+          "id": "a6c8b9b7869b5af7fffe7357",
+          "file": "F006",
+          "version": "after",
+          "kind": "function_source",
+          "function": "TestBoundLevel",
+          "span": [
+            34,
+            135
+          ],
+          "text": "func TestBoundLevel(t *testing.T) { if BoundLevel(-1)!=0 || BoundLevel(101)!=100 {t.Fatal(\"level\")} }",
+          "source_sha256": "1214f00ca9c92b63477b02f91f96c34e8c9ef37a832e4bf71623e64ab176b690",
+          "syntax": "func TestBoundLevel(t *testing.T) {\n\tif BoundLevel(-1) != 0 || BoundLevel(101) != 100 {\n\t\tt.Fatal(\"level\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            34,
+            135
+          ]
+        },
+        {
+          "id": "afee1a06efcfb8f2bcdf3cb6",
+          "file": "F004",
+          "version": "before",
+          "kind": "function_source",
+          "function": "TestNormalLabel",
+          "span": [
+            34,
+            120
+          ],
+          "text": "func TestNormalLabel(t *testing.T) { if NormalLabel(\" A \")!=\" a \" {t.Fatal(\"label\")} }",
+          "source_sha256": "478190a7c8d7eebabc7cad06323c2fbe7297b9ce9d5dac39c2c50345d371f0b1",
+          "syntax": "func TestNormalLabel(t *testing.T) {\n\tif NormalLabel(\" A \") != \" a \" {\n\t\tt.Fatal(\"label\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            34,
+            120
+          ]
+        },
+        {
+          "id": "bc5168f3b5b80bba34a2bdb3",
+          "file": "F006",
+          "version": "after",
+          "kind": "failure_predicate",
+          "function": "TestBoundLevel",
+          "span": [
+            73,
+            90
+          ],
+          "text": "BoundLevel(-1)!=0",
+          "source_sha256": "1214f00ca9c92b63477b02f91f96c34e8c9ef37a832e4bf71623e64ab176b690",
+          "syntax": "BoundLevel(-1) != 0",
+          "changed": false,
+          "condition_span": [
+            73,
+            114
+          ]
+        },
+        {
+          "id": "cc22e5ab3d9d06fe1576e58d",
+          "file": "F001",
+          "version": "before",
+          "kind": "function_source",
+          "function": "SafeRatio",
+          "span": [
+            17,
+            59
+          ],
+          "text": "func SafeRatio(n,d int) int { return n/d }",
+          "source_sha256": "cc36a1e2968c2660eb345c13c6d362ec977601a6c3f5296e24c7bf955fcc903d",
+          "syntax": "func SafeRatio(n, d int) int {\n\treturn n / d\n}",
+          "changed": true,
+          "condition_span": [
+            17,
+            59
+          ]
+        },
+        {
+          "id": "e224d68836573bc0edc54750",
+          "file": "F004",
+          "version": "after",
+          "kind": "failure_predicate",
+          "function": "TestNormalLabel",
+          "span": [
+            74,
+            97
+          ],
+          "text": "NormalLabel(\" A \")!=\"a\"",
+          "source_sha256": "7734f334ee8dd4599a70e544c837c1e4ae1518062076a797af2d1516c2650bf2",
+          "syntax": "NormalLabel(\" A \") != \"a\"",
+          "changed": true,
+          "condition_span": [
+            74,
+            97
+          ]
+        },
+        {
+          "id": "e7389eb356479016cf1a7cc9",
+          "file": "F001",
+          "version": "after",
+          "kind": "function_source",
+          "function": "SafeRatio",
+          "span": [
+            17,
+            81
+          ],
+          "text": "func SafeRatio(n,d int) int { if d==0 { return 0 }; return n/d }",
+          "source_sha256": "8c48a197a87cc9c1baa6998d4ba36e0eeedfce595998d90030053b4c682140de",
+          "syntax": "func SafeRatio(n, d int) int {\n\tif d == 0 {\n\t\treturn 0\n\t}\n\treturn n / d\n}",
+          "changed": true,
+          "condition_span": [
+            17,
+            81
+          ]
+        },
+        {
+          "id": "ff2f12690667a0b897387a3b",
+          "file": "F006",
+          "version": "after",
+          "kind": "failure_predicate",
+          "function": "TestBoundLevel",
+          "span": [
+            94,
+            114
+          ],
+          "text": "BoundLevel(101)!=100",
+          "source_sha256": "1214f00ca9c92b63477b02f91f96c34e8c9ef37a832e4bf71623e64ab176b690",
+          "syntax": "BoundLevel(101) != 100",
+          "changed": true,
+          "condition_span": [
+            73,
+            114
+          ]
+        }
+      ],
+      "source_status": [
+        {
+          "file": "F001",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F001",
+          "version": "before",
+          "status": "parsed"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F002",
+          "version": "before",
+          "status": "parsed"
+        },
+        {
+          "file": "F003",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F003",
+          "version": "before",
+          "status": "parsed"
+        },
+        {
+          "file": "F004",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F004",
+          "version": "before",
+          "status": "parsed"
+        },
+        {
+          "file": "F005",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F005",
+          "version": "before",
+          "status": "parsed"
+        },
+        {
+          "file": "F006",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F006",
+          "version": "before",
+          "status": "parsed"
+        }
+      ],
+      "semantic_quality": null
+    },
+    {
+      "name": "fee-rounding-and-wrap",
+      "split": "used_diagnostic",
+      "input_sha256": "3e979f767a7be4dcc2d45852284f9b9d0a12767d989c66cdf5cdf656dc09adc7",
+      "file_count": 4,
+      "inline_atoms": 10,
+      "predicate_observations": 4,
+      "changed_predicates_before": 2,
+      "changed_predicates_after": 2,
+      "source_mapping_valid": true,
+      "reconstruction_valid": true,
+      "deterministic": true,
+      "evidence": [
+        {
+          "id": "2e33d396564bdd6b69d9f3cb",
+          "file": "F004",
+          "version": "after",
+          "kind": "failure_predicate",
+          "function": "TestWrap",
+          "span": [
+            65,
+            81
+          ],
+          "text": "Wrap(\"a\")!=\"{a}\"",
+          "source_sha256": "d50a3d6b0bad0724d84234724c4778422ad48bc10a7355c7ae924d441d0f8c99",
+          "syntax": "Wrap(\"a\") != \"{a}\"",
+          "changed": true,
+          "condition_span": [
+            65,
+            81
+          ]
+        },
+        {
+          "id": "32dbacc7dda61bfffc467a2f",
+          "file": "F002",
+          "version": "before",
+          "kind": "function_source",
+          "function": "TestFee",
+          "span": [
+            32,
+            94
+          ],
+          "text": "func TestFee(t *testing.T) { if Fee(101)!=1 {t.Fatal(\"fee\")} }",
+          "source_sha256": "26570e1192496e1d195fc89591702e4fa9258d3585b15600f15f3b6098ea34d1",
+          "syntax": "func TestFee(t *testing.T) {\n\tif Fee(101) != 1 {\n\t\tt.Fatal(\"fee\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            32,
+            94
+          ]
+        },
+        {
+          "id": "484f69025a0befc7bf91d689",
+          "file": "F003",
+          "version": "after",
+          "kind": "function_source",
+          "function": "Wrap",
+          "span": [
+            15,
+            62
+          ],
+          "text": "func Wrap(s string) string { return \"{\"+s+\"}\" }",
+          "source_sha256": "9d9693913394cfc8ef9cadf2a2ba3829556925af441d2b836c3dc4ca19de3093",
+          "syntax": "func Wrap(s string) string {\n\treturn \"{\" + s + \"}\"\n}",
+          "changed": true,
+          "condition_span": [
+            15,
+            62
+          ]
+        },
+        {
+          "id": "4a75d573a2dc5f149af922f7",
+          "file": "F004",
+          "version": "after",
+          "kind": "function_source",
+          "function": "TestWrap",
+          "span": [
+            32,
+            101
+          ],
+          "text": "func TestWrap(t *testing.T) { if Wrap(\"a\")!=\"{a}\" {t.Fatal(\"wrap\")} }",
+          "source_sha256": "d50a3d6b0bad0724d84234724c4778422ad48bc10a7355c7ae924d441d0f8c99",
+          "syntax": "func TestWrap(t *testing.T) {\n\tif Wrap(\"a\") != \"{a}\" {\n\t\tt.Fatal(\"wrap\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            32,
+            101
+          ]
+        },
+        {
+          "id": "767390b9584ac828cb9e132e",
+          "file": "F004",
+          "version": "before",
+          "kind": "failure_predicate",
+          "function": "TestWrap",
+          "span": [
+            65,
+            81
+          ],
+          "text": "Wrap(\"a\")!=\"(a)\"",
+          "source_sha256": "fc839fabe615029bbbd38f3acabee436808810cfb77fd08ccf590254a504a4b3",
+          "syntax": "Wrap(\"a\") != \"(a)\"",
+          "changed": true,
+          "condition_span": [
+            65,
+            81
+          ]
+        },
+        {
+          "id": "7bf4cf392583477ac815359e",
+          "file": "F002",
+          "version": "before",
+          "kind": "failure_predicate",
+          "function": "TestFee",
+          "span": [
+            64,
+            75
+          ],
+          "text": "Fee(101)!=1",
+          "source_sha256": "26570e1192496e1d195fc89591702e4fa9258d3585b15600f15f3b6098ea34d1",
+          "syntax": "Fee(101) != 1",
+          "changed": true,
+          "condition_span": [
+            64,
+            75
+          ]
+        },
+        {
+          "id": "81984990a91c25110bca5a5e",
+          "file": "F004",
+          "version": "before",
+          "kind": "function_source",
+          "function": "TestWrap",
+          "span": [
+            32,
+            101
+          ],
+          "text": "func TestWrap(t *testing.T) { if Wrap(\"a\")!=\"(a)\" {t.Fatal(\"wrap\")} }",
+          "source_sha256": "fc839fabe615029bbbd38f3acabee436808810cfb77fd08ccf590254a504a4b3",
+          "syntax": "func TestWrap(t *testing.T) {\n\tif Wrap(\"a\") != \"(a)\" {\n\t\tt.Fatal(\"wrap\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            32,
+            101
+          ]
+        },
+        {
+          "id": "8ccb5f3ee4fd33add23ae37c",
+          "file": "F002",
+          "version": "after",
+          "kind": "failure_predicate",
+          "function": "TestFee",
+          "span": [
+            64,
+            75
+          ],
+          "text": "Fee(101)!=2",
+          "source_sha256": "af4d0e3e253a4eb0dd29d9771b557742c858226f4a3d28fcef9de50e8ecc706f",
+          "syntax": "Fee(101) != 2",
+          "changed": true,
+          "condition_span": [
+            64,
+            75
+          ]
+        },
+        {
+          "id": "91ee56ef3b89b6bdc7c1e798",
+          "file": "F001",
+          "version": "before",
+          "kind": "function_source",
+          "function": "Fee",
+          "span": [
+            15,
+            51
+          ],
+          "text": "func Fee(n int) int { return n/100 }",
+          "source_sha256": "e11ffc4baf2fd0979b41425f6131c121eb25f905ce71634fcd7f2d56d113df90",
+          "syntax": "func Fee(n int) int {\n\treturn n / 100\n}",
+          "changed": true,
+          "condition_span": [
+            15,
+            51
+          ]
+        },
+        {
+          "id": "dacdbac5cd2d0b8e2d5ddaff",
+          "file": "F002",
+          "version": "after",
+          "kind": "function_source",
+          "function": "TestFee",
+          "span": [
+            32,
+            94
+          ],
+          "text": "func TestFee(t *testing.T) { if Fee(101)!=2 {t.Fatal(\"fee\")} }",
+          "source_sha256": "af4d0e3e253a4eb0dd29d9771b557742c858226f4a3d28fcef9de50e8ecc706f",
+          "syntax": "func TestFee(t *testing.T) {\n\tif Fee(101) != 2 {\n\t\tt.Fatal(\"fee\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            32,
+            94
+          ]
+        },
+        {
+          "id": "eb39135c131a73e5aff95f51",
+          "file": "F001",
+          "version": "after",
+          "kind": "function_source",
+          "function": "Fee",
+          "span": [
+            15,
+            56
+          ],
+          "text": "func Fee(n int) int { return (n+99)/100 }",
+          "source_sha256": "7d58a052ae067e68b50fb3f378154f949ec911b5fc6852e4e8071360ac9b8914",
+          "syntax": "func Fee(n int) int {\n\treturn (n + 99) / 100\n}",
+          "changed": true,
+          "condition_span": [
+            15,
+            56
+          ]
+        },
+        {
+          "id": "fecdd33d722ddffdeeabc542",
+          "file": "F003",
+          "version": "before",
+          "kind": "function_source",
+          "function": "Wrap",
+          "span": [
+            15,
+            62
+          ],
+          "text": "func Wrap(s string) string { return \"(\"+s+\")\" }",
+          "source_sha256": "0eb6fed351017e40205c510ee3ce5810efdb711df13547f411db9e9804b36c99",
+          "syntax": "func Wrap(s string) string {\n\treturn \"(\" + s + \")\"\n}",
+          "changed": true,
+          "condition_span": [
+            15,
+            62
+          ]
+        }
+      ],
+      "source_status": [
+        {
+          "file": "F001",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F001",
+          "version": "before",
+          "status": "parsed"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F002",
+          "version": "before",
+          "status": "parsed"
+        },
+        {
+          "file": "F003",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F003",
+          "version": "before",
+          "status": "parsed"
+        },
+        {
+          "file": "F004",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F004",
+          "version": "before",
+          "status": "parsed"
+        }
+      ],
+      "semantic_quality": null
+    },
+    {
+      "name": "same-call-independent-diagnostic",
+      "split": "used_diagnostic",
+      "input_sha256": "70176f36ac97b72d5a488f0dcee6d7b9a05799a0b3e9dd64c2b71ad29f058c31",
+      "file_count": 2,
+      "inline_atoms": 39,
+      "predicate_observations": 2,
+      "changed_predicates_before": 0,
+      "changed_predicates_after": 0,
+      "source_mapping_valid": true,
+      "reconstruction_valid": true,
+      "deterministic": true,
+      "evidence": [
+        {
+          "id": "1ad465b3f861fc4c15649b02",
+          "file": "F001",
+          "version": "before",
+          "kind": "function_source",
+          "function": "Count",
+          "span": [
+            15,
+            49
+          ],
+          "text": "func Count(n int) int { return n }",
+          "source_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+          "syntax": "func Count(n int) int {\n\treturn n\n}",
+          "changed": true,
+          "condition_span": [
+            15,
+            49
+          ]
+        },
+        {
+          "id": "22b01387906514fcbe58995c",
+          "file": "F002",
+          "version": "after",
+          "kind": "function_source",
+          "function": "TestCount",
+          "span": [
+            32,
+            118
+          ],
+          "text": "func TestCount(t *testing.T) { if Count(3)!=3 {t.Fatal(\"unexpected positive count\")} }",
+          "source_sha256": "aab07f43be2e2a307862899d32d3949f18d0e85a42991ff6a1f8c265901cf09d",
+          "syntax": "func TestCount(t *testing.T) {\n\tif Count(3) != 3 {\n\t\tt.Fatal(\"unexpected positive count\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            32,
+            118
+          ]
+        },
+        {
+          "id": "338e408a0c8c36ebaf910c42",
+          "file": "F002",
+          "version": "after",
+          "kind": "failure_predicate",
+          "function": "TestCount",
+          "span": [
+            66,
+            77
+          ],
+          "text": "Count(3)!=3",
+          "source_sha256": "aab07f43be2e2a307862899d32d3949f18d0e85a42991ff6a1f8c265901cf09d",
+          "syntax": "Count(3) != 3",
+          "changed": false,
+          "condition_span": [
+            66,
+            77
+          ]
+        },
+        {
+          "id": "58cc25299255c15ac6f33f20",
+          "file": "F001",
+          "version": "after",
+          "kind": "function_source",
+          "function": "Count",
+          "span": [
+            15,
+            68
+          ],
+          "text": "func Count(n int) int { if n<0 {return 0}; return n }",
+          "source_sha256": "3cac3666017391ff611e35057fdc6e7f9101f5201cc69ea683b2e171271fcae2",
+          "syntax": "func Count(n int) int {\n\tif n < 0 {\n\t\treturn 0\n\t}\n\treturn n\n}",
+          "changed": true,
+          "condition_span": [
+            15,
+            68
+          ]
+        },
+        {
+          "id": "82083880b3ee0011acdf9a55",
+          "file": "F002",
+          "version": "before",
+          "kind": "function_source",
+          "function": "TestCount",
+          "span": [
+            32,
+            98
+          ],
+          "text": "func TestCount(t *testing.T) { if Count(3)!=3 {t.Fatal(\"count\")} }",
+          "source_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+          "syntax": "func TestCount(t *testing.T) {\n\tif Count(3) != 3 {\n\t\tt.Fatal(\"count\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            32,
+            98
+          ]
+        },
+        {
+          "id": "e2a918b65112a5cae0abf88a",
+          "file": "F002",
+          "version": "before",
+          "kind": "failure_predicate",
+          "function": "TestCount",
+          "span": [
+            66,
+            77
+          ],
+          "text": "Count(3)!=3",
+          "source_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+          "syntax": "Count(3) != 3",
+          "changed": false,
+          "condition_span": [
+            66,
+            77
+          ]
+        }
+      ],
+      "source_status": [
+        {
+          "file": "F001",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F001",
+          "version": "before",
+          "status": "parsed"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F002",
+          "version": "before",
+          "status": "parsed"
+        }
+      ],
+      "semantic_quality": null
+    },
+    {
+      "name": "shared-test-independent-assertions",
+      "split": "used_diagnostic",
+      "input_sha256": "dea91bd8a8bc993f1383110ef7d4fbc863bb32b49842b02b690160df29ad7f09",
+      "file_count": 3,
+      "inline_atoms": 4,
+      "predicate_observations": 4,
+      "changed_predicates_before": 2,
+      "changed_predicates_after": 2,
+      "source_mapping_valid": true,
+      "reconstruction_valid": true,
+      "deterministic": true,
+      "evidence": [
+        {
+          "id": "0149548c2f12486732751fb0",
+          "file": "F003",
+          "version": "before",
+          "kind": "function_source",
+          "function": "TestBoth",
+          "span": [
+            32,
+            199
+          ],
+          "text": "func TestBoth(t *testing.T) {\n if Left(2)!=3 {t.Fatal(\"left\")}\n // Keep both checks in one existing test.\n t.Log(\"checking right\")\n if Right(2)!=4 {t.Fatal(\"right\")}\n}",
+          "source_sha256": "1c38c08d88543e8664d6ad3eac45bd48cf299f9acee6976ec0aaec702072e312",
+          "syntax": "func TestBoth(t *testing.T) {\n\tif Left(2) != 3 {\n\t\tt.Fatal(\"left\")\n\t}\n\tt.Log(\"checking right\")\n\tif Right(2) != 4 {\n\t\tt.Fatal(\"right\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            32,
+            199
+          ]
+        },
+        {
+          "id": "13e38e5f97f5cddcaa600e78",
+          "file": "F001",
+          "version": "after",
+          "kind": "function_source",
+          "function": "Left",
+          "span": [
+            15,
+            48
+          ],
+          "text": "func Left(n int) int {return n+2}",
+          "source_sha256": "1576b0afb151cd22b77885f88c54cdb770d197c7bd55f96e081f1a16dafd465d",
+          "syntax": "func Left(n int) int {\n\treturn n + 2\n}",
+          "changed": true,
+          "condition_span": [
+            15,
+            48
+          ]
+        },
+        {
+          "id": "1d107bc0fa619d756395d4fb",
+          "file": "F002",
+          "version": "before",
+          "kind": "function_source",
+          "function": "Right",
+          "span": [
+            15,
+            49
+          ],
+          "text": "func Right(n int) int {return n*2}",
+          "source_sha256": "8a6da8c7ca0ec748c3a1f795cf489eb07507f853ff24e7ff1b14ab4a11ec50de",
+          "syntax": "func Right(n int) int {\n\treturn n * 2\n}",
+          "changed": true,
+          "condition_span": [
+            15,
+            49
+          ]
+        },
+        {
+          "id": "2ac0eb40d8af2662bfde8c70",
+          "file": "F003",
+          "version": "after",
+          "kind": "failure_predicate",
+          "function": "TestBoth",
+          "span": [
+            167,
+            178
+          ],
+          "text": "Right(2)!=6",
+          "source_sha256": "c9dee47c842d0e2197cae290f53cb4f975c0fd59921a1416ba3c5c68b6980994",
+          "syntax": "Right(2) != 6",
+          "changed": true,
+          "condition_span": [
+            167,
+            178
+          ]
+        },
+        {
+          "id": "67e2392d7581de95ae5533e0",
+          "file": "F002",
+          "version": "after",
+          "kind": "function_source",
+          "function": "Right",
+          "span": [
+            15,
+            49
+          ],
+          "text": "func Right(n int) int {return n*3}",
+          "source_sha256": "aa7dac4904297d794aad45d5e3b1d38d254d190a4a8c0036443c04f06630cea2",
+          "syntax": "func Right(n int) int {\n\treturn n * 3\n}",
+          "changed": true,
+          "condition_span": [
+            15,
+            49
+          ]
+        },
+        {
+          "id": "71167636670299dd4c37db83",
+          "file": "F003",
+          "version": "after",
+          "kind": "failure_predicate",
+          "function": "TestBoth",
+          "span": [
+            66,
+            76
+          ],
+          "text": "Left(2)!=4",
+          "source_sha256": "c9dee47c842d0e2197cae290f53cb4f975c0fd59921a1416ba3c5c68b6980994",
+          "syntax": "Left(2) != 4",
+          "changed": true,
+          "condition_span": [
+            66,
+            76
+          ]
+        },
+        {
+          "id": "e24ac75912cdd3762e2d2baa",
+          "file": "F003",
+          "version": "before",
+          "kind": "failure_predicate",
+          "function": "TestBoth",
+          "span": [
+            66,
+            76
+          ],
+          "text": "Left(2)!=3",
+          "source_sha256": "1c38c08d88543e8664d6ad3eac45bd48cf299f9acee6976ec0aaec702072e312",
+          "syntax": "Left(2) != 3",
+          "changed": true,
+          "condition_span": [
+            66,
+            76
+          ]
+        },
+        {
+          "id": "e7835d935c3b0cb39c69842f",
+          "file": "F003",
+          "version": "before",
+          "kind": "failure_predicate",
+          "function": "TestBoth",
+          "span": [
+            167,
+            178
+          ],
+          "text": "Right(2)!=4",
+          "source_sha256": "1c38c08d88543e8664d6ad3eac45bd48cf299f9acee6976ec0aaec702072e312",
+          "syntax": "Right(2) != 4",
+          "changed": true,
+          "condition_span": [
+            167,
+            178
+          ]
+        },
+        {
+          "id": "ead0c3456b6d146c28c523c9",
+          "file": "F003",
+          "version": "after",
+          "kind": "function_source",
+          "function": "TestBoth",
+          "span": [
+            32,
+            199
+          ],
+          "text": "func TestBoth(t *testing.T) {\n if Left(2)!=4 {t.Fatal(\"left\")}\n // Keep both checks in one existing test.\n t.Log(\"checking right\")\n if Right(2)!=6 {t.Fatal(\"right\")}\n}",
+          "source_sha256": "c9dee47c842d0e2197cae290f53cb4f975c0fd59921a1416ba3c5c68b6980994",
+          "syntax": "func TestBoth(t *testing.T) {\n\tif Left(2) != 4 {\n\t\tt.Fatal(\"left\")\n\t}\n\tt.Log(\"checking right\")\n\tif Right(2) != 6 {\n\t\tt.Fatal(\"right\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            32,
+            199
+          ]
+        },
+        {
+          "id": "ee22037e9ea155c03a2e05e7",
+          "file": "F001",
+          "version": "before",
+          "kind": "function_source",
+          "function": "Left",
+          "span": [
+            15,
+            48
+          ],
+          "text": "func Left(n int) int {return n+1}",
+          "source_sha256": "9f86177e497ca1ed3656108427173208d99fd62a6e88b60d165adf021e1c3389",
+          "syntax": "func Left(n int) int {\n\treturn n + 1\n}",
+          "changed": true,
+          "condition_span": [
+            15,
+            48
+          ]
+        }
+      ],
+      "source_status": [
+        {
+          "file": "F001",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F001",
+          "version": "before",
+          "status": "parsed"
+        },
+        {
+          "file": "F002",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F002",
+          "version": "before",
+          "status": "parsed"
+        },
+        {
+          "file": "F003",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F003",
+          "version": "before",
+          "status": "parsed"
+        }
+      ],
+      "semantic_quality": null
+    },
+    {
+      "name": "same-line-two-conditions",
+      "split": "development_scope_probe",
+      "input_sha256": "633f613158481f96d8943918969573fcaa6981e61f576109cd5e84e1827dc38d",
+      "file_count": 1,
+      "inline_atoms": 2,
+      "predicate_observations": 4,
+      "changed_predicates_before": 2,
+      "changed_predicates_after": 2,
+      "source_mapping_valid": true,
+      "reconstruction_valid": true,
+      "deterministic": true,
+      "evidence": [
+        {
+          "id": "3a0771dd6981304c9a9c8c8b",
+          "file": "F001",
+          "version": "before",
+          "kind": "failure_predicate",
+          "function": "TestPair",
+          "span": [
+            78,
+            89
+          ],
+          "text": "Right(2)!=4",
+          "source_sha256": "9e58a81aac7efbe82f6d6cc9415ee51ac731dead7cef7d5dd1026baf70808ba8",
+          "syntax": "Right(2) != 4",
+          "changed": true,
+          "condition_span": [
+            64,
+            89
+          ]
+        },
+        {
+          "id": "41e5c6b972aa853dfeb01d9f",
+          "file": "F001",
+          "version": "after",
+          "kind": "failure_predicate",
+          "function": "TestPair",
+          "span": [
+            64,
+            74
+          ],
+          "text": "Left(2)!=4",
+          "source_sha256": "451207f6dabaf4906a71844a13f65d3c3b0c30846595a103ffa7dd198bbf6306",
+          "syntax": "Left(2) != 4",
+          "changed": true,
+          "condition_span": [
+            64,
+            89
+          ]
+        },
+        {
+          "id": "545ebbdf30d9ecdb13d13a2d",
+          "file": "F001",
+          "version": "before",
+          "kind": "failure_predicate",
+          "function": "TestPair",
+          "span": [
+            64,
+            74
+          ],
+          "text": "Left(2)!=3",
+          "source_sha256": "9e58a81aac7efbe82f6d6cc9415ee51ac731dead7cef7d5dd1026baf70808ba8",
+          "syntax": "Left(2) != 3",
+          "changed": true,
+          "condition_span": [
+            64,
+            89
+          ]
+        },
+        {
+          "id": "7e4c07b57d12ef5414354384",
+          "file": "F001",
+          "version": "before",
+          "kind": "function_source",
+          "function": "TestPair",
+          "span": [
+            31,
+            114
+          ],
+          "text": "func TestPair(t *testing.T) { if Left(2)!=3 || Right(2)!=4 {t.Fatal(\"日本語\")} }",
+          "source_sha256": "9e58a81aac7efbe82f6d6cc9415ee51ac731dead7cef7d5dd1026baf70808ba8",
+          "syntax": "func TestPair(t *testing.T) {\n\tif Left(2) != 3 || Right(2) != 4 {\n\t\tt.Fatal(\"日本語\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            31,
+            114
+          ]
+        },
+        {
+          "id": "a3cf0950a691f44a4bd311fc",
+          "file": "F001",
+          "version": "after",
+          "kind": "failure_predicate",
+          "function": "TestPair",
+          "span": [
+            78,
+            89
+          ],
+          "text": "Right(2)!=6",
+          "source_sha256": "451207f6dabaf4906a71844a13f65d3c3b0c30846595a103ffa7dd198bbf6306",
+          "syntax": "Right(2) != 6",
+          "changed": true,
+          "condition_span": [
+            64,
+            89
+          ]
+        },
+        {
+          "id": "f1c3c7cc98a668b173cd436a",
+          "file": "F001",
+          "version": "after",
+          "kind": "function_source",
+          "function": "TestPair",
+          "span": [
+            31,
+            114
+          ],
+          "text": "func TestPair(t *testing.T) { if Left(2)!=4 || Right(2)!=6 {t.Fatal(\"日本語\")} }",
+          "source_sha256": "451207f6dabaf4906a71844a13f65d3c3b0c30846595a103ffa7dd198bbf6306",
+          "syntax": "func TestPair(t *testing.T) {\n\tif Left(2) != 4 || Right(2) != 6 {\n\t\tt.Fatal(\"日本語\")\n\t}\n}",
+          "changed": true,
+          "condition_span": [
+            31,
+            114
+          ]
+        }
+      ],
+      "source_status": [
+        {
+          "file": "F001",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F001",
+          "version": "before",
+          "status": "parsed"
+        }
+      ],
+      "semantic_quality": null
+    },
+    {
+      "name": "no-test-observation",
+      "split": "development_scope_probe",
+      "input_sha256": "2a704d9ba130347c88bcf235590e62160283c6cc875b3295d4e1e3afd11c23ec",
+      "file_count": 1,
+      "inline_atoms": 2,
+      "predicate_observations": 0,
+      "changed_predicates_before": 0,
+      "changed_predicates_after": 0,
+      "source_mapping_valid": true,
+      "reconstruction_valid": true,
+      "deterministic": true,
+      "evidence": [
+        {
+          "id": "44962ac82784291996f910f3",
+          "file": "F001",
+          "version": "before",
+          "kind": "function_source",
+          "function": "Value",
+          "span": [
+            14,
+            48
+          ],
+          "text": "func Value(n int) int { return n }",
+          "source_sha256": "a9b64038103ca2ff3749c46e48b4944c7d9e9037067aba061ce45370d7ec160b",
+          "syntax": "func Value(n int) int {\n\treturn n\n}",
+          "changed": true,
+          "condition_span": [
+            14,
+            48
+          ]
+        },
+        {
+          "id": "7c99e72ffbed576176a3f564",
+          "file": "F001",
+          "version": "after",
+          "kind": "function_source",
+          "function": "Value",
+          "span": [
+            14,
+            50
+          ],
+          "text": "func Value(n int) int { return n+1 }",
+          "source_sha256": "4bfcb553b6596c5cb0e3f49e5c829d8b286ad7bc73e5d1db55ab3faa6cce46de",
+          "syntax": "func Value(n int) int {\n\treturn n + 1\n}",
+          "changed": true,
+          "condition_span": [
+            14,
+            50
+          ]
+        }
+      ],
+      "source_status": [
+        {
+          "file": "F001",
+          "version": "after",
+          "status": "parsed"
+        },
+        {
+          "file": "F001",
+          "version": "before",
+          "status": "parsed"
+        }
+      ],
+      "semantic_quality": null
+    }
+  ]
+}

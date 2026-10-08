@@ -1,0 +1,211 @@
+[
+  {
+    "commit": "8092acd2886ba95ee8032518da6c1fcb67481e3b",
+    "parent": "e53eb7385428da731c43421ff9cb1ed0d81de5ac",
+    "paths": [
+      "internal/relation/graph.go",
+      "internal/relation/graph_test.go"
+    ],
+    "input_sha256": "283c5090c677288150634ee7ba37e2b1a85151f18a05dc16f9e0e1d46693f330",
+    "input_bytes": 38517,
+    "snapshot_sha256": [
+      {
+        "file": "F001",
+        "before": "3beeaca4cc1de6ce6e8aac238dd50714dfd4836b8c772014826dbd943eb8a53d",
+        "after": "c4f4ffeffcf930d7579a79ba427eb2db9f93fc4929c0949165535e1b14addc95"
+      },
+      {
+        "file": "F002",
+        "before": "11caffdadaa5e752d1be01949ff798ba9ac395b2866dcc093f3897e838b2661f",
+        "after": "7b488f25a459477cadf3aa93841ee5c3aa30206a4fc3b3af2daf429040429b41"
+      }
+    ],
+    "prior_commit_reference_hits": [],
+    "changed_failure_predicates": [
+      {
+        "id": "af32ad5af855c2e717327ab4",
+        "file": "F002",
+        "version": "after",
+        "kind": "failure_predicate",
+        "function": "TestGraphStatisticsCountEdgesByKind",
+        "span": [
+          2256,
+          2310
+        ],
+        "text": "!reflect.DeepEqual(graph.Statistics.EdgesByKind, want)",
+        "source_sha256": "7b488f25a459477cadf3aa93841ee5c3aa30206a4fc3b3af2daf429040429b41",
+        "syntax": "!reflect.DeepEqual(graph.Statistics.EdgesByKind, want)",
+        "changed": true,
+        "condition_span": [
+          2256,
+          2310
+        ]
+      },
+      {
+        "id": "b13fee12b8abb175620635ee",
+        "file": "F002",
+        "version": "after",
+        "kind": "failure_predicate",
+        "function": "TestGraphStatisticsCountEdgesByKind",
+        "span": [
+          2167,
+          2177
+        ],
+        "text": "err != nil",
+        "source_sha256": "7b488f25a459477cadf3aa93841ee5c3aa30206a4fc3b3af2daf429040429b41",
+        "syntax": "err != nil",
+        "changed": true,
+        "condition_span": [
+          2167,
+          2177
+        ]
+      }
+    ],
+    "disposition": "provisional candidate only; no holdout certification or gold yet",
+    "model_calls": 0
+  },
+  {
+    "commit": "c643154b0498e5d441efdb864a6cee26e3deb2e0",
+    "parent": "df4297d87c836c2861a024ddeee7a420d446c4eb",
+    "paths": [
+      "internal/relation/extract.go",
+      "internal/relation/extract_test.go"
+    ],
+    "input_sha256": "c8f7011f9548dff56571cc5e2feb3354ec4862e83eaba4f5c58a7a971c350228",
+    "input_bytes": 59506,
+    "snapshot_sha256": [
+      {
+        "file": "F001",
+        "before": "dbb9079c0610169aeb9a1105735b2c597888a68ea6dd8f78f13cd1e685f01cc9",
+        "after": "83ace70eda28dae7556ca82b970ad784a9b4e3057d801e042c83d480d201cdde"
+      },
+      {
+        "file": "F002",
+        "before": "4dea102f6809616f3584b59a5e6d9646e454dcf3660410bbcc41b50ff43bb31f",
+        "after": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37"
+      }
+    ],
+    "prior_commit_reference_hits": [
+      "docs/benchmarks/issue-153/iteration-5-preflight.json",
+      "docs/benchmarks/issue-153/iteration-5-report.md"
+    ],
+    "changed_failure_predicates": [
+      {
+        "id": "335cff456cef15c8ed1a65c7",
+        "file": "F002",
+        "version": "after",
+        "kind": "failure_predicate",
+        "function": "TestRootDirectoryProximityIsGrouped",
+        "span": [
+          5709,
+          5732
+        ],
+        "text": "len(got.Relations) != 0",
+        "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37",
+        "syntax": "len(got.Relations) != 0",
+        "changed": true,
+        "condition_span": [
+          5709,
+          5882
+        ]
+      },
+      {
+        "id": "4c51a79e3abb6a5e9d51f001",
+        "file": "F002",
+        "version": "after",
+        "kind": "failure_predicate",
+        "function": "TestRustUseIsRecordedAsUnsupported",
+        "span": [
+          6144,
+          6154
+        ],
+        "text": "err != nil",
+        "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37",
+        "syntax": "err != nil",
+        "changed": true,
+        "condition_span": [
+          6144,
+          6154
+        ]
+      },
+      {
+        "id": "52c9f750b6f29223dd398ab9",
+        "file": "F002",
+        "version": "after",
+        "kind": "failure_predicate",
+        "function": "TestRustUseIsRecordedAsUnsupported",
+        "span": [
+          6415,
+          6438
+        ],
+        "text": "len(got.Relations) != 0",
+        "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37",
+        "syntax": "len(got.Relations) != 0",
+        "changed": true,
+        "condition_span": [
+          6415,
+          6499
+        ]
+      },
+      {
+        "id": "9322d3ad4f8c79cd55ee3591",
+        "file": "F002",
+        "version": "after",
+        "kind": "failure_predicate",
+        "function": "TestRustUseIsRecordedAsUnsupported",
+        "span": [
+          6442,
+          6499
+        ],
+        "text": "!reflect.DeepEqual(got.Observations, []Observation{want})",
+        "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37",
+        "syntax": "!reflect.DeepEqual(got.Observations, []Observation{want})",
+        "changed": true,
+        "condition_span": [
+          6415,
+          6499
+        ]
+      },
+      {
+        "id": "aaa2aebb8e085d7c9d84df5d",
+        "file": "F002",
+        "version": "after",
+        "kind": "failure_predicate",
+        "function": "TestRootDirectoryProximityIsGrouped",
+        "span": [
+          5736,
+          5882
+        ],
+        "text": "!reflect.DeepEqual(got.Hints, []Hint{{Kind: PathProximity, Evidence: Evidence{Type: \"directory\", Value: \".\"}, FileIDs: []string{\"F001\", \"F002\"}}})",
+        "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37",
+        "syntax": "!reflect.DeepEqual(got.Hints, []Hint{{Kind: PathProximity, Evidence: Evidence{Type: \"directory\", Value: \".\"}, FileIDs: []string{\"F001\", \"F002\"}}})",
+        "changed": true,
+        "condition_span": [
+          5709,
+          5882
+        ]
+      },
+      {
+        "id": "c63be9ac7caaa8313e027e12",
+        "file": "F002",
+        "version": "after",
+        "kind": "failure_predicate",
+        "function": "TestRootDirectoryProximityIsGrouped",
+        "span": [
+          5674,
+          5684
+        ],
+        "text": "err != nil",
+        "source_sha256": "87117776470a621a0bc764650b452199df93e3b6cce80d2707c506f6d2a4cf37",
+        "syntax": "err != nil",
+        "changed": true,
+        "condition_span": [
+          5674,
+          5684
+        ]
+      }
+    ],
+    "disposition": "provisional candidate only; no holdout certification or gold yet",
+    "model_calls": 0
+  }
+]

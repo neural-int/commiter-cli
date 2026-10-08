@@ -1,0 +1,15 @@
+{
+  "kind": "no_inference_input_audit",
+  "model_calls": 0,
+  "fixture_sha256": "0d49674fb25c77f814ecb9cf48af1d52d4089da38be924dd2a1f5c3af027e598",
+  "observer_sha256": "41ac4061aae60a7349736c088a31d4041f919c30a55aa5a4f80403c9a7378f41",
+  "source_sha256": "61cb968470d4c9059642072b779e04455c073dafa14c474bcac8f03a450b09bb",
+  "checks": [
+    "exact UTF-8 source spans and source digests",
+    "repeat and reversed-file deterministic output",
+    "all inline atoms reconstruct before/after without omission",
+    "changed failure predicate counts are observations only; no relation quality or GO"
+  ],
+  "observer_scope": "Go Test functions with explicit single Fatal/Fatalf/Error/Errorf body; nested callbacks unsupported; || leaves retain common condition span",
+  "model_gate": "not registered; requires attribution schema, decoder audit and independent holdout before inference"
+}
