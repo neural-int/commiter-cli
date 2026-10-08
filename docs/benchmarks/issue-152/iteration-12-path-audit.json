@@ -1,0 +1,644 @@
+[
+  {
+    "fixture": "normalized-fresh-1",
+    "conditions": [
+      {
+        "mode": "A-only",
+        "expected_pairs": [
+          [
+            "U001",
+            "U006"
+          ],
+          [
+            "U002",
+            "U008"
+          ],
+          [
+            "U003",
+            "U005"
+          ],
+          [
+            "U004",
+            "U007"
+          ]
+        ],
+        "observed_pairs": [],
+        "true_positive": 0,
+        "false_positive": 0,
+        "false_negative": 4,
+        "relations": [],
+        "syntax_graph": {
+          "edges": [],
+          "files": 5,
+          "parse_unavailable": 0,
+          "semantics": "soft_syntactic_call_not_shared_intent",
+          "source_bytes": 712
+        },
+        "unit_symbols": {
+          "U001": [
+            "AccountQuota"
+          ],
+          "U002": [
+            "UploadLimit"
+          ],
+          "U003": [
+            "CacheSize"
+          ],
+          "U004": [
+            "RetryWindow"
+          ],
+          "U005": [
+            "TestCheck0"
+          ],
+          "U006": [
+            "TestCheck1"
+          ],
+          "U007": [
+            "TestCheck2"
+          ],
+          "U008": [
+            "TestCheck3"
+          ]
+        }
+      },
+      {
+        "mode": "repository",
+        "expected_pairs": [
+          [
+            "U001",
+            "U006"
+          ],
+          [
+            "U002",
+            "U008"
+          ],
+          [
+            "U003",
+            "U005"
+          ],
+          [
+            "U004",
+            "U007"
+          ]
+        ],
+        "observed_pairs": [
+          [
+            "U001",
+            "U006"
+          ],
+          [
+            "U002",
+            "U008"
+          ],
+          [
+            "U003",
+            "U005"
+          ],
+          [
+            "U004",
+            "U007"
+          ]
+        ],
+        "true_positive": 4,
+        "false_positive": 0,
+        "false_negative": 0,
+        "relations": [
+          {
+            "from_unit": "U005",
+            "to_unit": "U003",
+            "hops": 2,
+            "kind": "soft_directed_call_path"
+          },
+          {
+            "from_unit": "U006",
+            "to_unit": "U001",
+            "hops": 2,
+            "kind": "soft_directed_call_path"
+          },
+          {
+            "from_unit": "U007",
+            "to_unit": "U004",
+            "hops": 2,
+            "kind": "soft_directed_call_path"
+          },
+          {
+            "from_unit": "U008",
+            "to_unit": "U002",
+            "hops": 2,
+            "kind": "soft_directed_call_path"
+          }
+        ],
+        "syntax_graph": {
+          "edges": [
+            {
+              "from": "F002",
+              "to": "R001",
+              "caller": "TestCheck0",
+              "callee": "C0"
+            },
+            {
+              "from": "F003",
+              "to": "R001",
+              "caller": "TestCheck1",
+              "callee": "C1"
+            },
+            {
+              "from": "F004",
+              "to": "R001",
+              "caller": "TestCheck2",
+              "callee": "C2"
+            },
+            {
+              "from": "F005",
+              "to": "R001",
+              "caller": "TestCheck3",
+              "callee": "C3"
+            },
+            {
+              "from": "R001",
+              "to": "F001",
+              "caller": "C0",
+              "callee": "CacheSize"
+            },
+            {
+              "from": "R001",
+              "to": "F001",
+              "caller": "C1",
+              "callee": "AccountQuota"
+            },
+            {
+              "from": "R001",
+              "to": "F001",
+              "caller": "C2",
+              "callee": "RetryWindow"
+            },
+            {
+              "from": "R001",
+              "to": "F001",
+              "caller": "C3",
+              "callee": "UploadLimit"
+            }
+          ],
+          "files": 6,
+          "parse_unavailable": 0,
+          "semantics": "soft_syntactic_call_not_shared_intent",
+          "source_bytes": 950
+        },
+        "unit_symbols": {
+          "U001": [
+            "AccountQuota"
+          ],
+          "U002": [
+            "UploadLimit"
+          ],
+          "U003": [
+            "CacheSize"
+          ],
+          "U004": [
+            "RetryWindow"
+          ],
+          "U005": [
+            "TestCheck0"
+          ],
+          "U006": [
+            "TestCheck1"
+          ],
+          "U007": [
+            "TestCheck2"
+          ],
+          "U008": [
+            "TestCheck3"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "fixture": "normalized-fresh-2",
+    "conditions": [
+      {
+        "mode": "A-only",
+        "expected_pairs": [
+          [
+            "U001",
+            "U007"
+          ],
+          [
+            "U002",
+            "U005"
+          ],
+          [
+            "U003",
+            "U008"
+          ],
+          [
+            "U004",
+            "U006"
+          ]
+        ],
+        "observed_pairs": [],
+        "true_positive": 0,
+        "false_positive": 0,
+        "false_negative": 4,
+        "relations": [],
+        "syntax_graph": {
+          "edges": [],
+          "files": 5,
+          "parse_unavailable": 0,
+          "semantics": "soft_syntactic_call_not_shared_intent",
+          "source_bytes": 705
+        },
+        "unit_symbols": {
+          "U001": [
+            "ReadLimit"
+          ],
+          "U002": [
+            "WriteLimit"
+          ],
+          "U003": [
+            "BatchSize"
+          ],
+          "U004": [
+            "PoolSize"
+          ],
+          "U005": [
+            "TestCheck0"
+          ],
+          "U006": [
+            "TestCheck1"
+          ],
+          "U007": [
+            "TestCheck2"
+          ],
+          "U008": [
+            "TestCheck3"
+          ]
+        }
+      },
+      {
+        "mode": "repository",
+        "expected_pairs": [
+          [
+            "U001",
+            "U007"
+          ],
+          [
+            "U002",
+            "U005"
+          ],
+          [
+            "U003",
+            "U008"
+          ],
+          [
+            "U004",
+            "U006"
+          ]
+        ],
+        "observed_pairs": [
+          [
+            "U001",
+            "U007"
+          ],
+          [
+            "U002",
+            "U005"
+          ],
+          [
+            "U003",
+            "U008"
+          ],
+          [
+            "U004",
+            "U006"
+          ]
+        ],
+        "true_positive": 4,
+        "false_positive": 0,
+        "false_negative": 0,
+        "relations": [
+          {
+            "from_unit": "U005",
+            "to_unit": "U002",
+            "hops": 2,
+            "kind": "soft_directed_call_path"
+          },
+          {
+            "from_unit": "U006",
+            "to_unit": "U004",
+            "hops": 2,
+            "kind": "soft_directed_call_path"
+          },
+          {
+            "from_unit": "U007",
+            "to_unit": "U001",
+            "hops": 2,
+            "kind": "soft_directed_call_path"
+          },
+          {
+            "from_unit": "U008",
+            "to_unit": "U003",
+            "hops": 2,
+            "kind": "soft_directed_call_path"
+          }
+        ],
+        "syntax_graph": {
+          "edges": [
+            {
+              "from": "F002",
+              "to": "R001",
+              "caller": "TestCheck0",
+              "callee": "C0"
+            },
+            {
+              "from": "F003",
+              "to": "R001",
+              "caller": "TestCheck1",
+              "callee": "C1"
+            },
+            {
+              "from": "F004",
+              "to": "R001",
+              "caller": "TestCheck2",
+              "callee": "C2"
+            },
+            {
+              "from": "F005",
+              "to": "R001",
+              "caller": "TestCheck3",
+              "callee": "C3"
+            },
+            {
+              "from": "R001",
+              "to": "F001",
+              "caller": "C0",
+              "callee": "WriteLimit"
+            },
+            {
+              "from": "R001",
+              "to": "F001",
+              "caller": "C1",
+              "callee": "PoolSize"
+            },
+            {
+              "from": "R001",
+              "to": "F001",
+              "caller": "C2",
+              "callee": "ReadLimit"
+            },
+            {
+              "from": "R001",
+              "to": "F001",
+              "caller": "C3",
+              "callee": "BatchSize"
+            }
+          ],
+          "files": 6,
+          "parse_unavailable": 0,
+          "semantics": "soft_syntactic_call_not_shared_intent",
+          "source_bytes": 936
+        },
+        "unit_symbols": {
+          "U001": [
+            "ReadLimit"
+          ],
+          "U002": [
+            "WriteLimit"
+          ],
+          "U003": [
+            "BatchSize"
+          ],
+          "U004": [
+            "PoolSize"
+          ],
+          "U005": [
+            "TestCheck0"
+          ],
+          "U006": [
+            "TestCheck1"
+          ],
+          "U007": [
+            "TestCheck2"
+          ],
+          "U008": [
+            "TestCheck3"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "fixture": "normalized-fresh-3",
+    "conditions": [
+      {
+        "mode": "A-only",
+        "expected_pairs": [
+          [
+            "U001",
+            "U008"
+          ],
+          [
+            "U002",
+            "U007"
+          ],
+          [
+            "U003",
+            "U006"
+          ],
+          [
+            "U004",
+            "U005"
+          ]
+        ],
+        "observed_pairs": [],
+        "true_positive": 0,
+        "false_positive": 0,
+        "false_negative": 4,
+        "relations": [],
+        "syntax_graph": {
+          "edges": [],
+          "files": 5,
+          "parse_unavailable": 0,
+          "semantics": "soft_syntactic_call_not_shared_intent",
+          "source_bytes": 709
+        },
+        "unit_symbols": {
+          "U001": [
+            "QueueDepth"
+          ],
+          "U002": [
+            "PageSize"
+          ],
+          "U003": [
+            "TimeoutLimit"
+          ],
+          "U004": [
+            "BufferSize"
+          ],
+          "U005": [
+            "TestCheck0"
+          ],
+          "U006": [
+            "TestCheck1"
+          ],
+          "U007": [
+            "TestCheck2"
+          ],
+          "U008": [
+            "TestCheck3"
+          ]
+        }
+      },
+      {
+        "mode": "repository",
+        "expected_pairs": [
+          [
+            "U001",
+            "U008"
+          ],
+          [
+            "U002",
+            "U007"
+          ],
+          [
+            "U003",
+            "U006"
+          ],
+          [
+            "U004",
+            "U005"
+          ]
+        ],
+        "observed_pairs": [
+          [
+            "U001",
+            "U008"
+          ],
+          [
+            "U002",
+            "U007"
+          ],
+          [
+            "U003",
+            "U006"
+          ],
+          [
+            "U004",
+            "U005"
+          ]
+        ],
+        "true_positive": 4,
+        "false_positive": 0,
+        "false_negative": 0,
+        "relations": [
+          {
+            "from_unit": "U005",
+            "to_unit": "U004",
+            "hops": 2,
+            "kind": "soft_directed_call_path"
+          },
+          {
+            "from_unit": "U006",
+            "to_unit": "U003",
+            "hops": 2,
+            "kind": "soft_directed_call_path"
+          },
+          {
+            "from_unit": "U007",
+            "to_unit": "U002",
+            "hops": 2,
+            "kind": "soft_directed_call_path"
+          },
+          {
+            "from_unit": "U008",
+            "to_unit": "U001",
+            "hops": 2,
+            "kind": "soft_directed_call_path"
+          }
+        ],
+        "syntax_graph": {
+          "edges": [
+            {
+              "from": "F002",
+              "to": "R001",
+              "caller": "TestCheck0",
+              "callee": "C0"
+            },
+            {
+              "from": "F003",
+              "to": "R001",
+              "caller": "TestCheck1",
+              "callee": "C1"
+            },
+            {
+              "from": "F004",
+              "to": "R001",
+              "caller": "TestCheck2",
+              "callee": "C2"
+            },
+            {
+              "from": "F005",
+              "to": "R001",
+              "caller": "TestCheck3",
+              "callee": "C3"
+            },
+            {
+              "from": "R001",
+              "to": "F001",
+              "caller": "C0",
+              "callee": "BufferSize"
+            },
+            {
+              "from": "R001",
+              "to": "F001",
+              "caller": "C1",
+              "callee": "TimeoutLimit"
+            },
+            {
+              "from": "R001",
+              "to": "F001",
+              "caller": "C2",
+              "callee": "PageSize"
+            },
+            {
+              "from": "R001",
+              "to": "F001",
+              "caller": "C3",
+              "callee": "QueueDepth"
+            }
+          ],
+          "files": 6,
+          "parse_unavailable": 0,
+          "semantics": "soft_syntactic_call_not_shared_intent",
+          "source_bytes": 944
+        },
+        "unit_symbols": {
+          "U001": [
+            "QueueDepth"
+          ],
+          "U002": [
+            "PageSize"
+          ],
+          "U003": [
+            "TimeoutLimit"
+          ],
+          "U004": [
+            "BufferSize"
+          ],
+          "U005": [
+            "TestCheck0"
+          ],
+          "U006": [
+            "TestCheck1"
+          ],
+          "U007": [
+            "TestCheck2"
+          ],
+          "U008": [
+            "TestCheck3"
+          ]
+        }
+      }
+    ]
+  }
+]
