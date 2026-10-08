@@ -1,0 +1,23 @@
+## 要約
+
+初回入力をproposalの変更前後と短IDのみに限定し、実例3proposalが2255message bytesへ収まることを確認。全atomはhost側で保持。8192byte超過をbackend呼出し前に拒否。exact token countとモデル意味判断は未計測で、16K適合の証明ではない。
+
+## 検証結果
+
+payload_budget.pyはgoldを参照せずbefore/afterからhierarchy再抽出。初回に全source/base64/atom metadataを渡さず、各proposalの変更前後の内容は省略しない。短IDと元parent IDの対応をhostで保持する。schemaは各IDにaccept/refine/unresolvedの文字列一つを要求し、前回のaction/groups併用を構造として許さない。
+
+実例fd042894は3proposal、schema入りsystem/user messagesのUTF8 JSON計2255bytes。上限8192bytes。tokenizer/chat templateを含むexact tokensは不明。上限はbyte guardでありtoken限界の厳密証明ではない。model calls0。
+
+新規3testは内容保持/ID mapping、partial/extra/nested/unknown拒否、4001byte行の一文字変更によるmessage_byte_budget拒否を確認。既存7testを含む10test pass。sourceがA上限内の入力でbyte guardを直接検証した。git diff --check pass。
+
+## 考察
+
+上位proposalの詳細だけを先に送る責務境界により、実例の初回入力を小さくできた。refine判定後の詳細入力・実token予算・全pipeline latencyは未実装または未計測。明示的な段階分離を単なる前回prompt再試行と区別し、前回の101091token失敗を保持する。
+
+文字列enum形式は条件付きgroups矛盾をschemaから除けるが、native grammar強制がないためモデルが形式を守る保証ではない。acceptのsemantic正しさをhost構造validationだけで認定しない。D開始条件にはならない。
+
+## Next Steps
+
+- 新規C専用worktreeでこの初回形式を固定したまま、使用済み2件はwire回帰、実例はコスト診断として3callの最小比較を実行する。形式成功と意味品質を別記録し未使用holdoutとは扱わないため。
+- 実測tokensとstop reasonを記録し、byte guardが実モデル予算に適合するか確認する。backend拒否は未完成として保持しcontext上限は増やさない。
+- refine判定が得られた場合のみ、対象parentの詳細入力を同じbyte guard内で構成する。超過・判断不能は拒否し、全atomの無断間引きとgold oracleによる修復は行わない。
