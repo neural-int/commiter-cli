@@ -1,0 +1,19 @@
+## 要約
+
+実Git履歴を固定symbol窓へ接続するread-only scannerを検証した。再生成一致、実rename/mergeのunknown、snapshot欠落のunknownを確認。semantic追加価値は未評価でB No-Goを保持する。
+
+## 検証結果
+
+scannerはHEADから最大64commit、明示selected symbol64上限。parent0はunknown_initial、複数parentはunknown_merge。diff-tree -Mでrenameがあるcommitは保守的に全体unknown_rename。選択pathのbefore/after欠落または上限超過はunknown_snapshot。snapshot取得前にcat-file sizeで各1MiBを確認する。Git subprocessは各5秒timeout。symbol helperは既存snapshot extractorを利用する。
+
+実temp Git repositoryで個別symbol変更を1touchとして抽出し、同じscanの完全一致をassertした。実rename後の現在pathではrenameと旧path不明をunknownとして保存し、古いsymbolへ勝手に対応付けない。実no-fast-forward mergeはunknown_merge。既存と合わせPython10test、diff check成功。model call0。
+
+## 考察
+
+イベント入力だけのcontractから実commit取得へ進めたが、現在identityはpath/nameの一致に限定される。renameを追跡せずunknownとするためcoverageが減る。rename無関係fileもcommit全体をunknownとする保守性は意図的だが、最終品質は未評価。Git timeoutは各processで、全scan latency/memory/cacheの測定ではない。selected identity入力も現在unitから自動生成する接続が残る。production処理やunit/model上限は変更しない。
+
+## Next Steps
+
+- 新規専用worktreeで未使用source/test fixtureと実symbol履歴を固定し、current unit symbolからpath/name identityを自動生成する。手作業のidentity入力を正常CLI候補のevidence contractに近付けるため。
+- 一括履歴反例、独立symbolの別変更、new/rename/sparseを同時固定し、履歴の共変更をgoldへ合わせない。追加signalの一般化とabsenceを同時評価するため。
+- 共通containerの対照比較を事前登録し、抽出再生成・costを先に記録してから既存固定modelで最小計測する。B gateとproduction制約を保持する。
