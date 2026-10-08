@@ -1,0 +1,73 @@
+[
+  {
+    "Name": "same-statement-diagnostic",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/value.go",
+        "Before": "package calc\nfunc Value(n int) int { return n * 2 }\n",
+        "After": "package calc\nfunc Value(n int) int { return n * 4 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "calc/value_test.go",
+        "Before": "package calc\nimport \"testing\"\nfunc TestValue(t *testing.T) { t.Log(Value(1), \"old\") }\n",
+        "After": "package calc\nimport \"testing\"\nfunc TestValue(t *testing.T) { t.Log(Value(1), \"new\") }\n"
+      }
+    ],
+    "Repository": [],
+    "SymbolGold": [
+      {
+        "requirement": "係数仕様変更",
+        "symbols": [
+          [
+            "F001",
+            "Value"
+          ]
+        ]
+      },
+      {
+        "requirement": "diagnosticラベル独立変更",
+        "symbols": [
+          [
+            "F002",
+            "TestValue"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "variable-mediated-assertion",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/value.go",
+        "Before": "package calc\nfunc Value(n int) int { return n * 2 }\n",
+        "After": "package calc\nfunc Value(n int) int { return n * 4 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "calc/value_test.go",
+        "Before": "package calc\nimport \"testing\"\nfunc TestValue(t *testing.T) { got := Value(1); if got != 2 { t.Fatal(\"invalid\") } }\n",
+        "After": "package calc\nimport \"testing\"\nfunc TestValue(t *testing.T) { got := Value(1); if got != 4 { t.Fatal(\"invalid\") } }\n"
+      }
+    ],
+    "Repository": [],
+    "SymbolGold": [
+      {
+        "requirement": "係数と期待値の連動変更",
+        "symbols": [
+          [
+            "F001",
+            "Value"
+          ],
+          [
+            "F002",
+            "TestValue"
+          ]
+        ]
+      }
+    ]
+  }
+]

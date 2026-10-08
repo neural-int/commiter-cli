@@ -1,0 +1,3 @@
+# Lexical statement guardrails
+
+同じstatementのdiagnostic独立変更と変数経由assertion連動変更を固定。既存最小包含statementにValue callが存在するかを、source/testのgold対と照合する。これは評価用の単純判定でproductionのpartition ruleではない。前者がFPまたは後者がFNならlexical一致だけの十分性を棄却。全before/after組合せのGo test結果を失敗含め保存。goldとtoolを結果後変更しない。
