@@ -1,0 +1,65 @@
+{
+  "states": [
+    {
+      "selected_groups": [],
+      "test_pass": true,
+      "output": "ok  \tbehavior\t0.512s\n"
+    },
+    {
+      "selected_groups": [
+        "G001"
+      ],
+      "test_pass": true,
+      "output": "ok  \tbehavior\t0.358s\n"
+    },
+    {
+      "selected_groups": [
+        "G002"
+      ],
+      "test_pass": false,
+      "output": "--- FAIL: TestNormalLabel (0.00s)\n    label_test.go:3: label\nFAIL\nFAIL\tbehavior\t0.438s\nFAIL\n"
+    },
+    {
+      "selected_groups": [
+        "G003"
+      ],
+      "test_pass": false,
+      "output": "--- FAIL: TestBoundLevel (0.00s)\n    upper_test.go:3: level\nFAIL\nFAIL\tbehavior\t0.358s\nFAIL\n"
+    },
+    {
+      "selected_groups": [
+        "G004"
+      ],
+      "test_pass": false,
+      "output": "--- FAIL: TestBoundLevel (0.00s)\n    upper_test.go:3: level\nFAIL\nFAIL\tbehavior\t0.549s\nFAIL\n"
+    },
+    {
+      "selected_groups": [
+        "G005"
+      ],
+      "test_pass": false,
+      "output": "--- FAIL: TestNormalLabel (0.00s)\n    label_test.go:3: label\nFAIL\nFAIL\tbehavior\t0.369s\nFAIL\n"
+    },
+    {
+      "selected_groups": [
+        "G006"
+      ],
+      "test_pass": false,
+      "output": "--- FAIL: TestSafeRatio (0.00s)\npanic: runtime error: integer divide by zero [recovered, repanicked]\n\ngoroutine 34 [running]:\ntesting.tRunner.func1.2({0x1046be508, 0x1046f5020})\n\t/opt/homebrew/Cellar/go/1.27.1/libexec/src/testing/testing.go:2123 +0x1a0\ntesting.tRunner.func1()\n\t/opt/homebrew/Cellar/go/1.27.1/libexec/src/testing/testing.go:2126 +0x2c8\npanic({0x1046be508?, 0x1046f5020?})\n\t/opt/homebrew/Cellar/go/1.27.1/libexec/src/runtime/panic.go:859 +0x120\nbehavior.SafeRatio(...)\n\t/private/var/folders/yc/09twrrgj79ldn5_9npk7kz640000gn/T/issue153-six-predicted-byyuzrsc/division.go:2\nbehavior.TestSafeRatio(0x7808f4b54248?)\n\t/private/var/folders/yc/09twrrgj79ldn5_9npk7kz640000gn/T/issue153-six-predicted-byyuzrsc/division_test.go:3 +0x20\ntesting.tRunner(0x7808f4b54248, 0x1046db418)\n\t/opt/homebrew/Cellar/go/1.27.1/libexec/src/testing/testing.go:2193 +0xc4\ncreated by testing.(*T).Run in goroutine 1\n\t/opt/homebrew/Cellar/go/1.27.1/libexec/src/testing/testing.go:2258 +0x3b8\nFAIL\tbehavior\t0.358s\nFAIL\n"
+    },
+    {
+      "selected_groups": [
+        "G001",
+        "G002",
+        "G003",
+        "G004",
+        "G005",
+        "G006"
+      ],
+      "test_pass": true,
+      "output": "ok  \tbehavior\t0.346s\n"
+    }
+  ],
+  "staging": true,
+  "scope": "empty/full and each single predicted group; not all64 subsets"
+}
