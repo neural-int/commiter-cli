@@ -1,0 +1,21 @@
+## 要約
+
+詳細refinement2callは両方completedだがschema定義混入でinvalid_schema拒否。complete0/2、exact/FM/FS=null。初回refine判定が得られても、現詳細wireは受理できない。再試行/出力修復0、品質GOではない。
+
+## 検証結果
+
+b1edd35eで条件固定。使用済みwire回帰1件、未使用author-defined synthetic詳細診断1件。各1042message bytes、input295/291tokens、output130/130tokens、wall10.229/9.957秒。回答はgroups/unresolvedに加えtype/properties/required/additionalPropertiesというschema定義を含む。厳格なextra field拒否でinvalid_schema。groupsは両件A001/A002同groupだったが、無効回答を取り出してsemantic成功/失敗へ再集計しない。
+
+関連10testとgit diff --check成功。受理分割0でpartial snapshot compile/test未実施。初回判定を省略した未使用入力は詳細stage単独診断で、全体holdoutではない。Git mutation0。
+
+## 考察
+
+小型入力によりcontext予算問題は今回発生しなかったが、schema文字列をmessagesへ埋め込むだけの現backendでは出力形式保証が得られていない。semantic scorer支配の失敗とは言えずD開始条件を満たさない。余分なschema字段を削除して成功へ修復しない。
+
+同一詳細promptの繰返しや既知goldに合わせた調整では因果的改善を証明しにくい。次は既存helperのstructured-output能力とschema実行契約を確認する必要がある。native enforcementを確認できないまま形式違反を量産する方向は停止する。
+
+## Next Steps
+
+- 新規C専用worktreeで既存helper/backendのschema enforcement機能と実行設定を読み取り監査する。形式指示と生成制約が別物かを確認するため。
+- サポートされる制約があれば最小wire契約で診断し、既知結果は保持する。新依存やモデル変更は追加せず、形式保証をsemantic品質から分離するため。
+- 保証可能な契約がなければ現詳細wire候補の停止条件を記録する。prompt wording反復やinvalid出力のrepairでGoalを達成した扱いにしないため。B停止・D条件未達・production上限を保持する。
