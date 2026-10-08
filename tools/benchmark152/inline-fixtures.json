@@ -1,0 +1,386 @@
+[
+  {
+    "Name": "qual-direct-symbols",
+    "Split": "qualification",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/values.go",
+        "Before": "package calc\nfunc P0(n int) int { return n + 1 }\nfunc P1(n int) int { return n + 1 }\nfunc P2(n int) int { return n + 1 }\n",
+        "After": "package calc\nfunc P0(n int) int { return n + 2 }\nfunc P1(n int) int { return n + 2 }\nfunc P2(n int) int { return n + 2 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/case_0_test.go",
+        "Before": "package checks\nimport (\"testing\"; \"fixture/calc\")\nfunc TestT0(t *testing.T) { if calc.P0(0) != 1 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport (\"testing\"; \"fixture/calc\")\nfunc TestT0(t *testing.T) { if calc.P0(0) != 2 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F003",
+        "Path": "checks/case_1_test.go",
+        "Before": "package checks\nimport (\"testing\"; \"fixture/calc\")\nfunc TestT1(t *testing.T) { if calc.P1(0) != 1 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport (\"testing\"; \"fixture/calc\")\nfunc TestT1(t *testing.T) { if calc.P1(0) != 2 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F004",
+        "Path": "checks/case_2_test.go",
+        "Before": "package checks\nimport (\"testing\"; \"fixture/calc\")\nfunc TestT2(t *testing.T) { if calc.P2(0) != 1 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport (\"testing\"; \"fixture/calc\")\nfunc TestT2(t *testing.T) { if calc.P2(0) != 2 { t.Fatal(\"value\") } }\n"
+      }
+    ],
+    "Repository": [],
+    "SymbolGold": [
+      {
+        "requirement": "P0の独立した加算値を1から2へ変更し、対応するTestT0を更新する",
+        "symbols": [
+          [
+            "F001",
+            "P0"
+          ],
+          [
+            "F002",
+            "TestT0"
+          ]
+        ]
+      },
+      {
+        "requirement": "P1の独立した加算値を1から2へ変更し、対応するTestT1を更新する",
+        "symbols": [
+          [
+            "F001",
+            "P1"
+          ],
+          [
+            "F003",
+            "TestT1"
+          ]
+        ]
+      },
+      {
+        "requirement": "P2の独立した加算値を1から2へ変更し、対応するTestT2を更新する",
+        "symbols": [
+          [
+            "F001",
+            "P2"
+          ],
+          [
+            "F004",
+            "TestT2"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "qual-shared-helper",
+    "Split": "qualification",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/values.go",
+        "Before": "package calc\nimport \"fixture/common\"\nfunc P0(n int) int { return common.Clean(n) + 1 }\nfunc P1(n int) int { return common.Clean(n) + 1 }\nfunc P2(n int) int { return common.Clean(n) + 1 }\n",
+        "After": "package calc\nimport \"fixture/common\"\nfunc P0(n int) int { return common.Clean(n) + 2 }\nfunc P1(n int) int { return common.Clean(n) + 2 }\nfunc P2(n int) int { return common.Clean(n) + 2 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/case_0_test.go",
+        "Before": "package checks\nimport (\"testing\"; \"fixture/calc\")\nfunc TestT0(t *testing.T) { if calc.P0(0) != 1 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport (\"testing\"; \"fixture/calc\")\nfunc TestT0(t *testing.T) { if calc.P0(0) != 2 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F003",
+        "Path": "checks/case_1_test.go",
+        "Before": "package checks\nimport (\"testing\"; \"fixture/calc\")\nfunc TestT1(t *testing.T) { if calc.P1(0) != 1 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport (\"testing\"; \"fixture/calc\")\nfunc TestT1(t *testing.T) { if calc.P1(0) != 2 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F004",
+        "Path": "checks/case_2_test.go",
+        "Before": "package checks\nimport (\"testing\"; \"fixture/calc\")\nfunc TestT2(t *testing.T) { if calc.P2(0) != 1 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport (\"testing\"; \"fixture/calc\")\nfunc TestT2(t *testing.T) { if calc.P2(0) != 2 { t.Fatal(\"value\") } }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R002",
+        "Path": "common/clean.go",
+        "Content": "package common\nfunc Clean(n int) int { return n }\n"
+      }
+    ],
+    "SymbolGold": [
+      {
+        "requirement": "P0の独立した加算値を1から2へ変更し、対応するTestT0を更新する",
+        "symbols": [
+          [
+            "F001",
+            "P0"
+          ],
+          [
+            "F002",
+            "TestT0"
+          ]
+        ]
+      },
+      {
+        "requirement": "P1の独立した加算値を1から2へ変更し、対応するTestT1を更新する",
+        "symbols": [
+          [
+            "F001",
+            "P1"
+          ],
+          [
+            "F003",
+            "TestT1"
+          ]
+        ]
+      },
+      {
+        "requirement": "P2の独立した加算値を1から2へ変更し、対応するTestT2を更新する",
+        "symbols": [
+          [
+            "F001",
+            "P2"
+          ],
+          [
+            "F004",
+            "TestT2"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "independent-routed-a",
+    "Split": "independent",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/values.go",
+        "Before": "package calc\nfunc P0(n int) int { return n + 1 }\nfunc P1(n int) int { return n + 1 }\nfunc P2(n int) int { return n + 1 }\n",
+        "After": "package calc\nfunc P0(n int) int { return n + 2 }\nfunc P1(n int) int { return n + 2 }\nfunc P2(n int) int { return n + 2 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/case_0_test.go",
+        "Before": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT0(t *testing.T) { if adapters.Q0(0) != 1 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT0(t *testing.T) { if adapters.Q0(0) != 2 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F003",
+        "Path": "checks/case_1_test.go",
+        "Before": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT1(t *testing.T) { if adapters.Q1(0) != 1 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT1(t *testing.T) { if adapters.Q1(0) != 2 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F004",
+        "Path": "checks/case_2_test.go",
+        "Before": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT2(t *testing.T) { if adapters.Q2(0) != 1 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT2(t *testing.T) { if adapters.Q2(0) != 2 { t.Fatal(\"value\") } }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R001",
+        "Path": "adapters/routes.go",
+        "Content": "package adapters\nimport \"fixture/calc\"\nfunc Q0(n int) int { return calc.P2(n) }\nfunc Q1(n int) int { return calc.P0(n) }\nfunc Q2(n int) int { return calc.P1(n) }\n"
+      }
+    ],
+    "SymbolGold": [
+      {
+        "requirement": "P2の独立した加算値を1から2へ変更し、対応するTestT0を更新する",
+        "symbols": [
+          [
+            "F001",
+            "P2"
+          ],
+          [
+            "F002",
+            "TestT0"
+          ]
+        ]
+      },
+      {
+        "requirement": "P0の独立した加算値を1から2へ変更し、対応するTestT1を更新する",
+        "symbols": [
+          [
+            "F001",
+            "P0"
+          ],
+          [
+            "F003",
+            "TestT1"
+          ]
+        ]
+      },
+      {
+        "requirement": "P1の独立した加算値を1から2へ変更し、対応するTestT2を更新する",
+        "symbols": [
+          [
+            "F001",
+            "P1"
+          ],
+          [
+            "F004",
+            "TestT2"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "independent-routed-b",
+    "Split": "independent",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/values.go",
+        "Before": "package calc\nfunc P0(n int) int { return n + 5 }\nfunc P1(n int) int { return n + 5 }\nfunc P2(n int) int { return n + 5 }\n",
+        "After": "package calc\nfunc P0(n int) int { return n + 6 }\nfunc P1(n int) int { return n + 6 }\nfunc P2(n int) int { return n + 6 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/case_0_test.go",
+        "Before": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT0(t *testing.T) { if adapters.Q0(0) != 5 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT0(t *testing.T) { if adapters.Q0(0) != 6 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F003",
+        "Path": "checks/case_1_test.go",
+        "Before": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT1(t *testing.T) { if adapters.Q1(0) != 5 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT1(t *testing.T) { if adapters.Q1(0) != 6 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F004",
+        "Path": "checks/case_2_test.go",
+        "Before": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT2(t *testing.T) { if adapters.Q2(0) != 5 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT2(t *testing.T) { if adapters.Q2(0) != 6 { t.Fatal(\"value\") } }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R001",
+        "Path": "adapters/routes.go",
+        "Content": "package adapters\nimport \"fixture/calc\"\nfunc Q0(n int) int { return calc.P1(n) }\nfunc Q1(n int) int { return calc.P2(n) }\nfunc Q2(n int) int { return calc.P0(n) }\n"
+      }
+    ],
+    "SymbolGold": [
+      {
+        "requirement": "P1の独立した加算値を5から6へ変更し、対応するTestT0を更新する",
+        "symbols": [
+          [
+            "F001",
+            "P1"
+          ],
+          [
+            "F002",
+            "TestT0"
+          ]
+        ]
+      },
+      {
+        "requirement": "P2の独立した加算値を5から6へ変更し、対応するTestT1を更新する",
+        "symbols": [
+          [
+            "F001",
+            "P2"
+          ],
+          [
+            "F003",
+            "TestT1"
+          ]
+        ]
+      },
+      {
+        "requirement": "P0の独立した加算値を5から6へ変更し、対応するTestT2を更新する",
+        "symbols": [
+          [
+            "F001",
+            "P0"
+          ],
+          [
+            "F004",
+            "TestT2"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "independent-routed-c",
+    "Split": "independent",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/values.go",
+        "Before": "package calc\nfunc P0(n int) int { return n + 7 }\nfunc P1(n int) int { return n + 7 }\nfunc P2(n int) int { return n + 7 }\n",
+        "After": "package calc\nfunc P0(n int) int { return n + 8 }\nfunc P1(n int) int { return n + 8 }\nfunc P2(n int) int { return n + 8 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/case_0_test.go",
+        "Before": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT0(t *testing.T) { if adapters.Q0(0) != 7 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT0(t *testing.T) { if adapters.Q0(0) != 8 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F003",
+        "Path": "checks/case_1_test.go",
+        "Before": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT1(t *testing.T) { if adapters.Q1(0) != 7 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT1(t *testing.T) { if adapters.Q1(0) != 8 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F004",
+        "Path": "checks/case_2_test.go",
+        "Before": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT2(t *testing.T) { if adapters.Q2(0) != 7 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport (\"testing\"; \"fixture/adapters\")\nfunc TestT2(t *testing.T) { if adapters.Q2(0) != 8 { t.Fatal(\"value\") } }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R001",
+        "Path": "adapters/routes.go",
+        "Content": "package adapters\nimport \"fixture/calc\"\nfunc Q0(n int) int { return calc.P2(n) }\nfunc Q1(n int) int { return calc.P1(n) }\nfunc Q2(n int) int { return calc.P0(n) }\n"
+      }
+    ],
+    "SymbolGold": [
+      {
+        "requirement": "P2の独立した加算値を7から8へ変更し、対応するTestT0を更新する",
+        "symbols": [
+          [
+            "F001",
+            "P2"
+          ],
+          [
+            "F002",
+            "TestT0"
+          ]
+        ]
+      },
+      {
+        "requirement": "P1の独立した加算値を7から8へ変更し、対応するTestT1を更新する",
+        "symbols": [
+          [
+            "F001",
+            "P1"
+          ],
+          [
+            "F003",
+            "TestT1"
+          ]
+        ]
+      },
+      {
+        "requirement": "P0の独立した加算値を7から8へ変更し、対応するTestT2を更新する",
+        "symbols": [
+          [
+            "F001",
+            "P0"
+          ],
+          [
+            "F004",
+            "TestT2"
+          ]
+        ]
+      }
+    ]
+  }
+]
