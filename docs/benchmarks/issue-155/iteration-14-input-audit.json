@@ -1,0 +1,483 @@
+{
+  "selection": {
+    "repository": "iancoleman/strcase",
+    "path": "camel.go",
+    "rule": "API first six, then first three changing any Go test; no success filtering",
+    "selected": [
+      "531aaa44de12ec166ceb71d9bdad7c8295e4235f",
+      "d7993fd391266682cdd3408618e54058f8044f5c",
+      "692d1b89fed27aadf9d3ea07717014dffe558ede"
+    ],
+    "history": [
+      {
+        "sha": "531aaa44de12ec166ceb71d9bdad7c8295e4235f",
+        "files": [
+          "acronyms.go",
+          "camel.go",
+          "concurrency_test.go"
+        ]
+      },
+      {
+        "sha": "d7993fd391266682cdd3408618e54058f8044f5c",
+        "files": [
+          "camel.go",
+          "camel_test.go"
+        ]
+      },
+      {
+        "sha": "692d1b89fed27aadf9d3ea07717014dffe558ede",
+        "files": [
+          "camel.go",
+          "camel_test.go",
+          "snake_test.go"
+        ]
+      },
+      {
+        "sha": "6fab6530048ce8268098c5ef39c193028c5947ec",
+        "files": [
+          "camel.go",
+          "numbers.go",
+          "snake.go",
+          "snake_test.go"
+        ]
+      },
+      {
+        "sha": "820267b5d99440a88b47090af44de9127893c402",
+        "files": [
+          "acronyms.go",
+          "camel.go",
+          "snake.go"
+        ]
+      },
+      {
+        "sha": "486369db5a693767c407c57f0975767b5b65942d",
+        "files": [
+          "camel.go",
+          "camel_test.go",
+          "snake.go",
+          "snake_test.go"
+        ]
+      }
+    ],
+    "frozen_source_sha256": {
+      "tools/benchmark155/table_binding/main.go": "fdd805484802513656cb3b077e34050f89038bf947a81b581c78b7b6c55273e8",
+      "tools/benchmark155/column_guard_binding/main.go": "ffca230318ec0c54bbdf875625f22fde21565564b0abdddc9f6970134945af9c",
+      "tools/benchmark155/loop_binding/main.go": "5b9171faaa4780cb8ddcf9b00368c915f5bd0d82517874daa1fba8c2029fd97f",
+      "tools/benchmark155/error_guard_binding/main.go": "7a70ef037505ce273b4631af225361f43eab950ca0f3e1808e3ac11543c48486"
+    },
+    "base_commit": "22b57613a89107221203e95c21cc0d420546dede"
+  },
+  "rows": [
+    {
+      "commit": "531aaa44de12ec166ceb71d9bdad7c8295e4235f",
+      "parent": "6ce6fd7ae2b10f78f2d5867a7ddce34084d6b814",
+      "extractors": {
+        "loop": {
+          "status": "rejected",
+          "exit_code": 2
+        },
+        "table": {
+          "status": "rejected",
+          "exit_code": 2
+        },
+        "error": {
+          "status": "rejected",
+          "exit_code": 2
+        },
+        "column": {
+          "status": "rejected",
+          "exit_code": 2
+        }
+      },
+      "new_or_changed_source_bindings": [],
+      "units": null,
+      "attribution_input_reject": "unit_budget",
+      "model_calls": 0,
+      "holdout": "not_certified",
+      "positive_negative_unknown_gate": "unresolved: no independent semantic gold or cross-boundary coverage"
+    },
+    {
+      "commit": "d7993fd391266682cdd3408618e54058f8044f5c",
+      "parent": "a61ebb85b34d7b831590cd8fa7faafadc161a652",
+      "extractors": {
+        "loop": {
+          "status": "completed",
+          "bindings": 40
+        },
+        "table": {
+          "status": "completed",
+          "bindings": 0
+        },
+        "error": {
+          "status": "completed",
+          "bindings": 0
+        },
+        "column": {
+          "status": "completed",
+          "bindings": 0
+        }
+      },
+      "new_or_changed_source_bindings": [
+        {
+          "processor": "loop",
+          "binding": {
+            "Row": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                1566,
+                1599
+              ],
+              "text": "{\"CONSTANT_CASE\", \"ConstantCase\"}"
+            },
+            "Input": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                1567,
+                1582
+              ],
+              "text": "\"CONSTANT_CASE\""
+            },
+            "Expected": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                1584,
+                1598
+              ],
+              "text": "\"ConstantCase\""
+            },
+            "Call": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                1670,
+                1681
+              ],
+              "text": "ToCamel(in)"
+            },
+            "Condition": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                1687,
+                1700
+              ],
+              "text": "result != out"
+            },
+            "Function": "toCamel",
+            "Column": 0
+          },
+          "semantic_gold": null,
+          "implementation_effect": null
+        },
+        {
+          "processor": "loop",
+          "binding": {
+            "Row": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2176,
+                2209
+              ],
+              "text": "{\"CONSTANT_CASE\", \"constantCase\"}"
+            },
+            "Input": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2177,
+                2192
+              ],
+              "text": "\"CONSTANT_CASE\""
+            },
+            "Expected": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2194,
+                2208
+              ],
+              "text": "\"constantCase\""
+            },
+            "Call": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2280,
+                2296
+              ],
+              "text": "ToLowerCamel(in)"
+            },
+            "Condition": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2302,
+                2315
+              ],
+              "text": "result != out"
+            },
+            "Function": "toLowerCamel",
+            "Column": 0
+          },
+          "semantic_gold": null,
+          "implementation_effect": null
+        }
+      ],
+      "units": 27,
+      "attribution_input_reject": null,
+      "model_calls": 0,
+      "holdout": "not_certified",
+      "positive_negative_unknown_gate": "unresolved: no independent semantic gold or cross-boundary coverage"
+    },
+    {
+      "commit": "692d1b89fed27aadf9d3ea07717014dffe558ede",
+      "parent": "23e9d4e5c09d4767bb6a4d9fdc49a9d548b70898",
+      "extractors": {
+        "loop": {
+          "status": "completed",
+          "bindings": 90
+        },
+        "table": {
+          "status": "completed",
+          "bindings": 0
+        },
+        "error": {
+          "status": "completed",
+          "bindings": 0
+        },
+        "column": {
+          "status": "completed",
+          "bindings": 36
+        }
+      },
+      "new_or_changed_source_bindings": [
+        {
+          "processor": "loop",
+          "binding": {
+            "Row": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2072,
+                2101
+              ],
+              "text": "{\"some string\", \"someString\"}"
+            },
+            "Input": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2073,
+                2086
+              ],
+              "text": "\"some string\""
+            },
+            "Expected": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2088,
+                2100
+              ],
+              "text": "\"someString\""
+            },
+            "Call": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2206,
+                2222
+              ],
+              "text": "ToLowerCamel(in)"
+            },
+            "Condition": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2228,
+                2241
+              ],
+              "text": "result != out"
+            },
+            "Function": "toLowerCamel",
+            "Column": 0
+          },
+          "semantic_gold": null,
+          "implementation_effect": null
+        },
+        {
+          "processor": "loop",
+          "binding": {
+            "Row": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2105,
+                2135
+              ],
+              "text": "{\" some string\", \"someString\"}"
+            },
+            "Input": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2106,
+                2120
+              ],
+              "text": "\" some string\""
+            },
+            "Expected": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2122,
+                2134
+              ],
+              "text": "\"someString\""
+            },
+            "Call": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2206,
+                2222
+              ],
+              "text": "ToLowerCamel(in)"
+            },
+            "Condition": {
+              "file": "F003",
+              "version": "after",
+              "span": [
+                2228,
+                2241
+              ],
+              "text": "result != out"
+            },
+            "Function": "toLowerCamel",
+            "Column": 0
+          },
+          "semantic_gold": null,
+          "implementation_effect": null
+        },
+        {
+          "processor": "loop",
+          "binding": {
+            "Row": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                1987,
+                2017
+              ],
+              "text": "{\"some string\", \"some_string\"}"
+            },
+            "Input": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                1988,
+                2001
+              ],
+              "text": "\"some string\""
+            },
+            "Expected": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                2003,
+                2016
+              ],
+              "text": "\"some_string\""
+            },
+            "Call": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                2123,
+                2134
+              ],
+              "text": "ToSnake(in)"
+            },
+            "Condition": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                2140,
+                2153
+              ],
+              "text": "result != out"
+            },
+            "Function": "toSnake",
+            "Column": 0
+          },
+          "semantic_gold": null,
+          "implementation_effect": null
+        },
+        {
+          "processor": "loop",
+          "binding": {
+            "Row": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                2021,
+                2052
+              ],
+              "text": "{\" some string\", \"some_string\"}"
+            },
+            "Input": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                2022,
+                2036
+              ],
+              "text": "\" some string\""
+            },
+            "Expected": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                2038,
+                2051
+              ],
+              "text": "\"some_string\""
+            },
+            "Call": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                2123,
+                2134
+              ],
+              "text": "ToSnake(in)"
+            },
+            "Condition": {
+              "file": "F004",
+              "version": "after",
+              "span": [
+                2140,
+                2153
+              ],
+              "text": "result != out"
+            },
+            "Function": "toSnake",
+            "Column": 0
+          },
+          "semantic_gold": null,
+          "implementation_effect": null
+        }
+      ],
+      "units": 5,
+      "attribution_input_reject": null,
+      "model_calls": 0,
+      "holdout": "not_certified",
+      "positive_negative_unknown_gate": "unresolved: no independent semantic gold or cross-boundary coverage"
+    }
+  ],
+  "model_calls": 0
+}

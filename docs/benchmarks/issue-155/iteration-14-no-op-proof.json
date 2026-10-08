@@ -1,0 +1,65 @@
+{
+  "commit": "692d1b89fed27aadf9d3ea07717014dffe558ede",
+  "call_source": {
+    "Row": {
+      "file": "F003",
+      "version": "after",
+      "span": [
+        2072,
+        2101
+      ],
+      "text": "{\"some string\", \"someString\"}"
+    },
+    "Input": {
+      "file": "F003",
+      "version": "after",
+      "span": [
+        2073,
+        2086
+      ],
+      "text": "\"some string\""
+    },
+    "Expected": {
+      "file": "F003",
+      "version": "after",
+      "span": [
+        2088,
+        2100
+      ],
+      "text": "\"someString\""
+    },
+    "Call": {
+      "file": "F003",
+      "version": "after",
+      "span": [
+        2206,
+        2222
+      ],
+      "text": "ToLowerCamel(in)"
+    },
+    "Condition": {
+      "file": "F003",
+      "version": "after",
+      "span": [
+        2228,
+        2241
+      ],
+      "text": "result != out"
+    },
+    "Function": "toLowerCamel",
+    "Column": 0
+  },
+  "edit_text": "\ts = strings.TrimSpace(s)\n",
+  "scope": "only the added trim statement, for the concrete literal input some string; no whole-intent independence",
+  "proof": [
+    "after source differs from before only by the added standard strings.TrimSpace assignment",
+    "literal some string has no leading/trailing whitespace",
+    "trim preserves this input; subsequent source and state are unchanged"
+  ],
+  "before_sha256": "d0593ce03e14ca426e15d638015e5f1a63ad86c55de38e951b89d30da8187726",
+  "after_sha256": "e299322db8a5519f6b350fabe838b1348ae1ae2332fb48f972b01e517e50c943",
+  "gold_observation_effect": "unchanged_for_this_input",
+  "whole_intent_gold": null,
+  "actual_return_value": null,
+  "model_calls": 0
+}
