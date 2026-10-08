@@ -1,0 +1,15 @@
+--- a/Package.swift
++++ b/Package.swift
+@@ -29,7 +29,11 @@
+             .product(name: "MLXGuidedGeneration", package: "mlx-swift-lm"),
+             .product(name: "MLXLMCommon", package: "mlx-swift-lm"),
+         ]),
+-        .testTarget(name: "BoundedGenerationTests", dependencies: ["BoundedGeneration"]),
++        .testTarget(name: "BoundedGenerationTests", dependencies: [
++            "BoundedGeneration",
++            .product(name: "Tokenizers", package: "swift-transformers"),
++            .product(name: "MLXHuggingFace", package: "mlx-swift-lm"),
++        ]),
+         .target(
+             name: "CommiterMLXHelperProtocol"
+         ),
