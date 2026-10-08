@@ -1,0 +1,7 @@
+# Common-container normalized repository comparison
+
+同一container/metadataを両条件へ必ず追加する。A-only graphはselected sourceのみで生成し、repositoryは未変更adapter sourceを追加する。schema/system/model/helperを同一に保ち、graph/relations/sourceの観測差だけを比較する。test-impact containerは両方で空、同一文字列。
+
+未使用3syntheticの各5file/4intentは自然なAPI名と異なるroutingを要求から固定。Goldはsymbol対として評価側のみで、fixture名/要求/Goldをrequestへ渡さない。旧#149の4classも同じ条件で再比較。14比較行、完全に同一requestは一度だけinvokeして二条件へ同じ出力を投影し、再利用を明記。65unitは旧64上限でcall前拒否を保存し、都合よく除外しない。
+
+独立3件でexact増加、FM/FSとも減少か非増加、回帰で悪化なしの場合にevidence追加価値を支持する。全B Goには拒否・new file/rename/sparse history/memory/cacheの残条件も必要。context16384/output1536/120sec、retry/repairなし。使用済み7caseのmetadata成功を一般化へ転用しない。model結果でinput/policy/goldを変更しない。

@@ -1,0 +1,293 @@
+[
+  {
+    "Name": "normalized-fresh-1",
+    "Split": "independent",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/limits.go",
+        "Before": "package calc\nfunc AccountQuota(n int) int { return n * 2 }\nfunc UploadLimit(n int) int { return n * 2 }\nfunc CacheSize(n int) int { return n * 2 }\nfunc RetryWindow(n int) int { return n * 2 }\n",
+        "After": "package calc\nfunc AccountQuota(n int) int { return n * 3 }\nfunc UploadLimit(n int) int { return n * 3 }\nfunc CacheSize(n int) int { return n * 3 }\nfunc RetryWindow(n int) int { return n * 3 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/case_0_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck0(t *testing.T) { if adapters.C0(1) != 2 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck0(t *testing.T) { if adapters.C0(1) != 3 { t.Fatal(\"limit\") } }\n"
+      },
+      {
+        "ID": "F003",
+        "Path": "checks/case_1_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck1(t *testing.T) { if adapters.C1(1) != 2 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck1(t *testing.T) { if adapters.C1(1) != 3 { t.Fatal(\"limit\") } }\n"
+      },
+      {
+        "ID": "F004",
+        "Path": "checks/case_2_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck2(t *testing.T) { if adapters.C2(1) != 2 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck2(t *testing.T) { if adapters.C2(1) != 3 { t.Fatal(\"limit\") } }\n"
+      },
+      {
+        "ID": "F005",
+        "Path": "checks/case_3_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck3(t *testing.T) { if adapters.C3(1) != 2 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck3(t *testing.T) { if adapters.C3(1) != 3 { t.Fatal(\"limit\") } }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R001",
+        "Path": "adapters/routes.go",
+        "Content": "package adapters\nimport \"fixture/calc\"\nfunc C0(n int) int { return calc.CacheSize(n) }\nfunc C1(n int) int { return calc.AccountQuota(n) }\nfunc C2(n int) int { return calc.RetryWindow(n) }\nfunc C3(n int) int { return calc.UploadLimit(n) }\n"
+      }
+    ],
+    "SymbolGold": [
+      {
+        "requirement": "CacheSizeの独立した係数変更と対応test更新",
+        "symbols": [
+          [
+            "F001",
+            "CacheSize"
+          ],
+          [
+            "F002",
+            "TestCheck0"
+          ]
+        ]
+      },
+      {
+        "requirement": "AccountQuotaの独立した係数変更と対応test更新",
+        "symbols": [
+          [
+            "F001",
+            "AccountQuota"
+          ],
+          [
+            "F003",
+            "TestCheck1"
+          ]
+        ]
+      },
+      {
+        "requirement": "RetryWindowの独立した係数変更と対応test更新",
+        "symbols": [
+          [
+            "F001",
+            "RetryWindow"
+          ],
+          [
+            "F004",
+            "TestCheck2"
+          ]
+        ]
+      },
+      {
+        "requirement": "UploadLimitの独立した係数変更と対応test更新",
+        "symbols": [
+          [
+            "F001",
+            "UploadLimit"
+          ],
+          [
+            "F005",
+            "TestCheck3"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "normalized-fresh-2",
+    "Split": "independent",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/limits.go",
+        "Before": "package calc\nfunc ReadLimit(n int) int { return n * 5 }\nfunc WriteLimit(n int) int { return n * 5 }\nfunc BatchSize(n int) int { return n * 5 }\nfunc PoolSize(n int) int { return n * 5 }\n",
+        "After": "package calc\nfunc ReadLimit(n int) int { return n * 6 }\nfunc WriteLimit(n int) int { return n * 6 }\nfunc BatchSize(n int) int { return n * 6 }\nfunc PoolSize(n int) int { return n * 6 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/case_0_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck0(t *testing.T) { if adapters.C0(1) != 5 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck0(t *testing.T) { if adapters.C0(1) != 6 { t.Fatal(\"limit\") } }\n"
+      },
+      {
+        "ID": "F003",
+        "Path": "checks/case_1_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck1(t *testing.T) { if adapters.C1(1) != 5 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck1(t *testing.T) { if adapters.C1(1) != 6 { t.Fatal(\"limit\") } }\n"
+      },
+      {
+        "ID": "F004",
+        "Path": "checks/case_2_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck2(t *testing.T) { if adapters.C2(1) != 5 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck2(t *testing.T) { if adapters.C2(1) != 6 { t.Fatal(\"limit\") } }\n"
+      },
+      {
+        "ID": "F005",
+        "Path": "checks/case_3_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck3(t *testing.T) { if adapters.C3(1) != 5 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck3(t *testing.T) { if adapters.C3(1) != 6 { t.Fatal(\"limit\") } }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R001",
+        "Path": "adapters/routes.go",
+        "Content": "package adapters\nimport \"fixture/calc\"\nfunc C0(n int) int { return calc.WriteLimit(n) }\nfunc C1(n int) int { return calc.PoolSize(n) }\nfunc C2(n int) int { return calc.ReadLimit(n) }\nfunc C3(n int) int { return calc.BatchSize(n) }\n"
+      }
+    ],
+    "SymbolGold": [
+      {
+        "requirement": "WriteLimitの独立した係数変更と対応test更新",
+        "symbols": [
+          [
+            "F001",
+            "WriteLimit"
+          ],
+          [
+            "F002",
+            "TestCheck0"
+          ]
+        ]
+      },
+      {
+        "requirement": "PoolSizeの独立した係数変更と対応test更新",
+        "symbols": [
+          [
+            "F001",
+            "PoolSize"
+          ],
+          [
+            "F003",
+            "TestCheck1"
+          ]
+        ]
+      },
+      {
+        "requirement": "ReadLimitの独立した係数変更と対応test更新",
+        "symbols": [
+          [
+            "F001",
+            "ReadLimit"
+          ],
+          [
+            "F004",
+            "TestCheck2"
+          ]
+        ]
+      },
+      {
+        "requirement": "BatchSizeの独立した係数変更と対応test更新",
+        "symbols": [
+          [
+            "F001",
+            "BatchSize"
+          ],
+          [
+            "F005",
+            "TestCheck3"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "normalized-fresh-3",
+    "Split": "independent",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/limits.go",
+        "Before": "package calc\nfunc QueueDepth(n int) int { return n * 7 }\nfunc PageSize(n int) int { return n * 7 }\nfunc TimeoutLimit(n int) int { return n * 7 }\nfunc BufferSize(n int) int { return n * 7 }\n",
+        "After": "package calc\nfunc QueueDepth(n int) int { return n * 8 }\nfunc PageSize(n int) int { return n * 8 }\nfunc TimeoutLimit(n int) int { return n * 8 }\nfunc BufferSize(n int) int { return n * 8 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/case_0_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck0(t *testing.T) { if adapters.C0(1) != 7 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck0(t *testing.T) { if adapters.C0(1) != 8 { t.Fatal(\"limit\") } }\n"
+      },
+      {
+        "ID": "F003",
+        "Path": "checks/case_1_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck1(t *testing.T) { if adapters.C1(1) != 7 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck1(t *testing.T) { if adapters.C1(1) != 8 { t.Fatal(\"limit\") } }\n"
+      },
+      {
+        "ID": "F004",
+        "Path": "checks/case_2_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck2(t *testing.T) { if adapters.C2(1) != 7 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck2(t *testing.T) { if adapters.C2(1) != 8 { t.Fatal(\"limit\") } }\n"
+      },
+      {
+        "ID": "F005",
+        "Path": "checks/case_3_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck3(t *testing.T) { if adapters.C3(1) != 7 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck3(t *testing.T) { if adapters.C3(1) != 8 { t.Fatal(\"limit\") } }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R001",
+        "Path": "adapters/routes.go",
+        "Content": "package adapters\nimport \"fixture/calc\"\nfunc C0(n int) int { return calc.BufferSize(n) }\nfunc C1(n int) int { return calc.TimeoutLimit(n) }\nfunc C2(n int) int { return calc.PageSize(n) }\nfunc C3(n int) int { return calc.QueueDepth(n) }\n"
+      }
+    ],
+    "SymbolGold": [
+      {
+        "requirement": "BufferSizeの独立した係数変更と対応test更新",
+        "symbols": [
+          [
+            "F001",
+            "BufferSize"
+          ],
+          [
+            "F002",
+            "TestCheck0"
+          ]
+        ]
+      },
+      {
+        "requirement": "TimeoutLimitの独立した係数変更と対応test更新",
+        "symbols": [
+          [
+            "F001",
+            "TimeoutLimit"
+          ],
+          [
+            "F003",
+            "TestCheck1"
+          ]
+        ]
+      },
+      {
+        "requirement": "PageSizeの独立した係数変更と対応test更新",
+        "symbols": [
+          [
+            "F001",
+            "PageSize"
+          ],
+          [
+            "F004",
+            "TestCheck2"
+          ]
+        ]
+      },
+      {
+        "requirement": "QueueDepthの独立した係数変更と対応test更新",
+        "symbols": [
+          [
+            "F001",
+            "QueueDepth"
+          ],
+          [
+            "F005",
+            "TestCheck3"
+          ]
+        ]
+      }
+    ]
+  }
+]
