@@ -1,0 +1,23 @@
+## 要約
+
+gold非依存のline operation＋inline atom階層は18/18の境界表現と部分stagingを保持。ただし粗いoperationだけでは10/18。実履歴285atomは20operationへ減るがCの8unit上限を依然超える。階層の構造能力を確認しただけで、自動refinementやsemantic品質のGOではない。
+
+## 検証結果
+
+557087c2で仮説・実装を計測前固定。全atomは一意のparentへ割り当て、parentはsplittable proposalとして保持しmust-linkにしない。入力はbefore/after/file IDのみでgoldやfixture名を参照しない。
+
+既存12＋行内6ケースの葉表現は18/18、gold intent部分状態の再構築とstaging成功。parent-onlyは10/18で、粗粒度結合だけでは8件の境界を失う。評価側のgold oracleは構造能力検査のみ、runtimeには渡さない。
+
+実履歴fd042894のextract.goは146atom→6operation、extract_test.goは139atom→14operation。parent全適用の再構築・forward/reverse stagingと同一入力再現は両file成功。合計285→20であり8unit capは未達。全atomを保存するため保存容量の削減は未立証。モデルcall0。
+
+## 考察
+
+細粒度を残した粗粒度proposalは情報を捨てずに候補ID数を減らせるが、parent-onlyで処理を完結させると既知境界を失う。さらに実例20operationは現solverでも扱えない。leaf構造能力を、そのまま階層plannerの完全自動意味判断能力と扱わない。
+
+現在のline extractorは行別の置換を複数operationにする。連続編集をまとめる上位proposalは未評価であり、そこには新たな構造仮説がある。ただしsymbol/file単位のhard結合は採用せず、細粒度へ戻れる責務境界を保持する必要がある。A既存bounded GO、B停止、C現候補No-Go、D条件未達は変更しない。
+
+## Next Steps
+
+- 新規A専用worktreeで連続するedit spanの上位proposalをgold非依存で固定し、実例の候補数と既存18ケースの葉境界を検証する。行別operationの断片化を減らせるか確認するため。
+- 上位proposalのみでは表現できない境界を別集計する。圧縮の成功を意味品質へ転用せず、将来の自動refinementが必要な範囲を明確にするため。
+- Cへ接続する前にrefinementの完全自動・bounded・fail-closed条件を定義する。gold oracleによる分割をruntimeへ移植しないため。
