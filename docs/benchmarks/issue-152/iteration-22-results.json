@@ -1,0 +1,53 @@
+[
+  {
+    "case": "initial",
+    "result": {
+      "status": "unknown_snapshot_boundary",
+      "symbols": []
+    }
+  },
+  {
+    "case": "left",
+    "commit": "2134aaf653abf18046dcd8d1ff826006ff160393",
+    "result": {
+      "status": "observed_symbol_snapshot",
+      "symbols": [
+        "Left"
+      ]
+    }
+  },
+  {
+    "case": "housekeeping",
+    "commit": "07d9b3064387b470fc9723c515ffe8cf2159f58a",
+    "result": {
+      "status": "observed_symbol_snapshot",
+      "symbols": []
+    }
+  },
+  {
+    "case": "both",
+    "commit": "c3f29a9d2e9e77089245c2339329673a6505a24e",
+    "result": {
+      "status": "observed_symbol_snapshot",
+      "symbols": [
+        "Left",
+        "Right"
+      ]
+    }
+  },
+  {
+    "case": "rename_content",
+    "result": {
+      "status": "observed_symbol_snapshot",
+      "symbols": []
+    },
+    "identity": "rename_identity_not_extracted"
+  },
+  {
+    "case": "new_file",
+    "result": {
+      "status": "unknown_snapshot_boundary",
+      "symbols": []
+    }
+  }
+]
