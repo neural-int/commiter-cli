@@ -1,0 +1,249 @@
+{
+  "iteration": 24,
+  "scope": "used diagnostic scorer comparison; not fresh holdout or production",
+  "arms": {
+    "original": {
+      "calls": 4,
+      "backend_completed": 4,
+      "complete": 2,
+      "reject": 2,
+      "exact": 0,
+      "accepted_only_false_merge": 5,
+      "accepted_only_false_split": 0,
+      "input_tokens": 4723,
+      "output_tokens": 484,
+      "wall_seconds": 79.10196966840886,
+      "raw_score_counts": {
+        "0": 21,
+        "1": 5,
+        "2": 2
+      }
+    },
+    "policy": {
+      "calls": 4,
+      "backend_completed": 4,
+      "complete": 3,
+      "reject": 1,
+      "exact": 0,
+      "accepted_only_false_merge": 9,
+      "accepted_only_false_split": 0,
+      "input_tokens": 5091,
+      "output_tokens": 484,
+      "wall_seconds": 106.28481154306792,
+      "raw_score_counts": {
+        "0": 16,
+        "1": 6,
+        "2": 6
+      }
+    }
+  },
+  "pairs": [
+    {
+      "fixture": "fresh-six-file-behaviors",
+      "payload_equal": true,
+      "schema_equal": true,
+      "prompt_equal": false,
+      "policy_input_token_delta": 92,
+      "score_equal": true,
+      "original_reproduces_iteration23": true,
+      "original": {
+        "scores": {
+          "U001__U002": 0,
+          "U001__U003": 0,
+          "U001__U004": 0,
+          "U001__U005": 0,
+          "U001__U006": 0,
+          "U002__U003": 0,
+          "U002__U004": 0,
+          "U002__U005": 0,
+          "U002__U006": 0,
+          "U003__U004": 0,
+          "U003__U005": 0,
+          "U003__U006": 0,
+          "U004__U005": 0,
+          "U004__U006": 0,
+          "U005__U006": 0
+        },
+        "unresolved": true,
+        "complete": false,
+        "exact": null,
+        "false_merge": null,
+        "false_split": null,
+        "membership": null,
+        "reason": "unresolved"
+      },
+      "policy": {
+        "scores": {
+          "U001__U002": 0,
+          "U001__U003": 0,
+          "U001__U004": 0,
+          "U001__U005": 0,
+          "U001__U006": 0,
+          "U002__U003": 0,
+          "U002__U004": 0,
+          "U002__U005": 0,
+          "U002__U006": 0,
+          "U003__U004": 0,
+          "U003__U005": 0,
+          "U003__U006": 0,
+          "U004__U005": 0,
+          "U004__U006": 0,
+          "U005__U006": 0
+        },
+        "unresolved": true,
+        "complete": false,
+        "exact": null,
+        "false_merge": null,
+        "false_split": null,
+        "membership": null,
+        "reason": "unresolved"
+      }
+    },
+    {
+      "fixture": "fee-rounding-and-wrap",
+      "payload_equal": true,
+      "schema_equal": true,
+      "prompt_equal": false,
+      "policy_input_token_delta": 92,
+      "score_equal": false,
+      "original_reproduces_iteration23": true,
+      "original": {
+        "scores": {
+          "U001__U002": 0,
+          "U001__U003": 0,
+          "U001__U004": 0,
+          "U002__U003": 0,
+          "U002__U004": 0,
+          "U003__U004": 0
+        },
+        "unresolved": true,
+        "complete": false,
+        "exact": null,
+        "false_merge": null,
+        "false_split": null,
+        "membership": null,
+        "reason": "unresolved"
+      },
+      "policy": {
+        "scores": {
+          "U001__U002": 0,
+          "U001__U003": 1,
+          "U001__U004": 1,
+          "U002__U003": 2,
+          "U002__U004": 1,
+          "U003__U004": 2
+        },
+        "unresolved": false,
+        "complete": true,
+        "exact": false,
+        "false_merge": 4,
+        "false_split": 0,
+        "membership": {
+          "U001": "G001",
+          "U002": "G001",
+          "U003": "G001",
+          "U004": "G001"
+        },
+        "reason": "accepted"
+      }
+    },
+    {
+      "fixture": "same-call-independent-diagnostic",
+      "payload_equal": true,
+      "schema_equal": true,
+      "prompt_equal": false,
+      "policy_input_token_delta": 92,
+      "score_equal": false,
+      "original_reproduces_iteration23": true,
+      "original": {
+        "scores": {
+          "U001__U002": 1
+        },
+        "unresolved": false,
+        "complete": true,
+        "exact": false,
+        "false_merge": 1,
+        "false_split": 0,
+        "membership": {
+          "U001": "G001",
+          "U002": "G001"
+        },
+        "reason": "accepted"
+      },
+      "policy": {
+        "scores": {
+          "U001__U002": 2
+        },
+        "unresolved": false,
+        "complete": true,
+        "exact": false,
+        "false_merge": 1,
+        "false_split": 0,
+        "membership": {
+          "U001": "G001",
+          "U002": "G001"
+        },
+        "reason": "accepted"
+      }
+    },
+    {
+      "fixture": "shared-test-independent-assertions",
+      "payload_equal": true,
+      "schema_equal": true,
+      "prompt_equal": false,
+      "policy_input_token_delta": 92,
+      "score_equal": false,
+      "original_reproduces_iteration23": true,
+      "original": {
+        "scores": {
+          "U001__U002": 1,
+          "U001__U003": 2,
+          "U001__U004": 1,
+          "U002__U003": 1,
+          "U002__U004": 1,
+          "U003__U004": 2
+        },
+        "unresolved": false,
+        "complete": true,
+        "exact": false,
+        "false_merge": 4,
+        "false_split": 0,
+        "membership": {
+          "U001": "G001",
+          "U002": "G001",
+          "U003": "G001",
+          "U004": "G001"
+        },
+        "reason": "accepted"
+      },
+      "policy": {
+        "scores": {
+          "U001__U002": 1,
+          "U001__U003": 2,
+          "U001__U004": 2,
+          "U002__U003": 1,
+          "U002__U004": 1,
+          "U003__U004": 2
+        },
+        "unresolved": false,
+        "complete": true,
+        "exact": false,
+        "false_merge": 4,
+        "false_split": 0,
+        "membership": {
+          "U001": "G001",
+          "U002": "G001",
+          "U003": "G001",
+          "U004": "G001"
+        },
+        "reason": "accepted"
+      }
+    }
+  ],
+  "gate": {
+    "policy_all_four_exact": false,
+    "strict_exact_improvement": false,
+    "decision": "NO-GO",
+    "fresh_holdout_started": false
+  }
+}

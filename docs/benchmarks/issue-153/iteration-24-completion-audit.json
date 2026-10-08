@@ -1,0 +1,148 @@
+{
+  "iteration": 24,
+  "scope": "固定policyとneutral decoderの相互作用。使用済み原因診断のみ。正式gate更新なし",
+  "previous_requirements": [
+    {
+      "issue": 153,
+      "requirement": "semantic scoringと最終partition構築が明確に分離されている",
+      "status": "partial",
+      "evidence": "benchmark scoring/partition separated; formal B integration absent; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "benchmark scoring/partition separated; formal B integration absent"
+    },
+    {
+      "issue": 153,
+      "requirement": "同一validated inputに対してfinal partitionがdeterministicである",
+      "status": "partial",
+      "evidence": "bounded solver repeat tests pass; full pipeline determinism unproven; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "bounded solver repeat tests pass; full pipeline determinism unproven"
+    },
+    {
+      "issue": 153,
+      "requirement": "complete assignmentを保証し、保証できない場合はfail closedする",
+      "status": "partial",
+      "evidence": "host complete/refinement coverage; production mapping integration absent; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "host complete/refinement coverage; production mapping integration absent"
+    },
+    {
+      "issue": 153,
+      "requirement": "contradictory / insufficient evidenceからsilentにGit mutationへ進まない",
+      "status": "unproven",
+      "evidence": "unresolved/tie rejected; semantic contradiction and Git-entry full contract absent; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "unresolved/tie rejected; semantic contradiction and Git-entry full contract absent"
+    },
+    {
+      "issue": 153,
+      "requirement": "関連regression fixtureでend-to-end品質が現行production baseline以上である",
+      "status": "unmet",
+      "evidence": "same4 baseline FM4/FS0 versus C FM0/FS2; no dominance; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "same4 baseline FM4/FS0 versus C FM0/FS2; no dominance"
+    },
+    {
+      "issue": 153,
+      "requirement": "現在の4ファイル上限を超えるmulti-file / multi-changeケースを評価する",
+      "status": "partial",
+      "evidence": "fresh6 measured but exact0 and source/test FS3; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "fresh6 measured but exact0 and source/test FS3"
+    },
+    {
+      "issue": 153,
+      "requirement": "production recommendation前にfresh holdout fixtureを評価する",
+      "status": "partial",
+      "evidence": "fresh authored synthetic measured; production final holdout not passed; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "fresh authored synthetic measured; production final holdout not passed"
+    },
+    {
+      "issue": 153,
+      "requirement": "exact / FM / FS / unresolved / completenessを記録する",
+      "status": "partial",
+      "evidence": "local metrics retained; formal full regression/contradiction scope incomplete; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "local metrics retained; formal full regression/contradiction scope incomplete"
+    },
+    {
+      "issue": 153,
+      "requirement": "latency / model・backend call数 / token・context cost がlocal CLI UXとしてboundedである",
+      "status": "unmet",
+      "evidence": "4file C6calls76.185s versus baseline3calls49.427s; memory/cache budget not measured; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "4file C6calls76.185s versus baseline3calls49.427s; memory/cache budget not measured"
+    },
+    {
+      "issue": 153,
+      "requirement": "fixture-specific routingやgold leakageを必要としない",
+      "status": "partial",
+      "evidence": "runtime gold excluded in recorded fixtures; full pipeline not integrated; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "runtime gold excluded in recorded fixtures; full pipeline not integrated"
+    },
+    {
+      "issue": 150,
+      "requirement": "A / B / C の正式評価と承認済みA-only C探索を区別し、各段階で明示的に Go / No-Go を判定する",
+      "status": "incomplete_or_partial",
+      "evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete"
+    },
+    {
+      "issue": 150,
+      "requirement": "通常運用で完全自動のUXを維持する",
+      "status": "incomplete_or_partial",
+      "evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete"
+    },
+    {
+      "issue": 150,
+      "requirement": "semantic boundary の解決にユーザー確認を要求しない",
+      "status": "incomplete_or_partial",
+      "evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete"
+    },
+    {
+      "issue": 150,
+      "requirement": "現在の4ファイル上限を超える multi-file / multi-change planning を評価する",
+      "status": "incomplete_or_partial",
+      "evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete"
+    },
+    {
+      "issue": 150,
+      "requirement": "現行production baselineおよび #149 regression fixtures と品質比較する",
+      "status": "incomplete_or_partial",
+      "evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete"
+    },
+    {
+      "issue": 150,
+      "requirement": "production候補を判断する前に independent / holdout fixture を使用する",
+      "status": "incomplete_or_partial",
+      "evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete"
+    },
+    {
+      "issue": 150,
+      "requirement": "exact match / FM / FS / unresolved / completeness / latency / token・call cost を記録する",
+      "status": "incomplete_or_partial",
+      "evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete"
+    },
+    {
+      "issue": 150,
+      "requirement": "Git mutation前の complete assignment と fail-closed validation を deterministic に維持する",
+      "status": "incomplete_or_partial",
+      "evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete"
+    },
+    {
+      "issue": 150,
+      "requirement": "production candidate はevidenceが十分な場合のみ選定し、見つからない場合は停止条件を記録する",
+      "status": "incomplete_or_partial",
+      "evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete; iteration21 fixed scorer-policy comparison: no improvement; used6 FS3 and new3 exact1/3 per arm; no formal gate qualification",
+      "previous_evidence": "A bounded GO; B No-Go; C fixed families No-Go; production integration/regression gates not complete"
+    }
+  ],
+  "status_updates": [],
+  "retained_state": {
+    "A": "bounded GO",
+    "B": "NO-GO",
+    "C": "formal gates unmet",
+    "D": "not justified",
+    "production_file_limit": 4,
+    "goal": "unmet"
+  }
+}
