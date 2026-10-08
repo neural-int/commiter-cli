@@ -1,0 +1,495 @@
+{
+  "repository": "iancoleman/strcase",
+  "model_calls": 0,
+  "rows": [
+    {
+      "commit": "192a02172ed4cef346e7f4d476182ea129101b97",
+      "parent": "77ddaa2c2d3cbd5a4a4dcf7dff3652d5fb332fd2",
+      "changed_files": [
+        "snake.go",
+        "snake_test.go"
+      ],
+      "source_hashes": [
+        {
+          "path": "snake.go",
+          "before": "a75ca589be7f8ecce70f8d34cac428624b0ac73849e63f2fd1c42f2e1b931a5c",
+          "after": "dedbdf4bffb7c18f203e4a1d8f339f312970cee007ebe3df696b99ab1b52a9f1"
+        },
+        {
+          "path": "snake_test.go",
+          "before": "f5135781c07abda09c29da27de60c69bc4526a6c5e468c7522fab0b3a88c3335",
+          "after": "99be6c7739241f0edac8d9a4a7c061acccdbf34ad77399eb695e4f9529044b2d"
+        },
+        {
+          "path": "acronyms.go",
+          "before": "909b92e5f4855275d3805a12a34b033a747f50b44d23171bd4b303e56d51bbb1",
+          "after": "909b92e5f4855275d3805a12a34b033a747f50b44d23171bd4b303e56d51bbb1"
+        }
+      ],
+      "units": null,
+      "anchors": null,
+      "input_reject": "unit_budget",
+      "observations": [
+        {
+          "versions": {
+            "after": {
+              "status": "observed",
+              "query": {
+                "package": ".",
+                "function": "ToSnakeWithIgnore",
+                "arguments": [
+                  "AwesomeUsername@Awesome.Com",
+                  ".@"
+                ]
+              },
+              "test_source": {
+                "function": "ToSnakeWithIgnore",
+                "values": [
+                  "AwesomeUsername@Awesome.Com",
+                  "awesome_username@awesome.com",
+                  ".@"
+                ],
+                "span": [
+                  3001,
+                  3070
+                ],
+                "text": "{\"AwesomeUsername@Awesome.Com\", \"awesome_username@awesome.com\", \".@\"}"
+              },
+              "fact": {
+                "known": false,
+                "kind": "unknown",
+                "value": null,
+                "return_refs": []
+              }
+            },
+            "before": {
+              "status": "observed",
+              "query": {
+                "package": ".",
+                "function": "ToSnakeWithIgnore",
+                "arguments": [
+                  "AwesomeUsername@Awesome.Com",
+                  64
+                ]
+              },
+              "test_source": {
+                "function": "ToSnakeWithIgnore",
+                "values": [
+                  "AwesomeUsername@Awesome.Com",
+                  "awesome_username@awesome.com",
+                  "@"
+                ],
+                "span": [
+                  3001,
+                  3069
+                ],
+                "text": "{\"AwesomeUsername@Awesome.Com\", \"awesome_username@awesome.com\", \"@\"}"
+              },
+              "fact": {
+                "known": false,
+                "kind": "unknown",
+                "value": null,
+                "return_refs": []
+              }
+            }
+          },
+          "semantic_attribution": null
+        },
+        {
+          "versions": {
+            "after": {
+              "status": "observed",
+              "query": {
+                "package": ".",
+                "function": "ToSnakeWithIgnore",
+                "arguments": [
+                  "lets-ignore all.of dots-and-dashes",
+                  ".-"
+                ]
+              },
+              "test_source": {
+                "function": "ToSnakeWithIgnore",
+                "values": [
+                  "lets-ignore all.of dots-and-dashes",
+                  "lets-ignore_all.of_dots-and-dashes",
+                  ".-"
+                ],
+                "span": [
+                  3074,
+                  3156
+                ],
+                "text": "{\"lets-ignore all.of dots-and-dashes\", \"lets-ignore_all.of_dots-and-dashes\", \".-\"}"
+              },
+              "fact": {
+                "known": false,
+                "kind": "unknown",
+                "value": null,
+                "return_refs": []
+              }
+            },
+            "before": {
+              "status": "no_matching_natural_row",
+              "fact": null
+            }
+          },
+          "semantic_attribution": null
+        }
+      ],
+      "semantic_gold": null,
+      "holdout": "not_certified"
+    },
+    {
+      "commit": "6fab6530048ce8268098c5ef39c193028c5947ec",
+      "parent": "820267b5d99440a88b47090af44de9127893c402",
+      "changed_files": [
+        "camel.go",
+        "numbers.go",
+        "snake.go",
+        "snake_test.go"
+      ],
+      "source_hashes": [
+        {
+          "path": "snake.go",
+          "before": "167e8269c28fd700b2de0c6e335a5cc41448ccb407bf3411701addac016ca5e8",
+          "after": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283"
+        },
+        {
+          "path": "snake_test.go",
+          "before": "32dc2f331cbe5b6f2c4ecc1ed7ce9c1405236e41765963e2bae7ec3d665eebbc",
+          "after": "62318ca1a52ef6ab08f571f8253826f1bdd368757db1dca35a4d8ba85eba397f"
+        },
+        {
+          "path": "acronyms.go",
+          "before": "eef62d29d51fdae357923d5c5166e504590da4c6edcc30dca79d7122313c2bdd",
+          "after": "eef62d29d51fdae357923d5c5166e504590da4c6edcc30dca79d7122313c2bdd"
+        }
+      ],
+      "units": 102,
+      "anchors": 0,
+      "input_reject": null,
+      "observations": [
+        {
+          "versions": {
+            "after": {
+              "status": "observed",
+              "query": {
+                "package": ".",
+                "function": "ToSnake",
+                "arguments": [
+                  "1A2"
+                ]
+              },
+              "test_source": {
+                "function": "ToSnake",
+                "values": [
+                  "1A2",
+                  "1_a_2"
+                ],
+                "span": [
+                  1815,
+                  1831
+                ],
+                "text": "{\"1A2\", \"1_a_2\"}"
+              },
+              "fact": {
+                "known": false,
+                "kind": "unknown",
+                "value": null,
+                "return_refs": []
+              }
+            },
+            "before": {
+              "status": "no_matching_natural_row",
+              "fact": null
+            }
+          },
+          "semantic_attribution": null
+        },
+        {
+          "versions": {
+            "after": {
+              "status": "observed",
+              "query": {
+                "package": ".",
+                "function": "ToSnake",
+                "arguments": [
+                  "A1B"
+                ]
+              },
+              "test_source": {
+                "function": "ToSnake",
+                "values": [
+                  "A1B",
+                  "a_1_b"
+                ],
+                "span": [
+                  1835,
+                  1851
+                ],
+                "text": "{\"A1B\", \"a_1_b\"}"
+              },
+              "fact": {
+                "known": false,
+                "kind": "unknown",
+                "value": null,
+                "return_refs": []
+              }
+            },
+            "before": {
+              "status": "no_matching_natural_row",
+              "fact": null
+            }
+          },
+          "semantic_attribution": null
+        },
+        {
+          "versions": {
+            "after": {
+              "status": "observed",
+              "query": {
+                "package": ".",
+                "function": "ToSnake",
+                "arguments": [
+                  "A1A2A3"
+                ]
+              },
+              "test_source": {
+                "function": "ToSnake",
+                "values": [
+                  "A1A2A3",
+                  "a_1_a_2_a_3"
+                ],
+                "span": [
+                  1855,
+                  1880
+                ],
+                "text": "{\"A1A2A3\", \"a_1_a_2_a_3\"}"
+              },
+              "fact": {
+                "known": false,
+                "kind": "unknown",
+                "value": null,
+                "return_refs": []
+              }
+            },
+            "before": {
+              "status": "no_matching_natural_row",
+              "fact": null
+            }
+          },
+          "semantic_attribution": null
+        },
+        {
+          "versions": {
+            "after": {
+              "status": "observed",
+              "query": {
+                "package": ".",
+                "function": "ToSnake",
+                "arguments": [
+                  "A1 A2 A3"
+                ]
+              },
+              "test_source": {
+                "function": "ToSnake",
+                "values": [
+                  "A1 A2 A3",
+                  "a_1_a_2_a_3"
+                ],
+                "span": [
+                  1884,
+                  1911
+                ],
+                "text": "{\"A1 A2 A3\", \"a_1_a_2_a_3\"}"
+              },
+              "fact": {
+                "known": false,
+                "kind": "unknown",
+                "value": null,
+                "return_refs": []
+              }
+            },
+            "before": {
+              "status": "no_matching_natural_row",
+              "fact": null
+            }
+          },
+          "semantic_attribution": null
+        },
+        {
+          "versions": {
+            "after": {
+              "status": "observed",
+              "query": {
+                "package": ".",
+                "function": "ToSnake",
+                "arguments": [
+                  "AB1AB2AB3"
+                ]
+              },
+              "test_source": {
+                "function": "ToSnake",
+                "values": [
+                  "AB1AB2AB3",
+                  "ab_1_ab_2_ab_3"
+                ],
+                "span": [
+                  1915,
+                  1946
+                ],
+                "text": "{\"AB1AB2AB3\", \"ab_1_ab_2_ab_3\"}"
+              },
+              "fact": {
+                "known": false,
+                "kind": "unknown",
+                "value": null,
+                "return_refs": []
+              }
+            },
+            "before": {
+              "status": "no_matching_natural_row",
+              "fact": null
+            }
+          },
+          "semantic_attribution": null
+        },
+        {
+          "versions": {
+            "after": {
+              "status": "observed",
+              "query": {
+                "package": ".",
+                "function": "ToSnake",
+                "arguments": [
+                  "AB1 AB2 AB3"
+                ]
+              },
+              "test_source": {
+                "function": "ToSnake",
+                "values": [
+                  "AB1 AB2 AB3",
+                  "ab_1_ab_2_ab_3"
+                ],
+                "span": [
+                  1950,
+                  1983
+                ],
+                "text": "{\"AB1 AB2 AB3\", \"ab_1_ab_2_ab_3\"}"
+              },
+              "fact": {
+                "known": false,
+                "kind": "unknown",
+                "value": null,
+                "return_refs": []
+              }
+            },
+            "before": {
+              "status": "no_matching_natural_row",
+              "fact": null
+            }
+          },
+          "semantic_attribution": null
+        }
+      ],
+      "semantic_gold": null,
+      "holdout": "not_certified"
+    },
+    {
+      "commit": "a6b8dcde35569b34185fc011be4f0f41cf393f3d",
+      "parent": "486369db5a693767c407c57f0975767b5b65942d",
+      "changed_files": [
+        "snake.go",
+        "snake_test.go"
+      ],
+      "source_hashes": [
+        {
+          "path": "snake.go",
+          "before": "293709b5eea013e4551ab0ef8198070482eb0c7091478746f745c689a774cf61",
+          "after": "60d62a2daa0898fa9f092694251292792409384944097e9169da4a4c96e7da7f"
+        },
+        {
+          "path": "snake_test.go",
+          "before": "214e73dfdbecf94c44cd2d78b40146c8002293687dbe0849d17f7c5880a0322e",
+          "after": "32dc2f331cbe5b6f2c4ecc1ed7ce9c1405236e41765963e2bae7ec3d665eebbc"
+        },
+        {
+          "path": "acronyms.go",
+          "before": "ced18934add24f5850427d9485c27ed57b6f202735db917149a53b959fc478f1",
+          "after": "ced18934add24f5850427d9485c27ed57b6f202735db917149a53b959fc478f1"
+        }
+      ],
+      "units": 54,
+      "anchors": 0,
+      "input_reject": null,
+      "observations": [
+        {
+          "versions": {
+            "after": {
+              "status": "observed",
+              "query": {
+                "package": ".",
+                "function": "ToSnakeWithIgnore",
+                "arguments": [
+                  "AwesomeUsername@Awesome.Com",
+                  64
+                ]
+              },
+              "test_source": {
+                "function": "ToSnakeWithIgnore",
+                "values": [
+                  "AwesomeUsername@Awesome.Com",
+                  "awesome_username@awesome.com",
+                  "@"
+                ],
+                "span": [
+                  2760,
+                  2828
+                ],
+                "text": "{\"AwesomeUsername@Awesome.Com\", \"awesome_username@awesome.com\", \"@\"}"
+              },
+              "fact": {
+                "known": false,
+                "kind": "unknown",
+                "value": null,
+                "return_refs": []
+              }
+            },
+            "before": {
+              "status": "observed",
+              "query": {
+                "package": ".",
+                "function": "ToSnakeWithIgnore",
+                "arguments": [
+                  "AwesomeUsername@Awesome.Com",
+                  64
+                ]
+              },
+              "test_source": {
+                "function": "ToSnakeWithIgnore",
+                "values": [
+                  "AwesomeUsername@Awesome.Com",
+                  "awesome_username@awesome._com",
+                  "@"
+                ],
+                "span": [
+                  2760,
+                  2829
+                ],
+                "text": "{\"AwesomeUsername@Awesome.Com\", \"awesome_username@awesome._com\", \"@\"}"
+              },
+              "fact": {
+                "known": false,
+                "kind": "unknown",
+                "value": null,
+                "return_refs": []
+              }
+            }
+          },
+          "semantic_attribution": null
+        }
+      ],
+      "semantic_gold": null,
+      "holdout": "not_certified"
+    }
+  ]
+}
