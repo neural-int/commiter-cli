@@ -30,7 +30,7 @@ struct ScoreWireGrammarTests {
         for item in cases {
             for (messages, expected) in [(item.original,item.expected_original_tokens),(item.policy,item.expected_policy_tokens)] {
                 let chat: [[String: any Sendable]] = messages.map { ["role": $0.role, "content": $0.content] }
-                let tokens = try tokenizer.applyChatTemplate(messages: chat, additionalContext: ["enable_thinking": false])
+                let tokens = try tokenizer.applyChatTemplate(messages: chat, tools: nil, additionalContext: ["enable_thinking": false])
                 let decoded = tokenizer.decode(tokenIds: tokens)
                 #expect(tokens.count == expected)
                 #expect(decoded.contains(messages[0].content))
