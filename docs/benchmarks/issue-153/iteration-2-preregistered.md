@@ -1,0 +1,5 @@
+# Visible A-only correspondence
+
+未使用3syntheticのsource/test直接対応、shared dependency、同一file独立変更を固定。最初2件は5file/8unit、最後は1file/2unit。source/testはcalcの実関数名で直接呼び、未変更adapterのhidden routingを必要としない。goldは独立API要件として評価側のみ。同作者syntheticで別作者/実repository holdoutではない。
+
+scorer/system/schema/solver/objective/8unit上限/model/context16384/output1536/timeout120を初回から変更しない。directとscore_partition計6call、retry/repairなし。exact増加、FM/FS非悪化、complete非悪化を候補qualification条件。各case悪化も保存する。fail-closedによる拒否をFM/FS0へ変換しない。成功時はlegacy/range/独立最終holdout/staging/costへ、失敗時はscore/gold objectiveと情報可用性を診断する。

@@ -1,0 +1,217 @@
+[
+  {
+    "Name": "visible-direct",
+    "Split": "independent_synthetic",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/limits.go",
+        "Before": "package calc\nfunc ReadQuota(n int) int { return n * 3 }\nfunc WriteQuota(n int) int { return n * 3 }\nfunc CacheSlots(n int) int { return n * 3 }\nfunc RetryCount(n int) int { return n * 3 }\n",
+        "After": "package calc\nfunc ReadQuota(n int) int { return n * 4 }\nfunc WriteQuota(n int) int { return n * 4 }\nfunc CacheSlots(n int) int { return n * 4 }\nfunc RetryCount(n int) int { return n * 4 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/check_0_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestCacheSlots(t *testing.T) { if calc.CacheSlots(1) != 3 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestCacheSlots(t *testing.T) { if calc.CacheSlots(1) != 4 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F003",
+        "Path": "checks/check_1_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestReadQuota(t *testing.T) { if calc.ReadQuota(1) != 3 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestReadQuota(t *testing.T) { if calc.ReadQuota(1) != 4 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F004",
+        "Path": "checks/check_2_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestRetryCount(t *testing.T) { if calc.RetryCount(1) != 3 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestRetryCount(t *testing.T) { if calc.RetryCount(1) != 4 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F005",
+        "Path": "checks/check_3_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestWriteQuota(t *testing.T) { if calc.WriteQuota(1) != 3 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestWriteQuota(t *testing.T) { if calc.WriteQuota(1) != 4 { t.Fatal(\"value\") } }\n"
+      }
+    ],
+    "Repository": [],
+    "SymbolGold": [
+      {
+        "requirement": "CacheSlotsの独立した係数仕様変更と期待値更新",
+        "symbols": [
+          [
+            "F001",
+            "CacheSlots"
+          ],
+          [
+            "F002",
+            "TestCacheSlots"
+          ]
+        ]
+      },
+      {
+        "requirement": "ReadQuotaの独立した係数仕様変更と期待値更新",
+        "symbols": [
+          [
+            "F001",
+            "ReadQuota"
+          ],
+          [
+            "F003",
+            "TestReadQuota"
+          ]
+        ]
+      },
+      {
+        "requirement": "RetryCountの独立した係数仕様変更と期待値更新",
+        "symbols": [
+          [
+            "F001",
+            "RetryCount"
+          ],
+          [
+            "F004",
+            "TestRetryCount"
+          ]
+        ]
+      },
+      {
+        "requirement": "WriteQuotaの独立した係数仕様変更と期待値更新",
+        "symbols": [
+          [
+            "F001",
+            "WriteQuota"
+          ],
+          [
+            "F005",
+            "TestWriteQuota"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "visible-shared",
+    "Split": "independent_synthetic",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/limits.go",
+        "Before": "package calc\nfunc Shared(n int) int { return n }\nfunc ReadBudget(n int) int { return Shared(n) * 6 }\nfunc WriteBudget(n int) int { return Shared(n) * 6 }\nfunc BatchBudget(n int) int { return Shared(n) * 6 }\nfunc QueueBudget(n int) int { return Shared(n) * 6 }\n",
+        "After": "package calc\nfunc Shared(n int) int { return n }\nfunc ReadBudget(n int) int { return Shared(n) * 7 }\nfunc WriteBudget(n int) int { return Shared(n) * 7 }\nfunc BatchBudget(n int) int { return Shared(n) * 7 }\nfunc QueueBudget(n int) int { return Shared(n) * 7 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/check_0_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestBatchBudget(t *testing.T) { if calc.BatchBudget(1) != 6 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestBatchBudget(t *testing.T) { if calc.BatchBudget(1) != 7 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F003",
+        "Path": "checks/check_1_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestReadBudget(t *testing.T) { if calc.ReadBudget(1) != 6 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestReadBudget(t *testing.T) { if calc.ReadBudget(1) != 7 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F004",
+        "Path": "checks/check_2_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestQueueBudget(t *testing.T) { if calc.QueueBudget(1) != 6 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestQueueBudget(t *testing.T) { if calc.QueueBudget(1) != 7 { t.Fatal(\"value\") } }\n"
+      },
+      {
+        "ID": "F005",
+        "Path": "checks/check_3_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestWriteBudget(t *testing.T) { if calc.WriteBudget(1) != 6 { t.Fatal(\"value\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestWriteBudget(t *testing.T) { if calc.WriteBudget(1) != 7 { t.Fatal(\"value\") } }\n"
+      }
+    ],
+    "Repository": [],
+    "SymbolGold": [
+      {
+        "requirement": "BatchBudgetの独立した係数仕様変更と期待値更新",
+        "symbols": [
+          [
+            "F001",
+            "BatchBudget"
+          ],
+          [
+            "F002",
+            "TestBatchBudget"
+          ]
+        ]
+      },
+      {
+        "requirement": "ReadBudgetの独立した係数仕様変更と期待値更新",
+        "symbols": [
+          [
+            "F001",
+            "ReadBudget"
+          ],
+          [
+            "F003",
+            "TestReadBudget"
+          ]
+        ]
+      },
+      {
+        "requirement": "QueueBudgetの独立した係数仕様変更と期待値更新",
+        "symbols": [
+          [
+            "F001",
+            "QueueBudget"
+          ],
+          [
+            "F004",
+            "TestQueueBudget"
+          ]
+        ]
+      },
+      {
+        "requirement": "WriteBudgetの独立した係数仕様変更と期待値更新",
+        "symbols": [
+          [
+            "F001",
+            "WriteBudget"
+          ],
+          [
+            "F005",
+            "TestWriteBudget"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "visible-same-file-independent",
+    "Split": "independent_synthetic",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/values.go",
+        "Before": "package calc\nfunc ItemCapacity() int { return 4 }\nfunc RetryDelay() int { return 7 }\n",
+        "After": "package calc\nfunc ItemCapacity() int { return 6 }\nfunc RetryDelay() int { return 9 }\n"
+      }
+    ],
+    "Repository": [],
+    "SymbolGold": [
+      {
+        "requirement": "ItemCapacityの独立仕様",
+        "symbols": [
+          [
+            "F001",
+            "ItemCapacity"
+          ]
+        ]
+      },
+      {
+        "requirement": "RetryDelayの独立仕様",
+        "symbols": [
+          [
+            "F001",
+            "RetryDelay"
+          ]
+        ]
+      }
+    ]
+  }
+]
