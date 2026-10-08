@@ -1,0 +1,5 @@
+# Assertion-location evidenceの比較
+
+使用済みshared-test反例と未使用table-driven反例を測定前固定する。test失敗名に加え、Go test JSONのoutputからpackage/test/file/lineを観測する。goldや要求は抽出器/probeへ渡さない。
+
+同じassertion位置によるrelated判定のgold整合を検査する。table-driven testは独立したLeft/Right要求を同じassertionで検査する。各要求だけを適用した状態もGo testで検証する。位置一致はsoft evidenceに限り、default mergeしない。16unit/90secを維持。モデル呼出なし。今回の改善/反例検査はB独立A-only比較や全達成条件の代替ではない。

@@ -1,5 +1,5 @@
 """Counterfactual pilot on synthetic Go only; no gold used by probes."""
-import argparse,json,os,pathlib,subprocess,tempfile,time,sys
+import argparse,json,os,pathlib,subprocess,tempfile,time,sys,re
 sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/'benchmark151'))
 from inline import extract
 from evaluate import reconstruct
@@ -30,7 +30,8 @@ def main():
      try: events.append(json.loads(line))
      except ValueError: pass
     failures=sorted({e['Package']+'/'+e['Test'] for e in events if e.get('Action')=='fail' and e.get('Test')})
-    rows.append(dict(fixture=r['Name'],probe=label,returncode=result.returncode,failed_tests=failures,unknown=result.returncode!=0 and not failures,wall_seconds=time.perf_counter()-start))
+    locations=sorted({(e.get('Package',''),e.get('Test',''),match.group(1),int(match.group(2))) for e in events if e.get('Test') and e.get('Action')=='output' for match in re.finditer(r'(?m)^\s+([^\s:]+\.go):(\d+):',e.get('Output',''))})
+    rows.append(dict(fixture=r['Name'],probe=label,returncode=result.returncode,failed_tests=failures,assertion_locations=locations,unknown=result.returncode!=0 and not failures,wall_seconds=time.perf_counter()-start))
     print(r['Name'],label,failures,flush=True)
  pathlib.Path(a.output).write_text(json.dumps(rows,indent=2)+'\n')
 

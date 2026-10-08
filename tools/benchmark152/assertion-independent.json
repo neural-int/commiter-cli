@@ -1,0 +1,98 @@
+[
+  {
+    "Name": "independent-shared-test-two-intents",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/values.go",
+        "Before": "package calc\nfunc Left() int { return 3 }\nfunc Right() int { return 7 }\n",
+        "After": "package calc\nfunc Left() int { return 5 }\nfunc Right() int { return 9 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/both_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestBoth(t *testing.T) {\n if calc.Left()!=3 { t.Fatal(\"left\") }\n if calc.Right()!=7 { t.Fatal(\"right\") }\n}\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestBoth(t *testing.T) {\n if calc.Left()!=5 { t.Fatal(\"left\") }\n if calc.Right()!=9 { t.Fatal(\"right\") }\n}\n"
+      }
+    ],
+    "Repository": [],
+    "Requirements": [
+      "Leftの値と対応するassertionを独立更新",
+      "Rightの値と対応するassertionを独立更新"
+    ],
+    "IntentEdits": [
+      [
+        [
+          "F001",
+          "return 3",
+          "return 5"
+        ],
+        [
+          "F002",
+          "Left()!=3",
+          "Left()!=5"
+        ]
+      ],
+      [
+        [
+          "F001",
+          "return 7",
+          "return 9"
+        ],
+        [
+          "F002",
+          "Right()!=7",
+          "Right()!=9"
+        ]
+      ]
+    ]
+  },
+  {
+    "Name": "independent-table-driven-shared-assertion",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/values.go",
+        "Before": "package calc\nfunc Left() int { return 3 }\nfunc Right() int { return 7 }\n",
+        "After": "package calc\nfunc Left() int { return 5 }\nfunc Right() int { return 9 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/both_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestBoth(t *testing.T) {\n cases := []struct{ got, want int }{\n  {calc.Left(), 3},\n  {calc.Right(), 7},\n }\n for _, c := range cases {\n  if c.got != c.want { t.Fatal(\"value\") }\n }\n}\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/calc\")\nfunc TestBoth(t *testing.T) {\n cases := []struct{ got, want int }{\n  {calc.Left(), 5},\n  {calc.Right(), 9},\n }\n for _, c := range cases {\n  if c.got != c.want { t.Fatal(\"value\") }\n }\n}\n"
+      }
+    ],
+    "Repository": [],
+    "Requirements": [
+      "Leftの値と対応するassertionを独立更新",
+      "Rightの値と対応するassertionを独立更新"
+    ],
+    "IntentEdits": [
+      [
+        [
+          "F001",
+          "return 3",
+          "return 5"
+        ],
+        [
+          "F002",
+          "{calc.Left(), 3}",
+          "{calc.Left(), 5}"
+        ]
+      ],
+      [
+        [
+          "F001",
+          "return 7",
+          "return 9"
+        ],
+        [
+          "F002",
+          "{calc.Right(), 7}",
+          "{calc.Right(), 9}"
+        ]
+      ]
+    ]
+  }
+]
