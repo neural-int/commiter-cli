@@ -1,0 +1,65 @@
+{
+  "biased": {
+    "calls": 4,
+    "backend_completed": 4,
+    "complete": 4,
+    "rejected": 0,
+    "exact": 1,
+    "false_merge_on_accepted": 0,
+    "false_split_on_accepted": 7,
+    "quality_scope": "accepted partitions only; rejected rows remain null",
+    "input_tokens": 4723,
+    "output_tokens": 436,
+    "wall_seconds": 80.1085485839285,
+    "score_histogram": {
+      "-1": 28
+    }
+  },
+  "neutral": {
+    "calls": 4,
+    "backend_completed": 4,
+    "complete": 2,
+    "rejected": 2,
+    "exact": 0,
+    "false_merge_on_accepted": 5,
+    "false_split_on_accepted": 0,
+    "quality_scope": "accepted partitions only; rejected rows remain null",
+    "input_tokens": 4723,
+    "output_tokens": 484,
+    "wall_seconds": 140.08629916794598,
+    "score_histogram": {
+      "0": 21,
+      "1": 5,
+      "2": 2
+    }
+  },
+  "paired": [
+    {
+      "fixture": "fresh-six-file-behaviors",
+      "scores_changed": true,
+      "payload_schema_prompt_identical": true
+    },
+    {
+      "fixture": "fee-rounding-and-wrap",
+      "scores_changed": true,
+      "payload_schema_prompt_identical": true
+    },
+    {
+      "fixture": "same-call-independent-diagnostic",
+      "scores_changed": true,
+      "payload_schema_prompt_identical": true
+    },
+    {
+      "fixture": "shared-test-independent-assertions",
+      "scores_changed": true,
+      "payload_schema_prompt_identical": true
+    }
+  ],
+  "biased_reproduces_iteration21": true,
+  "decoder_effect_observed": true,
+  "semantic_candidate_gate": false,
+  "decision": "NO_GO_original_prompt_neutral_decoder",
+  "metric_scope": "unit_pair",
+  "all_fixtures_used": true,
+  "production_changed": false
+}
