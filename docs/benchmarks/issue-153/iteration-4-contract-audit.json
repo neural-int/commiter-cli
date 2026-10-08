@@ -1,0 +1,52 @@
+[
+  {
+    "requirement": "semantic scoringと最終partition構築が明確に分離されている",
+    "status": "限定的に確認",
+    "evidence": "evaluate.py scoreとpartition.pyは責務分離。ただし正式B統合なし"
+  },
+  {
+    "requirement": "同一validated inputに対してfinal partitionがdeterministicである",
+    "status": "限定的に確認",
+    "evidence": "既存3test・iteration1/2でsolver順序反転再現。2〜8unit限定、モデルrepeat未計測"
+  },
+  {
+    "requirement": "complete assignmentを保証し、保証できない場合はfail closedする",
+    "status": "限定的に確認",
+    "evidence": "全pair coverage/ID重複/tie拒否。production source mappingとの接続なし"
+  },
+  {
+    "requirement": "contradictory / insufficient evidenceからsilentにGit mutationへ進まない",
+    "status": "未立証",
+    "evidence": "solver tieとscorer unresolvedは拒否。矛盾辺の検出と実Git入口の統合未検証"
+  },
+  {
+    "requirement": "関連regression fixtureでend-to-end品質が現行production baseline以上である",
+    "status": "未達",
+    "evidence": "iteration2 exact direct1/3対candidate0/3。production/#149とのC比較未実施"
+  },
+  {
+    "requirement": "現在の4ファイル上限を超えるmulti-file / multi-changeケースを評価する",
+    "status": "限定的に確認",
+    "evidence": "5file8unitを計測。全pair評価・8unit上限でscaling未立証"
+  },
+  {
+    "requirement": "production recommendation前にfresh holdout fixtureを評価する",
+    "status": "未立証",
+    "evidence": "3件independent_syntheticは事前固定だが真の最終holdoutと一般化は未確認"
+  },
+  {
+    "requirement": "exact / FM / FS / unresolved / completenessを記録する",
+    "status": "限定的に確認",
+    "evidence": "局所jsonlにexact/FM/FS/completeness/reject理由あり。正式全rangeなし"
+  },
+  {
+    "requirement": "latency / model・backend call数 / token・context cost がlocal CLI UXとしてboundedである",
+    "status": "未立証",
+    "evidence": "局所latency/tokens記録あり。コスト許容gate・memory/cache・大規模入力未評価"
+  },
+  {
+    "requirement": "fixture-specific routingやgold leakageを必要としない",
+    "status": "限定的に確認",
+    "evidence": "runtimeにgold不使用、oracle/診断purposeは別。正式全pipeline未検証"
+  }
+]
