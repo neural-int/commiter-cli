@@ -1,0 +1,23 @@
+## 要約
+
+階層refinement新候補は3/3拒否。synthetic2件はacceptにgroupsを付けた契約違反、実例は詳細atom全送信で101091input tokensとなりbackend internal_error。意味品質は判定不能でexact/FM/FS=null。上位ID数削減だけでは入力コストを抑えられなかった。現wire候補No-Go、再試行0。
+
+## 検証結果
+
+条件8ad8d37aで事前固定。未使用2synthetic＋実履歴1、3call。syntheticはcompletedだがhost拒否：fresh-independentはaccept＋2groups、fresh-singleはaccept＋1group、両方invalid_accept。モデルのgroups内容を修復して成功へ置換しない。realはinternal_error、backend_not_completed。model結果にgold/期待数/requirementラベルは渡さない。
+
+input1264/880/101091tokens、output94/68/null、wall14.471/10.058/1.837秒。16K設定に対する実例の入力超過をモデル実行前に止めるpreflightは今回未実装だった。上位3proposalであっても全source/atom/base64/metadataを送るため巨大化した。失敗をcontext増加や間引きで救済しない。
+
+host既存7testとgit diff --checkは成功。受理refinementが0件のため分割結果に対するpartial snapshot compile/testは実行できず未検証。意味品質を0errorと記録しない。Git mutation0。
+
+## 考察
+
+今回の失敗はscorerの意味判断だけでは説明できない。actionとgroupsの条件付き契約をmodelが守らず、実例では入力表現自体が予算外だった。scorer専用学習Dの根拠にはならない。構造test成功とモデルwire成功を区別する必要がある。
+
+上位proposalはhost内ではlosslessでもmodelへ全atomを常時渡すと圧縮されない。必要な詳細だけを段階的に送る責務分離と、呼出し前の入力予算拒否が未実装だった。親A構造GOや既存C No-Goを今回のwire失敗で書き換えない。
+
+## Next Steps
+
+- 新規C専用worktreeで入力予算の事前検証と階層payloadの実サイズを監査する。101091tokenの失敗を事後検出する形式を繰り返さないため。
+- 初回は上位proposalのbefore/afterとIDだけを渡し、refine要求時に必要parentの詳細を渡す段階的責務境界を計測前固定する。予算超過parentは拒否し、atomの無断間引きはしない。
+- 条件付きaction/groups形式の矛盾を避けるwire契約をhost検証と整合させ、形式改善の検証とsemantic品質検証を別集計する。既知2件を未使用holdoutへ再分類しない。B停止・D条件未達を保持する。
