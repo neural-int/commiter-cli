@@ -1,0 +1,23 @@
+## 要約
+
+未使用6file/3intentのpreflight成功。ゼロ除算ガード・label空白除去・上限100補正を各実装/testの組として固定、全8目的部分状態Go test/staging成功。初回6proposal/2455bytesで現在の構造予算内。モデル品質・production比較は未計測。
+
+## 検証結果
+
+891d08ffでfixtureコードと条件を固定。fixture SHA256 62bfb1d76e0b48327ec6709671bf6280f709e6d308702a03d8cfcb3e0d64f029。6fileのinline atom数22/21/19/2/23/1、計88。全fileはAの256atom/file以内。contiguous上位6unitはC8unit以内、初回messages2455bytesは8192guard以内。
+
+全8目的subsetで実装と該当回帰testを同時適用し、Go test ./... count1成功。staging成功。独立目的のsubsetが成立する根拠であり、sourceのみ適用/新testのみ適用の依存診断は今回未実施。
+
+baseline比較projectionは先頭4file（division＋label、2intent）に事前固定。full6fileは現production上限外で、その拒否を品質成功にしない。現production model/planning経路の4file比較は未実施。model calls0。eval_intent/partial statesは評価側でありmodel payloadには含めない。
+
+## 考察
+
+単一fileの内部境界だけでなく、異なるfileに跨るsource/test目的をまとめるfresh評価を準備できた。全88atomをそのままscoreする方式は上限外だが、階層6proposalは入力予算に収まる。自動accept/refine判断後に8unitを超えれば拒否し、fixtureに合わせて間引かない。
+
+同作者syntheticで実repository一般化の証明はない。構造preflight成功をmodel exactやproduction推薦へ転用しない。B正式evidence未GOの制約も保持する。
+
+## Next Steps
+
+- 新規C専用worktreeで固定6file入力を抽出→初回grammar→必要parent詳細→signed score→deterministic partitionへ全段fresh計測する。cached前段の接続診断からscaling評価へ進むため。
+- 同一入力・予算でstage別cost、reject、unit/atom pair品質を保存し、モデルが返した目的subsetの再構築/test/stagingを確認する。構造validityとsemantic品質を分けるため。
+- 4file projectionの現production baseline経路を確認して比較条件を固定する。baseline拒否や不完全出力をFM/FS=0成功へ置換せず、production以上の品質gateを未実施のままチェックしないため。

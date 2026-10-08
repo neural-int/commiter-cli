@@ -1,0 +1,55 @@
+{
+  "name": "fresh-six-file-behaviors",
+  "split": "independent_synthetic",
+  "files": [
+    {
+      "id": "F001",
+      "path": "division.go",
+      "before": "package behavior\nfunc SafeRatio(n,d int) int { return n/d }\n",
+      "after": "package behavior\nfunc SafeRatio(n,d int) int { if d==0 { return 0 }; return n/d }\n",
+      "eval_intent": 0
+    },
+    {
+      "id": "F002",
+      "path": "division_test.go",
+      "before": "package behavior\nimport \"testing\"\nfunc TestSafeRatio(t *testing.T) { if SafeRatio(8,2)!=4 {t.Fatal(\"ratio\")} }\n",
+      "after": "package behavior\nimport \"testing\"\nfunc TestSafeRatio(t *testing.T) { if SafeRatio(8,2)!=4 || SafeRatio(8,0)!=0 {t.Fatal(\"ratio\")} }\n",
+      "eval_intent": 0
+    },
+    {
+      "id": "F003",
+      "path": "label.go",
+      "before": "package behavior\nimport \"strings\"\nfunc NormalLabel(s string) string { return strings.ToLower(s) }\n",
+      "after": "package behavior\nimport \"strings\"\nfunc NormalLabel(s string) string { return strings.ToLower(strings.TrimSpace(s)) }\n",
+      "eval_intent": 1
+    },
+    {
+      "id": "F004",
+      "path": "label_test.go",
+      "before": "package behavior\nimport \"testing\"\nfunc TestNormalLabel(t *testing.T) { if NormalLabel(\" A \")!=\" a \" {t.Fatal(\"label\")} }\n",
+      "after": "package behavior\nimport \"testing\"\nfunc TestNormalLabel(t *testing.T) { if NormalLabel(\" A \")!=\"a\" {t.Fatal(\"label\")} }\n",
+      "eval_intent": 1
+    },
+    {
+      "id": "F005",
+      "path": "upper.go",
+      "before": "package behavior\nfunc BoundLevel(n int) int { if n<0 {return 0}; return n }\n",
+      "after": "package behavior\nfunc BoundLevel(n int) int { if n<0 {return 0}; if n>100 {return 100}; return n }\n",
+      "eval_intent": 2
+    },
+    {
+      "id": "F006",
+      "path": "upper_test.go",
+      "before": "package behavior\nimport \"testing\"\nfunc TestBoundLevel(t *testing.T) { if BoundLevel(-1)!=0 || BoundLevel(101)!=101 {t.Fatal(\"level\")} }\n",
+      "after": "package behavior\nimport \"testing\"\nfunc TestBoundLevel(t *testing.T) { if BoundLevel(-1)!=0 || BoundLevel(101)!=100 {t.Fatal(\"level\")} }\n",
+      "eval_intent": 2
+    }
+  ],
+  "baseline_projection": [
+    "F001",
+    "F002",
+    "F003",
+    "F004"
+  ],
+  "baseline_projection_scope": "4file/2intent; full6 outside current production limit"
+}
