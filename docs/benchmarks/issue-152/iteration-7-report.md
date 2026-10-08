@@ -1,0 +1,19 @@
+## 要約
+
+共同適用によるtest回復を32probeで測定した。旧shared-test/table-drivenの2件では正しいsource/testの組を区別できた。一方、新規compensating valuesでは異なるintentが共同回復し、回復を同一intentの証明にはできなかった。comment-onlyはimpact不在。B Goは未判定。
+
+## 検証結果
+
+旧2fixtureは各12probe、各2組の共同回復がgold同intentに一致。新規compensating valuesは4probeで、Left 3→5、Right 7→5がそれぞれ単独では合計10のtestを失敗させ、両方で5+5=10となり回復した。事前に独立要求として固定した2intent間の1pairがrecovery-positiveとなった。新規comment-onlyは4probeの全状態でtest成功、単独失敗から回復するpairは0。全32probeでcompile error由来unknown0、モデル呼出0。事前固定commit bbf485d。
+
+## 考察
+
+test回復はbehavioral整合の観測であり、変更目的の一致と同じではない。aggregate assertionでは独立した変更の効果が相殺される。相殺ケースのsingle-intent状態はtestが失敗するが、semantic goldは別の公開値を変更する独立要求として固定しており、testがその境界を表さない反例である。独立intentの全中間状態がtest成功したと主張しない。
+
+共同回復predicateの5positive中4pairは旧回帰で整合し、新規1pairは異intentだった。この観測はsoft evidenceの限界を示し、modelとの併用を含むtest-impact全体の不可能性は証明しない。impact不在を同じintentへ変換しない。旧No-Goや65unit拒否は保存する。
+
+## Next Steps
+
+- 共同回復をsoft featureとしてA-onlyとの固定model比較へ渡す。evidence単体の整合ではなく実際の独立品質の追加価値を測るため。
+- 今回の反例を回帰へ保持し、未使用の非behavior/共有依存/absenceも固定する。soft featureがscorerを誤ったmergeへ誘導しないか検証するため。
+- probe cost・上限・未知の扱いを記録し、B条件を満たすまでCへ進まない。
