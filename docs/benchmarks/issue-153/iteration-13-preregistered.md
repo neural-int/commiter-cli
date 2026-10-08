@@ -1,0 +1,5 @@
+## 固定fixtureとpreflight
+
+未使用author-defined synthetic1件。隣接するClampNegativeの負数→0修正とCharactersのUTF8 byte→rune修正を独立目的として評価。正数/ASCIIの回帰を保持。4つの目的部分状態がGo test成功、atom subsetが一意、stagingが成功することをモデル計測前に確認する。gold要件・state別validation testは評価側だけで、modelへ送るのはbefore/after/hierarchy内容のみ。
+
+成功しても実repository holdout・production品質・D必要性の証明ではない。次のモデル評価では初回判断→必要parent詳細grammarを固定したまま用い、rejectとstage別cost、初回refine/詳細merge矛盾を記録する。今回preflightはcall0。構造不成立の場合はfixtureを成功例へ改変せずsetup失敗として保存する。
