@@ -27,6 +27,13 @@ struct ScoreWireGrammarTests {
         let config = try JSONSerialization.jsonObject(with: Data(contentsOf: folder.appendingPathComponent("config.json"))) as! [String: Any]
         let stopIDs = (config["eos_token_id"] as? [Int]) ?? [config["eos_token_id"] as? Int ?? eos]
         var accepted = 0; var rejected = 0; var promptPasses = 0
+        var spellingTrace = [[String: Any]]()
+        for value in [-2,-1,0,1,2] {
+            let tokens = tokenizer.encode(text: " \(value)", addSpecialTokens: false)
+            let whitespace = WhitespaceTokenBias.compute(tokenizer: tokenizer).tokenIDs
+            spellingTrace.append(["value":value,"token_ids":tokens,"pieces":tokens.map {tokenizer.convertIdToToken($0) ?? ""},"whitespace_penalty_count":tokens.filter {whitespace.contains($0)}.count])
+        }
+        var replayTrace = [[String: Any]]()
         for item in cases {
             for (messages, expected) in [(item.original,item.expected_original_tokens),(item.policy,item.expected_policy_tokens)] {
                 let chat: [[String: any Sendable]] = messages.map { ["role": $0.role, "content": $0.content] }
@@ -48,11 +55,15 @@ struct ScoreWireGrammarTests {
                     alignRuntimeStops: true, factory: factory)
                 let tokens = tokenizer.encode(text: vector.output, addSpecialTokens: false)
                 var allowed = true
+                var penaltyCount = 0
                 for token in tokens + [eos] {
-                    if !state.maskValues(count: grammarTokenizer.vocabSize)[token].isFinite { allowed = false; break }
+                    let mask = state.maskValues(count: grammarTokenizer.vocabSize)
+                    if !mask[token].isFinite { allowed = false; break }
+                    if mask[token] < 0 { penaltyCount += 1 }
                     state.commit(token)
                 }
                 if vector.legal {
+                    replayTrace.append(["fixture":item.name,"score":vector.score,"penalized_token_count":penaltyCount,"encoded_tokens":tokens.count])
                     #expect(allowed && state.succeeded && state.diagnostic == "none")
                     accepted += allowed && state.succeeded ? 1 : 0
                 } else {
@@ -61,7 +72,7 @@ struct ScoreWireGrammarTests {
                 }
             }
         }
-        let report: [String: Any] = ["cases":cases.count,"prompt_checks":promptPasses,"legal_replays_accepted":accepted,"illegal_replays_rejected":rejected,"model_calls":0,"weights_loaded":false,"vocab_size":grammarTokenizer.vocabSize,"eos":eos]
+        let report: [String: Any] = ["cases":cases.count,"prompt_checks":promptPasses,"legal_replays_accepted":accepted,"illegal_replays_rejected":rejected,"model_calls":0,"weights_loaded":false,"vocab_size":grammarTokenizer.vocabSize,"eos":eos,"score_spelling_trace":spellingTrace,"legal_replay_trace":replayTrace]
         let data = try JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted,.sortedKeys])
         try data.write(to: URL(fileURLWithPath: "/tmp/issue153-score-wire-result.json"))
     }
