@@ -1,0 +1,5 @@
+# Validated informative synthetic history
+
+使用済みfixture2件の履歴要因診断。未使用holdoutとして数えない。過去snapshotは現在Beforeより係数/期待値を1小さくし、実call graphからsource/test対応を得てfeature毎に現在Beforeへ更新する。各historical commitはgo test成功が必要。batchは全featureを一括更新。goldをhistory生成へ渡さず、graphの実依存を使用。ただしsynthetic作者が構造を作った正例なので実repository一般化を証明しない。
+
+共通graph/history container、履歴観測のみ追加。2件4call、既存model/予算/schema固定、retry/repairなし。feature case改善とbatch非悪化で候補signalを支持するがB Goは未使用正例/guardrail/new/rename/legacy/costも必要。過去に無関係な履歴を加えた失敗を保持する。

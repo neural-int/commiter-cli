@@ -1,0 +1,198 @@
+[
+  {
+    "Name": "informative-history-1",
+    "Split": "independent",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/limits.go",
+        "Before": "package calc\nfunc HistoryAccountQuota(n int) int { return n * 2 }\nfunc HistoryUploadLimit(n int) int { return n * 2 }\nfunc HistoryCacheSize(n int) int { return n * 2 }\nfunc HistoryRetryWindow(n int) int { return n * 2 }\n",
+        "After": "package calc\nfunc HistoryAccountQuota(n int) int { return n * 3 }\nfunc HistoryUploadLimit(n int) int { return n * 3 }\nfunc HistoryCacheSize(n int) int { return n * 3 }\nfunc HistoryRetryWindow(n int) int { return n * 3 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/case_0_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck0(t *testing.T) { if adapters.C0(1) != 2 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck0(t *testing.T) { if adapters.C0(1) != 3 { t.Fatal(\"limit\") } }\n"
+      },
+      {
+        "ID": "F003",
+        "Path": "checks/case_1_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck1(t *testing.T) { if adapters.C1(1) != 2 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck1(t *testing.T) { if adapters.C1(1) != 3 { t.Fatal(\"limit\") } }\n"
+      },
+      {
+        "ID": "F004",
+        "Path": "checks/case_2_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck2(t *testing.T) { if adapters.C2(1) != 2 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck2(t *testing.T) { if adapters.C2(1) != 3 { t.Fatal(\"limit\") } }\n"
+      },
+      {
+        "ID": "F005",
+        "Path": "checks/case_3_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck3(t *testing.T) { if adapters.C3(1) != 2 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck3(t *testing.T) { if adapters.C3(1) != 3 { t.Fatal(\"limit\") } }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R001",
+        "Path": "adapters/routes.go",
+        "Content": "package adapters\nimport \"fixture/calc\"\nfunc C0(n int) int { return calc.HistoryCacheSize(n) }\nfunc C1(n int) int { return calc.HistoryAccountQuota(n) }\nfunc C2(n int) int { return calc.HistoryRetryWindow(n) }\nfunc C3(n int) int { return calc.HistoryUploadLimit(n) }\n"
+      }
+    ],
+    "SymbolGold": [
+      {
+        "requirement": "独立API変更と実adapterに対応するtest更新",
+        "symbols": [
+          [
+            "F001",
+            "HistoryCacheSize"
+          ],
+          [
+            "F002",
+            "TestCheck0"
+          ]
+        ]
+      },
+      {
+        "requirement": "独立API変更と実adapterに対応するtest更新",
+        "symbols": [
+          [
+            "F001",
+            "HistoryAccountQuota"
+          ],
+          [
+            "F003",
+            "TestCheck1"
+          ]
+        ]
+      },
+      {
+        "requirement": "独立API変更と実adapterに対応するtest更新",
+        "symbols": [
+          [
+            "F001",
+            "HistoryRetryWindow"
+          ],
+          [
+            "F004",
+            "TestCheck2"
+          ]
+        ]
+      },
+      {
+        "requirement": "独立API変更と実adapterに対応するtest更新",
+        "symbols": [
+          [
+            "F001",
+            "HistoryUploadLimit"
+          ],
+          [
+            "F005",
+            "TestCheck3"
+          ]
+        ]
+      }
+    ],
+    "HistoryRegime": "feature"
+  },
+  {
+    "Name": "informative-history-2",
+    "Split": "independent",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/limits.go",
+        "Before": "package calc\nfunc HistoryReadLimit(n int) int { return n * 5 }\nfunc HistoryWriteLimit(n int) int { return n * 5 }\nfunc HistoryBatchSize(n int) int { return n * 5 }\nfunc HistoryPoolSize(n int) int { return n * 5 }\n",
+        "After": "package calc\nfunc HistoryReadLimit(n int) int { return n * 6 }\nfunc HistoryWriteLimit(n int) int { return n * 6 }\nfunc HistoryBatchSize(n int) int { return n * 6 }\nfunc HistoryPoolSize(n int) int { return n * 6 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "checks/case_0_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck0(t *testing.T) { if adapters.C0(1) != 5 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck0(t *testing.T) { if adapters.C0(1) != 6 { t.Fatal(\"limit\") } }\n"
+      },
+      {
+        "ID": "F003",
+        "Path": "checks/case_1_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck1(t *testing.T) { if adapters.C1(1) != 5 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck1(t *testing.T) { if adapters.C1(1) != 6 { t.Fatal(\"limit\") } }\n"
+      },
+      {
+        "ID": "F004",
+        "Path": "checks/case_2_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck2(t *testing.T) { if adapters.C2(1) != 5 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck2(t *testing.T) { if adapters.C2(1) != 6 { t.Fatal(\"limit\") } }\n"
+      },
+      {
+        "ID": "F005",
+        "Path": "checks/case_3_test.go",
+        "Before": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck3(t *testing.T) { if adapters.C3(1) != 5 { t.Fatal(\"limit\") } }\n",
+        "After": "package checks\nimport(\"testing\";\"fixture/adapters\")\nfunc TestCheck3(t *testing.T) { if adapters.C3(1) != 6 { t.Fatal(\"limit\") } }\n"
+      }
+    ],
+    "Repository": [
+      {
+        "ID": "R001",
+        "Path": "adapters/routes.go",
+        "Content": "package adapters\nimport \"fixture/calc\"\nfunc C0(n int) int { return calc.HistoryWriteLimit(n) }\nfunc C1(n int) int { return calc.HistoryPoolSize(n) }\nfunc C2(n int) int { return calc.HistoryReadLimit(n) }\nfunc C3(n int) int { return calc.HistoryBatchSize(n) }\n"
+      }
+    ],
+    "SymbolGold": [
+      {
+        "requirement": "独立API変更と実adapterに対応するtest更新",
+        "symbols": [
+          [
+            "F001",
+            "HistoryWriteLimit"
+          ],
+          [
+            "F002",
+            "TestCheck0"
+          ]
+        ]
+      },
+      {
+        "requirement": "独立API変更と実adapterに対応するtest更新",
+        "symbols": [
+          [
+            "F001",
+            "HistoryPoolSize"
+          ],
+          [
+            "F003",
+            "TestCheck1"
+          ]
+        ]
+      },
+      {
+        "requirement": "独立API変更と実adapterに対応するtest更新",
+        "symbols": [
+          [
+            "F001",
+            "HistoryReadLimit"
+          ],
+          [
+            "F004",
+            "TestCheck2"
+          ]
+        ]
+      },
+      {
+        "requirement": "独立API変更と実adapterに対応するtest更新",
+        "symbols": [
+          [
+            "F001",
+            "HistoryBatchSize"
+          ],
+          [
+            "F005",
+            "TestCheck3"
+          ]
+        ]
+      }
+    ],
+    "HistoryRegime": "batch"
+  }
+]
