@@ -1,0 +1,5 @@
+## 固定仮説
+
+既存line edit blockをsplittable operation proposalとし、全inline atomと一意parent mappingを保持する。gold/path/symbolの意味ラベルで結合しない。親単位の強制結合は行わない。既存18ケースで葉単位のgold境界、全coverage/reconstruction/stagingを保持し、実履歴fd042894の285atomが何operationになるか確認する。
+
+粗い親だけでgoldを表現できるかも別集計する。葉保持の成功を粗い親だけのsemantic品質・自動refinement能力・C GOとは扱わない。モデルcall0。階層の入力圧縮はID数のみで、全atom保持の保存容量削減を主張しない。
