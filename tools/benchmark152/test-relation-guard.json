@@ -1,0 +1,73 @@
+[
+  {
+    "Name": "test-assertion-coupled",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/value.go",
+        "Before": "package calc\nfunc Value(n int) int { return n * 2 }\n",
+        "After": "package calc\nfunc Value(n int) int { return n * 4 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "calc/value_test.go",
+        "Before": "package calc\nimport \"testing\"\nfunc TestValue(t *testing.T) { if Value(1) != 2 { t.Fatal(\"invalid\") } }\n",
+        "After": "package calc\nimport \"testing\"\nfunc TestValue(t *testing.T) { if Value(1) != 4 { t.Fatal(\"invalid\") } }\n"
+      }
+    ],
+    "Repository": [],
+    "SymbolGold": [
+      {
+        "requirement": "係数仕様とassertion更新",
+        "symbols": [
+          [
+            "F001",
+            "Value"
+          ],
+          [
+            "F002",
+            "TestValue"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "test-diagnostic-independent",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "calc/value.go",
+        "Before": "package calc\nfunc Value(n int) int { return n * 2 }\n",
+        "After": "package calc\nfunc Value(n int) int { return n * 4 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "calc/value_test.go",
+        "Before": "package calc\nimport \"testing\"\nfunc TestValue(t *testing.T) { if Value(1) < 0 { t.Fatal(\"invalid\") }; t.Log(\"old diagnostic\") }\n",
+        "After": "package calc\nimport \"testing\"\nfunc TestValue(t *testing.T) { if Value(1) < 0 { t.Fatal(\"invalid\") }; t.Log(\"new diagnostic\") }\n"
+      }
+    ],
+    "Repository": [],
+    "SymbolGold": [
+      {
+        "requirement": "係数仕様変更",
+        "symbols": [
+          [
+            "F001",
+            "Value"
+          ]
+        ]
+      },
+      {
+        "requirement": "test診断文の独立更新",
+        "symbols": [
+          [
+            "F002",
+            "TestValue"
+          ]
+        ]
+      }
+    ]
+  }
+]

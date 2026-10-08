@@ -1,0 +1,3 @@
+# Source/test relation guard
+
+同じGo TestValue(t *testing.T)がValueを呼ぶ2件を固定する。係数と期待値更新はcoupled、係数とtest診断文更新は独立要件。goldは抽出後の評価専用。修復済みgraphと既存unit抽出を変更せず、対のTP/FP/FNと全snapshotのGo test結果を保存する。coupledの単独状態がtest失敗しても拒否や修正せず保存する。型だけをhard mergeに使えるという仮説は独立caseのrelationで棄却する。モデル比較やwording調整は不要。
