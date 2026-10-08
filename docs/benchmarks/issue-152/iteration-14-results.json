@@ -1,0 +1,409 @@
+[
+  {
+    "fixture": "direct-dependent-independent",
+    "true_positive": 0,
+    "false_positive": 1,
+    "false_negative": 0,
+    "evidence": {
+      "unit_relations": [
+        {
+          "from_unit": "U002",
+          "to_unit": "U001",
+          "hops": 1,
+          "kind": "soft_directed_call_path"
+        }
+      ],
+      "syntax_graph": {
+        "edges": [
+          {
+            "from": "F001",
+            "to": "F001",
+            "caller": "Public",
+            "callee": "Base"
+          }
+        ],
+        "files": 1,
+        "parse_unavailable": 0,
+        "semantics": "soft_syntactic_call_not_shared_intent",
+        "source_bytes": 97
+      },
+      "absence": "unknown_no_default_merge",
+      "unchanged_sources": [],
+      "max_hops": 2
+    }
+  },
+  {
+    "fixture": "two-hop-dependent-independent",
+    "true_positive": 0,
+    "false_positive": 1,
+    "false_negative": 0,
+    "evidence": {
+      "unit_relations": [
+        {
+          "from_unit": "U002",
+          "to_unit": "U001",
+          "hops": 2,
+          "kind": "soft_directed_call_path"
+        }
+      ],
+      "syntax_graph": {
+        "edges": [
+          {
+            "from": "F001",
+            "to": "R001",
+            "caller": "Public",
+            "callee": "Route"
+          },
+          {
+            "from": "R001",
+            "to": "F001",
+            "caller": "Route",
+            "callee": "Base"
+          }
+        ],
+        "files": 2,
+        "parse_unavailable": 0,
+        "semantics": "soft_syntactic_call_not_shared_intent",
+        "source_bytes": 152
+      },
+      "absence": "unknown_no_default_merge",
+      "unchanged_sources": [
+        {
+          "ID": "R001",
+          "Path": "calc/routes.go",
+          "Content": "package calc\nfunc Route(n int) int { return Base(n) }\n"
+        }
+      ],
+      "max_hops": 2
+    }
+  },
+  {
+    "fixture": "shared-callee-independent",
+    "true_positive": 0,
+    "false_positive": 0,
+    "false_negative": 0,
+    "evidence": {
+      "unit_relations": [],
+      "syntax_graph": {
+        "edges": [
+          {
+            "from": "F001",
+            "to": "F001",
+            "caller": "Left",
+            "callee": "Shared"
+          },
+          {
+            "from": "F001",
+            "to": "F001",
+            "caller": "Right",
+            "callee": "Shared"
+          }
+        ],
+        "files": 1,
+        "parse_unavailable": 0,
+        "semantics": "soft_syntactic_call_not_shared_intent",
+        "source_bytes": 142
+      },
+      "absence": "unknown_no_default_merge",
+      "unchanged_sources": [],
+      "max_hops": 2
+    }
+  },
+  {
+    "fixture": "normalized-fresh-1",
+    "true_positive": 4,
+    "false_positive": 0,
+    "false_negative": 0,
+    "evidence": {
+      "unit_relations": [
+        {
+          "from_unit": "U005",
+          "to_unit": "U003",
+          "hops": 2,
+          "kind": "soft_directed_call_path"
+        },
+        {
+          "from_unit": "U006",
+          "to_unit": "U001",
+          "hops": 2,
+          "kind": "soft_directed_call_path"
+        },
+        {
+          "from_unit": "U007",
+          "to_unit": "U004",
+          "hops": 2,
+          "kind": "soft_directed_call_path"
+        },
+        {
+          "from_unit": "U008",
+          "to_unit": "U002",
+          "hops": 2,
+          "kind": "soft_directed_call_path"
+        }
+      ],
+      "syntax_graph": {
+        "edges": [
+          {
+            "from": "F002",
+            "to": "R001",
+            "caller": "TestCheck0",
+            "callee": "C0"
+          },
+          {
+            "from": "F003",
+            "to": "R001",
+            "caller": "TestCheck1",
+            "callee": "C1"
+          },
+          {
+            "from": "F004",
+            "to": "R001",
+            "caller": "TestCheck2",
+            "callee": "C2"
+          },
+          {
+            "from": "F005",
+            "to": "R001",
+            "caller": "TestCheck3",
+            "callee": "C3"
+          },
+          {
+            "from": "R001",
+            "to": "F001",
+            "caller": "C0",
+            "callee": "CacheSize"
+          },
+          {
+            "from": "R001",
+            "to": "F001",
+            "caller": "C1",
+            "callee": "AccountQuota"
+          },
+          {
+            "from": "R001",
+            "to": "F001",
+            "caller": "C2",
+            "callee": "RetryWindow"
+          },
+          {
+            "from": "R001",
+            "to": "F001",
+            "caller": "C3",
+            "callee": "UploadLimit"
+          }
+        ],
+        "files": 6,
+        "parse_unavailable": 0,
+        "semantics": "soft_syntactic_call_not_shared_intent",
+        "source_bytes": 950
+      },
+      "absence": "unknown_no_default_merge",
+      "unchanged_sources": [
+        {
+          "ID": "R001",
+          "Path": "adapters/routes.go",
+          "Content": "package adapters\nimport \"fixture/calc\"\nfunc C0(n int) int { return calc.CacheSize(n) }\nfunc C1(n int) int { return calc.AccountQuota(n) }\nfunc C2(n int) int { return calc.RetryWindow(n) }\nfunc C3(n int) int { return calc.UploadLimit(n) }\n"
+        }
+      ],
+      "max_hops": 2
+    }
+  },
+  {
+    "fixture": "normalized-fresh-2",
+    "true_positive": 4,
+    "false_positive": 0,
+    "false_negative": 0,
+    "evidence": {
+      "unit_relations": [
+        {
+          "from_unit": "U005",
+          "to_unit": "U002",
+          "hops": 2,
+          "kind": "soft_directed_call_path"
+        },
+        {
+          "from_unit": "U006",
+          "to_unit": "U004",
+          "hops": 2,
+          "kind": "soft_directed_call_path"
+        },
+        {
+          "from_unit": "U007",
+          "to_unit": "U001",
+          "hops": 2,
+          "kind": "soft_directed_call_path"
+        },
+        {
+          "from_unit": "U008",
+          "to_unit": "U003",
+          "hops": 2,
+          "kind": "soft_directed_call_path"
+        }
+      ],
+      "syntax_graph": {
+        "edges": [
+          {
+            "from": "F002",
+            "to": "R001",
+            "caller": "TestCheck0",
+            "callee": "C0"
+          },
+          {
+            "from": "F003",
+            "to": "R001",
+            "caller": "TestCheck1",
+            "callee": "C1"
+          },
+          {
+            "from": "F004",
+            "to": "R001",
+            "caller": "TestCheck2",
+            "callee": "C2"
+          },
+          {
+            "from": "F005",
+            "to": "R001",
+            "caller": "TestCheck3",
+            "callee": "C3"
+          },
+          {
+            "from": "R001",
+            "to": "F001",
+            "caller": "C0",
+            "callee": "WriteLimit"
+          },
+          {
+            "from": "R001",
+            "to": "F001",
+            "caller": "C1",
+            "callee": "PoolSize"
+          },
+          {
+            "from": "R001",
+            "to": "F001",
+            "caller": "C2",
+            "callee": "ReadLimit"
+          },
+          {
+            "from": "R001",
+            "to": "F001",
+            "caller": "C3",
+            "callee": "BatchSize"
+          }
+        ],
+        "files": 6,
+        "parse_unavailable": 0,
+        "semantics": "soft_syntactic_call_not_shared_intent",
+        "source_bytes": 936
+      },
+      "absence": "unknown_no_default_merge",
+      "unchanged_sources": [
+        {
+          "ID": "R001",
+          "Path": "adapters/routes.go",
+          "Content": "package adapters\nimport \"fixture/calc\"\nfunc C0(n int) int { return calc.WriteLimit(n) }\nfunc C1(n int) int { return calc.PoolSize(n) }\nfunc C2(n int) int { return calc.ReadLimit(n) }\nfunc C3(n int) int { return calc.BatchSize(n) }\n"
+        }
+      ],
+      "max_hops": 2
+    }
+  },
+  {
+    "fixture": "normalized-fresh-3",
+    "true_positive": 4,
+    "false_positive": 0,
+    "false_negative": 0,
+    "evidence": {
+      "unit_relations": [
+        {
+          "from_unit": "U005",
+          "to_unit": "U004",
+          "hops": 2,
+          "kind": "soft_directed_call_path"
+        },
+        {
+          "from_unit": "U006",
+          "to_unit": "U003",
+          "hops": 2,
+          "kind": "soft_directed_call_path"
+        },
+        {
+          "from_unit": "U007",
+          "to_unit": "U002",
+          "hops": 2,
+          "kind": "soft_directed_call_path"
+        },
+        {
+          "from_unit": "U008",
+          "to_unit": "U001",
+          "hops": 2,
+          "kind": "soft_directed_call_path"
+        }
+      ],
+      "syntax_graph": {
+        "edges": [
+          {
+            "from": "F002",
+            "to": "R001",
+            "caller": "TestCheck0",
+            "callee": "C0"
+          },
+          {
+            "from": "F003",
+            "to": "R001",
+            "caller": "TestCheck1",
+            "callee": "C1"
+          },
+          {
+            "from": "F004",
+            "to": "R001",
+            "caller": "TestCheck2",
+            "callee": "C2"
+          },
+          {
+            "from": "F005",
+            "to": "R001",
+            "caller": "TestCheck3",
+            "callee": "C3"
+          },
+          {
+            "from": "R001",
+            "to": "F001",
+            "caller": "C0",
+            "callee": "BufferSize"
+          },
+          {
+            "from": "R001",
+            "to": "F001",
+            "caller": "C1",
+            "callee": "TimeoutLimit"
+          },
+          {
+            "from": "R001",
+            "to": "F001",
+            "caller": "C2",
+            "callee": "PageSize"
+          },
+          {
+            "from": "R001",
+            "to": "F001",
+            "caller": "C3",
+            "callee": "QueueDepth"
+          }
+        ],
+        "files": 6,
+        "parse_unavailable": 0,
+        "semantics": "soft_syntactic_call_not_shared_intent",
+        "source_bytes": 944
+      },
+      "absence": "unknown_no_default_merge",
+      "unchanged_sources": [
+        {
+          "ID": "R001",
+          "Path": "adapters/routes.go",
+          "Content": "package adapters\nimport \"fixture/calc\"\nfunc C0(n int) int { return calc.BufferSize(n) }\nfunc C1(n int) int { return calc.TimeoutLimit(n) }\nfunc C2(n int) int { return calc.PageSize(n) }\nfunc C3(n int) int { return calc.QueueDepth(n) }\n"
+        }
+      ],
+      "max_hops": 2
+    }
+  }
+]
