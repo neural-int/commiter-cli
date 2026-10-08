@@ -1,0 +1,3 @@
+## 固定仮説
+
+前後両spanが隙間なく接するline operationのみを連続proposalへまとめる。未変更gapは跨がない。gold・symbol・path意味情報を参照せず、全atomと分割可能性を保持する。既存18件の葉境界/stagingとparent-only境界を別測定し、実例の285atomが8proposal以内になるか測る。8以内でもC品質/GOを主張しない。モデルcall0。
