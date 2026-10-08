@@ -1,0 +1,25 @@
+## 要約
+
+既存helperのschema制約は存在するが、現在のbounded-routed-groupingでは有効化されない。現在profileのnativeLimit=0ではGenerationComponentsが空で、schemaは最終JSON object確認にも使われない。詳細2件のschema混入はこの経路で拒否されず評価hostに届いた。形式保証の欠如を実装で確認、model call0。
+
+## 検証結果
+
+対象/tmp/issue149-qwen8-helper/Sources/commiter-mlx-helper/CommiterMLXHelper.swift。実行binary SHA256 016b706cacbbe39315b80fc68f4e82fa29e732afc3e371652c670d24ae3550c4。sourceとbinaryの再build同一性は今回未検証。
+
+generateBounded(333〜393行)はrouted profileでnativeLimit0、output1536/context<=16384、TokenBudget.validateとtoken計測あり。grammar processorはnativeLimit>0でのみ設定。nativeLimit>0経路はtoken '<|channel>'=100/'<channel|>'=101を要求するGemma固有経路で、Qwenへそのまま適用する根拠なし。
+
+generationProfileなしの通常経路(265〜301行)はGrammarConstraint/GuidedGenerationLoopを使用する。ただし同経路にはprompt/outputのTokenBudget.validateとbenchmarkCounts設定がなく、同予算条件の比較として未適合。通常経路へ単純切替して計測しない。
+
+CandidateOutput.finalJSONはnative0でJSON objectであることだけを確認し、schemaとの一致を検証しない。評価hostのstrict extra-field拒否が必要であり今回も保持する。監査はread-only、model/backend call0、新依存0、production変更0。
+
+## 考察
+
+形式違反はscorerの意味能力だけの証拠ではない。schemaがrequestに存在することと生成制約の適用は別である。grammarあり通常経路へ移ると予算/telemetry契約を失うため、既存bounded経路へnative thoughtに依存しないgrammar processorを追加するbenchmark仮説が必要になる。
+
+これはモデル/prompt/budget増加ではなく生成時の責務変更。効果が得られてもschema validityとsemantic qualityを別集計する。前回invalid回答の修復/上書きはしない。D必要性は未立証。
+
+## Next Steps
+
+- 新規C専用worktreeでbenchmark helperにnative thoughtを使わないbounded grammar profileの最小実装を固定する。TokenBudget/telemetry/output1536を保持して生成制約を適用するため。
+- 既存依存と同pinned modelを使用し、source/binary hashとprofileを記録して最小wire診断を行う。production/defaultは変更せず、形式validityを意味品質から分けるため。
+- grammar failure/timeout/unresolvedは拒否として保存する。必要以上のmodel×profile探索やschema無視・出力repairへ進まない。
