@@ -1,0 +1,5 @@
+## 固定production baseline比較入力
+
+iteration16の先頭4file/2intentを変更せず、unified diffからcontextinput Documentを作成する。config.Defaultsのpinned Gemmaと既存cached model/helperを使い、実planning.ThreePhaseGenerator→planning.Validateを既存benchmark149 baselineMode(full=true)で計測。新依存/ダウンロードなし。120秒cycle、retry0。metadata/最終plan validityとgroup品質を区別し、plan失敗があっても部分group観測をproduction成功と扱わない。
+
+Cは6file評価済みでprojectionの新モデル実行は今回なし。したがってbaseline4fileとC6fileのFM/FSを直接差として比較しない。baselineの実行可能性と安全品質を監査するための固定projection計測。全C完了/Goal完了ではない。

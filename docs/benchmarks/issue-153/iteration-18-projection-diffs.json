@@ -1,0 +1,6 @@
+{
+  "F001": "--- a/division.go\n+++ b/division.go\n@@ -1,2 +1,2 @@\n package behavior\n-func SafeRatio(n,d int) int { return n/d }\n+func SafeRatio(n,d int) int { if d==0 { return 0 }; return n/d }\n",
+  "F002": "--- a/division_test.go\n+++ b/division_test.go\n@@ -1,3 +1,3 @@\n package behavior\n import \"testing\"\n-func TestSafeRatio(t *testing.T) { if SafeRatio(8,2)!=4 {t.Fatal(\"ratio\")} }\n+func TestSafeRatio(t *testing.T) { if SafeRatio(8,2)!=4 || SafeRatio(8,0)!=0 {t.Fatal(\"ratio\")} }\n",
+  "F003": "--- a/label.go\n+++ b/label.go\n@@ -1,3 +1,3 @@\n package behavior\n import \"strings\"\n-func NormalLabel(s string) string { return strings.ToLower(s) }\n+func NormalLabel(s string) string { return strings.ToLower(strings.TrimSpace(s)) }\n",
+  "F004": "--- a/label_test.go\n+++ b/label_test.go\n@@ -1,3 +1,3 @@\n package behavior\n import \"testing\"\n-func TestNormalLabel(t *testing.T) { if NormalLabel(\" A \")!=\" a \" {t.Fatal(\"label\")} }\n+func TestNormalLabel(t *testing.T) { if NormalLabel(\" A \")!=\"a\" {t.Fatal(\"label\")} }\n"
+}
