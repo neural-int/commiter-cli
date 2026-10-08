@@ -1,5 +1,5 @@
 """A-only direct assignment versus relation scoring + exact host partition."""
-import json,pathlib,sys,subprocess,time,itertools
+import json,pathlib,sys,subprocess,time,itertools,argparse
 HERE=pathlib.Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE.parent/'benchmark152'))
 import inline_evaluate as base
@@ -30,13 +30,14 @@ def score(data):
  return m,meta
 
 def main():
- records=json.loads((HERE.parent/'benchmark152'/'normalized-fixtures.json').read_text())[:2]
- with (ROOT/'iteration-1-results.jsonl').open('w') as out:
+ parser=argparse.ArgumentParser();parser.add_argument('--fixtures',type=pathlib.Path);parser.add_argument('--output',type=pathlib.Path);args=parser.parse_args()
+ records=json.loads(args.fixtures.read_text()) if args.fixtures else json.loads((HERE.parent/'benchmark152'/'normalized-fixtures.json').read_text())[:2]
+ with (args.output or ROOT/'iteration-1-results.jsonl').open('w') as out:
   for r in records:
    data,gold,_,_=base.payload(r,'/tmp/issue152-samefile-graph','/tmp/issue151-remeasure-symbols','A-only')
    if not 2<=len(gold)<=8:raise ValueError('unit_budget')
    for mode in ['direct','score_partition']:
     m,meta=base.api.invoke(data,HELPER,MODEL) if mode=='direct' else score(data)
     exact,fm,fs=base.api.quality(m,gold) if m else (None,None,None)
-    row=dict(fixture=r['Name'],split='used_qualification',mode=mode,complete=m is not None,exact=exact,false_merge=fm,false_split=fs,membership=m,calls=1,**meta);out.write(json.dumps(row)+'\n');out.flush();print(json.dumps(row),flush=True)
+    row=dict(fixture=r['Name'],split=r.get('Split','used_qualification'),mode=mode,complete=m is not None,exact=exact,false_merge=fm,false_split=fs,membership=m,calls=1,**meta);out.write(json.dumps(row)+'\n');out.flush();print(json.dumps(row),flush=True)
 if __name__=='__main__':main()
