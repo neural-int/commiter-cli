@@ -1,0 +1,3456 @@
+{
+  "contract": {
+    "model": "mlx-community/Qwen3-8B-4bit@545dc4251c05440727734bcd94334791f6ab0192",
+    "helper_sha256": "bc61461f860957780394650f8b46fab2b737f9931917d0194a0f736e671b41a4",
+    "generation_profile": "bounded-routed-grammar-neutral",
+    "context_tokens": 16384,
+    "output_tokens": 1536,
+    "native_thought_tokens": 0,
+    "temperature": 0,
+    "top_p": 1,
+    "top_k": 0,
+    "seed": 144,
+    "per_call_seconds": 120,
+    "total_seconds": 960,
+    "max_calls": 8,
+    "retries": 0,
+    "repairs": 0,
+    "max_message_bytes": 32768,
+    "max_units": 128,
+    "purpose": "Diagnostic attribution/host contract contrast, not independent holdout or production GO",
+    "diagnostic_gate": "all attribution responses host-valid; all known attribution role/contract labels exact; unknown case explicitly unknown; all positive/negative relations correct. Failures reject this diagnostic candidate; passing only permits independent holdout.",
+    "full_go": "not eligible: holdout absent; cross-boundary and larger-range evaluation unproven",
+    "conditions": "same payload and local model/helper/budget; different output tasks; no wording/threshold/model sweep",
+    "source_sha256": {
+      "attribution.py": "4ce3b2af9c532424f77c9cf3a7dabf3b0a4327656d8ad37866a3744db4a72ef4",
+      "diagnostic_measure.py": "56c4dc3bb9178e97ebfb49eff4044ab7df4286a02797165f474d8e14d13a8f0b"
+    }
+  },
+  "rows": [
+    {
+      "name": "fee-rounding-and-wrap",
+      "split": "used_diagnostic",
+      "payload": {
+        "change_units": [
+          {
+            "id": "U001",
+            "file": "F001",
+            "old_span": [
+              44,
+              44
+            ],
+            "new_span": [
+              44,
+              45
+            ],
+            "before": "",
+            "after": "("
+          },
+          {
+            "id": "U002",
+            "file": "F001",
+            "old_span": [
+              45,
+              45
+            ],
+            "new_span": [
+              46,
+              47
+            ],
+            "before": "",
+            "after": "+"
+          },
+          {
+            "id": "U003",
+            "file": "F001",
+            "old_span": [
+              45,
+              45
+            ],
+            "new_span": [
+              47,
+              48
+            ],
+            "before": "",
+            "after": "9"
+          },
+          {
+            "id": "U004",
+            "file": "F001",
+            "old_span": [
+              45,
+              45
+            ],
+            "new_span": [
+              48,
+              49
+            ],
+            "before": "",
+            "after": "9"
+          },
+          {
+            "id": "U005",
+            "file": "F001",
+            "old_span": [
+              45,
+              45
+            ],
+            "new_span": [
+              49,
+              50
+            ],
+            "before": "",
+            "after": ")"
+          },
+          {
+            "id": "U006",
+            "file": "F002",
+            "old_span": [
+              74,
+              75
+            ],
+            "new_span": [
+              74,
+              75
+            ],
+            "before": "1",
+            "after": "2"
+          },
+          {
+            "id": "U007",
+            "file": "F003",
+            "old_span": [
+              52,
+              53
+            ],
+            "new_span": [
+              52,
+              53
+            ],
+            "before": "(",
+            "after": "{"
+          },
+          {
+            "id": "U008",
+            "file": "F003",
+            "old_span": [
+              58,
+              59
+            ],
+            "new_span": [
+              58,
+              59
+            ],
+            "before": ")",
+            "after": "}"
+          },
+          {
+            "id": "U009",
+            "file": "F004",
+            "old_span": [
+              77,
+              78
+            ],
+            "new_span": [
+              77,
+              78
+            ],
+            "before": "(",
+            "after": "{"
+          },
+          {
+            "id": "U010",
+            "file": "F004",
+            "old_span": [
+              79,
+              80
+            ],
+            "new_span": [
+              79,
+              80
+            ],
+            "before": ")",
+            "after": "}"
+          }
+        ],
+        "observations": [
+          {
+            "id": "C001",
+            "file": "F002",
+            "span": [
+              64,
+              75
+            ],
+            "condition_span": [
+              64,
+              75
+            ],
+            "predicate": "Fee(101)!=2",
+            "context_id": "E004",
+            "source_evidence_id": "8ccb5f3ee4fd33add23ae37c"
+          },
+          {
+            "id": "C002",
+            "file": "F004",
+            "span": [
+              65,
+              81
+            ],
+            "condition_span": [
+              65,
+              81
+            ],
+            "predicate": "Wrap(\"a\")!=\"{a}\"",
+            "context_id": "E009",
+            "source_evidence_id": "2e33d396564bdd6b69d9f3cb"
+          }
+        ],
+        "source_context": [
+          {
+            "id": "E001",
+            "kind": "function_source",
+            "symbol": "Fee",
+            "text": "func Fee(n int) int { return (n+99)/100 }",
+            "source_refs": [
+              {
+                "id": "eb39135c131a73e5aff95f51",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  15,
+                  56
+                ],
+                "source_sha256": "7d58a052ae067e68b50fb3f378154f949ec911b5fc6852e4e8071360ac9b8914"
+              }
+            ]
+          },
+          {
+            "id": "E002",
+            "kind": "function_source",
+            "symbol": "Fee",
+            "text": "func Fee(n int) int { return n/100 }",
+            "source_refs": [
+              {
+                "id": "91ee56ef3b89b6bdc7c1e798",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  15,
+                  51
+                ],
+                "source_sha256": "e11ffc4baf2fd0979b41425f6131c121eb25f905ce71634fcd7f2d56d113df90"
+              }
+            ]
+          },
+          {
+            "id": "E003",
+            "kind": "function_source",
+            "symbol": "TestFee",
+            "text": "func TestFee(t *testing.T) { if Fee(101)!=1 {t.Fatal(\"fee\")} }",
+            "source_refs": [
+              {
+                "id": "32dbacc7dda61bfffc467a2f",
+                "file": "F002",
+                "version": "before",
+                "span": [
+                  32,
+                  94
+                ],
+                "source_sha256": "26570e1192496e1d195fc89591702e4fa9258d3585b15600f15f3b6098ea34d1"
+              }
+            ]
+          },
+          {
+            "id": "E004",
+            "kind": "function_source",
+            "symbol": "TestFee",
+            "text": "func TestFee(t *testing.T) { if Fee(101)!=2 {t.Fatal(\"fee\")} }",
+            "source_refs": [
+              {
+                "id": "dacdbac5cd2d0b8e2d5ddaff",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  32,
+                  94
+                ],
+                "source_sha256": "af4d0e3e253a4eb0dd29d9771b557742c858226f4a3d28fcef9de50e8ecc706f"
+              }
+            ]
+          },
+          {
+            "id": "E005",
+            "kind": "import_source",
+            "symbol": "\"testing\"",
+            "text": "\"testing\"",
+            "source_refs": [
+              {
+                "id": "5b6868bbd69633fda5e5b582",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "af4d0e3e253a4eb0dd29d9771b557742c858226f4a3d28fcef9de50e8ecc706f"
+              },
+              {
+                "id": "81d677a975048d723353c4f3",
+                "file": "F002",
+                "version": "before",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "26570e1192496e1d195fc89591702e4fa9258d3585b15600f15f3b6098ea34d1"
+              }
+            ]
+          },
+          {
+            "id": "E006",
+            "kind": "function_source",
+            "symbol": "Wrap",
+            "text": "func Wrap(s string) string { return \"(\"+s+\")\" }",
+            "source_refs": [
+              {
+                "id": "fecdd33d722ddffdeeabc542",
+                "file": "F003",
+                "version": "before",
+                "span": [
+                  15,
+                  62
+                ],
+                "source_sha256": "0eb6fed351017e40205c510ee3ce5810efdb711df13547f411db9e9804b36c99"
+              }
+            ]
+          },
+          {
+            "id": "E007",
+            "kind": "function_source",
+            "symbol": "Wrap",
+            "text": "func Wrap(s string) string { return \"{\"+s+\"}\" }",
+            "source_refs": [
+              {
+                "id": "484f69025a0befc7bf91d689",
+                "file": "F003",
+                "version": "after",
+                "span": [
+                  15,
+                  62
+                ],
+                "source_sha256": "9d9693913394cfc8ef9cadf2a2ba3829556925af441d2b836c3dc4ca19de3093"
+              }
+            ]
+          },
+          {
+            "id": "E008",
+            "kind": "function_source",
+            "symbol": "TestWrap",
+            "text": "func TestWrap(t *testing.T) { if Wrap(\"a\")!=\"(a)\" {t.Fatal(\"wrap\")} }",
+            "source_refs": [
+              {
+                "id": "81984990a91c25110bca5a5e",
+                "file": "F004",
+                "version": "before",
+                "span": [
+                  32,
+                  101
+                ],
+                "source_sha256": "fc839fabe615029bbbd38f3acabee436808810cfb77fd08ccf590254a504a4b3"
+              }
+            ]
+          },
+          {
+            "id": "E009",
+            "kind": "function_source",
+            "symbol": "TestWrap",
+            "text": "func TestWrap(t *testing.T) { if Wrap(\"a\")!=\"{a}\" {t.Fatal(\"wrap\")} }",
+            "source_refs": [
+              {
+                "id": "4a75d573a2dc5f149af922f7",
+                "file": "F004",
+                "version": "after",
+                "span": [
+                  32,
+                  101
+                ],
+                "source_sha256": "d50a3d6b0bad0724d84234724c4778422ad48bc10a7355c7ae924d441d0f8c99"
+              }
+            ]
+          },
+          {
+            "id": "E010",
+            "kind": "import_source",
+            "symbol": "\"testing\"",
+            "text": "\"testing\"",
+            "source_refs": [
+              {
+                "id": "3fa544652b657f80991aeff5",
+                "file": "F004",
+                "version": "after",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "d50a3d6b0bad0724d84234724c4778422ad48bc10a7355c7ae924d441d0f8c99"
+              },
+              {
+                "id": "5e9e7cf82e8fc360ddc81d9f",
+                "file": "F004",
+                "version": "before",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "fc839fabe615029bbbd38f3acabee436808810cfb77fd08ccf590254a504a4b3"
+              }
+            ]
+          }
+        ],
+        "files": [
+          {
+            "id": "F001",
+            "path": "fee.go"
+          },
+          {
+            "id": "F002",
+            "path": "fee_test.go"
+          },
+          {
+            "id": "F003",
+            "path": "wrap.go"
+          },
+          {
+            "id": "F004",
+            "path": "wrap_test.go"
+          }
+        ],
+        "unresolved_calls": []
+      },
+      "manifest": [
+        {
+          "id": "U001",
+          "atom": {
+            "id": "b183edbf8e2d8703a8a90696",
+            "file": "F001",
+            "source_digest": "5d29352fe947311d3d389f2cdf9d626a5a1cb4e6856a1dda42a7d57efe802ee1",
+            "before_sha256": "e11ffc4baf2fd0979b41425f6131c121eb25f905ce71634fcd7f2d56d113df90",
+            "old_span": [
+              44,
+              44
+            ],
+            "new_span": [
+              44,
+              45
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "KA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U002",
+          "atom": {
+            "id": "07b265b8368a4012928d443e",
+            "file": "F001",
+            "source_digest": "5d29352fe947311d3d389f2cdf9d626a5a1cb4e6856a1dda42a7d57efe802ee1",
+            "before_sha256": "e11ffc4baf2fd0979b41425f6131c121eb25f905ce71634fcd7f2d56d113df90",
+            "old_span": [
+              45,
+              45
+            ],
+            "new_span": [
+              46,
+              47
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "Kw==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U003",
+          "atom": {
+            "id": "7753c022e946c2fe4bb3fd0d",
+            "file": "F001",
+            "source_digest": "5d29352fe947311d3d389f2cdf9d626a5a1cb4e6856a1dda42a7d57efe802ee1",
+            "before_sha256": "e11ffc4baf2fd0979b41425f6131c121eb25f905ce71634fcd7f2d56d113df90",
+            "old_span": [
+              45,
+              45
+            ],
+            "new_span": [
+              47,
+              48
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "OQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U004",
+          "atom": {
+            "id": "5f94bb8b20014075a774f59a",
+            "file": "F001",
+            "source_digest": "5d29352fe947311d3d389f2cdf9d626a5a1cb4e6856a1dda42a7d57efe802ee1",
+            "before_sha256": "e11ffc4baf2fd0979b41425f6131c121eb25f905ce71634fcd7f2d56d113df90",
+            "old_span": [
+              45,
+              45
+            ],
+            "new_span": [
+              48,
+              49
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "OQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U005",
+          "atom": {
+            "id": "90548719d3fd4b487b5c24c4",
+            "file": "F001",
+            "source_digest": "5d29352fe947311d3d389f2cdf9d626a5a1cb4e6856a1dda42a7d57efe802ee1",
+            "before_sha256": "e11ffc4baf2fd0979b41425f6131c121eb25f905ce71634fcd7f2d56d113df90",
+            "old_span": [
+              45,
+              45
+            ],
+            "new_span": [
+              49,
+              50
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "KQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U006",
+          "atom": {
+            "id": "5760e1a32465426b0ffabe93",
+            "file": "F002",
+            "source_digest": "5170fb05c9855891fa96fc28ace86f07410dad2f4a9c2b552ec4b988e737e965",
+            "before_sha256": "26570e1192496e1d195fc89591702e4fa9258d3585b15600f15f3b6098ea34d1",
+            "old_span": [
+              74,
+              75
+            ],
+            "new_span": [
+              74,
+              75
+            ],
+            "kind": "replace",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "MQ==",
+            "after": "Mg==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U007",
+          "atom": {
+            "id": "fe1a5fb4f8daef732c1de229",
+            "file": "F003",
+            "source_digest": "24c50a7e9859d446a3a81fc16a62f402433f5450223739b627cbfb003ffcc99d",
+            "before_sha256": "0eb6fed351017e40205c510ee3ce5810efdb711df13547f411db9e9804b36c99",
+            "old_span": [
+              52,
+              53
+            ],
+            "new_span": [
+              52,
+              53
+            ],
+            "kind": "replace",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "KA==",
+            "after": "ew==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U008",
+          "atom": {
+            "id": "a439cebc2f0478fc1eb6cdcd",
+            "file": "F003",
+            "source_digest": "24c50a7e9859d446a3a81fc16a62f402433f5450223739b627cbfb003ffcc99d",
+            "before_sha256": "0eb6fed351017e40205c510ee3ce5810efdb711df13547f411db9e9804b36c99",
+            "old_span": [
+              58,
+              59
+            ],
+            "new_span": [
+              58,
+              59
+            ],
+            "kind": "replace",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "KQ==",
+            "after": "fQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U009",
+          "atom": {
+            "id": "8b9c19dec0778ea7dfc1355d",
+            "file": "F004",
+            "source_digest": "60f2933363c7594e4da9ae0a0bb73483728039ddeddb7d94b029769138de6a04",
+            "before_sha256": "fc839fabe615029bbbd38f3acabee436808810cfb77fd08ccf590254a504a4b3",
+            "old_span": [
+              77,
+              78
+            ],
+            "new_span": [
+              77,
+              78
+            ],
+            "kind": "replace",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "KA==",
+            "after": "ew==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U010",
+          "atom": {
+            "id": "511f2eca1b5cae9553d309b0",
+            "file": "F004",
+            "source_digest": "60f2933363c7594e4da9ae0a0bb73483728039ddeddb7d94b029769138de6a04",
+            "before_sha256": "fc839fabe615029bbbd38f3acabee436808810cfb77fd08ccf590254a504a4b3",
+            "old_span": [
+              79,
+              80
+            ],
+            "new_span": [
+              79,
+              80
+            ],
+            "kind": "replace",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "KQ==",
+            "after": "fQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        }
+      ],
+      "gold": {
+        "attribution": {
+          "U001": {
+            "role": "implements_changed_behavior",
+            "contracts": [
+              "C001"
+            ]
+          },
+          "U002": {
+            "role": "implements_changed_behavior",
+            "contracts": [
+              "C001"
+            ]
+          },
+          "U003": {
+            "role": "implements_changed_behavior",
+            "contracts": [
+              "C001"
+            ]
+          },
+          "U004": {
+            "role": "implements_changed_behavior",
+            "contracts": [
+              "C001"
+            ]
+          },
+          "U005": {
+            "role": "implements_changed_behavior",
+            "contracts": [
+              "C001"
+            ]
+          },
+          "U006": {
+            "role": "asserts_changed_behavior",
+            "contracts": [
+              "C001"
+            ]
+          },
+          "U007": {
+            "role": "implements_changed_behavior",
+            "contracts": [
+              "C002"
+            ]
+          },
+          "U008": {
+            "role": "implements_changed_behavior",
+            "contracts": [
+              "C002"
+            ]
+          },
+          "U009": {
+            "role": "asserts_changed_behavior",
+            "contracts": [
+              "C002"
+            ]
+          },
+          "U010": {
+            "role": "asserts_changed_behavior",
+            "contracts": [
+              "C002"
+            ]
+          }
+        },
+        "partition": {
+          "U001": 0,
+          "U002": 0,
+          "U003": 0,
+          "U004": 0,
+          "U005": 0,
+          "U006": 0,
+          "U007": 1,
+          "U008": 1,
+          "U009": 1,
+          "U010": 1
+        },
+        "rationale": "Fee ceiling versus Wrap delimiters are independently changed and verified; shared-test Left increment versus Right multiplier have distinct changed assertions; Count(3) stays 3 before/after while only negative inputs and diagnostic wording change; no-test Value has no supplied observation. This gold describes local attribution to supplied observations, not arbitrary author intent."
+      },
+      "payload_sha256": "6cb2487220a773dc1044f22df18b32ed57bcff2335595d20f7f148ec385b2883",
+      "message_bytes": {
+        "attribution": 7820,
+        "direct": 6483
+      }
+    },
+    {
+      "name": "shared-test-independent-assertions",
+      "split": "used_diagnostic",
+      "payload": {
+        "change_units": [
+          {
+            "id": "U001",
+            "file": "F001",
+            "old_span": [
+              46,
+              47
+            ],
+            "new_span": [
+              46,
+              47
+            ],
+            "before": "1",
+            "after": "2"
+          },
+          {
+            "id": "U002",
+            "file": "F002",
+            "old_span": [
+              47,
+              48
+            ],
+            "new_span": [
+              47,
+              48
+            ],
+            "before": "2",
+            "after": "3"
+          },
+          {
+            "id": "U003",
+            "file": "F003",
+            "old_span": [
+              75,
+              76
+            ],
+            "new_span": [
+              75,
+              76
+            ],
+            "before": "3",
+            "after": "4"
+          },
+          {
+            "id": "U004",
+            "file": "F003",
+            "old_span": [
+              177,
+              178
+            ],
+            "new_span": [
+              177,
+              178
+            ],
+            "before": "4",
+            "after": "6"
+          }
+        ],
+        "observations": [
+          {
+            "id": "C001",
+            "file": "F003",
+            "span": [
+              66,
+              76
+            ],
+            "condition_span": [
+              66,
+              76
+            ],
+            "predicate": "Left(2)!=4",
+            "context_id": "E006",
+            "source_evidence_id": "71167636670299dd4c37db83"
+          },
+          {
+            "id": "C002",
+            "file": "F003",
+            "span": [
+              167,
+              178
+            ],
+            "condition_span": [
+              167,
+              178
+            ],
+            "predicate": "Right(2)!=6",
+            "context_id": "E006",
+            "source_evidence_id": "2ac0eb40d8af2662bfde8c70"
+          }
+        ],
+        "source_context": [
+          {
+            "id": "E001",
+            "kind": "function_source",
+            "symbol": "Left",
+            "text": "func Left(n int) int {return n+1}",
+            "source_refs": [
+              {
+                "id": "ee22037e9ea155c03a2e05e7",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  15,
+                  48
+                ],
+                "source_sha256": "9f86177e497ca1ed3656108427173208d99fd62a6e88b60d165adf021e1c3389"
+              }
+            ]
+          },
+          {
+            "id": "E002",
+            "kind": "function_source",
+            "symbol": "Left",
+            "text": "func Left(n int) int {return n+2}",
+            "source_refs": [
+              {
+                "id": "13e38e5f97f5cddcaa600e78",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  15,
+                  48
+                ],
+                "source_sha256": "1576b0afb151cd22b77885f88c54cdb770d197c7bd55f96e081f1a16dafd465d"
+              }
+            ]
+          },
+          {
+            "id": "E003",
+            "kind": "function_source",
+            "symbol": "Right",
+            "text": "func Right(n int) int {return n*2}",
+            "source_refs": [
+              {
+                "id": "1d107bc0fa619d756395d4fb",
+                "file": "F002",
+                "version": "before",
+                "span": [
+                  15,
+                  49
+                ],
+                "source_sha256": "8a6da8c7ca0ec748c3a1f795cf489eb07507f853ff24e7ff1b14ab4a11ec50de"
+              }
+            ]
+          },
+          {
+            "id": "E004",
+            "kind": "function_source",
+            "symbol": "Right",
+            "text": "func Right(n int) int {return n*3}",
+            "source_refs": [
+              {
+                "id": "67e2392d7581de95ae5533e0",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  15,
+                  49
+                ],
+                "source_sha256": "aa7dac4904297d794aad45d5e3b1d38d254d190a4a8c0036443c04f06630cea2"
+              }
+            ]
+          },
+          {
+            "id": "E005",
+            "kind": "function_source",
+            "symbol": "TestBoth",
+            "text": "func TestBoth(t *testing.T) {\n if Left(2)!=3 {t.Fatal(\"left\")}\n // Keep both checks in one existing test.\n t.Log(\"checking right\")\n if Right(2)!=4 {t.Fatal(\"right\")}\n}",
+            "source_refs": [
+              {
+                "id": "0149548c2f12486732751fb0",
+                "file": "F003",
+                "version": "before",
+                "span": [
+                  32,
+                  199
+                ],
+                "source_sha256": "1c38c08d88543e8664d6ad3eac45bd48cf299f9acee6976ec0aaec702072e312"
+              }
+            ]
+          },
+          {
+            "id": "E006",
+            "kind": "function_source",
+            "symbol": "TestBoth",
+            "text": "func TestBoth(t *testing.T) {\n if Left(2)!=4 {t.Fatal(\"left\")}\n // Keep both checks in one existing test.\n t.Log(\"checking right\")\n if Right(2)!=6 {t.Fatal(\"right\")}\n}",
+            "source_refs": [
+              {
+                "id": "ead0c3456b6d146c28c523c9",
+                "file": "F003",
+                "version": "after",
+                "span": [
+                  32,
+                  199
+                ],
+                "source_sha256": "c9dee47c842d0e2197cae290f53cb4f975c0fd59921a1416ba3c5c68b6980994"
+              }
+            ]
+          },
+          {
+            "id": "E007",
+            "kind": "import_source",
+            "symbol": "\"testing\"",
+            "text": "\"testing\"",
+            "source_refs": [
+              {
+                "id": "2ff2c5d989c5781e05a95cbd",
+                "file": "F003",
+                "version": "before",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "1c38c08d88543e8664d6ad3eac45bd48cf299f9acee6976ec0aaec702072e312"
+              },
+              {
+                "id": "863e8a94afedc2ea7a1f154f",
+                "file": "F003",
+                "version": "after",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "c9dee47c842d0e2197cae290f53cb4f975c0fd59921a1416ba3c5c68b6980994"
+              }
+            ]
+          }
+        ],
+        "files": [
+          {
+            "id": "F001",
+            "path": "left.go"
+          },
+          {
+            "id": "F002",
+            "path": "right.go"
+          },
+          {
+            "id": "F003",
+            "path": "both_test.go"
+          }
+        ],
+        "unresolved_calls": []
+      },
+      "manifest": [
+        {
+          "id": "U001",
+          "atom": {
+            "id": "8dc8827feb998912901b9d2d",
+            "file": "F001",
+            "source_digest": "59a8fdfb64057da27c80c923c63493f53838d76a58fd4e942a4ff2dfc654f946",
+            "before_sha256": "9f86177e497ca1ed3656108427173208d99fd62a6e88b60d165adf021e1c3389",
+            "old_span": [
+              46,
+              47
+            ],
+            "new_span": [
+              46,
+              47
+            ],
+            "kind": "replace",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "MQ==",
+            "after": "Mg==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U002",
+          "atom": {
+            "id": "2a0f1bdc8b661b866aa8381a",
+            "file": "F002",
+            "source_digest": "c324625646fb1a50d465aadc5131ae4c84a4b80adc8237c581d549f9f1f45817",
+            "before_sha256": "8a6da8c7ca0ec748c3a1f795cf489eb07507f853ff24e7ff1b14ab4a11ec50de",
+            "old_span": [
+              47,
+              48
+            ],
+            "new_span": [
+              47,
+              48
+            ],
+            "kind": "replace",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "Mg==",
+            "after": "Mw==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U003",
+          "atom": {
+            "id": "de27938bee3239d47cf0dbb6",
+            "file": "F003",
+            "source_digest": "206d68d4f590df4f4f64a06ff9bd44b14a898063f743cf36fabd513a6966d066",
+            "before_sha256": "1c38c08d88543e8664d6ad3eac45bd48cf299f9acee6976ec0aaec702072e312",
+            "old_span": [
+              75,
+              76
+            ],
+            "new_span": [
+              75,
+              76
+            ],
+            "kind": "replace",
+            "old_lines": [
+              3,
+              4
+            ],
+            "new_lines": [
+              3,
+              4
+            ],
+            "before": "Mw==",
+            "after": "NA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U004",
+          "atom": {
+            "id": "fa4261b0ed3a75b2635061ec",
+            "file": "F003",
+            "source_digest": "206d68d4f590df4f4f64a06ff9bd44b14a898063f743cf36fabd513a6966d066",
+            "before_sha256": "1c38c08d88543e8664d6ad3eac45bd48cf299f9acee6976ec0aaec702072e312",
+            "old_span": [
+              177,
+              178
+            ],
+            "new_span": [
+              177,
+              178
+            ],
+            "kind": "replace",
+            "old_lines": [
+              6,
+              7
+            ],
+            "new_lines": [
+              6,
+              7
+            ],
+            "before": "NA==",
+            "after": "Ng==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        }
+      ],
+      "gold": {
+        "attribution": {
+          "U001": {
+            "role": "implements_changed_behavior",
+            "contracts": [
+              "C001"
+            ]
+          },
+          "U002": {
+            "role": "implements_changed_behavior",
+            "contracts": [
+              "C002"
+            ]
+          },
+          "U003": {
+            "role": "asserts_changed_behavior",
+            "contracts": [
+              "C001"
+            ]
+          },
+          "U004": {
+            "role": "asserts_changed_behavior",
+            "contracts": [
+              "C002"
+            ]
+          }
+        },
+        "partition": {
+          "U001": 0,
+          "U002": 1,
+          "U003": 0,
+          "U004": 1
+        },
+        "rationale": "Fee ceiling versus Wrap delimiters are independently changed and verified; shared-test Left increment versus Right multiplier have distinct changed assertions; Count(3) stays 3 before/after while only negative inputs and diagnostic wording change; no-test Value has no supplied observation. This gold describes local attribution to supplied observations, not arbitrary author intent."
+      },
+      "payload_sha256": "3768ea224136b49f33edf0e34e5585ee8117651ddd089d0a7579418b873311ce",
+      "message_bytes": {
+        "attribution": 5991,
+        "direct": 4682
+      }
+    },
+    {
+      "name": "same-call-independent-diagnostic",
+      "split": "used_diagnostic",
+      "payload": {
+        "change_units": [
+          {
+            "id": "U001",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              39,
+              40
+            ],
+            "before": "",
+            "after": "i"
+          },
+          {
+            "id": "U002",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              40,
+              41
+            ],
+            "before": "",
+            "after": "f"
+          },
+          {
+            "id": "U003",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              41,
+              42
+            ],
+            "before": "",
+            "after": " "
+          },
+          {
+            "id": "U004",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              42,
+              43
+            ],
+            "before": "",
+            "after": "n"
+          },
+          {
+            "id": "U005",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              43,
+              44
+            ],
+            "before": "",
+            "after": "<"
+          },
+          {
+            "id": "U006",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              44,
+              45
+            ],
+            "before": "",
+            "after": "0"
+          },
+          {
+            "id": "U007",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              45,
+              46
+            ],
+            "before": "",
+            "after": " "
+          },
+          {
+            "id": "U008",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              46,
+              47
+            ],
+            "before": "",
+            "after": "{"
+          },
+          {
+            "id": "U009",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              47,
+              48
+            ],
+            "before": "",
+            "after": "r"
+          },
+          {
+            "id": "U010",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              48,
+              49
+            ],
+            "before": "",
+            "after": "e"
+          },
+          {
+            "id": "U011",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              49,
+              50
+            ],
+            "before": "",
+            "after": "t"
+          },
+          {
+            "id": "U012",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              50,
+              51
+            ],
+            "before": "",
+            "after": "u"
+          },
+          {
+            "id": "U013",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              51,
+              52
+            ],
+            "before": "",
+            "after": "r"
+          },
+          {
+            "id": "U014",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              52,
+              53
+            ],
+            "before": "",
+            "after": "n"
+          },
+          {
+            "id": "U015",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              53,
+              54
+            ],
+            "before": "",
+            "after": " "
+          },
+          {
+            "id": "U016",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              54,
+              55
+            ],
+            "before": "",
+            "after": "0"
+          },
+          {
+            "id": "U017",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              55,
+              56
+            ],
+            "before": "",
+            "after": "}"
+          },
+          {
+            "id": "U018",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              56,
+              57
+            ],
+            "before": "",
+            "after": ";"
+          },
+          {
+            "id": "U019",
+            "file": "F001",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              57,
+              58
+            ],
+            "before": "",
+            "after": " "
+          },
+          {
+            "id": "U020",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              88,
+              89
+            ],
+            "before": "",
+            "after": "u"
+          },
+          {
+            "id": "U021",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              89,
+              90
+            ],
+            "before": "",
+            "after": "n"
+          },
+          {
+            "id": "U022",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              90,
+              91
+            ],
+            "before": "",
+            "after": "e"
+          },
+          {
+            "id": "U023",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              91,
+              92
+            ],
+            "before": "",
+            "after": "x"
+          },
+          {
+            "id": "U024",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              92,
+              93
+            ],
+            "before": "",
+            "after": "p"
+          },
+          {
+            "id": "U025",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              93,
+              94
+            ],
+            "before": "",
+            "after": "e"
+          },
+          {
+            "id": "U026",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              94,
+              95
+            ],
+            "before": "",
+            "after": "c"
+          },
+          {
+            "id": "U027",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              95,
+              96
+            ],
+            "before": "",
+            "after": "t"
+          },
+          {
+            "id": "U028",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              96,
+              97
+            ],
+            "before": "",
+            "after": "e"
+          },
+          {
+            "id": "U029",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              97,
+              98
+            ],
+            "before": "",
+            "after": "d"
+          },
+          {
+            "id": "U030",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              98,
+              99
+            ],
+            "before": "",
+            "after": " "
+          },
+          {
+            "id": "U031",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              99,
+              100
+            ],
+            "before": "",
+            "after": "p"
+          },
+          {
+            "id": "U032",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              100,
+              101
+            ],
+            "before": "",
+            "after": "o"
+          },
+          {
+            "id": "U033",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              101,
+              102
+            ],
+            "before": "",
+            "after": "s"
+          },
+          {
+            "id": "U034",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              102,
+              103
+            ],
+            "before": "",
+            "after": "i"
+          },
+          {
+            "id": "U035",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              103,
+              104
+            ],
+            "before": "",
+            "after": "t"
+          },
+          {
+            "id": "U036",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              104,
+              105
+            ],
+            "before": "",
+            "after": "i"
+          },
+          {
+            "id": "U037",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              105,
+              106
+            ],
+            "before": "",
+            "after": "v"
+          },
+          {
+            "id": "U038",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              106,
+              107
+            ],
+            "before": "",
+            "after": "e"
+          },
+          {
+            "id": "U039",
+            "file": "F002",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              107,
+              108
+            ],
+            "before": "",
+            "after": " "
+          }
+        ],
+        "observations": [
+          {
+            "id": "C001",
+            "file": "F002",
+            "span": [
+              66,
+              77
+            ],
+            "condition_span": [
+              66,
+              77
+            ],
+            "predicate": "Count(3)!=3",
+            "context_id": "E004",
+            "source_evidence_id": "338e408a0c8c36ebaf910c42"
+          }
+        ],
+        "source_context": [
+          {
+            "id": "E001",
+            "kind": "function_source",
+            "symbol": "Count",
+            "text": "func Count(n int) int { if n<0 {return 0}; return n }",
+            "source_refs": [
+              {
+                "id": "58cc25299255c15ac6f33f20",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  15,
+                  68
+                ],
+                "source_sha256": "3cac3666017391ff611e35057fdc6e7f9101f5201cc69ea683b2e171271fcae2"
+              }
+            ]
+          },
+          {
+            "id": "E002",
+            "kind": "function_source",
+            "symbol": "Count",
+            "text": "func Count(n int) int { return n }",
+            "source_refs": [
+              {
+                "id": "1ad465b3f861fc4c15649b02",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  15,
+                  49
+                ],
+                "source_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3"
+              }
+            ]
+          },
+          {
+            "id": "E003",
+            "kind": "function_source",
+            "symbol": "TestCount",
+            "text": "func TestCount(t *testing.T) { if Count(3)!=3 {t.Fatal(\"count\")} }",
+            "source_refs": [
+              {
+                "id": "82083880b3ee0011acdf9a55",
+                "file": "F002",
+                "version": "before",
+                "span": [
+                  32,
+                  98
+                ],
+                "source_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289"
+              }
+            ]
+          },
+          {
+            "id": "E004",
+            "kind": "function_source",
+            "symbol": "TestCount",
+            "text": "func TestCount(t *testing.T) { if Count(3)!=3 {t.Fatal(\"unexpected positive count\")} }",
+            "source_refs": [
+              {
+                "id": "22b01387906514fcbe58995c",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  32,
+                  118
+                ],
+                "source_sha256": "aab07f43be2e2a307862899d32d3949f18d0e85a42991ff6a1f8c265901cf09d"
+              }
+            ]
+          },
+          {
+            "id": "E005",
+            "kind": "import_source",
+            "symbol": "\"testing\"",
+            "text": "\"testing\"",
+            "source_refs": [
+              {
+                "id": "146fae0dbdb7b0a76ddc9df0",
+                "file": "F002",
+                "version": "before",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289"
+              },
+              {
+                "id": "856ac97045964c16fc2e8f75",
+                "file": "F002",
+                "version": "after",
+                "span": [
+                  22,
+                  31
+                ],
+                "source_sha256": "aab07f43be2e2a307862899d32d3949f18d0e85a42991ff6a1f8c265901cf09d"
+              }
+            ]
+          }
+        ],
+        "files": [
+          {
+            "id": "F001",
+            "path": "count.go"
+          },
+          {
+            "id": "F002",
+            "path": "count_test.go"
+          }
+        ],
+        "unresolved_calls": []
+      },
+      "manifest": [
+        {
+          "id": "U001",
+          "atom": {
+            "id": "f9d88d6f6ef97b32fd282373",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              39,
+              40
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "aQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U002",
+          "atom": {
+            "id": "288cbde2e85cae8a785850fe",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              40,
+              41
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "Zg==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U003",
+          "atom": {
+            "id": "ef9277379141657b6dc0b00c",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              41,
+              42
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "IA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U004",
+          "atom": {
+            "id": "63d14ef724e2ebc6e1080d91",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              42,
+              43
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "bg==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U005",
+          "atom": {
+            "id": "74a20660eb33e6fb57d2e16d",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              43,
+              44
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "PA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U006",
+          "atom": {
+            "id": "943683d5fab905da3ff551fd",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              44,
+              45
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "MA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U007",
+          "atom": {
+            "id": "7726dc0098873299921e53e9",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              45,
+              46
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "IA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U008",
+          "atom": {
+            "id": "8de7fd3e1b9650ae1f011a06",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              46,
+              47
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "ew==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U009",
+          "atom": {
+            "id": "796f549868ab85668b93059c",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              47,
+              48
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "cg==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U010",
+          "atom": {
+            "id": "365dc44e9005ca412a4f4f01",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              48,
+              49
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "ZQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U011",
+          "atom": {
+            "id": "445f0c499f4a7ad173ace684",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              49,
+              50
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "dA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U012",
+          "atom": {
+            "id": "d45d2f781e1980e3f6d6fdaf",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              50,
+              51
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "dQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U013",
+          "atom": {
+            "id": "aa6ebbc400ed7e32e20619ee",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              51,
+              52
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "cg==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U014",
+          "atom": {
+            "id": "48c870523ac456e9a12b7dcf",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              52,
+              53
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "bg==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U015",
+          "atom": {
+            "id": "b08d6703a46ab5af6818e647",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              53,
+              54
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "IA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U016",
+          "atom": {
+            "id": "2c24bb3f72896b0bb5a8ff4a",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              54,
+              55
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "MA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U017",
+          "atom": {
+            "id": "542f8b1000f312789c5d50f8",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              55,
+              56
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "fQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U018",
+          "atom": {
+            "id": "0bc0ea2ed9dfccd90fee9ed6",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              56,
+              57
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "Ow==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U019",
+          "atom": {
+            "id": "1b7b0649829946c6bc414835",
+            "file": "F001",
+            "source_digest": "f7a7f7935a283ce27bfbe8ffe29d87ac4bc1e18298c93959a5e9abe991a9c3d2",
+            "before_sha256": "26b6f318bea9167e9337d1fa80892e85ada52ed71224fdd767a681bd278dace3",
+            "old_span": [
+              39,
+              39
+            ],
+            "new_span": [
+              57,
+              58
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "IA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U020",
+          "atom": {
+            "id": "ac2e43072bf00fabe1d03916",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              88,
+              89
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "dQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U021",
+          "atom": {
+            "id": "4386f406e81723013b6c312d",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              89,
+              90
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "bg==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U022",
+          "atom": {
+            "id": "357822229beda0e0566a77e0",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              90,
+              91
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "ZQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U023",
+          "atom": {
+            "id": "c88d56d03420bd1d522e641f",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              91,
+              92
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "eA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U024",
+          "atom": {
+            "id": "69043d45e972acfa8c59b0ac",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              92,
+              93
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "cA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U025",
+          "atom": {
+            "id": "1518edb3a7f7f962bb8facf7",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              93,
+              94
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "ZQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U026",
+          "atom": {
+            "id": "866b9b6bf79d95ea47543385",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              94,
+              95
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "Yw==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U027",
+          "atom": {
+            "id": "644f6eefce8a03216a417930",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              95,
+              96
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "dA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U028",
+          "atom": {
+            "id": "a8308cdd208771d53ac21023",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              96,
+              97
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "ZQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U029",
+          "atom": {
+            "id": "1477da3df1341b801854817c",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              97,
+              98
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "ZA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U030",
+          "atom": {
+            "id": "c59226d2b270966b18cf1482",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              98,
+              99
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "IA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U031",
+          "atom": {
+            "id": "bef69cd1db2d66077d2b72d0",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              99,
+              100
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "cA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U032",
+          "atom": {
+            "id": "ec8e54211b734c8f42997c9c",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              100,
+              101
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "bw==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U033",
+          "atom": {
+            "id": "a5e393e5f65bb12ab51a0a99",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              101,
+              102
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "cw==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U034",
+          "atom": {
+            "id": "3a383184a21120b6136e3929",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              102,
+              103
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "aQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U035",
+          "atom": {
+            "id": "824d90e5b8b06551b81747cb",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              103,
+              104
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "dA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U036",
+          "atom": {
+            "id": "294ec3c0f8c0fa1d7ae9619c",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              104,
+              105
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "aQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U037",
+          "atom": {
+            "id": "b748dc8b106f7cad299e967b",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              105,
+              106
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "dg==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U038",
+          "atom": {
+            "id": "daa0ad2343ef50b631aa655c",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              106,
+              107
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "ZQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U039",
+          "atom": {
+            "id": "596c5feacfadcfcda4e240e1",
+            "file": "F002",
+            "source_digest": "40bed18ceaee08c5bc6e3f4dfea9ef6ac7a6914f095bc10703b24f695c4f10a2",
+            "before_sha256": "c1f923102c5cd2e1d83fb72d6b7744221e12e8e298d42080b3689be06d915289",
+            "old_span": [
+              88,
+              88
+            ],
+            "new_span": [
+              107,
+              108
+            ],
+            "kind": "insert",
+            "old_lines": [
+              2,
+              3
+            ],
+            "new_lines": [
+              2,
+              3
+            ],
+            "before": "",
+            "after": "IA==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        }
+      ],
+      "gold": {
+        "attribution": {
+          "U001": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U002": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U003": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U004": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U005": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U006": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U007": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U008": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U009": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U010": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U011": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U012": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U013": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U014": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U015": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U016": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U017": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U018": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U019": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U020": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U021": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U022": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U023": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U024": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U025": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U026": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U027": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U028": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U029": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U030": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U031": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U032": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U033": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U034": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U035": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U036": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U037": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U038": {
+            "role": "independent",
+            "contracts": []
+          },
+          "U039": {
+            "role": "independent",
+            "contracts": []
+          }
+        },
+        "partition": {
+          "U001": 0,
+          "U002": 0,
+          "U003": 0,
+          "U004": 0,
+          "U005": 0,
+          "U006": 0,
+          "U007": 0,
+          "U008": 0,
+          "U009": 0,
+          "U010": 0,
+          "U011": 0,
+          "U012": 0,
+          "U013": 0,
+          "U014": 0,
+          "U015": 0,
+          "U016": 0,
+          "U017": 0,
+          "U018": 0,
+          "U019": 0,
+          "U020": 1,
+          "U021": 1,
+          "U022": 1,
+          "U023": 1,
+          "U024": 1,
+          "U025": 1,
+          "U026": 1,
+          "U027": 1,
+          "U028": 1,
+          "U029": 1,
+          "U030": 1,
+          "U031": 1,
+          "U032": 1,
+          "U033": 1,
+          "U034": 1,
+          "U035": 1,
+          "U036": 1,
+          "U037": 1,
+          "U038": 1,
+          "U039": 1
+        },
+        "rationale": "Fee ceiling versus Wrap delimiters are independently changed and verified; shared-test Left increment versus Right multiplier have distinct changed assertions; Count(3) stays 3 before/after while only negative inputs and diagnostic wording change; no-test Value has no supplied observation. This gold describes local attribution to supplied observations, not arbitrary author intent."
+      },
+      "payload_sha256": "85451af477fd2923bd9d497f99c84dbd09a90fc3814ad47f9c7bc4a1b7ba83a9",
+      "message_bytes": {
+        "attribution": 9077,
+        "direct": 7795
+      }
+    },
+    {
+      "name": "no-test-observation",
+      "split": "development_scope_probe",
+      "payload": {
+        "change_units": [
+          {
+            "id": "U001",
+            "file": "F001",
+            "old_span": [
+              46,
+              46
+            ],
+            "new_span": [
+              46,
+              47
+            ],
+            "before": "",
+            "after": "+"
+          },
+          {
+            "id": "U002",
+            "file": "F001",
+            "old_span": [
+              46,
+              46
+            ],
+            "new_span": [
+              47,
+              48
+            ],
+            "before": "",
+            "after": "1"
+          }
+        ],
+        "observations": [],
+        "source_context": [
+          {
+            "id": "E001",
+            "kind": "function_source",
+            "symbol": "Value",
+            "text": "func Value(n int) int { return n }",
+            "source_refs": [
+              {
+                "id": "44962ac82784291996f910f3",
+                "file": "F001",
+                "version": "before",
+                "span": [
+                  14,
+                  48
+                ],
+                "source_sha256": "a9b64038103ca2ff3749c46e48b4944c7d9e9037067aba061ce45370d7ec160b"
+              }
+            ]
+          },
+          {
+            "id": "E002",
+            "kind": "function_source",
+            "symbol": "Value",
+            "text": "func Value(n int) int { return n+1 }",
+            "source_refs": [
+              {
+                "id": "7c99e72ffbed576176a3f564",
+                "file": "F001",
+                "version": "after",
+                "span": [
+                  14,
+                  50
+                ],
+                "source_sha256": "4bfcb553b6596c5cb0e3f49e5c829d8b286ad7bc73e5d1db55ab3faa6cce46de"
+              }
+            ]
+          }
+        ],
+        "files": [
+          {
+            "id": "F001",
+            "path": "value.go"
+          }
+        ],
+        "unresolved_calls": []
+      },
+      "manifest": [
+        {
+          "id": "U001",
+          "atom": {
+            "id": "e84bf2529e1e4b7242e11e87",
+            "file": "F001",
+            "source_digest": "79907e0d6b9e21cb1d7e3a592bb8fab63182b994a2ff35f18fc269b66df58d4a",
+            "before_sha256": "a9b64038103ca2ff3749c46e48b4944c7d9e9037067aba061ce45370d7ec160b",
+            "old_span": [
+              46,
+              46
+            ],
+            "new_span": [
+              46,
+              47
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "Kw==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        },
+        {
+          "id": "U002",
+          "atom": {
+            "id": "d1f7343365746eeada23d4df",
+            "file": "F001",
+            "source_digest": "79907e0d6b9e21cb1d7e3a592bb8fab63182b994a2ff35f18fc269b66df58d4a",
+            "before_sha256": "a9b64038103ca2ff3749c46e48b4944c7d9e9037067aba061ce45370d7ec160b",
+            "old_span": [
+              46,
+              46
+            ],
+            "new_span": [
+              47,
+              48
+            ],
+            "kind": "insert",
+            "old_lines": [
+              1,
+              2
+            ],
+            "new_lines": [
+              1,
+              2
+            ],
+            "before": "",
+            "after": "MQ==",
+            "symbols": [],
+            "granularity": "utf8-edit-atom"
+          }
+        }
+      ],
+      "gold": {
+        "attribution": {
+          "U001": {
+            "role": "unknown",
+            "contracts": []
+          },
+          "U002": {
+            "role": "unknown",
+            "contracts": []
+          }
+        },
+        "partition": {
+          "U001": 0,
+          "U002": 0
+        },
+        "rationale": "Fee ceiling versus Wrap delimiters are independently changed and verified; shared-test Left increment versus Right multiplier have distinct changed assertions; Count(3) stays 3 before/after while only negative inputs and diagnostic wording change; no-test Value has no supplied observation. This gold describes local attribution to supplied observations, not arbitrary author intent."
+      },
+      "payload_sha256": "289908a623079363337aaa5d80856bea6ce1c1448021a0595bc93ea96202838b",
+      "message_bytes": {
+        "attribution": 3136,
+        "direct": 1901
+      }
+    }
+  ]
+}
