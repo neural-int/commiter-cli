@@ -7,7 +7,7 @@ from inline import extract
 
 
 def main():
- parser=argparse.ArgumentParser();parser.add_argument('--modes',nargs='+',choices=['A-only','impact','context-only'],default=['A-only','impact']);parser.add_argument('--output',default='iteration-8-results.jsonl');args=parser.parse_args()
+ parser=argparse.ArgumentParser();parser.add_argument('--modes',nargs='+',choices=['A-only','impact','context-only','metadata-only'],default=['A-only','impact']);parser.add_argument('--output',default='iteration-8-results.jsonl');args=parser.parse_args()
  root=HERE.parents[1]/'docs/benchmarks/issue-152'
  records=json.loads((HERE/'impact-ablation.json').read_text())
  probes=json.loads((root/'iteration-7-results.json').read_text())+json.loads((root/'iteration-8-probes.json').read_text())
@@ -33,7 +33,7 @@ def main():
    assert observations
    for mode in args.modes:
     data=dict(change_units=units,selected_file_context=[dict(id=f['ID'],path=f['Path'],before=f['Before'],after=f['After']) for f in r['Files']])
-    if mode in ('impact','context-only'):data['test_impact_evidence']=dict(observations=observations if mode=='impact' else [],unchanged_sources=r['Repository'],semantics='soft_behavioral_consistency_not_shared_intent; absence_unknown_no_default_merge')
+    if mode in ('impact','context-only','metadata-only'):data['test_impact_evidence']=dict(observations=observations if mode=='impact' else [],unchanged_sources=r['Repository'] if mode!='metadata-only' else [],semantics='soft_behavioral_consistency_not_shared_intent; absence_unknown_no_default_merge')
     assert 'IntentEdits' not in json.dumps(data) and 'Requirements' not in json.dumps(data)
     m,meta=api.invoke(data,helper,model);exact,fm,fs=api.quality(m,gold) if m else (None,None,None)
     row=dict(fixture=r['Name'],split=r['Split'],source=mode,units=len(units),exact=exact,false_merge=fm,false_split=fs,complete=m is not None,unresolved=m is None,calls=1,membership=m,context_bytes=len(json.dumps(data).encode()),**meta)
