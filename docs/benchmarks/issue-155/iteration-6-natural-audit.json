@@ -1,0 +1,372 @@
+{
+  "selection": "latest six bytes.go commits; first three also changing bytes_test.go, before inspecting source",
+  "rows": [
+    {
+      "repository": "https://github.com/dustin/go-humanize",
+      "commit": "2ccb40ff40263df6ede3d42093de3b7b0eaeb4ae",
+      "parent": "0509d5bf3e4a84cd3c8d15e7cd5fdb929da99cb4",
+      "source_hashes": [
+        {
+          "path": "bytes.go",
+          "before": "078cae13302fe51c2e7c3af9192b129cdc1c9ffcdbc77b8d95600d556a95ddc0",
+          "after": "0a152d19cf6af3aaa2f365cdbcf7cd073f14eff13a001920c098c08a6eb310f2"
+        },
+        {
+          "path": "bytes_test.go",
+          "before": "66226fe451dd33af502ba9107a26d8096d72937a1113041e463d95e7e0921cd9",
+          "after": "42eb9e12a664cc769670740c7004e498fb9a2e16773b92b71b427c0b4f629db2"
+        }
+      ],
+      "units": null,
+      "supported_failure_predicates": null,
+      "input_reject": "unit_budget",
+      "natural_queries": [
+        {
+          "query": {
+            "package": ".",
+            "function": "Bytes",
+            "arguments": [
+              31350000
+            ]
+          },
+          "source_span": [
+            3618,
+            3663
+          ],
+          "text": "{\"bytes(31350000)\", Bytes(31350000), \"31 MB\"}",
+          "expected": "31 MB",
+          "facts": {
+            "after": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            },
+            "before": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            }
+          },
+          "observation_origin": "direct_call_table_row",
+          "semantic_attribution": null
+        },
+        {
+          "query": {
+            "package": ".",
+            "function": "Bytes",
+            "arguments": [
+              31450000
+            ]
+          },
+          "source_span": [
+            3667,
+            3712
+          ],
+          "text": "{\"bytes(31450000)\", Bytes(31450000), \"31 MB\"}",
+          "expected": "31 MB",
+          "facts": {
+            "after": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            },
+            "before": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            }
+          },
+          "observation_origin": "direct_call_table_row",
+          "semantic_attribution": null
+        }
+      ],
+      "model_calls": 0,
+      "semantic_gold": null,
+      "partition": null,
+      "holdout_status": "input_audit_only_not_certified",
+      "warning": "Expected table values do not establish developer intent; unsupported evaluation is unknown, not success."
+    },
+    {
+      "repository": "https://github.com/dustin/go-humanize",
+      "commit": "71f653b2f435ca3898cffe7097697aa59227a87e",
+      "parent": "6c77086689a8f1abb1348ccd165447c848949446",
+      "source_hashes": [
+        {
+          "path": "bytes.go",
+          "before": "9bb0fb4abf384536ae68a507d18e869d029bf45c34c822b5e6405f0cb1675830",
+          "after": "078cae13302fe51c2e7c3af9192b129cdc1c9ffcdbc77b8d95600d556a95ddc0"
+        },
+        {
+          "path": "bytes_test.go",
+          "before": "4409675c9dca780c912f555fa0a4bbd6c7bc386efec098aeb85c971cc86728be",
+          "after": "3a95cef60520886c4176dde786dc73d79698255a62e3c486cdfee24cdc5ecbc0"
+        }
+      ],
+      "units": 37,
+      "supported_failure_predicates": 1,
+      "input_reject": null,
+      "natural_queries": [
+        {
+          "query": {
+            "package": ".",
+            "function": "ParseBytes",
+            "arguments": [
+              "9007199254740993"
+            ]
+          },
+          "source_span": [
+            1835,
+            1873
+          ],
+          "text": "{\"9007199254740993\", 9007199254740993}",
+          "expected": 9007199254740993,
+          "origin": "table_input_requires_loop_mapping",
+          "facts": {
+            "after": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            },
+            "before": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            }
+          },
+          "observation_origin": "table_input_requires_loop_mapping",
+          "semantic_attribution": null
+        },
+        {
+          "query": {
+            "package": ".",
+            "function": "ParseBytes",
+            "arguments": [
+              "9007199254740993B"
+            ]
+          },
+          "source_span": [
+            1897,
+            1936
+          ],
+          "text": "{\"9007199254740993B\", 9007199254740993}",
+          "expected": 9007199254740993,
+          "origin": "table_input_requires_loop_mapping",
+          "facts": {
+            "after": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            },
+            "before": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            }
+          },
+          "observation_origin": "table_input_requires_loop_mapping",
+          "semantic_attribution": null
+        },
+        {
+          "query": {
+            "package": ".",
+            "function": "ParseBytes",
+            "arguments": [
+              "18446744073709551615"
+            ]
+          },
+          "source_span": [
+            1968,
+            2014
+          ],
+          "text": "{\"18446744073709551615\", 18446744073709551615}",
+          "expected": 18446744073709551615,
+          "origin": "table_input_requires_loop_mapping",
+          "facts": {
+            "after": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            },
+            "before": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            }
+          },
+          "observation_origin": "table_input_requires_loop_mapping",
+          "semantic_attribution": null
+        },
+        {
+          "query": {
+            "package": ".",
+            "function": "ParseBytes",
+            "arguments": [
+              "18446744073709551615 B"
+            ]
+          },
+          "source_span": [
+            2036,
+            2084
+          ],
+          "text": "{\"18446744073709551615 B\", 18446744073709551615}",
+          "expected": 18446744073709551615,
+          "origin": "table_input_requires_loop_mapping",
+          "facts": {
+            "after": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            },
+            "before": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            }
+          },
+          "observation_origin": "table_input_requires_loop_mapping",
+          "semantic_attribution": null
+        }
+      ],
+      "model_calls": 0,
+      "semantic_gold": null,
+      "partition": null,
+      "holdout_status": "input_audit_only_not_certified",
+      "warning": "Expected table values do not establish developer intent; unsupported evaluation is unknown, not success."
+    },
+    {
+      "repository": "https://github.com/dustin/go-humanize",
+      "commit": "5ce95c58a9e11ad9d59f28d1d489f34989b473ec",
+      "parent": "0efe7fd75bb93ca979a54d71e85c34675e11fb38",
+      "source_hashes": [
+        {
+          "path": "bytes.go",
+          "before": "9fb2391c3896a42cd4091279701f6274c19f3c3f15145503477229a67835d5da",
+          "after": "8e982827624a15d7c16f0af6820526b8b4b86d8f460f0a0618e7c67ca85d8087"
+        },
+        {
+          "path": "bytes_test.go",
+          "before": "e2772a2d8d263d18b35c5e3c29a65e1b36bbd1b85123facfe686467dc2a50e65",
+          "after": "4409675c9dca780c912f555fa0a4bbd6c7bc386efec098aeb85c971cc86728be"
+        }
+      ],
+      "units": null,
+      "supported_failure_predicates": null,
+      "input_reject": "unit_budget",
+      "natural_queries": [
+        {
+          "query": {
+            "package": ".",
+            "function": "BytesN",
+            "arguments": [
+              1234,
+              3
+            ]
+          },
+          "source_span": [
+            2503,
+            2550
+          ],
+          "text": "{\"bytesN(1234, 3)\", BytesN(1234, 3), \"1.23 kB\"}",
+          "expected": "1.23 kB",
+          "facts": {
+            "after": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            },
+            "before": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            }
+          },
+          "observation_origin": "direct_call_table_row",
+          "semantic_attribution": null
+        },
+        {
+          "query": {
+            "package": ".",
+            "function": "IBytesN",
+            "arguments": [
+              123456789,
+              3
+            ]
+          },
+          "source_span": [
+            3476,
+            3533
+          ],
+          "text": "{\"bytes(123456789, 3)\", IBytesN(123456789, 3), \"118 MiB\"}",
+          "expected": "118 MiB",
+          "facts": {
+            "after": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            },
+            "before": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            }
+          },
+          "observation_origin": "direct_call_table_row",
+          "semantic_attribution": null
+        },
+        {
+          "query": {
+            "package": ".",
+            "function": "IBytesN",
+            "arguments": [
+              123456789,
+              6
+            ]
+          },
+          "source_span": [
+            3537,
+            3598
+          ],
+          "text": "{\"bytes(123456789, 6)\", IBytesN(123456789, 6), \"117.738 MiB\"}",
+          "expected": "117.738 MiB",
+          "facts": {
+            "after": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            },
+            "before": {
+              "known": false,
+              "kind": "unknown",
+              "value": null,
+              "return_refs": []
+            }
+          },
+          "observation_origin": "direct_call_table_row",
+          "semantic_attribution": null
+        }
+      ],
+      "model_calls": 0,
+      "semantic_gold": null,
+      "partition": null,
+      "holdout_status": "input_audit_only_not_certified",
+      "warning": "Expected table values do not establish developer intent; unsupported evaluation is unknown, not success."
+    }
+  ]
+}
