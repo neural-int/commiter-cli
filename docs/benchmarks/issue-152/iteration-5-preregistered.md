@@ -1,0 +1,5 @@
+# Independent shared-test guardrail
+
+新規の独立2要求: Left値とassertion、Right値とassertionを別々に更新する。同じTestBothが両方を検査する。全source/test内容と要求/IntentEditsをモデル/impact probeへ渡す前に固定する。probeはFiles/Repositoryのみ利用し、要求/IntentEditsは評価専用。
+
+4unitの単独probeとbaseline/allを実行する。同じfailed test集合だけでrelated判定した場合のgold整合を評価する。独立2intentのそれぞれをstageしたコードでtestが成功することも確認する。影響が同じだけでdefault mergeしない。compile/absenceはunknown。新規1件の最小反例検査であり、B Goの独立品質比較全体の代わりにしない。LLM呼出なし、既存16unit/90sec上限を維持する。

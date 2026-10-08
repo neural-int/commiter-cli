@@ -6,8 +6,8 @@ from evaluate import reconstruct
 
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('--output',required=True);a=p.parse_args()
- records=json.loads(pathlib.Path(__file__).with_name('inline-fixtures.json').read_text());rows=[]
+ p=argparse.ArgumentParser();p.add_argument('--output',required=True);p.add_argument('--fixtures',type=pathlib.Path);a=p.parse_args()
+ records=json.loads((a.fixtures or pathlib.Path(__file__).with_name('inline-fixtures.json')).read_text());rows=[]
  for r in records:
   files=r['Files'];units={};all_ids=[]
   for f in files:
