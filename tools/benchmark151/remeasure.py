@@ -53,7 +53,40 @@ def coverage(before, after, units):
     assert before[old_cursor:] == after[new_cursor:]
 
 
-def measure(root):
+def matching_subsets(before, units, target):
+    """Prefix DP, at most two witnesses; gold stays exclusively in evaluator."""
+    import base64
+    from functools import lru_cache
+    visited = 0
+
+    @lru_cache(None)
+    def visit(index, position):
+        nonlocal visited
+        visited += 1
+        if visited > 4096:
+            raise ValueError('oracle_state_budget')
+        cursor = units[index-1]['old_span'][1] if index else 0
+        if index == len(units):
+            return [()] if target[position:] == before[cursor:] else []
+        unit = units[index]
+        start, end = unit['old_span']
+        gap = before[cursor:start]
+        if not target.startswith(gap, position):
+            return []
+        position += len(gap)
+        matches = []
+        for chosen, payload in ((False, before[start:end]), (True, base64.b64decode(unit['after']))):
+            if target.startswith(payload, position):
+                for rest in visit(index+1, position+len(payload)):
+                    matches.append(((unit['id'],) if chosen else ()) + rest)
+                    if len(matches) == 2:
+                        return matches
+        return matches
+
+    return visit(0, 0)
+
+
+def measure(root, extractor=extract, oracle='exhaustive'):
     gold = json.loads((root/'gold.json').read_text())
     intents = list(gold['requirements'])
     paths = sorted(str(p.relative_to(root/'before')) for p in (root/'before').rglob('*') if p.is_file())
@@ -62,21 +95,25 @@ def measure(root):
     assert len(intents) <= 3 and len(expected) == 2**len(intents)
     assert expected[()] == before and expected[tuple(intents)] == after
     start = time.perf_counter()
-    units = {p: extract(before[p], after[p], p) for p in paths}
+    units = {p: extractor(before[p], after[p], p) for p in paths}
     latency = time.perf_counter()-start
-    deterministic = units == {p: extract(before[p], after[p], p) for p in paths}
+    deterministic = units == {p: extractor(before[p], after[p], p) for p in paths}
     assert deterministic
     for p in paths:
         coverage(before[p], after[p], units[p])
         assert reconstruct(before[p], units[p], []) == before[p]
         assert reconstruct(before[p], units[p], [u['id'] for u in units[p]]) == after[p]
-        assert len(units[p]) <= 16
+        assert len(units[p]) <= (256 if oracle == 'bounded-dp' else 16)
     assignments = {i: {} for i in intents}
     missing = []
     for i in intents:
         for p in paths:
-            matches = [choice for choice in subsets([u['id'] for u in units[p]])
-                       if reconstruct(before[p], units[p], choice) == expected[(i,)][p]]
+            if oracle == 'bounded-dp':
+                matches = matching_subsets(before[p], units[p], expected[(i,)][p])
+                assert all(reconstruct(before[p], units[p], choice) == expected[(i,)][p] for choice in matches)
+            else:
+                matches = [choice for choice in subsets([u['id'] for u in units[p]])
+                           if reconstruct(before[p], units[p], choice) == expected[(i,)][p]]
             if len(matches) != 1:
                 missing.append({'intent': i, 'path': p, 'matching_subsets': len(matches)})
             else:
@@ -119,15 +156,21 @@ def measure(root):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--output', required=True)
+    ap.add_argument('--fixtures-root', type=pathlib.Path)
+    ap.add_argument('--representation', choices=['line','inline'], default='line')
+    ap.add_argument('--oracle', choices=['exhaustive','bounded-dp'], default='exhaustive')
     args = ap.parse_args()
-    root = pathlib.Path(__file__).resolve().parent/'fixtures'
+    root = args.fixtures_root or pathlib.Path(__file__).resolve().parent/'fixtures'
+    extractor = extract
+    if args.representation == 'inline':
+        from inline import extract as extractor
     manifest = json.loads((root/'manifest.json').read_text())
     actual_paths = {str(p.relative_to(root)) for p in root.rglob('*') if p.is_file() and p.name != 'manifest.json'}
     assert actual_paths == set(manifest)
     for path, digest in manifest.items():
         assert hashlib.sha256((root/path).read_bytes()).hexdigest() == digest
-    rows = [measure(p.parent) for p in sorted(root.glob('*/*/gold.json'))]
-    result = {'manifest_sha256': hashlib.sha256((root/'manifest.json').read_bytes()).hexdigest(),
+    rows = [measure(p.parent, extractor, args.oracle) for p in sorted(root.glob('*/*/gold.json'))]
+    result = {'representation': args.representation, 'oracle': args.oracle, 'manifest_sha256': hashlib.sha256((root/'manifest.json').read_bytes()).hexdigest(),
               'rows': rows, 'cases': len(rows),
               'representable': sum(r['gold_representable'] for r in rows),
               'file_representable': sum(r['file_gold_representable'] for r in rows),

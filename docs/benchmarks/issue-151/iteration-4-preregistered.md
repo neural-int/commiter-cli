@@ -21,3 +21,7 @@ feasibility oracleの16unit/file上限を維持する。超過は検査不能と
 未知/重複ID、stale snapshot、overlapは既存reconstruct contractで拒否。新方式のUTF-8 boundary、同位置insertの順序、refinement byte予算とunit予算、非UTF8のbyte保存を追加testで確認する。単一実行のunit数・overhead・latencyを記録する。LLM呼出0、exact/FM/FS/unresolvedはN/A。細粒度化によるfragmentationは費用として保持し、semantic品質やproduction採用を宣言しない。
 
 測定前new fixture manifest SHA256: `3174e13813e9b0e99f3fc062ef898c9de014b2f0d946d97434188ddb50fa018f`
+
+## 測定開始前の評価器補足
+
+まだ候補抽出・計測を実行していない時点で、行内の複数文字insert/deleteを扱うatom方式では従来16unitの総当たりoracleが指数的になると確認した。goldや抽出器予算を変更せず、byte prefixのdynamic programmingで最大2個の一致subsetを検出するoracleを追加する。256unit/file、4096探索stateを上限として失敗時はgateを通さない。これは評価器の検査方法の変更であり、モデルbudget増加・production budget増加ではない。旧exhaustive方式は維持し、小規模入力で両方式の一致を検証する。今回の比較はline/inline両方で同じbounded-dpを使用する。上記16unitの検査条件は今回のDP比較に限り、この補足で置換する。
