@@ -1,0 +1,454 @@
+{
+  "model_calls": 0,
+  "rows": [
+    {
+      "commit": "192a02172ed4cef346e7f4d476182ea129101b97",
+      "parent": "77ddaa2c2d3cbd5a4a4dcf7dff3652d5fb332fd2",
+      "entries": [
+        {
+          "versions": {
+            "after": {
+              "status": "source_binding_verified",
+              "binding": {
+                "Row": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3001,
+                    3070
+                  ],
+                  "text": "{\"AwesomeUsername@Awesome.Com\", \"awesome_username@awesome.com\", \".@\"}"
+                },
+                "Input": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3002,
+                    3031
+                  ],
+                  "text": "\"AwesomeUsername@Awesome.Com\""
+                },
+                "Expected": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3033,
+                    3063
+                  ],
+                  "text": "\"awesome_username@awesome.com\""
+                },
+                "Call": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3301,
+                    3330
+                  ],
+                  "text": "ToSnakeWithIgnore(in, ignore)"
+                },
+                "Condition": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3336,
+                    3349
+                  ],
+                  "text": "result != out"
+                },
+                "Function": "toSnakeWithIgnore",
+                "Column": 0,
+                "Guard": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3254,
+                    3265
+                  ],
+                  "text": "len(i) == 3"
+                },
+                "ArgumentDefinition": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3217,
+                    3234
+                  ],
+                  "text": "var ignore string"
+                },
+                "ArgumentAssignment": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3271,
+                    3284
+                  ],
+                  "text": "ignore = i[2]"
+                },
+                "ArgumentType": "string",
+                "SelectedArgument": ".@",
+                "GuardTaken": true
+              },
+              "actual_value": null,
+              "implementation_attribution": null
+            },
+            "before": {
+              "status": "source_binding_verified",
+              "binding": {
+                "Row": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    3001,
+                    3069
+                  ],
+                  "text": "{\"AwesomeUsername@Awesome.Com\", \"awesome_username@awesome.com\", \"@\"}"
+                },
+                "Input": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    3002,
+                    3031
+                  ],
+                  "text": "\"AwesomeUsername@Awesome.Com\""
+                },
+                "Expected": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    3033,
+                    3063
+                  ],
+                  "text": "\"awesome_username@awesome.com\""
+                },
+                "Call": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    3202,
+                    3231
+                  ],
+                  "text": "ToSnakeWithIgnore(in, ignore)"
+                },
+                "Condition": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    3237,
+                    3250
+                  ],
+                  "text": "result != out"
+                },
+                "Function": "toSnakeWithIgnore",
+                "Column": 0,
+                "Guard": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    3152,
+                    3163
+                  ],
+                  "text": "len(i) == 3"
+                },
+                "ArgumentDefinition": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    3130,
+                    3146
+                  ],
+                  "text": "var ignore uint8"
+                },
+                "ArgumentAssignment": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    3169,
+                    3185
+                  ],
+                  "text": "ignore = i[2][0]"
+                },
+                "ArgumentType": "uint8",
+                "SelectedArgument": "64",
+                "GuardTaken": true
+              },
+              "actual_value": null,
+              "implementation_attribution": null
+            }
+          }
+        },
+        {
+          "versions": {
+            "after": {
+              "status": "source_binding_verified",
+              "binding": {
+                "Row": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3074,
+                    3156
+                  ],
+                  "text": "{\"lets-ignore all.of dots-and-dashes\", \"lets-ignore_all.of_dots-and-dashes\", \".-\"}"
+                },
+                "Input": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3075,
+                    3111
+                  ],
+                  "text": "\"lets-ignore all.of dots-and-dashes\""
+                },
+                "Expected": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3113,
+                    3149
+                  ],
+                  "text": "\"lets-ignore_all.of_dots-and-dashes\""
+                },
+                "Call": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3301,
+                    3330
+                  ],
+                  "text": "ToSnakeWithIgnore(in, ignore)"
+                },
+                "Condition": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3336,
+                    3349
+                  ],
+                  "text": "result != out"
+                },
+                "Function": "toSnakeWithIgnore",
+                "Column": 0,
+                "Guard": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3254,
+                    3265
+                  ],
+                  "text": "len(i) == 3"
+                },
+                "ArgumentDefinition": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3217,
+                    3234
+                  ],
+                  "text": "var ignore string"
+                },
+                "ArgumentAssignment": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    3271,
+                    3284
+                  ],
+                  "text": "ignore = i[2]"
+                },
+                "ArgumentType": "string",
+                "SelectedArgument": ".-",
+                "GuardTaken": true
+              },
+              "actual_value": null,
+              "implementation_attribution": null
+            },
+            "before": {
+              "status": "no_natural_row",
+              "binding": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "commit": "a6b8dcde35569b34185fc011be4f0f41cf393f3d",
+      "parent": "486369db5a693767c407c57f0975767b5b65942d",
+      "entries": [
+        {
+          "versions": {
+            "after": {
+              "status": "source_binding_verified",
+              "binding": {
+                "Row": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    2760,
+                    2828
+                  ],
+                  "text": "{\"AwesomeUsername@Awesome.Com\", \"awesome_username@awesome.com\", \"@\"}"
+                },
+                "Input": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    2761,
+                    2790
+                  ],
+                  "text": "\"AwesomeUsername@Awesome.Com\""
+                },
+                "Expected": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    2792,
+                    2822
+                  ],
+                  "text": "\"awesome_username@awesome.com\""
+                },
+                "Call": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    2961,
+                    2990
+                  ],
+                  "text": "ToSnakeWithIgnore(in, ignore)"
+                },
+                "Condition": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    2996,
+                    3009
+                  ],
+                  "text": "result != out"
+                },
+                "Function": "toSnakeWithIgnore",
+                "Column": 0,
+                "Guard": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    2911,
+                    2922
+                  ],
+                  "text": "len(i) == 3"
+                },
+                "ArgumentDefinition": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    2889,
+                    2905
+                  ],
+                  "text": "var ignore uint8"
+                },
+                "ArgumentAssignment": {
+                  "file": "F002",
+                  "version": "after",
+                  "span": [
+                    2928,
+                    2944
+                  ],
+                  "text": "ignore = i[2][0]"
+                },
+                "ArgumentType": "uint8",
+                "SelectedArgument": "64",
+                "GuardTaken": true
+              },
+              "actual_value": null,
+              "implementation_attribution": null
+            },
+            "before": {
+              "status": "source_binding_verified",
+              "binding": {
+                "Row": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    2760,
+                    2829
+                  ],
+                  "text": "{\"AwesomeUsername@Awesome.Com\", \"awesome_username@awesome._com\", \"@\"}"
+                },
+                "Input": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    2761,
+                    2790
+                  ],
+                  "text": "\"AwesomeUsername@Awesome.Com\""
+                },
+                "Expected": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    2792,
+                    2823
+                  ],
+                  "text": "\"awesome_username@awesome._com\""
+                },
+                "Call": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    2962,
+                    2991
+                  ],
+                  "text": "ToSnakeWithIgnore(in, ignore)"
+                },
+                "Condition": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    2997,
+                    3010
+                  ],
+                  "text": "result != out"
+                },
+                "Function": "toSnakeWithIgnore",
+                "Column": 0,
+                "Guard": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    2912,
+                    2923
+                  ],
+                  "text": "len(i) == 3"
+                },
+                "ArgumentDefinition": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    2890,
+                    2906
+                  ],
+                  "text": "var ignore uint8"
+                },
+                "ArgumentAssignment": {
+                  "file": "F002",
+                  "version": "before",
+                  "span": [
+                    2929,
+                    2945
+                  ],
+                  "text": "ignore = i[2][0]"
+                },
+                "ArgumentType": "uint8",
+                "SelectedArgument": "64",
+                "GuardTaken": true
+              },
+              "actual_value": null,
+              "implementation_attribution": null
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "scope": "strict table column guard; string/first-byte argument selection only; no implementation call execution or intent classification"
+}
