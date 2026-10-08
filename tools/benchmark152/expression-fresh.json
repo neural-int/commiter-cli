@@ -1,0 +1,114 @@
+[
+  {
+    "Name": "fresh-variable-check",
+    "Split": "independent",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "quota/capacity.go",
+        "Before": "package quota\nfunc Capacity(n int) int { return n * 3 }\n",
+        "After": "package quota\nfunc Capacity(n int) int { return n * 5 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "quota/capacity_test.go",
+        "Before": "package quota\nimport \"testing\"\nfunc TestCapacity(t *testing.T) { v:=Capacity(2); if v!=6 { t.Fatal(\"capacity\") } }\n",
+        "After": "package quota\nimport \"testing\"\nfunc TestCapacity(t *testing.T) { v:=Capacity(2); if v!=10 { t.Fatal(\"capacity\") } }\n"
+      }
+    ],
+    "Repository": [],
+    "SymbolGold": [
+      {
+        "requirement": "係数と期待値変更",
+        "symbols": [
+          [
+            "F001",
+            "Capacity"
+          ],
+          [
+            "F002",
+            "TestCapacity"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "fresh-sibling-log",
+    "Split": "independent",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "quota/capacity.go",
+        "Before": "package quota\nfunc Capacity(n int) int { return n * 3 }\n",
+        "After": "package quota\nfunc Capacity(n int) int { return n * 5 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "quota/capacity_test.go",
+        "Before": "package quota\nimport \"testing\"\nfunc TestCapacity(t *testing.T) { t.Log(Capacity(2), \"capacity audit\") }\n",
+        "After": "package quota\nimport \"testing\"\nfunc TestCapacity(t *testing.T) { t.Log(Capacity(2), \"capacity trace\") }\n"
+      }
+    ],
+    "Repository": [],
+    "SymbolGold": [
+      {
+        "requirement": "Capacity係数変更",
+        "symbols": [
+          [
+            "F001",
+            "Capacity"
+          ]
+        ]
+      },
+      {
+        "requirement": "test診断文変更",
+        "symbols": [
+          [
+            "F002",
+            "TestCapacity"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "fresh-reassigned-check",
+    "Split": "independent",
+    "Files": [
+      {
+        "ID": "F001",
+        "Path": "quota/capacity.go",
+        "Before": "package quota\nfunc Capacity(n int) int { return n * 3 }\n",
+        "After": "package quota\nfunc Capacity(n int) int { return n * 5 }\n"
+      },
+      {
+        "ID": "F002",
+        "Path": "quota/capacity_test.go",
+        "Before": "package quota\nimport \"testing\"\nfunc TestCapacity(t *testing.T) { v:=Capacity(2); v=12; if v!=12 { t.Fatal(\"audit\") } }\n",
+        "After": "package quota\nimport \"testing\"\nfunc TestCapacity(t *testing.T) { v:=Capacity(2); v=12; if v!=12 { t.Fatal(\"trace\") } }\n"
+      }
+    ],
+    "Repository": [],
+    "SymbolGold": [
+      {
+        "requirement": "Capacity係数変更",
+        "symbols": [
+          [
+            "F001",
+            "Capacity"
+          ]
+        ]
+      },
+      {
+        "requirement": "test診断文変更",
+        "symbols": [
+          [
+            "F002",
+            "TestCapacity"
+          ]
+        ]
+      }
+    ]
+  }
+]
