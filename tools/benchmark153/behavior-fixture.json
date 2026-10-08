@@ -1,0 +1,31 @@
+{
+  "name": "negative-clamp-and-unicode-count",
+  "before": "package behavior\nfunc ClampNegative(n int) int { return n }\nfunc Characters(s string) int { return len([]byte(s)) }\n",
+  "after": "package behavior\nfunc ClampNegative(n int) int { if n < 0 { return 0 }; return n }\nfunc Characters(s string) int { return len([]rune(s)) }\n",
+  "requirements": [
+    "negative clamping preserves positive values",
+    "Unicode rune count replaces byte count"
+  ],
+  "expected_states": [
+    {
+      "a": false,
+      "b": false,
+      "content": "package behavior\nfunc ClampNegative(n int) int { return n }\nfunc Characters(s string) int { return len([]byte(s)) }\n"
+    },
+    {
+      "a": true,
+      "b": false,
+      "content": "package behavior\nfunc ClampNegative(n int) int { if n < 0 { return 0 }; return n }\nfunc Characters(s string) int { return len([]byte(s)) }\n"
+    },
+    {
+      "a": false,
+      "b": true,
+      "content": "package behavior\nfunc ClampNegative(n int) int { return n }\nfunc Characters(s string) int { return len([]rune(s)) }\n"
+    },
+    {
+      "a": true,
+      "b": true,
+      "content": "package behavior\nfunc ClampNegative(n int) int { if n < 0 { return 0 }; return n }\nfunc Characters(s string) int { return len([]rune(s)) }\n"
+    }
+  ]
+}
