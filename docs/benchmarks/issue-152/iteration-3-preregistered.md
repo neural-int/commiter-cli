@@ -26,3 +26,7 @@ Aはユーザー承認の新gateでGoした`codex/issue-151-inline-operations`�
 independent3件のexact増加かつaggregate FM/FS減少、qualificationと#149回帰でaggregate FM/FSを悪化させない、accepted completeな出力を得る場合に追加signalを支持する。独立改善なし・regressionの場合は今回仮説No-Go。全B完了にはnew file/rename/sparse-history、memory/cache/scaleの未達条件も別途確認が必要であり、この比較だけで#152全checkboxを達成としない。
 
 測定開始前にgold isolation、symbolごとのassignment、common-helperがdefault mergeにならないこと、bounded paths/absenceとschema contractを検証する。入力とhelperのSHA256をpinsに保存する。semantic model結果を見てgold/graph/promptを調整しない。
+
+## preflight不成立と正式測定の区別
+
+モデル結果を見る前のpreflightでshared-callee回帰が64unitを超えた。入力・gold・モデルbudget・graphを変更せず、その2conditionをcalls=0 / preflight_rejectedとして正式結果へ保存し、Goのcomplete条件を未達とする。従って全18比較行のうちモデル呼出は最大16。shell列がpreflight失敗後も進んでしまった初回起動は3完了＋1中断で停止し、setup-resultsとして保存する。まだ未使用のindependent3件のgold/evidenceは変更せず、正式な条件固定とpins保存後に測定する。条件伝達やevidence設計の調整ではなく、host budget超過のfail-closed記録を修正する。以降はset -eで事前失敗から計測へ進ませない。
