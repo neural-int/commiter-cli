@@ -103,7 +103,7 @@ func main() {
 					}
 				}
 				targets := defs[key]
-				if len(targets) == 1 && targets[0] != f.src.ID {
+				if len(targets) == 1 && (targets[0] != f.src.ID || name != fn.Name.Name) {
 					k := f.src.ID + "\x00" + targets[0] + "\x00" + fn.Name.Name + "\x00" + name
 					if !seen[k] {
 						seen[k] = true
