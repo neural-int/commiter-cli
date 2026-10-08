@@ -32,3 +32,25 @@ func TestVariableAndSiblingArguments(t *testing.T) {
 		}
 	}
 }
+
+func TestReassignedDefinitionsFailClosed(t *testing.T) {
+	for _, body := range []string{"got:=Value(1); got=8; if got!=8 { fail() }", "got:=Value(1); if flag { got=8 }; if got!=8 { fail() }", "got:=Value(1); got++; if got!=8 { fail() }"} {
+		src := "package p\nfunc Check(flag bool){" + body + "}"
+		rows, err := observe(src)
+		if err != nil {
+			t.Fatal(err)
+		}
+		found := false
+		for _, r := range rows {
+			if src[r.Start:r.End] == "got!=8" {
+				found = true
+				if r.Status != "partial_unknown" || len(r.Calls) != 0 {
+					t.Fatalf("unsafe definition %+v", r)
+				}
+			}
+		}
+		if !found {
+			t.Fatal("missing comparison")
+		}
+	}
+}

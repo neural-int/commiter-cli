@@ -24,6 +24,30 @@ func observe(src string) ([]row, error) {
 	if e != nil {
 		return nil, e
 	}
+	// Any non-definition write makes the initial definition insufficient.
+	unstable := map[*ast.Object]bool{}
+	ast.Inspect(f, func(n ast.Node) bool {
+		mark := func(x ast.Expr) {
+			if id, ok := x.(*ast.Ident); ok && id.Obj != nil {
+				unstable[id.Obj] = true
+			}
+		}
+		switch v := n.(type) {
+		case *ast.AssignStmt:
+			for _, lhs := range v.Lhs {
+				if id, ok := lhs.(*ast.Ident); ok && id.Obj != nil && (v.Tok != token.DEFINE || id.Obj.Decl != v) {
+					mark(lhs)
+				}
+			}
+		case *ast.IncDecStmt:
+			mark(v.X)
+		case *ast.UnaryExpr:
+			if v.Op == token.AND {
+				mark(v.X)
+			}
+		}
+		return true
+	})
 	out := []row{}
 	ast.Inspect(f, func(n ast.Node) bool {
 		var roots []ast.Expr
@@ -59,6 +83,10 @@ func observe(src string) ([]row, error) {
 					case *ast.Ident:
 						if v.Obj != nil && v.Obj.Kind == ast.Var && !seen[v.Obj] {
 							seen[v.Obj] = true
+							if unstable[v.Obj] {
+								unknown = true
+								return false
+							}
 							switch d := v.Obj.Decl.(type) {
 							case *ast.AssignStmt:
 								if len(d.Lhs) == 1 && len(d.Rhs) == 1 {
@@ -89,6 +117,7 @@ func observe(src string) ([]row, error) {
 			status := "observed_syntactic"
 			if unknown {
 				status = "partial_unknown"
+				names = []string{}
 			}
 			out = append(out, row{fs.Position(root.Pos()).Offset, fs.Position(root.End()).Offset, names, status})
 		}
