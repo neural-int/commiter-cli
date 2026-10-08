@@ -1,0 +1,71 @@
+[
+  {
+    "source": "package p\nfunc Check(flag bool){got:=Value(1); got=8; if got!=8 { fail() }}",
+    "conditions": {
+      "before": [
+        {
+          "start": 57,
+          "end": 63,
+          "calls": [
+            "Value"
+          ],
+          "status": "observed_syntactic"
+        }
+      ],
+      "after": [
+        {
+          "start": 57,
+          "end": 63,
+          "calls": [],
+          "status": "partial_unknown"
+        }
+      ]
+    }
+  },
+  {
+    "source": "package p\nfunc Check(flag bool){got:=Value(1); if flag { got=8 }; if got!=8 { fail() }}",
+    "conditions": {
+      "before": [
+        {
+          "start": 69,
+          "end": 75,
+          "calls": [
+            "Value"
+          ],
+          "status": "observed_syntactic"
+        }
+      ],
+      "after": [
+        {
+          "start": 69,
+          "end": 75,
+          "calls": [],
+          "status": "partial_unknown"
+        }
+      ]
+    }
+  },
+  {
+    "source": "package p\nfunc Check(flag bool){got:=Value(1); got++; if got!=8 { fail() }}",
+    "conditions": {
+      "before": [
+        {
+          "start": 57,
+          "end": 63,
+          "calls": [
+            "Value"
+          ],
+          "status": "observed_syntactic"
+        }
+      ],
+      "after": [
+        {
+          "start": 57,
+          "end": 63,
+          "calls": [],
+          "status": "partial_unknown"
+        }
+      ]
+    }
+  }
+]
