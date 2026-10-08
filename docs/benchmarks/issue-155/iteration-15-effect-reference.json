@@ -1,0 +1,928 @@
+{
+  "model_calls": 0,
+  "rows": [
+    {
+      "commit": "d7993fd391266682cdd3408618e54058f8044f5c",
+      "call": {
+        "file": "F003",
+        "version": "after",
+        "span": [
+          1670,
+          1681
+        ],
+        "text": "ToCamel(in)"
+      },
+      "input": {
+        "file": "F003",
+        "version": "after",
+        "span": [
+          1567,
+          1582
+        ],
+        "text": "\"CONSTANT_CASE\""
+      },
+      "expected": {
+        "file": "F003",
+        "version": "after",
+        "span": [
+          1584,
+          1598
+        ],
+        "text": "\"ConstantCase\""
+      },
+      "source_refs": [
+        {
+          "id": "a94e2dc9e9611f8346d77c6d",
+          "file": "F002",
+          "version": "after",
+          "kind": "function_source",
+          "function": "toCamelInitCase",
+          "span": [
+            1268,
+            2095
+          ],
+          "text": "func toCamelInitCase(s string, initCase bool) string {\n\ts = strings.TrimSpace(s)\n\tif s == \"\" {\n\t\treturn s\n\t}\n\ta, hasAcronym := uppercaseAcronym[s]\n\tif hasAcronym {\n\t\ts = a\n\t}\n\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tprevIsCap := false\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t} else if prevIsCap && vIsCap && !hasAcronym {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\t\tprevIsCap = vIsCap\n\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "source_sha256": "cb253836ececc3e02e306f8c0372ea7754dae947a4b01b98f0e4fe96626088d4",
+          "syntax": "func toCamelInitCase(s string, initCase bool) string {\n\ts = strings.TrimSpace(s)\n\tif s == \"\" {\n\t\treturn s\n\t}\n\ta, hasAcronym := uppercaseAcronym[s]\n\tif hasAcronym {\n\t\ts = a\n\t}\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tprevIsCap := false\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t} else if prevIsCap && vIsCap && !hasAcronym {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\t\tprevIsCap = vIsCap\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "changed": true,
+          "calls": [
+            "len"
+          ],
+          "condition_span": [
+            1268,
+            2095
+          ]
+        },
+        {
+          "id": "aed0e22bdc113a966e38b8dd",
+          "file": "F002",
+          "version": "before",
+          "kind": "function_source",
+          "function": "ToCamel",
+          "span": [
+            2008,
+            2074
+          ],
+          "text": "func ToCamel(s string) string {\n\treturn toCamelInitCase(s, true)\n}",
+          "source_sha256": "e299322db8a5519f6b350fabe838b1348ae1ae2332fb48f972b01e517e50c943",
+          "syntax": "func ToCamel(s string) string {\n\treturn toCamelInitCase(s, true)\n}",
+          "changed": false,
+          "calls": [
+            "toCamelInitCase"
+          ],
+          "condition_span": [
+            2008,
+            2074
+          ]
+        },
+        {
+          "id": "e087982fc3168e0631e0d3c3",
+          "file": "F002",
+          "version": "after",
+          "kind": "function_source",
+          "function": "ToCamel",
+          "span": [
+            2139,
+            2205
+          ],
+          "text": "func ToCamel(s string) string {\n\treturn toCamelInitCase(s, true)\n}",
+          "source_sha256": "cb253836ececc3e02e306f8c0372ea7754dae947a4b01b98f0e4fe96626088d4",
+          "syntax": "func ToCamel(s string) string {\n\treturn toCamelInitCase(s, true)\n}",
+          "changed": false,
+          "calls": [
+            "toCamelInitCase"
+          ],
+          "condition_span": [
+            2139,
+            2205
+          ]
+        },
+        {
+          "id": "e13b30ba91855b95ca48e2c3",
+          "file": "F002",
+          "version": "before",
+          "kind": "function_source",
+          "function": "toCamelInitCase",
+          "span": [
+            1268,
+            1964
+          ],
+          "text": "func toCamelInitCase(s string, initCase bool) string {\n\ts = strings.TrimSpace(s)\n\tif s == \"\" {\n\t\treturn s\n\t}\n\tif a, ok := uppercaseAcronym[s]; ok {\n\t\ts = a\n\t}\n\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t}\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "source_sha256": "e299322db8a5519f6b350fabe838b1348ae1ae2332fb48f972b01e517e50c943",
+          "syntax": "func toCamelInitCase(s string, initCase bool) string {\n\ts = strings.TrimSpace(s)\n\tif s == \"\" {\n\t\treturn s\n\t}\n\tif a, ok := uppercaseAcronym[s]; ok {\n\t\ts = a\n\t}\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t}\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "changed": true,
+          "calls": [
+            "len"
+          ],
+          "condition_span": [
+            1268,
+            1964
+          ]
+        }
+      ],
+      "source_hashes": [
+        {
+          "path": "acronyms.go",
+          "before_sha256": "909b92e5f4855275d3805a12a34b033a747f50b44d23171bd4b303e56d51bbb1",
+          "after_sha256": "909b92e5f4855275d3805a12a34b033a747f50b44d23171bd4b303e56d51bbb1"
+        },
+        {
+          "path": "camel.go",
+          "before_sha256": "e299322db8a5519f6b350fabe838b1348ae1ae2332fb48f972b01e517e50c943",
+          "after_sha256": "cb253836ececc3e02e306f8c0372ea7754dae947a4b01b98f0e4fe96626088d4"
+        }
+      ],
+      "proposed_observation_effect": "changed",
+      "reference_return_before": "CONSTANTCASE",
+      "reference_return_after": "ConstantCase",
+      "reason": "Repeated capitals are retained before; the added prevIsCap path lowers capitals after the word initial.",
+      "status": "source_reasoned_reference_not_runtime_measured",
+      "required_state": "For Camel references: initialized uppercaseAcronym map with ID:id, no outside ConfigureAcronym mutation; same initial state in before and after. Snake refers to the unchanged supplied source.",
+      "whole_intent_gold": null,
+      "runtime_measurement": null
+    },
+    {
+      "commit": "d7993fd391266682cdd3408618e54058f8044f5c",
+      "call": {
+        "file": "F003",
+        "version": "after",
+        "span": [
+          2280,
+          2296
+        ],
+        "text": "ToLowerCamel(in)"
+      },
+      "input": {
+        "file": "F003",
+        "version": "after",
+        "span": [
+          2177,
+          2192
+        ],
+        "text": "\"CONSTANT_CASE\""
+      },
+      "expected": {
+        "file": "F003",
+        "version": "after",
+        "span": [
+          2194,
+          2208
+        ],
+        "text": "\"constantCase\""
+      },
+      "source_refs": [
+        {
+          "id": "15fd622c77a53e5902d93798",
+          "file": "F002",
+          "version": "before",
+          "kind": "function_source",
+          "function": "ToLowerCamel",
+          "span": [
+            2128,
+            2200
+          ],
+          "text": "func ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}",
+          "source_sha256": "e299322db8a5519f6b350fabe838b1348ae1ae2332fb48f972b01e517e50c943",
+          "syntax": "func ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}",
+          "changed": false,
+          "calls": [
+            "toCamelInitCase"
+          ],
+          "condition_span": [
+            2128,
+            2200
+          ]
+        },
+        {
+          "id": "a94e2dc9e9611f8346d77c6d",
+          "file": "F002",
+          "version": "after",
+          "kind": "function_source",
+          "function": "toCamelInitCase",
+          "span": [
+            1268,
+            2095
+          ],
+          "text": "func toCamelInitCase(s string, initCase bool) string {\n\ts = strings.TrimSpace(s)\n\tif s == \"\" {\n\t\treturn s\n\t}\n\ta, hasAcronym := uppercaseAcronym[s]\n\tif hasAcronym {\n\t\ts = a\n\t}\n\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tprevIsCap := false\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t} else if prevIsCap && vIsCap && !hasAcronym {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\t\tprevIsCap = vIsCap\n\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "source_sha256": "cb253836ececc3e02e306f8c0372ea7754dae947a4b01b98f0e4fe96626088d4",
+          "syntax": "func toCamelInitCase(s string, initCase bool) string {\n\ts = strings.TrimSpace(s)\n\tif s == \"\" {\n\t\treturn s\n\t}\n\ta, hasAcronym := uppercaseAcronym[s]\n\tif hasAcronym {\n\t\ts = a\n\t}\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tprevIsCap := false\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t} else if prevIsCap && vIsCap && !hasAcronym {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\t\tprevIsCap = vIsCap\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "changed": true,
+          "calls": [
+            "len"
+          ],
+          "condition_span": [
+            1268,
+            2095
+          ]
+        },
+        {
+          "id": "dd8b2947762e1976f4b21856",
+          "file": "F002",
+          "version": "after",
+          "kind": "function_source",
+          "function": "ToLowerCamel",
+          "span": [
+            2259,
+            2331
+          ],
+          "text": "func ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}",
+          "source_sha256": "cb253836ececc3e02e306f8c0372ea7754dae947a4b01b98f0e4fe96626088d4",
+          "syntax": "func ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}",
+          "changed": false,
+          "calls": [
+            "toCamelInitCase"
+          ],
+          "condition_span": [
+            2259,
+            2331
+          ]
+        },
+        {
+          "id": "e13b30ba91855b95ca48e2c3",
+          "file": "F002",
+          "version": "before",
+          "kind": "function_source",
+          "function": "toCamelInitCase",
+          "span": [
+            1268,
+            1964
+          ],
+          "text": "func toCamelInitCase(s string, initCase bool) string {\n\ts = strings.TrimSpace(s)\n\tif s == \"\" {\n\t\treturn s\n\t}\n\tif a, ok := uppercaseAcronym[s]; ok {\n\t\ts = a\n\t}\n\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t}\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "source_sha256": "e299322db8a5519f6b350fabe838b1348ae1ae2332fb48f972b01e517e50c943",
+          "syntax": "func toCamelInitCase(s string, initCase bool) string {\n\ts = strings.TrimSpace(s)\n\tif s == \"\" {\n\t\treturn s\n\t}\n\tif a, ok := uppercaseAcronym[s]; ok {\n\t\ts = a\n\t}\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t}\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "changed": true,
+          "calls": [
+            "len"
+          ],
+          "condition_span": [
+            1268,
+            1964
+          ]
+        }
+      ],
+      "source_hashes": [
+        {
+          "path": "acronyms.go",
+          "before_sha256": "909b92e5f4855275d3805a12a34b033a747f50b44d23171bd4b303e56d51bbb1",
+          "after_sha256": "909b92e5f4855275d3805a12a34b033a747f50b44d23171bd4b303e56d51bbb1"
+        },
+        {
+          "path": "camel.go",
+          "before_sha256": "e299322db8a5519f6b350fabe838b1348ae1ae2332fb48f972b01e517e50c943",
+          "after_sha256": "cb253836ececc3e02e306f8c0372ea7754dae947a4b01b98f0e4fe96626088d4"
+        }
+      ],
+      "proposed_observation_effect": "changed",
+      "reference_return_before": "cONSTANTCASE",
+      "reference_return_after": "constantCase",
+      "reason": "Before only the first capital is lowered; after the prevIsCap path lowers later capitals while separator starts the next word.",
+      "status": "source_reasoned_reference_not_runtime_measured",
+      "required_state": "For Camel references: initialized uppercaseAcronym map with ID:id, no outside ConfigureAcronym mutation; same initial state in before and after. Snake refers to the unchanged supplied source.",
+      "whole_intent_gold": null,
+      "runtime_measurement": null
+    },
+    {
+      "commit": "692d1b89fed27aadf9d3ea07717014dffe558ede",
+      "call": {
+        "file": "F003",
+        "version": "after",
+        "span": [
+          2206,
+          2222
+        ],
+        "text": "ToLowerCamel(in)"
+      },
+      "input": {
+        "file": "F003",
+        "version": "after",
+        "span": [
+          2073,
+          2086
+        ],
+        "text": "\"some string\""
+      },
+      "expected": {
+        "file": "F003",
+        "version": "after",
+        "span": [
+          2088,
+          2100
+        ],
+        "text": "\"someString\""
+      },
+      "source_refs": [
+        {
+          "id": "0b333d7702e1c59153657174",
+          "file": "F002",
+          "version": "before",
+          "kind": "function_source",
+          "function": "ToLowerCamel",
+          "span": [
+            2102,
+            2174
+          ],
+          "text": "func ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}",
+          "source_sha256": "d0593ce03e14ca426e15d638015e5f1a63ad86c55de38e951b89d30da8187726",
+          "syntax": "func ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}",
+          "changed": false,
+          "calls": [
+            "toCamelInitCase"
+          ],
+          "condition_span": [
+            2102,
+            2174
+          ]
+        },
+        {
+          "id": "25bfa9a3873d2aae5dcba657",
+          "file": "F002",
+          "version": "after",
+          "kind": "function_source",
+          "function": "ToLowerCamel",
+          "span": [
+            2128,
+            2200
+          ],
+          "text": "func ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}",
+          "source_sha256": "e299322db8a5519f6b350fabe838b1348ae1ae2332fb48f972b01e517e50c943",
+          "syntax": "func ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}",
+          "changed": false,
+          "calls": [
+            "toCamelInitCase"
+          ],
+          "condition_span": [
+            2128,
+            2200
+          ]
+        },
+        {
+          "id": "52a1030ff1abf7d62dcfe9d2",
+          "file": "F002",
+          "version": "before",
+          "kind": "function_source",
+          "function": "toCamelInitCase",
+          "span": [
+            1268,
+            1938
+          ],
+          "text": "func toCamelInitCase(s string, initCase bool) string {\n\tif s == \"\" {\n\t\treturn s\n\t}\n\tif a, ok := uppercaseAcronym[s]; ok {\n\t\ts = a\n\t}\n\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t}\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "source_sha256": "d0593ce03e14ca426e15d638015e5f1a63ad86c55de38e951b89d30da8187726",
+          "syntax": "func toCamelInitCase(s string, initCase bool) string {\n\tif s == \"\" {\n\t\treturn s\n\t}\n\tif a, ok := uppercaseAcronym[s]; ok {\n\t\ts = a\n\t}\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t}\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "changed": true,
+          "calls": [
+            "len"
+          ],
+          "condition_span": [
+            1268,
+            1938
+          ]
+        },
+        {
+          "id": "bdebc765e96a635444eb50e9",
+          "file": "F002",
+          "version": "after",
+          "kind": "function_source",
+          "function": "toCamelInitCase",
+          "span": [
+            1268,
+            1964
+          ],
+          "text": "func toCamelInitCase(s string, initCase bool) string {\n\ts = strings.TrimSpace(s)\n\tif s == \"\" {\n\t\treturn s\n\t}\n\tif a, ok := uppercaseAcronym[s]; ok {\n\t\ts = a\n\t}\n\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t}\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "source_sha256": "e299322db8a5519f6b350fabe838b1348ae1ae2332fb48f972b01e517e50c943",
+          "syntax": "func toCamelInitCase(s string, initCase bool) string {\n\ts = strings.TrimSpace(s)\n\tif s == \"\" {\n\t\treturn s\n\t}\n\tif a, ok := uppercaseAcronym[s]; ok {\n\t\ts = a\n\t}\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t}\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "changed": true,
+          "calls": [
+            "len"
+          ],
+          "condition_span": [
+            1268,
+            1964
+          ]
+        }
+      ],
+      "source_hashes": [
+        {
+          "path": "acronyms.go",
+          "before_sha256": "eef62d29d51fdae357923d5c5166e504590da4c6edcc30dca79d7122313c2bdd",
+          "after_sha256": "eef62d29d51fdae357923d5c5166e504590da4c6edcc30dca79d7122313c2bdd"
+        },
+        {
+          "path": "camel.go",
+          "before_sha256": "d0593ce03e14ca426e15d638015e5f1a63ad86c55de38e951b89d30da8187726",
+          "after_sha256": "e299322db8a5519f6b350fabe838b1348ae1ae2332fb48f972b01e517e50c943"
+        }
+      ],
+      "proposed_observation_effect": "unchanged",
+      "reference_return_before": "someString",
+      "reference_return_after": "someString",
+      "reason": "Only the added TrimSpace statement changes; it preserves this input and subsequent state/source are identical.",
+      "status": "source_reasoned_reference_not_runtime_measured",
+      "required_state": "For Camel references: initialized uppercaseAcronym map with ID:id, no outside ConfigureAcronym mutation; same initial state in before and after. Snake refers to the unchanged supplied source.",
+      "whole_intent_gold": null,
+      "runtime_measurement": null
+    },
+    {
+      "commit": "692d1b89fed27aadf9d3ea07717014dffe558ede",
+      "call": {
+        "file": "F003",
+        "version": "after",
+        "span": [
+          2206,
+          2222
+        ],
+        "text": "ToLowerCamel(in)"
+      },
+      "input": {
+        "file": "F003",
+        "version": "after",
+        "span": [
+          2106,
+          2120
+        ],
+        "text": "\" some string\""
+      },
+      "expected": {
+        "file": "F003",
+        "version": "after",
+        "span": [
+          2122,
+          2134
+        ],
+        "text": "\"someString\""
+      },
+      "source_refs": [
+        {
+          "id": "0b333d7702e1c59153657174",
+          "file": "F002",
+          "version": "before",
+          "kind": "function_source",
+          "function": "ToLowerCamel",
+          "span": [
+            2102,
+            2174
+          ],
+          "text": "func ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}",
+          "source_sha256": "d0593ce03e14ca426e15d638015e5f1a63ad86c55de38e951b89d30da8187726",
+          "syntax": "func ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}",
+          "changed": false,
+          "calls": [
+            "toCamelInitCase"
+          ],
+          "condition_span": [
+            2102,
+            2174
+          ]
+        },
+        {
+          "id": "25bfa9a3873d2aae5dcba657",
+          "file": "F002",
+          "version": "after",
+          "kind": "function_source",
+          "function": "ToLowerCamel",
+          "span": [
+            2128,
+            2200
+          ],
+          "text": "func ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}",
+          "source_sha256": "e299322db8a5519f6b350fabe838b1348ae1ae2332fb48f972b01e517e50c943",
+          "syntax": "func ToLowerCamel(s string) string {\n\treturn toCamelInitCase(s, false)\n}",
+          "changed": false,
+          "calls": [
+            "toCamelInitCase"
+          ],
+          "condition_span": [
+            2128,
+            2200
+          ]
+        },
+        {
+          "id": "52a1030ff1abf7d62dcfe9d2",
+          "file": "F002",
+          "version": "before",
+          "kind": "function_source",
+          "function": "toCamelInitCase",
+          "span": [
+            1268,
+            1938
+          ],
+          "text": "func toCamelInitCase(s string, initCase bool) string {\n\tif s == \"\" {\n\t\treturn s\n\t}\n\tif a, ok := uppercaseAcronym[s]; ok {\n\t\ts = a\n\t}\n\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t}\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "source_sha256": "d0593ce03e14ca426e15d638015e5f1a63ad86c55de38e951b89d30da8187726",
+          "syntax": "func toCamelInitCase(s string, initCase bool) string {\n\tif s == \"\" {\n\t\treturn s\n\t}\n\tif a, ok := uppercaseAcronym[s]; ok {\n\t\ts = a\n\t}\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t}\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "changed": true,
+          "calls": [
+            "len"
+          ],
+          "condition_span": [
+            1268,
+            1938
+          ]
+        },
+        {
+          "id": "bdebc765e96a635444eb50e9",
+          "file": "F002",
+          "version": "after",
+          "kind": "function_source",
+          "function": "toCamelInitCase",
+          "span": [
+            1268,
+            1964
+          ],
+          "text": "func toCamelInitCase(s string, initCase bool) string {\n\ts = strings.TrimSpace(s)\n\tif s == \"\" {\n\t\treturn s\n\t}\n\tif a, ok := uppercaseAcronym[s]; ok {\n\t\ts = a\n\t}\n\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t}\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "source_sha256": "e299322db8a5519f6b350fabe838b1348ae1ae2332fb48f972b01e517e50c943",
+          "syntax": "func toCamelInitCase(s string, initCase bool) string {\n\ts = strings.TrimSpace(s)\n\tif s == \"\" {\n\t\treturn s\n\t}\n\tif a, ok := uppercaseAcronym[s]; ok {\n\t\ts = a\n\t}\n\tn := strings.Builder{}\n\tn.Grow(len(s))\n\tcapNext := initCase\n\tfor i, v := range []byte(s) {\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif capNext {\n\t\t\tif vIsLow {\n\t\t\t\tv += 'A'\n\t\t\t\tv -= 'a'\n\t\t\t}\n\t\t} else if i == 0 {\n\t\t\tif vIsCap {\n\t\t\t\tv += 'a'\n\t\t\t\tv -= 'A'\n\t\t\t}\n\t\t}\n\t\tif vIsCap || vIsLow {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = false\n\t\t} else if vIsNum := v >= '0' && v <= '9'; vIsNum {\n\t\t\tn.WriteByte(v)\n\t\t\tcapNext = true\n\t\t} else {\n\t\t\tcapNext = v == '_' || v == ' ' || v == '-' || v == '.'\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "changed": true,
+          "calls": [
+            "len"
+          ],
+          "condition_span": [
+            1268,
+            1964
+          ]
+        }
+      ],
+      "source_hashes": [
+        {
+          "path": "acronyms.go",
+          "before_sha256": "eef62d29d51fdae357923d5c5166e504590da4c6edcc30dca79d7122313c2bdd",
+          "after_sha256": "eef62d29d51fdae357923d5c5166e504590da4c6edcc30dca79d7122313c2bdd"
+        },
+        {
+          "path": "camel.go",
+          "before_sha256": "d0593ce03e14ca426e15d638015e5f1a63ad86c55de38e951b89d30da8187726",
+          "after_sha256": "e299322db8a5519f6b350fabe838b1348ae1ae2332fb48f972b01e517e50c943"
+        }
+      ],
+      "proposed_observation_effect": "changed",
+      "reference_return_before": "SomeString",
+      "reference_return_after": "someString",
+      "reason": "Before the first space sets capNext before the s byte; after trim the s byte is first and initCase is false.",
+      "status": "source_reasoned_reference_not_runtime_measured",
+      "required_state": "For Camel references: initialized uppercaseAcronym map with ID:id, no outside ConfigureAcronym mutation; same initial state in before and after. Snake refers to the unchanged supplied source.",
+      "whole_intent_gold": null,
+      "runtime_measurement": null
+    },
+    {
+      "commit": "692d1b89fed27aadf9d3ea07717014dffe558ede",
+      "call": {
+        "file": "F004",
+        "version": "after",
+        "span": [
+          2123,
+          2134
+        ],
+        "text": "ToSnake(in)"
+      },
+      "input": {
+        "file": "F004",
+        "version": "after",
+        "span": [
+          1988,
+          2001
+        ],
+        "text": "\"some string\""
+      },
+      "expected": {
+        "file": "F004",
+        "version": "after",
+        "span": [
+          2003,
+          2016
+        ],
+        "text": "\"some_string\""
+      },
+      "source_refs": [
+        {
+          "id": "4d2811906569b5e789bb307d",
+          "file": "F099",
+          "version": "before",
+          "kind": "function_source",
+          "function": "ToSnake",
+          "span": [
+            1277,
+            1338
+          ],
+          "text": "func ToSnake(s string) string {\n\treturn ToDelimited(s, '_')\n}",
+          "source_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283",
+          "syntax": "func ToSnake(s string) string {\n\treturn ToDelimited(s, '_')\n}",
+          "changed": false,
+          "calls": [
+            "ToDelimited"
+          ],
+          "condition_span": [
+            1277,
+            1338
+          ]
+        },
+        {
+          "id": "5bf8c755532ce621c5490746",
+          "file": "F099",
+          "version": "before",
+          "kind": "function_source",
+          "function": "ToDelimited",
+          "span": [
+            1954,
+            2061
+          ],
+          "text": "func ToDelimited(s string, delimiter uint8) string {\n\treturn ToScreamingDelimited(s, delimiter, 0, false)\n}",
+          "source_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283",
+          "syntax": "func ToDelimited(s string, delimiter uint8) string {\n\treturn ToScreamingDelimited(s, delimiter, 0, false)\n}",
+          "changed": false,
+          "calls": [
+            "ToScreamingDelimited"
+          ],
+          "condition_span": [
+            1954,
+            2061
+          ]
+        },
+        {
+          "id": "61e25428a2d467232bf0959a",
+          "file": "F099",
+          "version": "after",
+          "kind": "function_source",
+          "function": "ToScreamingDelimited",
+          "span": [
+            2275,
+            3950
+          ],
+          "text": "func ToScreamingDelimited(s string, delimiter uint8, ignore uint8, screaming bool) string {\n\tn := strings.Builder{}\n\tn.Grow(len(s) + 2) // nominal 2 bytes of extra space for inserted delimiters\n\tstart := true\n\tspaces := 0\n\tfor i, v := range []byte(s) {\n\t\tif v == ' ' {\n\t\t\tspaces++\n\t\t\tcontinue\n\t\t} else if start {\n\t\t\tstart = false\n\t\t\tspaces = 0\n\t\t} else {\n\t\t\tfor ; spaces > 0; spaces-- {\n\t\t\t\tif ignore == ' ' {\n\t\t\t\t\tn.WriteByte(' ')\n\t\t\t\t} else {\n\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif vIsLow && screaming {\n\t\t\tv += 'A'\n\t\t\tv -= 'a'\n\t\t} else if vIsCap && !screaming {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\n\t\t// treat acronyms as words, eg for JSONData -> JSON is a whole word\n\t\tif i+1 < len(s) {\n\t\t\tnext := s[i+1]\n\t\t\tvIsNum := v >= '0' && v <= '9'\n\t\t\tnextIsCap := next >= 'A' && next <= 'Z'\n\t\t\tnextIsLow := next >= 'a' && next <= 'z'\n\t\t\tnextIsNum := next >= '0' && next <= '9'\n\t\t\t// add underscore if next letter case type is changed\n\t\t\tif (vIsCap && (nextIsLow || nextIsNum)) || (vIsLow && (nextIsCap || nextIsNum)) || (vIsNum && (nextIsCap || nextIsLow)) {\n\t\t\t\tif prevIgnore := ignore > 0 && i > 0 && s[i-1] == ignore; !prevIgnore {\n\t\t\t\t\tif vIsCap && nextIsLow {\n\t\t\t\t\t\tif prevIsCap := i > 0 && s[i-1] >= 'A' && s[i-1] <= 'Z'; prevIsCap {\n\t\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\tn.WriteByte(v)\n\t\t\t\t\tif vIsLow || vIsNum || nextIsNum {\n\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t}\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tif (v == ' ' || v == '_' || v == '-') && uint8(v) != ignore {\n\t\t\t// replace space/underscore/hyphen with delimiter\n\t\t\tn.WriteByte(delimiter)\n\t\t} else {\n\t\t\tn.WriteByte(v)\n\t\t}\n\t}\n\n\treturn n.String()\n}",
+          "source_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283",
+          "syntax": "func ToScreamingDelimited(s string, delimiter uint8, ignore uint8, screaming bool) string {\n\tn := strings.Builder{}\n\tn.Grow(len(s) + 2)\n\tstart := true\n\tspaces := 0\n\tfor i, v := range []byte(s) {\n\t\tif v == ' ' {\n\t\t\tspaces++\n\t\t\tcontinue\n\t\t} else if start {\n\t\t\tstart = false\n\t\t\tspaces = 0\n\t\t} else {\n\t\t\tfor ; spaces > 0; spaces-- {\n\t\t\t\tif ignore == ' ' {\n\t\t\t\t\tn.WriteByte(' ')\n\t\t\t\t} else {\n\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif vIsLow && screaming {\n\t\t\tv += 'A'\n\t\t\tv -= 'a'\n\t\t} else if vIsCap && !screaming {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\t\tif i+1 < len(s) {\n\t\t\tnext := s[i+1]\n\t\t\tvIsNum := v >= '0' && v <= '9'\n\t\t\tnextIsCap := next >= 'A' && next <= 'Z'\n\t\t\tnextIsLow := next >= 'a' && next <= 'z'\n\t\t\tnextIsNum := next >= '0' && next <= '9'\n\t\t\tif (vIsCap && (nextIsLow || nextIsNum)) || (vIsLow && (nextIsCap || nextIsNum)) || (vIsNum && (nextIsCap || nextIsLow)) {\n\t\t\t\tif prevIgnore := ignore > 0 && i > 0 && s[i-1] == ignore; !prevIgnore {\n\t\t\t\t\tif vIsCap && nextIsLow {\n\t\t\t\t\t\tif prevIsCap := i > 0 && s[i-1] >= 'A' && s[i-1] <= 'Z'; prevIsCap {\n\t\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\tn.WriteByte(v)\n\t\t\t\t\tif vIsLow || vIsNum || nextIsNum {\n\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t}\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tif (v == ' ' || v == '_' || v == '-') && uint8(v) != ignore {\n\t\t\tn.WriteByte(delimiter)\n\t\t} else {\n\t\t\tn.WriteByte(v)\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "changed": false,
+          "calls": [
+            "len",
+            "uint8"
+          ],
+          "condition_span": [
+            2275,
+            3950
+          ]
+        },
+        {
+          "id": "6f5e187cc1765d68eedd24db",
+          "file": "F099",
+          "version": "after",
+          "kind": "function_source",
+          "function": "ToSnake",
+          "span": [
+            1277,
+            1338
+          ],
+          "text": "func ToSnake(s string) string {\n\treturn ToDelimited(s, '_')\n}",
+          "source_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283",
+          "syntax": "func ToSnake(s string) string {\n\treturn ToDelimited(s, '_')\n}",
+          "changed": false,
+          "calls": [
+            "ToDelimited"
+          ],
+          "condition_span": [
+            1277,
+            1338
+          ]
+        },
+        {
+          "id": "74c29c75113d64e0ed503deb",
+          "file": "F099",
+          "version": "after",
+          "kind": "function_source",
+          "function": "ToDelimited",
+          "span": [
+            1954,
+            2061
+          ],
+          "text": "func ToDelimited(s string, delimiter uint8) string {\n\treturn ToScreamingDelimited(s, delimiter, 0, false)\n}",
+          "source_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283",
+          "syntax": "func ToDelimited(s string, delimiter uint8) string {\n\treturn ToScreamingDelimited(s, delimiter, 0, false)\n}",
+          "changed": false,
+          "calls": [
+            "ToScreamingDelimited"
+          ],
+          "condition_span": [
+            1954,
+            2061
+          ]
+        },
+        {
+          "id": "9da64eb6d9111b331ca2ce6f",
+          "file": "F099",
+          "version": "before",
+          "kind": "function_source",
+          "function": "ToScreamingDelimited",
+          "span": [
+            2275,
+            3950
+          ],
+          "text": "func ToScreamingDelimited(s string, delimiter uint8, ignore uint8, screaming bool) string {\n\tn := strings.Builder{}\n\tn.Grow(len(s) + 2) // nominal 2 bytes of extra space for inserted delimiters\n\tstart := true\n\tspaces := 0\n\tfor i, v := range []byte(s) {\n\t\tif v == ' ' {\n\t\t\tspaces++\n\t\t\tcontinue\n\t\t} else if start {\n\t\t\tstart = false\n\t\t\tspaces = 0\n\t\t} else {\n\t\t\tfor ; spaces > 0; spaces-- {\n\t\t\t\tif ignore == ' ' {\n\t\t\t\t\tn.WriteByte(' ')\n\t\t\t\t} else {\n\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif vIsLow && screaming {\n\t\t\tv += 'A'\n\t\t\tv -= 'a'\n\t\t} else if vIsCap && !screaming {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\n\t\t// treat acronyms as words, eg for JSONData -> JSON is a whole word\n\t\tif i+1 < len(s) {\n\t\t\tnext := s[i+1]\n\t\t\tvIsNum := v >= '0' && v <= '9'\n\t\t\tnextIsCap := next >= 'A' && next <= 'Z'\n\t\t\tnextIsLow := next >= 'a' && next <= 'z'\n\t\t\tnextIsNum := next >= '0' && next <= '9'\n\t\t\t// add underscore if next letter case type is changed\n\t\t\tif (vIsCap && (nextIsLow || nextIsNum)) || (vIsLow && (nextIsCap || nextIsNum)) || (vIsNum && (nextIsCap || nextIsLow)) {\n\t\t\t\tif prevIgnore := ignore > 0 && i > 0 && s[i-1] == ignore; !prevIgnore {\n\t\t\t\t\tif vIsCap && nextIsLow {\n\t\t\t\t\t\tif prevIsCap := i > 0 && s[i-1] >= 'A' && s[i-1] <= 'Z'; prevIsCap {\n\t\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\tn.WriteByte(v)\n\t\t\t\t\tif vIsLow || vIsNum || nextIsNum {\n\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t}\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tif (v == ' ' || v == '_' || v == '-') && uint8(v) != ignore {\n\t\t\t// replace space/underscore/hyphen with delimiter\n\t\t\tn.WriteByte(delimiter)\n\t\t} else {\n\t\t\tn.WriteByte(v)\n\t\t}\n\t}\n\n\treturn n.String()\n}",
+          "source_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283",
+          "syntax": "func ToScreamingDelimited(s string, delimiter uint8, ignore uint8, screaming bool) string {\n\tn := strings.Builder{}\n\tn.Grow(len(s) + 2)\n\tstart := true\n\tspaces := 0\n\tfor i, v := range []byte(s) {\n\t\tif v == ' ' {\n\t\t\tspaces++\n\t\t\tcontinue\n\t\t} else if start {\n\t\t\tstart = false\n\t\t\tspaces = 0\n\t\t} else {\n\t\t\tfor ; spaces > 0; spaces-- {\n\t\t\t\tif ignore == ' ' {\n\t\t\t\t\tn.WriteByte(' ')\n\t\t\t\t} else {\n\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif vIsLow && screaming {\n\t\t\tv += 'A'\n\t\t\tv -= 'a'\n\t\t} else if vIsCap && !screaming {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\t\tif i+1 < len(s) {\n\t\t\tnext := s[i+1]\n\t\t\tvIsNum := v >= '0' && v <= '9'\n\t\t\tnextIsCap := next >= 'A' && next <= 'Z'\n\t\t\tnextIsLow := next >= 'a' && next <= 'z'\n\t\t\tnextIsNum := next >= '0' && next <= '9'\n\t\t\tif (vIsCap && (nextIsLow || nextIsNum)) || (vIsLow && (nextIsCap || nextIsNum)) || (vIsNum && (nextIsCap || nextIsLow)) {\n\t\t\t\tif prevIgnore := ignore > 0 && i > 0 && s[i-1] == ignore; !prevIgnore {\n\t\t\t\t\tif vIsCap && nextIsLow {\n\t\t\t\t\t\tif prevIsCap := i > 0 && s[i-1] >= 'A' && s[i-1] <= 'Z'; prevIsCap {\n\t\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\tn.WriteByte(v)\n\t\t\t\t\tif vIsLow || vIsNum || nextIsNum {\n\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t}\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tif (v == ' ' || v == '_' || v == '-') && uint8(v) != ignore {\n\t\t\tn.WriteByte(delimiter)\n\t\t} else {\n\t\t\tn.WriteByte(v)\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "changed": false,
+          "calls": [
+            "len",
+            "uint8"
+          ],
+          "condition_span": [
+            2275,
+            3950
+          ]
+        }
+      ],
+      "source_hashes": [
+        {
+          "path": "snake.go",
+          "before_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283",
+          "after_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283"
+        }
+      ],
+      "proposed_observation_effect": "unchanged",
+      "reference_return_before": "some_string",
+      "reference_return_after": "some_string",
+      "reason": "Snake implementation and reachable package functions are unchanged and do not call the modified Camel implementation.",
+      "status": "source_reasoned_reference_not_runtime_measured",
+      "required_state": "For Camel references: initialized uppercaseAcronym map with ID:id, no outside ConfigureAcronym mutation; same initial state in before and after. Snake refers to the unchanged supplied source.",
+      "whole_intent_gold": null,
+      "runtime_measurement": null
+    },
+    {
+      "commit": "692d1b89fed27aadf9d3ea07717014dffe558ede",
+      "call": {
+        "file": "F004",
+        "version": "after",
+        "span": [
+          2123,
+          2134
+        ],
+        "text": "ToSnake(in)"
+      },
+      "input": {
+        "file": "F004",
+        "version": "after",
+        "span": [
+          2022,
+          2036
+        ],
+        "text": "\" some string\""
+      },
+      "expected": {
+        "file": "F004",
+        "version": "after",
+        "span": [
+          2038,
+          2051
+        ],
+        "text": "\"some_string\""
+      },
+      "source_refs": [
+        {
+          "id": "4d2811906569b5e789bb307d",
+          "file": "F099",
+          "version": "before",
+          "kind": "function_source",
+          "function": "ToSnake",
+          "span": [
+            1277,
+            1338
+          ],
+          "text": "func ToSnake(s string) string {\n\treturn ToDelimited(s, '_')\n}",
+          "source_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283",
+          "syntax": "func ToSnake(s string) string {\n\treturn ToDelimited(s, '_')\n}",
+          "changed": false,
+          "calls": [
+            "ToDelimited"
+          ],
+          "condition_span": [
+            1277,
+            1338
+          ]
+        },
+        {
+          "id": "5bf8c755532ce621c5490746",
+          "file": "F099",
+          "version": "before",
+          "kind": "function_source",
+          "function": "ToDelimited",
+          "span": [
+            1954,
+            2061
+          ],
+          "text": "func ToDelimited(s string, delimiter uint8) string {\n\treturn ToScreamingDelimited(s, delimiter, 0, false)\n}",
+          "source_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283",
+          "syntax": "func ToDelimited(s string, delimiter uint8) string {\n\treturn ToScreamingDelimited(s, delimiter, 0, false)\n}",
+          "changed": false,
+          "calls": [
+            "ToScreamingDelimited"
+          ],
+          "condition_span": [
+            1954,
+            2061
+          ]
+        },
+        {
+          "id": "61e25428a2d467232bf0959a",
+          "file": "F099",
+          "version": "after",
+          "kind": "function_source",
+          "function": "ToScreamingDelimited",
+          "span": [
+            2275,
+            3950
+          ],
+          "text": "func ToScreamingDelimited(s string, delimiter uint8, ignore uint8, screaming bool) string {\n\tn := strings.Builder{}\n\tn.Grow(len(s) + 2) // nominal 2 bytes of extra space for inserted delimiters\n\tstart := true\n\tspaces := 0\n\tfor i, v := range []byte(s) {\n\t\tif v == ' ' {\n\t\t\tspaces++\n\t\t\tcontinue\n\t\t} else if start {\n\t\t\tstart = false\n\t\t\tspaces = 0\n\t\t} else {\n\t\t\tfor ; spaces > 0; spaces-- {\n\t\t\t\tif ignore == ' ' {\n\t\t\t\t\tn.WriteByte(' ')\n\t\t\t\t} else {\n\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif vIsLow && screaming {\n\t\t\tv += 'A'\n\t\t\tv -= 'a'\n\t\t} else if vIsCap && !screaming {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\n\t\t// treat acronyms as words, eg for JSONData -> JSON is a whole word\n\t\tif i+1 < len(s) {\n\t\t\tnext := s[i+1]\n\t\t\tvIsNum := v >= '0' && v <= '9'\n\t\t\tnextIsCap := next >= 'A' && next <= 'Z'\n\t\t\tnextIsLow := next >= 'a' && next <= 'z'\n\t\t\tnextIsNum := next >= '0' && next <= '9'\n\t\t\t// add underscore if next letter case type is changed\n\t\t\tif (vIsCap && (nextIsLow || nextIsNum)) || (vIsLow && (nextIsCap || nextIsNum)) || (vIsNum && (nextIsCap || nextIsLow)) {\n\t\t\t\tif prevIgnore := ignore > 0 && i > 0 && s[i-1] == ignore; !prevIgnore {\n\t\t\t\t\tif vIsCap && nextIsLow {\n\t\t\t\t\t\tif prevIsCap := i > 0 && s[i-1] >= 'A' && s[i-1] <= 'Z'; prevIsCap {\n\t\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\tn.WriteByte(v)\n\t\t\t\t\tif vIsLow || vIsNum || nextIsNum {\n\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t}\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tif (v == ' ' || v == '_' || v == '-') && uint8(v) != ignore {\n\t\t\t// replace space/underscore/hyphen with delimiter\n\t\t\tn.WriteByte(delimiter)\n\t\t} else {\n\t\t\tn.WriteByte(v)\n\t\t}\n\t}\n\n\treturn n.String()\n}",
+          "source_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283",
+          "syntax": "func ToScreamingDelimited(s string, delimiter uint8, ignore uint8, screaming bool) string {\n\tn := strings.Builder{}\n\tn.Grow(len(s) + 2)\n\tstart := true\n\tspaces := 0\n\tfor i, v := range []byte(s) {\n\t\tif v == ' ' {\n\t\t\tspaces++\n\t\t\tcontinue\n\t\t} else if start {\n\t\t\tstart = false\n\t\t\tspaces = 0\n\t\t} else {\n\t\t\tfor ; spaces > 0; spaces-- {\n\t\t\t\tif ignore == ' ' {\n\t\t\t\t\tn.WriteByte(' ')\n\t\t\t\t} else {\n\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif vIsLow && screaming {\n\t\t\tv += 'A'\n\t\t\tv -= 'a'\n\t\t} else if vIsCap && !screaming {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\t\tif i+1 < len(s) {\n\t\t\tnext := s[i+1]\n\t\t\tvIsNum := v >= '0' && v <= '9'\n\t\t\tnextIsCap := next >= 'A' && next <= 'Z'\n\t\t\tnextIsLow := next >= 'a' && next <= 'z'\n\t\t\tnextIsNum := next >= '0' && next <= '9'\n\t\t\tif (vIsCap && (nextIsLow || nextIsNum)) || (vIsLow && (nextIsCap || nextIsNum)) || (vIsNum && (nextIsCap || nextIsLow)) {\n\t\t\t\tif prevIgnore := ignore > 0 && i > 0 && s[i-1] == ignore; !prevIgnore {\n\t\t\t\t\tif vIsCap && nextIsLow {\n\t\t\t\t\t\tif prevIsCap := i > 0 && s[i-1] >= 'A' && s[i-1] <= 'Z'; prevIsCap {\n\t\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\tn.WriteByte(v)\n\t\t\t\t\tif vIsLow || vIsNum || nextIsNum {\n\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t}\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tif (v == ' ' || v == '_' || v == '-') && uint8(v) != ignore {\n\t\t\tn.WriteByte(delimiter)\n\t\t} else {\n\t\t\tn.WriteByte(v)\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "changed": false,
+          "calls": [
+            "len",
+            "uint8"
+          ],
+          "condition_span": [
+            2275,
+            3950
+          ]
+        },
+        {
+          "id": "6f5e187cc1765d68eedd24db",
+          "file": "F099",
+          "version": "after",
+          "kind": "function_source",
+          "function": "ToSnake",
+          "span": [
+            1277,
+            1338
+          ],
+          "text": "func ToSnake(s string) string {\n\treturn ToDelimited(s, '_')\n}",
+          "source_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283",
+          "syntax": "func ToSnake(s string) string {\n\treturn ToDelimited(s, '_')\n}",
+          "changed": false,
+          "calls": [
+            "ToDelimited"
+          ],
+          "condition_span": [
+            1277,
+            1338
+          ]
+        },
+        {
+          "id": "74c29c75113d64e0ed503deb",
+          "file": "F099",
+          "version": "after",
+          "kind": "function_source",
+          "function": "ToDelimited",
+          "span": [
+            1954,
+            2061
+          ],
+          "text": "func ToDelimited(s string, delimiter uint8) string {\n\treturn ToScreamingDelimited(s, delimiter, 0, false)\n}",
+          "source_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283",
+          "syntax": "func ToDelimited(s string, delimiter uint8) string {\n\treturn ToScreamingDelimited(s, delimiter, 0, false)\n}",
+          "changed": false,
+          "calls": [
+            "ToScreamingDelimited"
+          ],
+          "condition_span": [
+            1954,
+            2061
+          ]
+        },
+        {
+          "id": "9da64eb6d9111b331ca2ce6f",
+          "file": "F099",
+          "version": "before",
+          "kind": "function_source",
+          "function": "ToScreamingDelimited",
+          "span": [
+            2275,
+            3950
+          ],
+          "text": "func ToScreamingDelimited(s string, delimiter uint8, ignore uint8, screaming bool) string {\n\tn := strings.Builder{}\n\tn.Grow(len(s) + 2) // nominal 2 bytes of extra space for inserted delimiters\n\tstart := true\n\tspaces := 0\n\tfor i, v := range []byte(s) {\n\t\tif v == ' ' {\n\t\t\tspaces++\n\t\t\tcontinue\n\t\t} else if start {\n\t\t\tstart = false\n\t\t\tspaces = 0\n\t\t} else {\n\t\t\tfor ; spaces > 0; spaces-- {\n\t\t\t\tif ignore == ' ' {\n\t\t\t\t\tn.WriteByte(' ')\n\t\t\t\t} else {\n\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif vIsLow && screaming {\n\t\t\tv += 'A'\n\t\t\tv -= 'a'\n\t\t} else if vIsCap && !screaming {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\n\t\t// treat acronyms as words, eg for JSONData -> JSON is a whole word\n\t\tif i+1 < len(s) {\n\t\t\tnext := s[i+1]\n\t\t\tvIsNum := v >= '0' && v <= '9'\n\t\t\tnextIsCap := next >= 'A' && next <= 'Z'\n\t\t\tnextIsLow := next >= 'a' && next <= 'z'\n\t\t\tnextIsNum := next >= '0' && next <= '9'\n\t\t\t// add underscore if next letter case type is changed\n\t\t\tif (vIsCap && (nextIsLow || nextIsNum)) || (vIsLow && (nextIsCap || nextIsNum)) || (vIsNum && (nextIsCap || nextIsLow)) {\n\t\t\t\tif prevIgnore := ignore > 0 && i > 0 && s[i-1] == ignore; !prevIgnore {\n\t\t\t\t\tif vIsCap && nextIsLow {\n\t\t\t\t\t\tif prevIsCap := i > 0 && s[i-1] >= 'A' && s[i-1] <= 'Z'; prevIsCap {\n\t\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\tn.WriteByte(v)\n\t\t\t\t\tif vIsLow || vIsNum || nextIsNum {\n\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t}\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tif (v == ' ' || v == '_' || v == '-') && uint8(v) != ignore {\n\t\t\t// replace space/underscore/hyphen with delimiter\n\t\t\tn.WriteByte(delimiter)\n\t\t} else {\n\t\t\tn.WriteByte(v)\n\t\t}\n\t}\n\n\treturn n.String()\n}",
+          "source_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283",
+          "syntax": "func ToScreamingDelimited(s string, delimiter uint8, ignore uint8, screaming bool) string {\n\tn := strings.Builder{}\n\tn.Grow(len(s) + 2)\n\tstart := true\n\tspaces := 0\n\tfor i, v := range []byte(s) {\n\t\tif v == ' ' {\n\t\t\tspaces++\n\t\t\tcontinue\n\t\t} else if start {\n\t\t\tstart = false\n\t\t\tspaces = 0\n\t\t} else {\n\t\t\tfor ; spaces > 0; spaces-- {\n\t\t\t\tif ignore == ' ' {\n\t\t\t\t\tn.WriteByte(' ')\n\t\t\t\t} else {\n\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tvIsCap := v >= 'A' && v <= 'Z'\n\t\tvIsLow := v >= 'a' && v <= 'z'\n\t\tif vIsLow && screaming {\n\t\t\tv += 'A'\n\t\t\tv -= 'a'\n\t\t} else if vIsCap && !screaming {\n\t\t\tv += 'a'\n\t\t\tv -= 'A'\n\t\t}\n\t\tif i+1 < len(s) {\n\t\t\tnext := s[i+1]\n\t\t\tvIsNum := v >= '0' && v <= '9'\n\t\t\tnextIsCap := next >= 'A' && next <= 'Z'\n\t\t\tnextIsLow := next >= 'a' && next <= 'z'\n\t\t\tnextIsNum := next >= '0' && next <= '9'\n\t\t\tif (vIsCap && (nextIsLow || nextIsNum)) || (vIsLow && (nextIsCap || nextIsNum)) || (vIsNum && (nextIsCap || nextIsLow)) {\n\t\t\t\tif prevIgnore := ignore > 0 && i > 0 && s[i-1] == ignore; !prevIgnore {\n\t\t\t\t\tif vIsCap && nextIsLow {\n\t\t\t\t\t\tif prevIsCap := i > 0 && s[i-1] >= 'A' && s[i-1] <= 'Z'; prevIsCap {\n\t\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\tn.WriteByte(v)\n\t\t\t\t\tif vIsLow || vIsNum || nextIsNum {\n\t\t\t\t\t\tn.WriteByte(delimiter)\n\t\t\t\t\t}\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tif (v == ' ' || v == '_' || v == '-') && uint8(v) != ignore {\n\t\t\tn.WriteByte(delimiter)\n\t\t} else {\n\t\t\tn.WriteByte(v)\n\t\t}\n\t}\n\treturn n.String()\n}",
+          "changed": false,
+          "calls": [
+            "len",
+            "uint8"
+          ],
+          "condition_span": [
+            2275,
+            3950
+          ]
+        }
+      ],
+      "source_hashes": [
+        {
+          "path": "snake.go",
+          "before_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283",
+          "after_sha256": "5c7ae3a9502f2ab4e33db0f6c7f348b11696616d06f0964d97089f31dabe2283"
+        }
+      ],
+      "proposed_observation_effect": "unchanged",
+      "reference_return_before": "some_string",
+      "reference_return_after": "some_string",
+      "reason": "Snake trims its input in the unchanged implementation; the Camel edit is outside its package-call path.",
+      "status": "source_reasoned_reference_not_runtime_measured",
+      "required_state": "For Camel references: initialized uppercaseAcronym map with ID:id, no outside ConfigureAcronym mutation; same initial state in before and after. Snake refers to the unchanged supplied source.",
+      "whole_intent_gold": null,
+      "runtime_measurement": null
+    }
+  ],
+  "scope": "reference effects on concrete observations, not independent commit purposes; formal acceptance threshold/holdout still not registered"
+}
