@@ -46,3 +46,7 @@ PY
 通常worktreeや既存indexをstage/replayに使わない。source snapshot→temp-index→最終tree一致はGitの構造検証であり、中間commitで元projectのtestsが成功するという主張ではない。Aのwall timeには重い正逆順stage監査が含まれる。runtime planner latencyやpure LLM latencyへ読み替えない。process peak RSSは子process集合の累積maximumであり、各callの独立peakではない。
 
 prototypeはrename、symlink、submodule、mode-only、競合をサポートしない。fixed unit/context budget超過や不正mappingは明示的に停止し、部分的なGit変更を行わない。意味unknownは合法なfile fallbackを返すが、fallbackをexact正解に数えない。
+
+## A2
+
+`coarse.py`は同じ#151行抽出器で所有権を確定し、`refine`要求時のみ元のinline上限内で細分化する。refinement予算超過時は検証済みcoarse所有権を保持する。`evaluate_a2.py`は使用済みDの構造診断であり新holdoutではない。immutableなiteration-5の事前登録と結果を保存する。意味unknown・file fallback契約は変更していない。
