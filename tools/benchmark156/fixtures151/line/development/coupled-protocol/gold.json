@@ -1,0 +1,43 @@
+{
+  "name": "coupled-protocol",
+  "split": "development",
+  "requirements": {
+    "R1": "wireとencoderのprotocol version、および対応するtest期待値を同時に更新する"
+  },
+  "edits": {
+    "R1": [
+      [
+        "protocol.py",
+        "WIRE_VERSION = 1",
+        "WIRE_VERSION = 2"
+      ],
+      [
+        "protocol.py",
+        "ENCODER_VERSION = 1",
+        "ENCODER_VERSION = 2"
+      ],
+      [
+        "tests/protocol.txt",
+        "wire-version=1",
+        "wire-version=2"
+      ],
+      [
+        "tests/protocol.txt",
+        "encoder-version=1",
+        "encoder-version=2"
+      ]
+    ]
+  },
+  "expected_states": [
+    {
+      "selected_intents": [],
+      "directory": "none"
+    },
+    {
+      "selected_intents": [
+        "R1"
+      ],
+      "directory": "R1"
+    }
+  ]
+}

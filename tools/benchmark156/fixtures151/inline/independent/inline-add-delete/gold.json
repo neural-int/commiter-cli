@@ -1,0 +1,49 @@
+{
+  "name": "inline-add-delete",
+  "split": "independent",
+  "requirements": {
+    "R1": "retired設定を削除する",
+    "R2": "独立したaudit設定を追加する"
+  },
+  "edits": {
+    "R1": [
+      [
+        "flags.py",
+        "retired=False, ",
+        ""
+      ]
+    ],
+    "R2": [
+      [
+        "flags.py",
+        "limit=8",
+        "limit=8, audit=True"
+      ]
+    ]
+  },
+  "expected_states": [
+    {
+      "selected_intents": [],
+      "directory": "none"
+    },
+    {
+      "selected_intents": [
+        "R1"
+      ],
+      "directory": "R1"
+    },
+    {
+      "selected_intents": [
+        "R2"
+      ],
+      "directory": "R2"
+    },
+    {
+      "selected_intents": [
+        "R1",
+        "R2"
+      ],
+      "directory": "R1+R2"
+    }
+  ]
+}

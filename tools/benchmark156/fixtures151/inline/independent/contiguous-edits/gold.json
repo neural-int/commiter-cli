@@ -1,0 +1,49 @@
+{
+  "name": "contiguous-edits",
+  "split": "independent",
+  "requirements": {
+    "R1": "一文字目の独立labelを変更する",
+    "R2": "二文字目の独立labelを変更する"
+  },
+  "edits": {
+    "R1": [
+      [
+        "labels.txt",
+        "a",
+        "c"
+      ]
+    ],
+    "R2": [
+      [
+        "labels.txt",
+        "b",
+        "d"
+      ]
+    ]
+  },
+  "expected_states": [
+    {
+      "selected_intents": [],
+      "directory": "none"
+    },
+    {
+      "selected_intents": [
+        "R1"
+      ],
+      "directory": "R1"
+    },
+    {
+      "selected_intents": [
+        "R2"
+      ],
+      "directory": "R2"
+    },
+    {
+      "selected_intents": [
+        "R1",
+        "R2"
+      ],
+      "directory": "R1+R2"
+    }
+  ]
+}

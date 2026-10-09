@@ -1,0 +1,49 @@
+{
+  "name": "crlf",
+  "split": "independent",
+  "requirements": {
+    "R1": "retry上限を変更する",
+    "R2": "windowを変更する"
+  },
+  "edits": {
+    "R1": [
+      [
+        "config.ini",
+        "retries=6",
+        "retries=9"
+      ]
+    ],
+    "R2": [
+      [
+        "config.ini",
+        "window=15",
+        "window=45"
+      ]
+    ]
+  },
+  "expected_states": [
+    {
+      "selected_intents": [],
+      "directory": "none"
+    },
+    {
+      "selected_intents": [
+        "R1"
+      ],
+      "directory": "R1"
+    },
+    {
+      "selected_intents": [
+        "R2"
+      ],
+      "directory": "R2"
+    },
+    {
+      "selected_intents": [
+        "R1",
+        "R2"
+      ],
+      "directory": "R1+R2"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "name": "coupled-protocol",
+  "split": "independent",
+  "requirements": {
+    "R1": "wireとencoderのprotocol version、および対応するtest期待値を同時に更新する"
+  },
+  "edits": {
+    "R1": [
+      [
+        "protocol.py",
+        "WIRE_VERSION = 7",
+        "WIRE_VERSION = 8"
+      ],
+      [
+        "protocol.py",
+        "ENCODER_VERSION = 7",
+        "ENCODER_VERSION = 8"
+      ],
+      [
+        "tests/protocol.txt",
+        "wire-version=7",
+        "wire-version=8"
+      ],
+      [
+        "tests/protocol.txt",
+        "encoder-version=7",
+        "encoder-version=8"
+      ]
+    ]
+  },
+  "expected_states": [
+    {
+      "selected_intents": [],
+      "directory": "none"
+    },
+    {
+      "selected_intents": [
+        "R1"
+      ],
+      "directory": "R1"
+    }
+  ]
+}

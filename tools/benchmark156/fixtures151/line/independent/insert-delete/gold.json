@@ -1,0 +1,49 @@
+{
+  "name": "insert-delete",
+  "split": "independent",
+  "requirements": {
+    "R1": "旧設定retired_uploadを削除する",
+    "R2": "独立した新機能の設定を追加する"
+  },
+  "edits": {
+    "R1": [
+      [
+        "settings.conf",
+        "retired_upload=true\n",
+        ""
+      ]
+    ],
+    "R2": [
+      [
+        "settings.conf",
+        "footer=true\n",
+        "enable_upload=true\nfooter=true\n"
+      ]
+    ]
+  },
+  "expected_states": [
+    {
+      "selected_intents": [],
+      "directory": "none"
+    },
+    {
+      "selected_intents": [
+        "R1"
+      ],
+      "directory": "R1"
+    },
+    {
+      "selected_intents": [
+        "R2"
+      ],
+      "directory": "R2"
+    },
+    {
+      "selected_intents": [
+        "R1",
+        "R2"
+      ],
+      "directory": "R1+R2"
+    }
+  ]
+}
