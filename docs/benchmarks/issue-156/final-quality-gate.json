@@ -1,0 +1,124 @@
+{
+  "verification_precondition": "verification-before-final-gate.json records all36 GitHub checkboxes checked before running final gate",
+  "checks": [
+    {
+      "check": "go-test",
+      "command": [
+        "go",
+        "test",
+        "./..."
+      ],
+      "pass_": true,
+      "exit_code": 0,
+      "seconds": 55.8486260001082,
+      "log_sha256": "85acaf05bb4b212a7a5cf380362a0a43cf1947e21d67898799cdf487362d5fac",
+      "log_path": "/private/tmp/benchmark156-final-quality/go-test.log"
+    },
+    {
+      "check": "go-vet",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "pass_": true,
+      "exit_code": 0,
+      "seconds": 2.63415841688402,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_path": "/private/tmp/benchmark156-final-quality/go-vet.log"
+    },
+    {
+      "check": "go-build-all",
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "pass_": true,
+      "exit_code": 0,
+      "seconds": 1.7302906250115484,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_path": "/private/tmp/benchmark156-final-quality/go-build-all.log"
+    },
+    {
+      "check": "go-build-cli",
+      "command": [
+        "go",
+        "build",
+        "-o",
+        "/private/tmp/benchmark156-final-commiter",
+        "./cmd/commiter"
+      ],
+      "pass_": true,
+      "exit_code": 0,
+      "seconds": 1.2009175829589367,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_path": "/private/tmp/benchmark156-final-quality/go-build-cli.log"
+    },
+    {
+      "check": "release-notes-tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        ".github/scripts/release-notes",
+        "-p",
+        "test_*.py"
+      ],
+      "pass_": true,
+      "exit_code": 0,
+      "seconds": 0.6706082921009511,
+      "log_sha256": "542029f086852f7ad6f9a087f1603712178939fa9cb1830e9a27a57642371de0",
+      "log_path": "/private/tmp/benchmark156-final-quality/release-notes-tests.log"
+    },
+    {
+      "check": "research-regressions",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/benchmark156",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "pass_": true,
+      "exit_code": 0,
+      "seconds": 0.9473527499940246,
+      "log_sha256": "6c5b6827a3b4c93d0e98ac67b12557443e7e384d7ecb146e65bcdcd954a72a71",
+      "log_path": "/private/tmp/benchmark156-final-quality/research-regressions.log"
+    },
+    {
+      "check": "gofmt",
+      "command": [
+        "gofmt",
+        "-l",
+        "tools/benchmark156/validate/main.go"
+      ],
+      "pass_": true,
+      "exit_code": 0,
+      "seconds": 0.012218750081956387,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_path": "/private/tmp/benchmark156-final-quality/gofmt.log"
+    },
+    {
+      "check": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "f275d953f0c15452e9281d1c678cb9bb20adcbbb"
+      ],
+      "pass_": false,
+      "exit_code": 2,
+      "seconds": 0.07767125009559095,
+      "log_sha256": "20f6d60feb2390a4f8d2b033bbe00b5e5d94ac4e7a9cf04188deb6489f550963",
+      "log_path": "/private/tmp/benchmark156-final-quality/diff-check.log"
+    }
+  ],
+  "all_pass": false
+}

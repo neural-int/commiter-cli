@@ -25,4 +25,4 @@
 
 metadata不足・目的分類の不安定・runtime予算管理は残余課題として確定した。このIssue内でproductionのvalidationを緩和する理由にはならない。将来の別Issueには目的帰属の安定性、CU/file所有権schema、partial-stage検証、type/body/release互換性、全cycle予算管理が必要である。
 
-最終repository品質ゲートはこの照合とGitHubチェック更新の後に実行する。機能削除が無いため既存test削除は不要。追加7研究回帰はsource corruption/割当不正/path/mode/resource/UTF8 stage/mixed false absorb/bridge/実際の予算停止/実際のvalidator互換性を確認し、自明なtestを追加していない。
+最終repository品質ゲートはこの照合とGitHubチェック更新の後に実行済みで、全8項目PASS。初回diff-check失敗とbyte-preserving修正後の影響範囲再検証はfinal-quality-gate.json / final-quality-gate-recheck.json / iteration-9-report.mdに保存した。機能削除が無いため既存test削除は不要。追加7研究回帰はsource corruption/割当不正/path/mode/resource/UTF8 stage/mixed false absorb/bridge/実際の予算停止/実際のvalidator互換性を確認し、自明なtestを追加していない。

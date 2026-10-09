@@ -1,0 +1,48 @@
+{
+  "original_failure_preserved": "final-quality-gate.json",
+  "repair": "only byte-preserving diagnostic asset storage and loader; all18 frozen input hashes match; unaffected Go/build/release gates reuse initial PASS",
+  "rechecks": [
+    {
+      "check": "research-regressions",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/benchmark156",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "pass_": true,
+      "exit_code": 0,
+      "seconds": 1.1381237499881536,
+      "output_sha256": "1243be801d2c5d64000a7a3911c96f961a63d2db9efe22e2876992c69cdca7d9"
+    },
+    {
+      "check": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "f275d953f0c15452e9281d1c678cb9bb20adcbbb"
+      ],
+      "pass_": true,
+      "exit_code": 0,
+      "seconds": 0.0341407498344779,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "combined_gate": {
+    "go-test": true,
+    "go-vet": true,
+    "go-build-all": true,
+    "go-build-cli": true,
+    "release-notes-tests": true,
+    "research-regressions": true,
+    "gofmt": true,
+    "diff-check": true
+  },
+  "all_pass": true
+}
