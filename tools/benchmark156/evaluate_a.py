@@ -9,6 +9,7 @@ import sys
 import time
 from planner import prepare, fallback, replay, encode
 from remeasure import matching_subsets
+from fixture_bytes import read as fixture_read, paths as fixture_paths
 
 ROOT=pathlib.Path(__file__).resolve().parents[2]
 OUT=ROOT/'docs/benchmarks/issue-156'
@@ -27,20 +28,18 @@ def diagnostic_cases():
     for folder in ('line','inline'):
         manifest=json.loads((root/folder/'manifest.json').read_text())
         for path,digest in manifest.items():
-            if hashlib.sha256((root/folder/path).read_bytes()).hexdigest()!=digest:raise ValueError('fixture_manifest')
+            if hashlib.sha256(fixture_read(root/folder/path)).hexdigest()!=digest:raise ValueError('fixture_manifest')
         for gp in sorted((root/folder).glob('*/*/gold.json')):
             label=json.loads(gp.read_text());base=gp.parent;files=[]
-            for index,p in enumerate(sorted((base/'before').rglob('*'))):
-                if not p.is_file():continue
-                path=str(p.relative_to(base/'before'))
+            for path in fixture_paths(base/'before'):
                 files.append(dict(id=f'F{len(files)+1:03}',path=path,
-                    before_b64=base64.b64encode(p.read_bytes()).decode(),after_b64=base64.b64encode((base/'after'/path).read_bytes()).decode()))
+                    before_b64=base64.b64encode(fixture_read(base/'before'/path)).decode(),after_b64=base64.b64encode(fixture_read(base/'after'/path)).decode()))
             units=prepare(files);gold={}
             for intent in label['requirements']:
                 state=next(s for s in label['expected_states'] if s['selected_intents']==[intent])
                 for f in files:
                     atoms=[a for a in units if a['file']==f['id']]
-                    matches=matching_subsets(base64.b64decode(f['before_b64']),atoms,(base/'expected'/state['directory']/f['path']).read_bytes())
+                    matches=matching_subsets(base64.b64decode(f['before_b64']),atoms,fixture_read(base/'expected'/state['directory']/f['path']))
                     if len(matches)!=1:raise ValueError('diagnostic_gold_unrepresentable')
                     for uid in matches[0]:
                         if uid in gold:raise ValueError('gold_duplicate')

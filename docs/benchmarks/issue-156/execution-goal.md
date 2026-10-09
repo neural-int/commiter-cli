@@ -1,4 +1,4 @@
-## Objective 
+## Objective
  - Userより指定されたGitHub上のissueの課題を解決する。
 
 ## Success Criteria
@@ -30,29 +30,29 @@
 ## Iteration Policy
 以下の**WorkFlow**に従うこと。
 
- 1. 調査・検証 
+ 1. 調査・検証
  isuue課題を解決するための仮説をもとに調査・検証。
-  - 2回目以降の仮説・検証内容はNext Stepsに従う。 
+  - 2回目以降の仮説・検証内容はNext Stepsに従う。
   - まず課題に対するアプローチの方向性が適切か、検証が必要かどうかを判断する。
   - 必要に応じて外部ネットワークを使用し調査。issueの履歴も必要に応じて参照。
   - 検証が必要な場合、立証可能になる最小限の回数で検証。
- 
- 2. 報告 
+
+ 2. 報告
   該当issueのスレッドへ以下のフォーマットに従い新規コメントを追加。
   **Constraints.Japanese Writing Guidelines** のルールに則って記述。
     ## 要約
     - 検証結果と考察の要約を人間向けにわかりやすく噛み砕いて簡潔に整理。
-    ## 検証結果 
+    ## 検証結果
     - 検証から得られた観測的事実・結果のみを整理。
     ## 考察
     - 検証結果から得られた事実をもとに客観的考察を詳細に記述。
     ## Next Steps
     - 考察からisuueの課題解決に向けた次のActionを箇条書きで記述。(Action + なぜそのActionなのか)のセットで根拠を明確にする。
- 
+
  3. 判断
   作業履歴をcommit&pushし、iterationを継続or終了するかを判断する。
   - **Success Criteria**全条件を満たしている場合goal達成として終了する。
-  - **Blocked Condition**を一つでも満たした場合、Blockedとして停止。 
+  - **Blocked Condition**を一つでも満たした場合、Blockedとして停止。
   - 上記に該当しない場合は**4.継続**へ進む
 
  4. 継続
