@@ -1,0 +1,247 @@
+{
+  "A2": {
+    "observations": 15,
+    "primary": 12,
+    "excluded_gold": 3,
+    "exact": 4,
+    "complete": 15,
+    "grains": {
+      "line-operation": {
+        "cases": 10,
+        "complete": 10,
+        "null_pair_cases": 0,
+        "fm": 0,
+        "fs": 12775,
+        "fm_case": 0,
+        "fs_case": 6
+      },
+      "utf8-edit-atom": {
+        "cases": 2,
+        "complete": 2,
+        "null_pair_cases": 0,
+        "fm": 9,
+        "fs": 2,
+        "fm_case": 2,
+        "fs_case": 1
+      }
+    },
+    "wall_total": 179.93430862715468,
+    "wall_mean": 11.995620575143645,
+    "wall_p95_lower": 49.81648245896213,
+    "calls": 0,
+    "input_tokens_lower_bound": 0,
+    "output_tokens_lower_bound": 0,
+    "token_incomplete_cases": 0,
+    "call_telemetry_missing": 0,
+    "stops": {},
+    "strata": {
+      "1-4": {
+        "primary": 7,
+        "exact": 2,
+        "complete": 10,
+        "observations": 10
+      },
+      "5-8": {
+        "primary": 2,
+        "exact": 1,
+        "complete": 2,
+        "observations": 2
+      },
+      "9-16": {
+        "primary": 3,
+        "exact": 1,
+        "complete": 3,
+        "observations": 3
+      }
+    }
+  },
+  "baseline": {
+    "observations": 4,
+    "primary": 4,
+    "excluded_gold": 0,
+    "exact": 2,
+    "complete": 2,
+    "grains": {
+      "line-operation": {
+        "cases": 4,
+        "complete": 2,
+        "null_pair_cases": 2,
+        "fm": 0,
+        "fs": 0,
+        "fm_case": 0,
+        "fs_case": 0
+      }
+    },
+    "wall_total": 388.69964045798406,
+    "wall_mean": 97.17491011449602,
+    "wall_p95_lower": 119.37957983301021,
+    "calls": 12,
+    "input_tokens_lower_bound": 38108,
+    "output_tokens_lower_bound": 4074,
+    "token_incomplete_cases": 1,
+    "call_telemetry_missing": 0,
+    "stops": {
+      "baseline_failed": 2
+    },
+    "strata": {
+      "1-4": {
+        "primary": 4,
+        "exact": 2,
+        "complete": 2,
+        "observations": 4
+      },
+      "5-8": {
+        "primary": 0,
+        "exact": 0,
+        "complete": 0,
+        "observations": 0
+      },
+      "9-16": {
+        "primary": 0,
+        "exact": 0,
+        "complete": 0,
+        "observations": 0
+      }
+    }
+  },
+  "h23": {
+    "observations": 4,
+    "primary": 4,
+    "excluded_gold": 0,
+    "exact": 0,
+    "complete": 0,
+    "grains": {
+      "line-operation": {
+        "cases": 4,
+        "complete": 0,
+        "null_pair_cases": 4,
+        "fm": null,
+        "fs": null,
+        "fm_case": 0,
+        "fs_case": 0
+      }
+    },
+    "wall_total": 479.19529637508094,
+    "wall_mean": 119.79882409377024,
+    "wall_p95_lower": 120.26207787496969,
+    "calls": 8,
+    "input_tokens_lower_bound": 26938,
+    "output_tokens_lower_bound": 1084,
+    "token_incomplete_cases": 3,
+    "call_telemetry_missing": 0,
+    "stops": {
+      "metadata_timeout": 2,
+      "context_overflow": 1,
+      "global_grouping_not_final": 1
+    },
+    "strata": {
+      "1-4": {
+        "primary": 2,
+        "exact": 0,
+        "complete": 0,
+        "observations": 2
+      },
+      "5-8": {
+        "primary": 1,
+        "exact": 0,
+        "complete": 0,
+        "observations": 1
+      },
+      "9-16": {
+        "primary": 1,
+        "exact": 0,
+        "complete": 0,
+        "observations": 1
+      }
+    }
+  },
+  "canonical_failure_classes": [
+    {
+      "architecture": "baseline",
+      "name": "mock-plus-assert-negative",
+      "reverse": false,
+      "reason": "baseline_failed",
+      "call_stops": [
+        "completed",
+        "completed",
+        "completed"
+      ],
+      "classification": "final_invalid_or_unlogged_error_after_completed_backend"
+    },
+    {
+      "architecture": "baseline",
+      "name": "mock-plus-assert-negative",
+      "reverse": true,
+      "reason": "baseline_failed",
+      "call_stops": [
+        "completed",
+        "completed",
+        "timeout"
+      ],
+      "classification": "observed_resource_timeout"
+    },
+    {
+      "architecture": "h23",
+      "name": "mock-plus-assert-negative",
+      "reverse": false,
+      "reason": "metadata_timeout",
+      "call_stops": [
+        "completed",
+        "completed",
+        "timeout"
+      ],
+      "classification": "observed_resource_timeout"
+    },
+    {
+      "architecture": "h23",
+      "name": "mock-plus-assert-negative",
+      "reverse": true,
+      "reason": "metadata_timeout",
+      "call_stops": [
+        "completed",
+        "completed",
+        "timeout"
+      ],
+      "classification": "observed_resource_timeout"
+    },
+    {
+      "architecture": "h23",
+      "name": "formatter-eight",
+      "reverse": false,
+      "reason": "context_overflow",
+      "call_stops": [
+        "completed"
+      ],
+      "classification": "observed_host_context_budget"
+    },
+    {
+      "architecture": "h23",
+      "name": "public-sixteen-mixed",
+      "reverse": false,
+      "reason": "global_grouping_not_final",
+      "call_stops": [
+        "timeout"
+      ],
+      "classification": "observed_resource_timeout"
+    }
+  ],
+  "contract": {
+    "excluded_input_rate": 0.2,
+    "target": 0.8,
+    "population_inference": false,
+    "components_correlated": true,
+    "stop_pairs": "null excluded from pair sums but stop retained as exact failure",
+    "cost": "audit wall includes temp-index; tokens lower bounds; peak RSS cumulative max"
+  },
+  "comparison_4file": {
+    "cases": [
+      "mock-sentinel",
+      "mock-plus-assert-negative"
+    ],
+    "orders": 2,
+    "a_exact": 0,
+    "baseline_exact": 2,
+    "baseline_observations": 4
+  },
+  "decision": "A2 semantic candidate NO-GO; target overall and 9-16 not reached; production unchanged. A2 structural fallback limited GO only."
+}
