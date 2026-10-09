@@ -50,3 +50,12 @@ prototypeはrename、symlink、submodule、mode-only、競合をサポートし�
 ## A2
 
 `coarse.py`は同じ#151行抽出器で所有権を確定し、`refine`要求時のみ元のinline上限内で細分化する。refinement予算超過時は検証済みcoarse所有権を保持する。`evaluate_a2.py`は使用済みDの構造診断であり新holdoutではない。immutableなiteration-5の事前登録と結果を保存する。意味unknown・file fallback契約は変更していない。
+
+## 最終評価とbyte保存
+
+- C独立評価はiteration-6（raw splitとfinal planを分離）、D独立評価はiteration-7、B大規模transferはiteration-8。`completion-audit.md`が成果物の対応表、`gold-audit.md`が識別可能性と相関の根拠。
+- 目標は未達、production導入NO-GO。final quality gateの初回failureも保存し、PASSへ上書きしない。
+- CRLF fixtureは`config.ini.bytes.json`から`fixture_bytes.read`が元bytesへ復元する。logical pathとmanifestを維持し、18 diagnostic inputsがiteration-1と同じhashであることを確認した。threshold、gold、source mapping、model入力は変更していない。original sourcesを再現する場合は対応iteration commitをcheckoutし、現在の保存形式を当時のsource hashと混同しない。
+- 取得時のgoal全文とlicenseの元bytesは`original-text-bytes.json`に保存する。表示用goalは末尾空白だけ正規化し、provenanceの元SHAを保持する。
+- 使用helperのbinary SHAは全iterationで固定した。sourceはpublic neutral-score branchそのものとは異なり、既存のresearch telemetry/decoder拡張を含む。`helper-source-provenance.json`に差を記録し、`measured-helper-source-archive.json`にbase revision・同一source hashes・異なるsourceのbyte archiveを保存した。これは既存build inputの記録で、新依存導入・helper再buildではない。sourceを再構築する場合はbaseの`mlx-helper`を別の一時directoryへ展開し、archiveの変更fileだけ復元する。異なるruntime/binary/model digestの再実行は別条件として新規事前登録する。
+- B2の監査wall639.897秒は600秒上限を超えた。inferenceだけをdeadlineで止め、後続mandatory stage監査の時間を予約していない制約をNO-GOとして記録する。partition一致4/8を時間条件付き成功へ昇格しない。
