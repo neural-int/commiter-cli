@@ -1,0 +1,151 @@
+{
+  "sources_unchanged": true,
+  "all16_prompt_hashes_match": true,
+  "all8_audited_inputs_match": true,
+  "models": {
+    "gemma": {
+      "calls": 16,
+      "mean_inference_seconds": 4.579810265524429,
+      "total_inference_seconds": 73.27696424839087,
+      "authoritative_valid": 16,
+      "reconstruction_valid": 16,
+      "ordered_states_pass": 16,
+      "independent_reverts_pass": 16,
+      "review_valid": 13
+    }
+  },
+  "families": {
+    "must_join": {
+      "observations": 4,
+      "valid": 4,
+      "predictions": [
+        "merge",
+        "merge",
+        "merge",
+        "merge"
+      ]
+    },
+    "must_separate": {
+      "observations": 4,
+      "valid": 1,
+      "predictions": [
+        "merge",
+        "merge",
+        "defer",
+        "merge"
+      ]
+    },
+    "dependency": {
+      "observations": 4,
+      "valid": 4,
+      "predictions": [
+        "merge",
+        "merge",
+        "merge",
+        "merge"
+      ]
+    },
+    "multiple_valid": {
+      "observations": 4,
+      "valid": 4,
+      "predictions": [
+        "merge",
+        "merge",
+        "merge",
+        "merge"
+      ]
+    }
+  },
+  "baselines_independent_revert": {
+    "file-only": 4,
+    "static-new-api-order": 4,
+    "test-assisted-pair": 6
+  },
+  "failures": [
+    {
+      "case": "shared-helper-independent",
+      "reverse": false,
+      "answer": {
+        "decision": "merge",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      },
+      "reason": "review contract requires independent observable changes to remain separate; tests/byte/validator pass",
+      "groups": [
+        [
+          "E2"
+        ],
+        [
+          "E3"
+        ],
+        [
+          "EA",
+          "EB"
+        ]
+      ]
+    },
+    {
+      "case": "shared-helper-independent",
+      "reverse": true,
+      "answer": {
+        "decision": "merge",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      },
+      "reason": "review contract requires independent observable changes to remain separate; tests/byte/validator pass",
+      "groups": [
+        [
+          "E2"
+        ],
+        [
+          "E3"
+        ],
+        [
+          "EA",
+          "EB"
+        ]
+      ]
+    },
+    {
+      "case": "same-package-independent",
+      "reverse": true,
+      "answer": {
+        "decision": "merge",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      },
+      "reason": "review contract requires independent observable changes to remain separate; tests/byte/validator pass",
+      "groups": [
+        [
+          "E2"
+        ],
+        [
+          "E3"
+        ],
+        [
+          "E4"
+        ],
+        [
+          "E5"
+        ],
+        [
+          "E6"
+        ],
+        [
+          "E7"
+        ],
+        [
+          "EA",
+          "EB"
+        ]
+      ]
+    }
+  ],
+  "stable_cases": 7
+}
