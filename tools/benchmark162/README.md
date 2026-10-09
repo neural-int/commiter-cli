@@ -27,3 +27,8 @@ source IDの有効性は説明の正しさを保証しない。API依存をtoget
 runは自己作成Go fixtureを標準libraryのみ・network offでtemp directoryに作り、testsとtemp Git treeを検証する。外部repo code/test実行用ではない。test-assisted baselineはモデルへ渡さないtest実測を追加情報として使う。監査cacheを同じcase/ordered partitionで再利用するため、total wallはuncached production latencyと違う。
 
 初回は関係分類、次試験は複数許容partitionの妥当性なので、8/16と13/16を同じ指標の改善と呼ばない。局所2fileの境界を評価したcontrolled4/6/8file workloadであり、全8fileの意味分割や#156の16file/80%採用成功ではない。
+
+
+### Iteration 3: 観測限界と費用
+
+`observation_trial.py freeze` で未使用の自己作成8ケース・観測条件・Gateを固定し、commit/push後に `observation_trial.py run` で実行する。40probeはtest実行cacheを無効化。実行済み記録へ上書きしない。結果は前回test-assisted6/8、保留方式3/8確定・5未解決、採用NO-GO。詳細はdocs/benchmarks/issue-162/iteration-3-report.md。全file groupingやproduction成功の記録ではない。
