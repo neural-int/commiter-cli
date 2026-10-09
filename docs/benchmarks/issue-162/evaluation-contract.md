@@ -1,0 +1,18 @@
+# 初回の評価契約
+
+これは作者のcommit境界再現でも、最終partitionの評価でもなく、与えられたbefore/afterから対象A/Bのレビュー関係と方向付きAPI依存を区別するcontrolled診断である。
+
+- together: 実際に変更した入力/分岐を直接検証するassertionと実装。依存方向のない不可分変更。単純な共通symbol名だけでは不可。
+- separate: 独立した観測動作を変更し、一方を読むために他方の新しいAPI/対応assertionを必要としないケース。
+- depends_a_on_b / depends_b_on_a: 呼び出す側が新APIに依存するが、API追加側は単独で成立する。これは関係の分類であり、実際のpartitionは一緒にする方法と、方向を明示して分ける方法を許容する。
+- unknown: 同じ値/flag等の並行変更で共通policyか独立変更かを識別する理由が不足。どちらかを創作しない。
+
+対応testと実装を同時レビューするという本診断の規範を明示する。test-first等の別workflowを普遍的に否定しない。自己作成8ケース/同じdistractor2fileを反復し、独立作者・母集団性能の主張はしない。goldの分類だけでレビュー/revert妥当性の全体が測れたとしない。
+
+完全性・再構築・stage・各中間stateの動作/全tests・実revertは今回モデル診断では未測定。AST parseはsource構文確認のみ。外部コードを実行しない。後段のpartition評価で複数許容境界、必要な対応、依存order、unsupported入力、temp-indexを明示する。
+
+機械的baselineはfile-only separateと、同一symbol/importがある場合togetherとする素朴な対照。後者の関係候補はmust-linkにできないことを測る。baseline結果とモデルの正解/不正解は同じ関係分類単位で比較する。
+
+識別可能6ケース/曖昧2ケースを推論前に固定。2提示順はtargetA/Bの役割を維持し、全4fileの表示順だけ反転する。根拠IDはfile全体の参照であり細かいspanや自然言語説明の真偽を証明しない。根拠参照のvalidと意味的正解を別に数える。
+
+capability Gateはモデル別16/16 valid correct、順序一致、総1200秒以内。小さい関係判断が次のグループ構築を正当化できるかのスクリーニングでありproduction採用閾値ではない。failは有限条件のNO-GO。全小型モデル/別promptの不可能性へ拡張しない。timeoutも失敗として保持し、tokens nullは0にしない。
