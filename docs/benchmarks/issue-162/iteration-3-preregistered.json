@@ -1,0 +1,338 @@
+{
+  "contract": {
+    "cases": 8,
+    "selected_files": 4,
+    "model_calls": 0,
+    "total_seconds": 1200,
+    "command_seconds": 30,
+    "retries": 0,
+    "test_command": "go test -count=1 -json ./...",
+    "conditions": [
+      "absent",
+      "unchanged-observing",
+      "one-sided-unobserved"
+    ],
+    "methods": [
+      "file-only",
+      "static-new-api-order",
+      "test-assisted-v2",
+      "observability-cautious"
+    ],
+    "evaluation": "record review validity separately from ordered tests; cautious defer is unresolved, never successful split; same all-pass observation for must_join and must_separate falsifies test-only independence inference",
+    "adoption_gate": "all8 partitions finalized, review valid and ordered tests/byte/authoritative valid; no forced wrong split or overmerge; total<=1200s. Study completion is separate from adoption GO",
+    "cost": "one measured probe set per case reused by test-assisted methods; report marginal observation cost and shared audit cost separately; no sum double counting; test execution cache disabled via -count=1; Go compilation cache normal; source and audit use existing helpers",
+    "limitations": "authored local pair fixtures, no public history or full4/16file grouping; cautious policy can abstain without proving review validity; assertion count does not prove coverage; must_join compensating pairs defined normatively before execution, not author intent",
+    "safety": "self-authored code only, temp dirs, no external code tests/new dependencies/models/production edits"
+  },
+  "cases": [
+    {
+      "name": "absent-independent",
+      "condition": "absent",
+      "kind": "must_separate",
+      "files": [
+        {
+          "id": "EA",
+          "path": "accept.go",
+          "before": "package fixture\n\nfunc Accept(n int) bool { return n >= 0 }\n",
+          "after": "package fixture\n\nfunc Accept(n int) bool { return n > 0 }\n"
+        },
+        {
+          "id": "EB",
+          "path": "limit.go",
+          "before": "package fixture\n\nconst Limit = 10\n",
+          "after": "package fixture\n\nconst Limit = 20\n"
+        },
+        {
+          "id": "E2",
+          "path": "padding.go",
+          "before": "package fixture\n\nconst Padding = 2\n",
+          "after": "package fixture\n\nconst Padding = 3\n"
+        },
+        {
+          "id": "E3",
+          "path": "buffer.go",
+          "before": "package fixture\n\nconst Buffer = 8\n",
+          "after": "package fixture\n\nconst Buffer = 16\n"
+        }
+      ],
+      "support": {
+        "go.mod": "module example.test/observationfixture\n\ngo 1.27\n",
+        "support.go": "package fixture\n\n\n"
+      },
+      "rationale": "独立した受理条件と上限値の変更。テストなし。",
+      "input_sha256": "f79be1f3fb3b0c802eaf35c805807835a18b3e6a824eae1e88e69e55f5f3caca"
+    },
+    {
+      "name": "absent-new-api",
+      "condition": "absent",
+      "kind": "dependency",
+      "files": [
+        {
+          "id": "EA",
+          "path": "consumer.go",
+          "before": "package fixture\n\nfunc Read(n int) int { return n }\n",
+          "after": "package fixture\n\nfunc Read(n int) int { return Normalize(n) }\n"
+        },
+        {
+          "id": "EB",
+          "path": "provider.go",
+          "before": "package fixture\n\nconst Version = 1\n",
+          "after": "package fixture\n\nconst Version = 1\nfunc Normalize(n int) int { if n < 0 { return 0 }; return n }\n"
+        },
+        {
+          "id": "E2",
+          "path": "padding.go",
+          "before": "package fixture\n\nconst Padding = 2\n",
+          "after": "package fixture\n\nconst Padding = 3\n"
+        },
+        {
+          "id": "E3",
+          "path": "buffer.go",
+          "before": "package fixture\n\nconst Buffer = 8\n",
+          "after": "package fixture\n\nconst Buffer = 16\n"
+        }
+      ],
+      "support": {
+        "go.mod": "module example.test/observationfixture\n\ngo 1.27\n",
+        "support.go": "package fixture\n\n\n"
+      },
+      "rationale": "新APIのprovider/consumer。統合と依存順分割を許容。テストなしでもコンパイル依存は観測可能。",
+      "input_sha256": "17c033943babf75c0bd53551227077707fcde7f2418ddb716a2614850ffaf259"
+    },
+    {
+      "name": "unchanged-strong-offset",
+      "condition": "unchanged-observing",
+      "kind": "must_join",
+      "files": [
+        {
+          "id": "EA",
+          "path": "compute.go",
+          "before": "package fixture\n\nfunc Compute(n int) int { return n + 1 }\n",
+          "after": "package fixture\n\nfunc Compute(n int) int { return n + 2 }\n"
+        },
+        {
+          "id": "EB",
+          "path": "offset.go",
+          "before": "package fixture\n\nconst Offset = 1\n",
+          "after": "package fixture\n\nconst Offset = 2\n"
+        },
+        {
+          "id": "E2",
+          "path": "padding.go",
+          "before": "package fixture\n\nconst Padding = 2\n",
+          "after": "package fixture\n\nconst Padding = 3\n"
+        },
+        {
+          "id": "E3",
+          "path": "buffer.go",
+          "before": "package fixture\n\nconst Buffer = 8\n",
+          "after": "package fixture\n\nconst Buffer = 16\n"
+        }
+      ],
+      "support": {
+        "go.mod": "module example.test/observationfixture\n\ngo 1.27\n",
+        "support.go": "package fixture\n\nfunc Result(n int) int { return Compute(n) - Offset }\n",
+        "support_test.go": "package fixture\n\nimport \"testing\"\nfunc TestResult(t *testing.T) { if got := Result(3); got != 3 { t.Fatal(got) } }\n"
+      },
+      "rationale": "Result(n)=nを維持する補償変更。片側だけではResult(3)が2または4になるため、本試験では共同レビューを要求。弱いassertionでは両方とも通る。",
+      "input_sha256": "6a1c9542ab5210f357903a4e92267753b25ca93739960f260bedf43cb59b4552"
+    },
+    {
+      "name": "unchanged-strong-scale",
+      "condition": "unchanged-observing",
+      "kind": "must_join",
+      "files": [
+        {
+          "id": "EA",
+          "path": "scale.go",
+          "before": "package fixture\n\nfunc Scale(n int) int { return n * 2 }\n",
+          "after": "package fixture\n\nfunc Scale(n int) int { return n * 4 }\n"
+        },
+        {
+          "id": "EB",
+          "path": "divisor.go",
+          "before": "package fixture\n\nconst Divisor = 2\n",
+          "after": "package fixture\n\nconst Divisor = 4\n"
+        },
+        {
+          "id": "E2",
+          "path": "padding.go",
+          "before": "package fixture\n\nconst Padding = 2\n",
+          "after": "package fixture\n\nconst Padding = 3\n"
+        },
+        {
+          "id": "E3",
+          "path": "buffer.go",
+          "before": "package fixture\n\nconst Buffer = 8\n",
+          "after": "package fixture\n\nconst Buffer = 16\n"
+        }
+      ],
+      "support": {
+        "go.mod": "module example.test/observationfixture\n\ngo 1.27\n",
+        "support.go": "package fixture\n\nfunc Result(n int) int { return Scale(n) / Divisor }\n",
+        "support_test.go": "package fixture\n\nimport \"testing\"\nfunc TestResult(t *testing.T) { if got := Result(8); got != 8 { t.Fatal(got) } }\n"
+      },
+      "rationale": "Result(n)=nを維持する倍率・除数の補償変更。片側だけではResult(8)が4または16になる。本試験のレビュー規範はjoin。",
+      "input_sha256": "ea34f3c283ac696fe7abbabea7fb5a77a6a0ebfc48fca2c771e48271bd55733c"
+    },
+    {
+      "name": "weak-offset",
+      "condition": "one-sided-unobserved",
+      "kind": "must_join",
+      "files": [
+        {
+          "id": "EA",
+          "path": "compute.go",
+          "before": "package fixture\n\nfunc Compute(n int) int { return n + 1 }\n",
+          "after": "package fixture\n\nfunc Compute(n int) int { return n + 2 }\n"
+        },
+        {
+          "id": "EB",
+          "path": "offset.go",
+          "before": "package fixture\n\nconst Offset = 1\n",
+          "after": "package fixture\n\nconst Offset = 2\n"
+        },
+        {
+          "id": "E2",
+          "path": "padding.go",
+          "before": "package fixture\n\nconst Padding = 2\n",
+          "after": "package fixture\n\nconst Padding = 3\n"
+        },
+        {
+          "id": "E3",
+          "path": "buffer.go",
+          "before": "package fixture\n\nconst Buffer = 8\n",
+          "after": "package fixture\n\nconst Buffer = 16\n"
+        }
+      ],
+      "support": {
+        "go.mod": "module example.test/observationfixture\n\ngo 1.27\n",
+        "support.go": "package fixture\n\nfunc Result(n int) int { return Compute(n) - Offset }\n",
+        "support_test.go": "package fixture\n\nimport \"testing\"\nfunc TestResult(t *testing.T) { if Result(3) < 0 { t.Fatal(\"negative\") } }\n"
+      },
+      "rationale": "Result(n)=nを維持する補償変更。片側だけではResult(3)が2または4になるため、本試験では共同レビューを要求。弱いassertionでは両方とも通る。",
+      "input_sha256": "6d5b7e05a4bf2e8e317d81b843b6f0caca17d6f34e89e66fbf607d93f7c60494"
+    },
+    {
+      "name": "weak-scale",
+      "condition": "one-sided-unobserved",
+      "kind": "must_join",
+      "files": [
+        {
+          "id": "EA",
+          "path": "scale.go",
+          "before": "package fixture\n\nfunc Scale(n int) int { return n * 2 }\n",
+          "after": "package fixture\n\nfunc Scale(n int) int { return n * 4 }\n"
+        },
+        {
+          "id": "EB",
+          "path": "divisor.go",
+          "before": "package fixture\n\nconst Divisor = 2\n",
+          "after": "package fixture\n\nconst Divisor = 4\n"
+        },
+        {
+          "id": "E2",
+          "path": "padding.go",
+          "before": "package fixture\n\nconst Padding = 2\n",
+          "after": "package fixture\n\nconst Padding = 3\n"
+        },
+        {
+          "id": "E3",
+          "path": "buffer.go",
+          "before": "package fixture\n\nconst Buffer = 8\n",
+          "after": "package fixture\n\nconst Buffer = 16\n"
+        }
+      ],
+      "support": {
+        "go.mod": "module example.test/observationfixture\n\ngo 1.27\n",
+        "support.go": "package fixture\n\nfunc Result(n int) int { return Scale(n) / Divisor }\n",
+        "support_test.go": "package fixture\n\nimport \"testing\"\nfunc TestResult(t *testing.T) { if Result(8) < 0 { t.Fatal(\"negative\") } }\n"
+      },
+      "rationale": "Result(n)=nを維持する倍率・除数の補償変更。片側だけではResult(8)が4または16になる。本試験のレビュー規範はjoin。",
+      "input_sha256": "15ff957362da7fb0f1e0d4f4182e7e339e607671226606b468c285677da0d636"
+    },
+    {
+      "name": "weak-independent-first",
+      "condition": "one-sided-unobserved",
+      "kind": "must_separate",
+      "files": [
+        {
+          "id": "EA",
+          "path": "first.go",
+          "before": "package fixture\n\nfunc First(n int) int { return n + 1 }\n",
+          "after": "package fixture\n\nfunc First(n int) int { return n + 2 }\n"
+        },
+        {
+          "id": "EB",
+          "path": "second.go",
+          "before": "package fixture\n\nfunc Second(n int) int { return n * 2 }\n",
+          "after": "package fixture\n\nfunc Second(n int) int { return n * 4 }\n"
+        },
+        {
+          "id": "E2",
+          "path": "padding.go",
+          "before": "package fixture\n\nconst Padding = 2\n",
+          "after": "package fixture\n\nconst Padding = 3\n"
+        },
+        {
+          "id": "E3",
+          "path": "buffer.go",
+          "before": "package fixture\n\nconst Buffer = 8\n",
+          "after": "package fixture\n\nconst Buffer = 16\n"
+        }
+      ],
+      "support": {
+        "go.mod": "module example.test/observationfixture\n\ngo 1.27\n",
+        "support.go": "package fixture\n\n\n",
+        "support_test.go": "package fixture\n\nimport \"testing\"\nfunc TestResult(t *testing.T) { if First(3) < 0 { t.Fatal(\"negative\") } }\n"
+      },
+      "rationale": "独立した関数変更。弱い既存テストはSecondを呼ばない。",
+      "input_sha256": "af914882c8c3167732a57ccf9d1879f857104e847c7b4c49e9224f3a5819bd74"
+    },
+    {
+      "name": "weak-independent-second",
+      "condition": "one-sided-unobserved",
+      "kind": "must_separate",
+      "files": [
+        {
+          "id": "EA",
+          "path": "enabled.go",
+          "before": "package fixture\n\nfunc Enabled(n int) bool { return n >= 0 }\n",
+          "after": "package fixture\n\nfunc Enabled(n int) bool { return n > 0 }\n"
+        },
+        {
+          "id": "EB",
+          "path": "capacity.go",
+          "before": "package fixture\n\nfunc Capacity(n int) int { return n + 5 }\n",
+          "after": "package fixture\n\nfunc Capacity(n int) int { return n + 10 }\n"
+        },
+        {
+          "id": "E2",
+          "path": "padding.go",
+          "before": "package fixture\n\nconst Padding = 2\n",
+          "after": "package fixture\n\nconst Padding = 3\n"
+        },
+        {
+          "id": "E3",
+          "path": "buffer.go",
+          "before": "package fixture\n\nconst Buffer = 8\n",
+          "after": "package fixture\n\nconst Buffer = 16\n"
+        }
+      ],
+      "support": {
+        "go.mod": "module example.test/observationfixture\n\ngo 1.27\n",
+        "support.go": "package fixture\n\n\n",
+        "support_test.go": "package fixture\n\nimport \"testing\"\nfunc TestResult(t *testing.T) { if Capacity(3) < 0 { t.Fatal(\"negative\") } }\n"
+      },
+      "rationale": "独立した条件と容量の変更。既存テストはEnabledを呼ばない。",
+      "input_sha256": "b2bc0cb85d85dbafdc46fcef4ee6867343398347a2148dd0fdc4668fdd31fca7"
+    }
+  ],
+  "source_sha256": {
+    "tools/benchmark162/observation_trial.py": "11c1f85511fb6df9b1e461e90435c9b49dca27209fa0d735132086991f4d947d",
+    "tools/benchmark162/partition_trial.py": "fe75cbc424b4e69a3fe21f1951c32d7341c046111ef46a8d69ae9038d43e175c",
+    "tools/benchmark162/benchmark.py": "9e498eb7d43d33ad504037a3719693c4cbebcb376eafee669dd50c7f0a9873b7"
+  },
+  "facts_binary_sha256": "46962ee6d921818c8509f5a80d7647d554e38fc81938d1fbf6e892d401cb7589",
+  "validator_binary_sha256": "78f9f432e3752266ed03678557a11ef108485a35ff1018d86d00dd62dd33aa81"
+}
