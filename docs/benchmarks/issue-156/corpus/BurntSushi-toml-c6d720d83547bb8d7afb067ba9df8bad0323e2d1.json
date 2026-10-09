@@ -1,0 +1,52 @@
+{
+  "sha": "c6d720d83547bb8d7afb067ba9df8bad0323e2d1",
+  "parents": [
+    {
+      "sha": "277ecb0abd5e5945cf4c0a5cf3668759a27aa7fd",
+      "url": "https://api.github.com/repos/BurntSushi/toml/commits/277ecb0abd5e5945cf4c0a5cf3668759a27aa7fd",
+      "html_url": "https://github.com/BurntSushi/toml/commit/277ecb0abd5e5945cf4c0a5cf3668759a27aa7fd"
+    }
+  ],
+  "files": [
+    {
+      "sha": "d4a2808cb074b7ff0dc39bf2083d06b9c3fd82f6",
+      "filename": "encode.go",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 6,
+      "changes": 7,
+      "blob_url": "https://github.com/BurntSushi/toml/blob/c6d720d83547bb8d7afb067ba9df8bad0323e2d1/encode.go",
+      "raw_url": "https://github.com/BurntSushi/toml/raw/c6d720d83547bb8d7afb067ba9df8bad0323e2d1/encode.go",
+      "contents_url": "https://api.github.com/repos/BurntSushi/toml/contents/encode.go?ref=c6d720d83547bb8d7afb067ba9df8bad0323e2d1",
+      "patch": "@@ -226,12 +226,7 @@ func (enc *Encoder) eElement(rv reflect.Value) {\n \t\tcase internal.LocalTime:\n \t\t\tformat = \"15:04:05.999999999\"\n \t\t}\n-\t\tswitch v.Location() {\n-\t\tdefault:\n-\t\t\tenc.write(v.Format(format))\n-\t\tcase internal.LocalDatetime, internal.LocalDate, internal.LocalTime:\n-\t\t\tenc.write(v.In(time.UTC).Format(format))\n-\t\t}\n+\t\tenc.write(v.Format(format))\n \t\treturn\n \tcase Marshaler:\n \t\ts, err := v.MarshalTOML()"
+    },
+    {
+      "sha": "ec03288892dcf94d2bcb47bb2de0f51029f3e0e1",
+      "filename": "encode_test.go",
+      "status": "modified",
+      "additions": 46,
+      "deletions": 9,
+      "changes": 55,
+      "blob_url": "https://github.com/BurntSushi/toml/blob/c6d720d83547bb8d7afb067ba9df8bad0323e2d1/encode_test.go",
+      "raw_url": "https://github.com/BurntSushi/toml/raw/c6d720d83547bb8d7afb067ba9df8bad0323e2d1/encode_test.go",
+      "contents_url": "https://api.github.com/repos/BurntSushi/toml/contents/encode_test.go?ref=c6d720d83547bb8d7afb067ba9df8bad0323e2d1",
+      "patch": "@@ -25,15 +25,15 @@ func TestRoundtrip(t *testing.T) {\n \t\tLargeFloat float64   `toml:\"large_float\"`\n \t}\n \n-\tdoc := `\n-age = 13\n-cats = [\"one\", \"two\", \"three\"]\n-pi = 3.145\n-perfection = [11, 2, 3, 4]\n-dob = 2012-01-02T15:16:17Z\n-ip = \"192.168.59.254\"\n-large_float = 5e+22\n-`[1:]\n+\tdoc := strings.ReplaceAll(`\n+\t\tage = 13\n+\t\tcats = [\"one\", \"two\", \"three\"]\n+\t\tpi = 3.145\n+\t\tperfection = [11, 2, 3, 4]\n+\t\tdob = 2012-01-02T15:16:17Z\n+\t\tip = \"192.168.59.254\"\n+\t\tlarge_float = 5e+22\n+\t`[1:], \"\\t\", \"\")\n \n \twant := scan{\n \t\tAge:        13,\n@@ -63,6 +63,43 @@ large_float = 5e+22\n \t}\n }\n \n+// local date types have no offset – encoding must emit the wall clock value as\n+// present in the time.Time.\n+//\n+// Previously the encoder shifted them to UTC first, which corrupted the value\n+// on any machine not in UTC (e.g. a local time of \"07:32:00\" was emitted as\n+// \"11:32:00\" in UTC-4).\n+func TestEncodeRoundtripLocalDatetime(t *testing.T) {\n+\tdocs := []string{\n+\t\t\"d = 1987-07-05T17:45:00\\n\",\n+\t\t\"d = 1977-12-21T10:32:00.555\\n\",\n+\t\t\"d = 1987-07-05\\n\",\n+\t\t\"d = 17:45:00\\n\",\n+\t\t\"d = 10:32:00.555\\n\",\n+\t\t\"d = 2024-03-10T23:30:00\\n\", // Near a day boundary, a UTC shift could even roll the date over.\n+\t\t\"d = 23:30:00\\n\",\n+\t}\n+\tfor _, doc := range docs {\n+\t\tt.Run(\"\", func(t *testing.T) {\n+\t\t\tvar m map[string]any\n+\t\t\t_, err := Decode(doc, &m)\n+\t\t\tif err != nil {\n+\t\t\t\tt.Fatalf(\"decode %q: %s\", doc, err)\n+\t\t\t}\n+\n+\t\t\tvar buf bytes.Buffer\n+\t\t\terr = NewEncoder(&buf).Encode(m)\n+\t\t\tif err != nil {\n+\t\t\t\tt.Fatalf(\"encode %q: %s\", doc, err)\n+\t\t\t}\n+\n+\t\t\tif buf.String() != doc {\n+\t\t\t\tt.Errorf(\"\\nhave: %q\\nwant: %q\", buf.String(), doc)\n+\t\t\t}\n+\t\t})\n+\t}\n+}\n+\n func TestEncodeArrayHashWithNormalHashOrder(t *testing.T) {\n \ttype Alpha struct {\n \t\tV int"
+    },
+    {
+      "sha": "9e46703d0393efca9274a08713b7340f9a8d6077",
+      "filename": "internal/tag/rm.go",
+      "status": "modified",
+      "additions": 7,
+      "deletions": 4,
+      "changes": 11,
+      "blob_url": "https://github.com/BurntSushi/toml/blob/c6d720d83547bb8d7afb067ba9df8bad0323e2d1/internal%2Ftag%2Frm.go",
+      "raw_url": "https://github.com/BurntSushi/toml/raw/c6d720d83547bb8d7afb067ba9df8bad0323e2d1/internal%2Ftag%2Frm.go",
+      "contents_url": "https://api.github.com/repos/BurntSushi/toml/contents/internal%2Ftag%2Frm.go?ref=c6d720d83547bb8d7afb067ba9df8bad0323e2d1",
+      "patch": "@@ -100,12 +100,15 @@ func untag(typed map[string]any) (any, error) {\n }\n \n func parseTime(v, format string, l *time.Location) (time.Time, error) {\n-\tt, err := time.Parse(format, v)\n+\tif l == nil {\n+\t\tl = time.UTC\n+\t}\n+\t// Parse the wall-clock value directly into the target location, matching\n+\t// how the decoder builds local datetimes/dates/times. Using time.Parse and\n+\t// then .In(l) would instead shift the value by l's offset.\n+\tt, err := time.ParseInLocation(format, v, l)\n \tif err != nil {\n \t\treturn time.Time{}, fmt.Errorf(\"could not parse %q as a datetime: %w\", v, err)\n \t}\n-\tif l != nil {\n-\t\tt = t.In(l)\n-\t}\n \treturn t, nil\n }"
+    }
+  ],
+  "repository": "BurntSushi/toml",
+  "commit": {
+    "message": "encode: don't shift local datetimes/dates/times to UTC\n\nA local datetime, date, or time carries no timezone offset, so its value\nis the literal wall-clock time. The decoder stores it as such using\ntime.ParseInLocation, but the encoder formatted it with v.In(time.UTC)\nfirst. On any machine not in UTC this shifted the value by the local\noffset, so Decode -> Encode -> Decode changed the time (e.g. a local\ntime of 07:32:00 became 11:32:00 in UTC-4, and a near-midnight local\ndatetime could even roll over to a different day).\n\nFormat the wall-clock value directly instead. Also fix the toml-test\nhelper's parseTime to build local times with time.ParseInLocation so it\nmatches how the decoder constructs them."
+  }
+}

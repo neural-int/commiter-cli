@@ -1,0 +1,28 @@
+{
+  "sha": "25a51134cd15acef20d6fe7e3f06ec1555e360ec",
+  "parents": [
+    {
+      "sha": "bc916999dc0011f5caf1f0d40e898ea9f839f4ea",
+      "url": "https://api.github.com/repos/jmoiron/sqlx/commits/bc916999dc0011f5caf1f0d40e898ea9f839f4ea",
+      "html_url": "https://github.com/jmoiron/sqlx/commit/bc916999dc0011f5caf1f0d40e898ea9f839f4ea"
+    }
+  ],
+  "files": [
+    {
+      "sha": "e6980392b49ba015b00156398c2e0839d151edac",
+      "filename": "bind.go",
+      "status": "modified",
+      "additions": 4,
+      "deletions": 4,
+      "changes": 8,
+      "blob_url": "https://github.com/jmoiron/sqlx/blob/25a51134cd15acef20d6fe7e3f06ec1555e360ec/bind.go",
+      "raw_url": "https://github.com/jmoiron/sqlx/raw/25a51134cd15acef20d6fe7e3f06ec1555e360ec/bind.go",
+      "contents_url": "https://api.github.com/repos/jmoiron/sqlx/contents/bind.go?ref=25a51134cd15acef20d6fe7e3f06ec1555e360ec",
+      "patch": "@@ -22,10 +22,10 @@ const (\n )\n \n var defaultBinds = map[int][]string{\n-\tDOLLAR:   []string{\"postgres\", \"pgx\", \"pq-timeouts\", \"cloudsqlpostgres\", \"ql\", \"nrpostgres\", \"cockroach\"},\n-\tQUESTION: []string{\"mysql\", \"sqlite3\", \"nrmysql\", \"nrsqlite3\"},\n-\tNAMED:    []string{\"oci8\", \"ora\", \"goracle\", \"godror\"},\n-\tAT:       []string{\"sqlserver\"},\n+\tDOLLAR:   {\"postgres\", \"pgx\", \"pq-timeouts\", \"cloudsqlpostgres\", \"ql\", \"nrpostgres\", \"cockroach\"},\n+\tQUESTION: {\"mysql\", \"sqlite3\", \"nrmysql\", \"nrsqlite3\"},\n+\tNAMED:    {\"oci8\", \"ora\", \"goracle\", \"godror\"},\n+\tAT:       {\"sqlserver\", \"azuresql\"},\n }\n \n var binds sync.Map"
+    }
+  ],
+  "repository": "jmoiron/sqlx",
+  "commit": {
+    "message": "Add azuresql driver bind"
+  }
+}

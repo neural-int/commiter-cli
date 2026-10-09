@@ -1,0 +1,40 @@
+{
+  "sha": "9fe9ada4e0e92a52f18a95a971bafb66c01e1393",
+  "parents": [
+    {
+      "sha": "3e6586b65608c4a02118a9b30334796c008eda35",
+      "url": "https://api.github.com/repos/BurntSushi/toml/commits/3e6586b65608c4a02118a9b30334796c008eda35",
+      "html_url": "https://github.com/BurntSushi/toml/commit/3e6586b65608c4a02118a9b30334796c008eda35"
+    }
+  ],
+  "files": [
+    {
+      "sha": "ccc0a243b4985bb167370b9babf73aa5ac0c7985",
+      "filename": "error.go",
+      "status": "modified",
+      "additions": 4,
+      "deletions": 0,
+      "changes": 4,
+      "blob_url": "https://github.com/BurntSushi/toml/blob/9fe9ada4e0e92a52f18a95a971bafb66c01e1393/error.go",
+      "raw_url": "https://github.com/BurntSushi/toml/raw/9fe9ada4e0e92a52f18a95a971bafb66c01e1393/error.go",
+      "contents_url": "https://api.github.com/repos/BurntSushi/toml/contents/error.go?ref=9fe9ada4e0e92a52f18a95a971bafb66c01e1393",
+      "patch": "@@ -98,6 +98,10 @@ func (pe ParseError) Error() string {\n \treturn fmt.Sprintf(\"toml: line %d (last key %q): %s\", pe.Position.Line, pe.LastKey, pe.Message)\n }\n \n+func (pe ParseError) Unwrap() error {\n+\treturn pe.err\n+}\n+\n // ErrorWithPosition returns the error with detailed location context.\n //\n // See the documentation on [ParseError]."
+    },
+    {
+      "sha": "b9f9d1e9a7e6b8bda038fbebf031706242a636ad",
+      "filename": "error_test.go",
+      "status": "modified",
+      "additions": 10,
+      "deletions": 2,
+      "changes": 12,
+      "blob_url": "https://github.com/BurntSushi/toml/blob/9fe9ada4e0e92a52f18a95a971bafb66c01e1393/error_test.go",
+      "raw_url": "https://github.com/BurntSushi/toml/raw/9fe9ada4e0e92a52f18a95a971bafb66c01e1393/error_test.go",
+      "contents_url": "https://api.github.com/repos/BurntSushi/toml/contents/error_test.go?ref=9fe9ada4e0e92a52f18a95a971bafb66c01e1393",
+      "patch": "@@ -301,14 +301,16 @@ func TestParseError(t *testing.T) {\n \t}\n }\n \n+var errInvalidValue = errors.New(\"invalid value\")\n+\n type Enum1 uint8\n \n func (n *Enum1) UnmarshalText(text []byte) error {\n \tswitch t := strings.TrimSpace(string(text)); t {\n \tcase \"ok\":\n \t\t*n = 1\n \tdefault:\n-\t\treturn fmt.Errorf(\"invalid value: %q\", t)\n+\t\treturn fmt.Errorf(\"%w: %q\", errInvalidValue, t)\n \t}\n \treturn nil\n }\n@@ -324,6 +326,9 @@ func TestUnmarshalTypeError(t *testing.T) {\n \tif err == nil {\n \t\tt.Fatal(\"error is nil\")\n \t}\n+\tif !errors.Is(err, errInvalidValue) {\n+\t\tt.Errorf(\"error %#v does not wrap errInvalidValue (%v)\", err, errInvalidValue)\n+\t}\n \tvar pErr toml.ParseError\n \tif !errors.As(err, &pErr) {\n \t\tt.Fatalf(\"not a ParseError: %#v\", err)\n@@ -351,7 +356,7 @@ func (n *Enum2) UnmarshalTOML(text any) error {\n \tcase \"ok\":\n \t\t*n = 1\n \tdefault:\n-\t\treturn fmt.Errorf(\"invalid value: %q\", t)\n+\t\treturn fmt.Errorf(\"%w: %q\", errInvalidValue, t)\n \t}\n \treturn nil\n }\n@@ -366,6 +371,9 @@ func TestMarshalError(t *testing.T) {\n \tif err == nil {\n \t\tt.Fatal(\"error is nil\")\n \t}\n+\tif !errors.Is(err, errInvalidValue) {\n+\t\tt.Errorf(\"error %#v does not wrap errInvalidValue (%v)\", err, errInvalidValue)\n+\t}\n \tvar pErr toml.ParseError\n \tif !errors.As(err, &pErr) {\n \t\tt.Fatalf(\"not a ParseError: %#v\", err)"
+    }
+  ],
+  "repository": "BurntSushi/toml",
+  "commit": {
+    "message": "errors: implement Unwrap for ParseError\n\nFor types with custom UnmarshalTOML methods, being able to return an\nerror that is then checked using errors.Is() is quite handy and matches\nuser expecations with regards to how error wrapping works in modern Go.\n\n"
+  }
+}

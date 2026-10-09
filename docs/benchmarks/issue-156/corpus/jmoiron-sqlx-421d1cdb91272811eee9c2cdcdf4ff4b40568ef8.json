@@ -1,0 +1,40 @@
+{
+  "sha": "421d1cdb91272811eee9c2cdcdf4ff4b40568ef8",
+  "parents": [
+    {
+      "sha": "a62bc6088664eb854c3d5ebbd08a1ffd59662ef1",
+      "url": "https://api.github.com/repos/jmoiron/sqlx/commits/a62bc6088664eb854c3d5ebbd08a1ffd59662ef1",
+      "html_url": "https://github.com/jmoiron/sqlx/commit/a62bc6088664eb854c3d5ebbd08a1ffd59662ef1"
+    }
+  ],
+  "files": [
+    {
+      "sha": "f7b2876834f67f9e6b254982545097c27e5070e6",
+      "filename": "sqlx.go",
+      "status": "modified",
+      "additions": 5,
+      "deletions": 3,
+      "changes": 8,
+      "blob_url": "https://github.com/jmoiron/sqlx/blob/421d1cdb91272811eee9c2cdcdf4ff4b40568ef8/sqlx.go",
+      "raw_url": "https://github.com/jmoiron/sqlx/raw/421d1cdb91272811eee9c2cdcdf4ff4b40568ef8/sqlx.go",
+      "contents_url": "https://api.github.com/repos/jmoiron/sqlx/contents/sqlx.go?ref=421d1cdb91272811eee9c2cdcdf4ff4b40568ef8",
+      "patch": "@@ -878,9 +878,10 @@ func structOnlyError(t reflect.Type) error {\n }\n \n // scanAll scans all rows into a destination, which must be a slice of any\n-// type.  If the destination slice type is a Struct, then StructScan will be\n-// used on each row.  If the destination is some other kind of base type, then\n-// each row must only have one column which can scan into that type.  This\n+// type.  It resets the slice length to zero before appending each element to\n+// the slice.  If the destination slice type is a Struct, then StructScan will\n+// be used on each row.  If the destination is some other kind of base type,\n+// then each row must only have one column which can scan into that type.  This\n // allows you to do something like:\n //\n //    rows, _ := db.Query(\"select id from people;\")\n@@ -910,6 +911,7 @@ func scanAll(rows rowsi, dest interface{}, structOnly bool) error {\n \tif err != nil {\n \t\treturn err\n \t}\n+\tdirect.SetLen(0)\n \n \tisPtr := slice.Elem().Kind() == reflect.Ptr\n \tbase := reflectx.Deref(slice.Elem())"
+    },
+    {
+      "sha": "1d4aa20d444662f6d116a4a01423539c2d12caf1",
+      "filename": "sqlx_test.go",
+      "status": "modified",
+      "additions": 32,
+      "deletions": 0,
+      "changes": 32,
+      "blob_url": "https://github.com/jmoiron/sqlx/blob/421d1cdb91272811eee9c2cdcdf4ff4b40568ef8/sqlx_test.go",
+      "raw_url": "https://github.com/jmoiron/sqlx/raw/421d1cdb91272811eee9c2cdcdf4ff4b40568ef8/sqlx_test.go",
+      "contents_url": "https://api.github.com/repos/jmoiron/sqlx/contents/sqlx_test.go?ref=421d1cdb91272811eee9c2cdcdf4ff4b40568ef8",
+      "patch": "@@ -1892,3 +1892,35 @@ func TestIn130Regression(t *testing.T) {\n \t\t}\n \t})\n }\n+\n+func TestSelectReset(t *testing.T) {\n+\tRunWithSchema(defaultSchema, t, func(db *DB, t *testing.T, now string) {\n+\t\tloadDefaultFixture(db, t)\n+\n+\t\tfilledDest := []string{\"a\", \"b\", \"c\"}\n+\t\terr := db.Select(&filledDest, \"SELECT first_name FROM person ORDER BY first_name ASC;\")\n+\t\tif err != nil {\n+\t\t\tt.Fatal(err)\n+\t\t}\n+\t\tif len(filledDest) != 2 {\n+\t\t\tt.Errorf(\"Expected 2 first names, got %d.\", len(filledDest))\n+\t\t}\n+\t\texpected := []string{\"Jason\", \"John\"}\n+\t\tfor i, got := range filledDest {\n+\t\t\tif got != expected[i] {\n+\t\t\t\tt.Errorf(\"Expected %d result to be %s, but got %s.\", i, expected[i], got)\n+\t\t\t}\n+\t\t}\n+\n+\t\tvar emptyDest []string\n+\t\terr = db.Select(&emptyDest, \"SELECT first_name FROM person WHERE first_name = 'Jack';\")\n+\t\tif err != nil {\n+\t\t\tt.Fatal(err)\n+\t\t}\n+\t\t// Verify that selecting 0 rows into a nil target didn't create a\n+\t\t// non-nil slice.\n+\t\tif emptyDest != nil {\n+\t\t\tt.Error(\"Expected emptyDest to be nil\")\n+\t\t}\n+\t})\n+}"
+    }
+  ],
+  "repository": "jmoiron/sqlx",
+  "commit": {
+    "message": "Make Select reset slice length"
+  }
+}

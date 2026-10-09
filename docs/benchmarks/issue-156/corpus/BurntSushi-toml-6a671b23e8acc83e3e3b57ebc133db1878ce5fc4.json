@@ -1,0 +1,52 @@
+{
+  "sha": "6a671b23e8acc83e3e3b57ebc133db1878ce5fc4",
+  "parents": [
+    {
+      "sha": "eb8b9987e23e6f5aff69fb1a1d0b113840c0964e",
+      "url": "https://api.github.com/repos/BurntSushi/toml/commits/eb8b9987e23e6f5aff69fb1a1d0b113840c0964e",
+      "html_url": "https://github.com/BurntSushi/toml/commit/eb8b9987e23e6f5aff69fb1a1d0b113840c0964e"
+    }
+  ],
+  "files": [
+    {
+      "sha": "73f89c9533f8054d323d8cde68530eea6db43a6e",
+      "filename": "decode.go",
+      "status": "modified",
+      "additions": 7,
+      "deletions": 7,
+      "changes": 14,
+      "blob_url": "https://github.com/BurntSushi/toml/blob/6a671b23e8acc83e3e3b57ebc133db1878ce5fc4/decode.go",
+      "raw_url": "https://github.com/BurntSushi/toml/raw/6a671b23e8acc83e3e3b57ebc133db1878ce5fc4/decode.go",
+      "contents_url": "https://api.github.com/repos/BurntSushi/toml/contents/decode.go?ref=6a671b23e8acc83e3e3b57ebc133db1878ce5fc4",
+      "patch": "@@ -118,20 +118,20 @@ const (\n // This decoder does not handle cyclic types. Decode will not terminate if a\n // cyclic type is passed.\n type Decoder struct {\n-\tr       io.Reader\n-\tmaxNest int\n+\tr        io.Reader\n+\tmaxDepth int\n }\n \n // NewDecoder creates a new Decoder.\n func NewDecoder(r io.Reader) *Decoder {\n-\treturn &Decoder{r: r, maxNest: 128}\n+\treturn &Decoder{r: r, maxDepth: 128}\n }\n \n-// MaxTableNesting sets the maximum table nesting to prevent using an\n-// inordinate amount of system resources on deeply nested tables.\n+// MaxDepth sets the maximum table and array depth to prevent using an\n+// inordinate amount of system resources on deeply nested objects.\n //\n // The default is 128. Set to <=0 to disable the limit.\n-func (dec *Decoder) MaxTableNesting(l int) { dec.maxNest = l }\n+func (dec *Decoder) MaxDepth(l int) { dec.maxDepth = l }\n \n var (\n \tunmarshalToml = reflect.TypeOf((*Unmarshaler)(nil)).Elem()\n@@ -171,7 +171,7 @@ func (dec *Decoder) Decode(v any) (MetaData, error) {\n \t\treturn MetaData{}, err\n \t}\n \n-\tp, err := parse(string(data), dec.maxNest)\n+\tp, err := parse(string(data), dec.maxDepth)\n \tif err != nil {\n \t\treturn MetaData{}, err\n \t}"
+    },
+    {
+      "sha": "88cdb2a7f81695bfa8d8b882dac6ec30fab59e07",
+      "filename": "decode_test.go",
+      "status": "modified",
+      "additions": 18,
+      "deletions": 7,
+      "changes": 25,
+      "blob_url": "https://github.com/BurntSushi/toml/blob/6a671b23e8acc83e3e3b57ebc133db1878ce5fc4/decode_test.go",
+      "raw_url": "https://github.com/BurntSushi/toml/raw/6a671b23e8acc83e3e3b57ebc133db1878ce5fc4/decode_test.go",
+      "contents_url": "https://api.github.com/repos/BurntSushi/toml/contents/decode_test.go?ref=6a671b23e8acc83e3e3b57ebc133db1878ce5fc4",
+      "patch": "@@ -1244,24 +1244,35 @@ func TestDecodeCustomStructMarkedDecoded(t *testing.T) {\n \t}\n }\n \n-func TestMaxTableNesting(t *testing.T) {\n+func TestMaxDepth(t *testing.T) {\n+\tvar (\n+\t\ttbl = func(n int) string { return strings.Repeat(\".a\", n)[1:] + \"=1\" }\n+\t\tarr = func(n int) string { return \"a=\" + strings.Repeat(\"[\", n) + \"1\" + strings.Repeat(\"]\", n) }\n+\t)\n \ttests := []struct {\n \t\tdoc     string\n \t\tmaxNest int\n \t\twantErr string\n \t}{\n-\t\t{\"\\n\\n\" + strings.Repeat(\".a\", 128)[1:] + \" = 1\", -99, \"\"},\n-\t\t{\"\\n\\n\" + strings.Repeat(\".a\", 129)[1:] + \" = 1\", -99, \"toml: line 3: too many nested tables: can have up to 128 nested tables\"},\n-\t\t{\"\\n\\n\" + strings.Repeat(\".a\", 300)[1:] + \" = 1\", 0, \"\"},\n-\t\t{\"\\n\\n\" + strings.Repeat(\".a\", 5)[1:] + \" = 1\", 5, \"\"},\n-\t\t{\"\\n\\n\" + strings.Repeat(\".a\", 6)[1:] + \" = 1\", 5, \"toml: line 3: too many nested tables: can have up to 5 nested tables\"},\n+\t\t{\"\\n\\n\" + tbl(128), -99, \"\"},\n+\t\t{\"\\n\\n\" + tbl(129), -99, \"toml: line 3: exceeds maximum table depth of 128\"},\n+\t\t{\"\\n\\n\" + tbl(300), 0, \"\"},\n+\t\t{\"\\n\\n\" + tbl(5), 5, \"\"},\n+\t\t{\"\\n\\n\" + tbl(6), 5, \"toml: line 3: exceeds maximum table depth of 5\"},\n+\n+\t\t{arr(128), -99, \"\"},\n+\t\t{arr(129), -99, `toml: line 1 (last key \"a\"): exceeds maximum array depth of 128`},\n+\t\t{\"x=1\\n\" + arr(129), -99, `toml: line 2 (last key \"a\"): exceeds maximum array depth of 128`},\n+\t\t{arr(300), 0, ``},\n+\t\t{arr(5), 5, \"\"},\n+\t\t{arr(6), 5, `toml: line 1 (last key \"a\"): exceeds maximum array depth of 5`},\n \t}\n \n \tfor _, tt := range tests {\n \t\tt.Run(\"\", func(t *testing.T) {\n \t\t\td := NewDecoder(strings.NewReader(tt.doc))\n \t\t\tif tt.maxNest != -99 {\n-\t\t\t\td.MaxTableNesting(tt.maxNest)\n+\t\t\t\td.MaxDepth(tt.maxNest)\n \t\t\t}\n \n \t\t\tvar m map[string]any"
+    },
+    {
+      "sha": "918fba8d1f1381e708002fdb46f217ea81b688e6",
+      "filename": "parse.go",
+      "status": "modified",
+      "additions": 12,
+      "deletions": 5,
+      "changes": 17,
+      "blob_url": "https://github.com/BurntSushi/toml/blob/6a671b23e8acc83e3e3b57ebc133db1878ce5fc4/parse.go",
+      "raw_url": "https://github.com/BurntSushi/toml/raw/6a671b23e8acc83e3e3b57ebc133db1878ce5fc4/parse.go",
+      "contents_url": "https://api.github.com/repos/BurntSushi/toml/contents/parse.go?ref=6a671b23e8acc83e3e3b57ebc133db1878ce5fc4",
+      "patch": "@@ -13,7 +13,8 @@ import (\n \n type parser struct {\n \tlx         *lexer\n-\tmaxNest    int\n+\tmaxDepth   int\n+\tarrDepth   int\n \tcontext    Key      // Full key for the current hash in scope.\n \tcurrentKey string   // Base key name for everything except hashes.\n \tpos        Position // Current position in the TOML file.\n@@ -29,7 +30,7 @@ type keyInfo struct {\n \ttomlType tomlType\n }\n \n-func parse(data string, maxNest int) (p *parser, err error) {\n+func parse(data string, maxDepth int) (p *parser, err error) {\n \tdefer func() {\n \t\tif r := recover(); r != nil {\n \t\t\tif pErr, ok := r.(ParseError); ok {\n@@ -64,7 +65,7 @@ func parse(data string, maxNest int) (p *parser, err error) {\n \n \tp = &parser{\n \t\tlx:        lex(data),\n-\t\tmaxNest:   maxNest,\n+\t\tmaxDepth:  maxDepth,\n \t\tkeyInfo:   make(map[string]keyInfo),\n \t\tmapping:   make(map[string]any),\n \t\tordered:   make([]Key, 0),\n@@ -393,6 +394,12 @@ func missingLeadingZero(d, l string) bool {\n }\n \n func (p *parser) valueArray(it item) (any, tomlType) {\n+\tif p.maxDepth > 0 && p.arrDepth >= p.maxDepth {\n+\t\tp.panicf(\"exceeds maximum array depth of %d\", p.maxDepth)\n+\t}\n+\tp.arrDepth++\n+\tdefer func() { p.arrDepth-- }()\n+\n \tp.setType(p.currentKey, tomlArray, it.pos)\n \n \tvar (\n@@ -539,11 +546,11 @@ func numPeriodsOK(s string) bool {\n // Establishing the context also makes sure that the key isn't a duplicate, and\n // will create implicit hashes automatically.\n func (p *parser) addContext(key Key, array bool) {\n-\tif p.maxNest > 0 && len(key) >= p.maxNest {\n+\tif p.maxDepth > 0 && len(key) >= p.maxDepth {\n \t\t// Don't use panicf() helper because we don't want to set LastKey here –\n \t\t// it's going to be a very long string and not very useful.\n \t\tpanic(ParseError{\n-\t\t\tMessage:  fmt.Sprintf(\"too many nested tables: can have up to %d nested tables\", p.maxNest),\n+\t\t\tMessage:  fmt.Sprintf(\"exceeds maximum table depth of %d\", p.maxDepth),\n \t\t\tPosition: p.pos.withCol(p.lx.input),\n \t\t\tLine:     p.pos.Line,\n \t\t})"
+    }
+  ],
+  "repository": "BurntSushi/toml",
+  "commit": {
+    "message": "Expand Decoder.MaxTableNesting() to arrays, rename to MaxDepth()\n\nIt would limit the max depth of tables, but not arrays like:\n\n\ta = [[[ 1 ]]] # Well, many more obviously\n\nSo also apply it here. And rename to MaxDepth() as it now works for more\nthan just arrays. Also nicer and short.\n\nFixes #497\nCloses #501"
+  }
+}

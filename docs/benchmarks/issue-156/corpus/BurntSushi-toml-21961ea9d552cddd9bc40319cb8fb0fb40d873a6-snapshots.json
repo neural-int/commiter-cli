@@ -1,0 +1,161 @@
+{
+  "repository": "BurntSushi/toml",
+  "commit": "21961ea9d552cddd9bc40319cb8fb0fb40d873a6",
+  "parent": "874dff3e98ef2c10d01e95a0a4d73987d5a29705",
+  "files": [
+    {
+      "id": "F001",
+      "path": "internal/toml-test/tests/invalid/array/no-close-table-01.toml",
+      "before_b64": "eCA9IFt7IGtleSA9IDQyCg==",
+      "after_b64": "bm8tY2xvc2UtdGFibGUtMDEgPSBbeyBrZXkgPSA0Mgo=",
+      "before_exists": true,
+      "after_exists": true,
+      "public_patch": "@@ -1 +1 @@\n-x = [{ key = 42\n+no-close-table-01 = [{ key = 42"
+    },
+    {
+      "id": "F002",
+      "path": "internal/toml-test/tests/invalid/array/no-close-table-02.toml",
+      "before_b64": "eCA9IFt7IGtleSA9IDQyICMK",
+      "after_b64": "bm8tY2xvc2UtdGFibGUtMDIgPSBbeyBrZXkgPSA0MiAjCg==",
+      "before_exists": true,
+      "after_exists": true,
+      "public_patch": "@@ -1 +1 @@\n-x = [{ key = 42 #\n+no-close-table-02 = [{ key = 42 #"
+    },
+    {
+      "id": "F003",
+      "path": "internal/toml-test/tests/invalid/array/no-close-table-03.toml",
+      "before_b64": "",
+      "after_b64": "bm8tY2xvc2UtdGFibGUtMDMgPSBbMSx7YT0xXQo=",
+      "before_exists": false,
+      "after_exists": true,
+      "public_patch": "@@ -0,0 +1 @@\n+no-close-table-03 = [1,{a=1]"
+    },
+    {
+      "id": "F004",
+      "path": "internal/toml-test/tests/invalid/array/no-close-table-04.toml",
+      "before_b64": "",
+      "after_b64": "bm8tY2xvc2UtdGFibGUtMDQgPSBbMSx7Ml0K",
+      "before_exists": false,
+      "after_exists": true,
+      "public_patch": "@@ -0,0 +1 @@\n+no-close-table-04 = [1,{2]"
+    },
+    {
+      "id": "F005",
+      "path": "internal/toml-test/tests/invalid/control/linetab-number-01.toml",
+      "before_b64": "",
+      "after_b64": "bGluZXRhYi1udW1iZXItMDEgPSAxCwo=",
+      "before_exists": false,
+      "after_exists": true,
+      "public_patch": "@@ -0,0 +1 @@\n+linetab-number-01 = 1\u000b"
+    },
+    {
+      "id": "F006",
+      "path": "internal/toml-test/tests/invalid/control/linetab-number-02.toml",
+      "before_b64": "",
+      "after_b64": "bGluZXRhYi1udW1iZXItMDIgPSAxLjULCg==",
+      "before_exists": false,
+      "after_exists": true,
+      "public_patch": "@@ -0,0 +1 @@\n+linetab-number-02 = 1.5\u000b"
+    },
+    {
+      "id": "F007",
+      "path": "internal/toml-test/tests/invalid/control/linetab-number-03.toml",
+      "before_b64": "",
+      "after_b64": "bGluZXRhYi1udW1iZXItMDMgPSAweGZmCwo=",
+      "before_exists": false,
+      "after_exists": true,
+      "public_patch": "@@ -0,0 +1 @@\n+linetab-number-03 = 0xff\u000b"
+    },
+    {
+      "id": "F008",
+      "path": "internal/toml-test/tests/invalid/control/linetab-number-04.toml",
+      "before_b64": "",
+      "after_b64": "bGluZXRhYi1udW1iZXItMDQgPSAraW5mCwo=",
+      "before_exists": false,
+      "after_exists": true,
+      "public_patch": "@@ -0,0 +1 @@\n+linetab-number-04 = +inf\u000b"
+    },
+    {
+      "id": "F009",
+      "path": "internal/toml-test/tests/invalid/datetime/leading-zero-date.toml",
+      "before_b64": "",
+      "after_b64": "IyBObyBsZWFkaW5nIHplcm8gb24geWVhciBhbGxvd2VkLgpkID0gMDIwMjYtMDUtMDcK",
+      "before_exists": false,
+      "after_exists": true,
+      "public_patch": "@@ -0,0 +1,2 @@\n+# No leading zero on year allowed.\n+d = 02026-05-07"
+    },
+    {
+      "id": "F010",
+      "path": "internal/toml-test/tests/invalid/datetime/leading-zero-datetime.toml",
+      "before_b64": "",
+      "after_b64": "IyBObyBsZWFkaW5nIHplcm8gb24geWVhciBhbGxvd2VkLgpkID0gMDIwMjYtMDUtMDdUMTQ6MTU6MTZaCg==",
+      "before_exists": false,
+      "after_exists": true,
+      "public_patch": "@@ -0,0 +1,2 @@\n+# No leading zero on year allowed.\n+d = 02026-05-07T14:15:16Z"
+    },
+    {
+      "id": "F011",
+      "path": "internal/toml-test/tests/invalid/datetime/y10k-date.toml",
+      "before_b64": "",
+      "after_b64": "IyBNYXhpbXVtIFJGQzMzOTkgeWVhciBpcyA5OTk5LgpkID0gMTAwMDAtMDEtMDEK",
+      "before_exists": false,
+      "after_exists": true,
+      "public_patch": "@@ -0,0 +1,2 @@\n+# Maximum RFC3399 year is 9999.\n+d = 10000-01-01"
+    },
+    {
+      "id": "F012",
+      "path": "internal/toml-test/tests/invalid/encoding/bom-not-at-start-01.toml",
+      "before_b64": "Ym9tLW5vdC1hdC1zdGFydCDvv73vv70K",
+      "after_b64": "IyBDb250YWlucyBVVEYtOCBCT00gYmV0d2VlbiA9IGFuZCAxCmE977u/MQo=",
+      "before_exists": true,
+      "after_exists": true,
+      "public_patch": "@@ -1 +1,2 @@\n-bom-not-at-start ��\n+# Contains UTF-8 BOM between = and 1\n+a=﻿1"
+    },
+    {
+      "id": "F013",
+      "path": "internal/toml-test/tests/invalid/encoding/bom-not-at-start-02.toml",
+      "before_b64": "Ym9tLW5vdC1hdC1zdGFydD0g77+977+9Cg==",
+      "after_b64": "77u/77u/IyBDb250YWlucyB0d28gVVRGLTggQk9NUyBhdCB0aGUgc3RhcnQKYT0xCg==",
+      "before_exists": true,
+      "after_exists": true,
+      "public_patch": "@@ -1 +1,2 @@\n-bom-not-at-start= ��\n+﻿﻿# Contains two UTF-8 BOMS at the start\n+a=1"
+    },
+    {
+      "id": "F014",
+      "path": "internal/toml-test/tests/invalid/encoding/bom-not-at-start-03.toml",
+      "before_b64": "",
+      "after_b64": "77u/77u/YT0xCiMgQ29udGFpbnMgdHdvIFVURi04IEJPTVMgYXQgdGhlIHN0YXJ0Cg==",
+      "before_exists": false,
+      "after_exists": true,
+      "public_patch": "@@ -0,0 +1,2 @@\n+﻿﻿a=1\n+# Contains two UTF-8 BOMS at the start"
+    },
+    {
+      "id": "F015",
+      "path": "internal/toml-test/tests/invalid/float/arabic-zero-01.toml",
+      "before_b64": "",
+      "after_b64": "YXJhYmljLXplcm8tMDEgPSAxLtmgCg==",
+      "before_exists": false,
+      "after_exists": true,
+      "public_patch": "@@ -0,0 +1 @@\n+arabic-zero-01 = 1.٠"
+    },
+    {
+      "id": "F016",
+      "path": "internal/toml-test/tests/invalid/float/arabic-zero-02.toml",
+      "before_b64": "",
+      "after_b64": "YXJhYmljLXplcm8tMDIgPSDZoAo=",
+      "before_exists": false,
+      "after_exists": true,
+      "public_patch": "@@ -0,0 +1 @@\n+arabic-zero-02 = ٠"
+    }
+  ],
+  "input_sha256": "c5f1b697d693de527097fb4a69316bad7ba24e6b3c0f0033bbfc9d1373c132bf",
+  "source_commit_message": "Update toml-test from upstream\n\ntoml-test commit 4d77658",
+  "audit": {
+    "structurally_supported": true,
+    "units": 126,
+    "reason": null
+  },
+  "classification": "unseen_public_repository_source; gold requires separate audit before inference",
+  "whole_commit_files": 61,
+  "selected_files": 16
+}
