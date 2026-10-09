@@ -1,0 +1,95 @@
+{
+  "checks": [
+    {
+      "name": "research-regressions",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/benchmark162",
+        "-v"
+      ],
+      "exit": 0,
+      "pass": true,
+      "seconds": 0.05962283303961158,
+      "log_path": "/private/tmp/benchmark162-quality/research-regressions.log",
+      "log_sha256": "06b9265dc83ec903e083edb0fa0f60466686b016d0380826ff3b7ebcb6ad5a15"
+    },
+    {
+      "name": "go-test",
+      "command": [
+        "go",
+        "test",
+        "./..."
+      ],
+      "exit": 0,
+      "pass": true,
+      "seconds": 40.46507633314468,
+      "log_path": "/private/tmp/benchmark162-quality/go-test.log",
+      "log_sha256": "88e222e44fe9e6583913dfcc455eafc0ebc69827eaf780ba28546aeffc92b933"
+    },
+    {
+      "name": "go-vet",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit": 0,
+      "pass": true,
+      "seconds": 0.35700275003910065,
+      "log_path": "/private/tmp/benchmark162-quality/go-vet.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "go-build",
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit": 0,
+      "pass": true,
+      "seconds": 1.2517292078118771,
+      "log_path": "/private/tmp/benchmark162-quality/go-build.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "release-notes-tests",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        ".github/scripts/release-notes",
+        "-p",
+        "test_*.py"
+      ],
+      "exit": 0,
+      "pass": true,
+      "seconds": 0.2933089160360396,
+      "log_path": "/private/tmp/benchmark162-quality/release-notes-tests.log",
+      "log_sha256": "4c2de99f46bcce57129a20f1bb8ebe58c9cdee39baa3db358254d7fb6b6e8ccf"
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "f275d953f0c15452e9281d1c678cb9bb20adcbbb"
+      ],
+      "exit": 0,
+      "pass": true,
+      "seconds": 0.015801999950781465,
+      "log_path": "/private/tmp/benchmark162-quality/diff-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "all_pass": true
+}

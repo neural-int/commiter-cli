@@ -1,0 +1,317 @@
+{
+  "frozen_source_verified": true,
+  "all32_prompt_hashes_verified": true,
+  "families": {
+    "gemma": {
+      "matching_implementation_test": {
+        "correct": 4,
+        "observations": 4,
+        "predictions": {
+          "together": 4
+        }
+      },
+      "independent": {
+        "correct": 4,
+        "observations": 4,
+        "predictions": {
+          "separate": 4
+        }
+      },
+      "directional_api_dependency": {
+        "correct": 0,
+        "observations": 4,
+        "predictions": {
+          "together": 4
+        }
+      },
+      "insufficient_evidence": {
+        "correct": 0,
+        "observations": 4,
+        "predictions": {
+          "together": 2,
+          "separate": 2
+        }
+      },
+      "cost": {
+        "input_tokens": 7666,
+        "output_tokens": 512,
+        "mean_seconds": 7.925218463642523
+      }
+    },
+    "qwen": {
+      "matching_implementation_test": {
+        "correct": 2,
+        "observations": 4,
+        "predictions": {
+          "together": 2,
+          "depends_a_on_b": 2
+        }
+      },
+      "independent": {
+        "correct": 2,
+        "observations": 4,
+        "predictions": {
+          "depends_a_on_b": 2,
+          "separate": 2
+        }
+      },
+      "directional_api_dependency": {
+        "correct": 2,
+        "observations": 4,
+        "predictions": {
+          "depends_a_on_b": 4
+        }
+      },
+      "insufficient_evidence": {
+        "correct": 0,
+        "observations": 4,
+        "predictions": {
+          "together": 3,
+          "separate": 1
+        }
+      },
+      "cost": {
+        "input_tokens": 7140,
+        "output_tokens": 368,
+        "mean_seconds": 7.943711252621142
+      }
+    }
+  },
+  "failure_rows": [
+    {
+      "name": "caller-needs-api",
+      "reverse": false,
+      "model": "gemma",
+      "gold": "depends_a_on_b",
+      "answer": {
+        "decision": "together",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "caller-needs-api",
+      "reverse": true,
+      "model": "gemma",
+      "gold": "depends_a_on_b",
+      "answer": {
+        "decision": "together",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "reverse-api-dependency",
+      "reverse": false,
+      "model": "gemma",
+      "gold": "depends_b_on_a",
+      "answer": {
+        "decision": "together",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "reverse-api-dependency",
+      "reverse": true,
+      "model": "gemma",
+      "gold": "depends_b_on_a",
+      "answer": {
+        "decision": "together",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "same-value-ambiguous",
+      "reverse": false,
+      "model": "gemma",
+      "gold": "unknown",
+      "answer": {
+        "decision": "together",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "same-value-ambiguous",
+      "reverse": true,
+      "model": "gemma",
+      "gold": "unknown",
+      "answer": {
+        "decision": "together",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "feature-flag-ambiguous",
+      "reverse": false,
+      "model": "gemma",
+      "gold": "unknown",
+      "answer": {
+        "decision": "separate",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "feature-flag-ambiguous",
+      "reverse": true,
+      "model": "gemma",
+      "gold": "unknown",
+      "answer": {
+        "decision": "separate",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "bug-and-test",
+      "reverse": true,
+      "model": "qwen",
+      "gold": "together",
+      "answer": {
+        "decision": "depends_a_on_b",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "utf8-limit-and-test",
+      "reverse": true,
+      "model": "qwen",
+      "gold": "together",
+      "answer": {
+        "decision": "depends_a_on_b",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "shared-name-independent",
+      "reverse": false,
+      "model": "qwen",
+      "gold": "separate",
+      "answer": {
+        "decision": "depends_a_on_b",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "shared-name-independent",
+      "reverse": true,
+      "model": "qwen",
+      "gold": "separate",
+      "answer": {
+        "decision": "depends_a_on_b",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "reverse-api-dependency",
+      "reverse": false,
+      "model": "qwen",
+      "gold": "depends_b_on_a",
+      "answer": {
+        "decision": "depends_a_on_b",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "reverse-api-dependency",
+      "reverse": true,
+      "model": "qwen",
+      "gold": "depends_b_on_a",
+      "answer": {
+        "decision": "depends_a_on_b",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "same-value-ambiguous",
+      "reverse": false,
+      "model": "qwen",
+      "gold": "unknown",
+      "answer": {
+        "decision": "together",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "same-value-ambiguous",
+      "reverse": true,
+      "model": "qwen",
+      "gold": "unknown",
+      "answer": {
+        "decision": "together",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "feature-flag-ambiguous",
+      "reverse": false,
+      "model": "qwen",
+      "gold": "unknown",
+      "answer": {
+        "decision": "together",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    },
+    {
+      "name": "feature-flag-ambiguous",
+      "reverse": true,
+      "model": "qwen",
+      "gold": "unknown",
+      "answer": {
+        "decision": "separate",
+        "evidence_refs": [
+          "EA",
+          "EB"
+        ]
+      }
+    }
+  ],
+  "interpretation": "Directional gold vs together is a relationship-classification mismatch, not proof that a merged commit is invalid. No post-hoc gate or gold change. Baselines are naive diagnostic controls, not all possible mechanical algorithms."
+}
