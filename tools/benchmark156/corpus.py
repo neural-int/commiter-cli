@@ -11,6 +11,8 @@ OUT=ROOT/'docs/benchmarks/issue-156/corpus'
 
 def selected(record):
     files=[f for f in record['files'] if f['status'] in ('modified','added','removed') and f['changes']>0]
+    if record['repository']=='google/go-cmp':
+        return sorted(files,key=lambda f:f['filename'])[:16]
     if len(files)>16:
         # Predeclared selected-file slice; not a claim about the entire 61-file commit.
         files=sorted((f for f in files if f['filename'].endswith('.toml') and '/key/' not in f['filename']),key=lambda f:f['filename'])[:16]

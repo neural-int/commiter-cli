@@ -1,0 +1,220 @@
+{
+  "summary": [
+    {
+      "architecture": "A",
+      "stratum": "1-4",
+      "observations": 4,
+      "exact": 2,
+      "exact_rate": 0.5,
+      "coverage": 1.0,
+      "valid_staging": 4,
+      "fm_known": 0,
+      "fs_known": 27348,
+      "pair_metrics_unknown": 0,
+      "calls": 0,
+      "input_tokens_observed": 0,
+      "output_tokens_observed": 0,
+      "token_telemetry_incomplete": 0,
+      "mean_wall_seconds": 1.2803924062172882,
+      "p95_wall_seconds": 3.3156280000694096,
+      "commits_delivered": 8
+    },
+    {
+      "architecture": "A",
+      "stratum": "5-8",
+      "observations": 1,
+      "exact": 0,
+      "exact_rate": 0.0,
+      "coverage": 1.0,
+      "valid_staging": 1,
+      "fm_known": 0,
+      "fs_known": 89500,
+      "pair_metrics_unknown": 0,
+      "calls": 0,
+      "input_tokens_observed": 0,
+      "output_tokens_observed": 0,
+      "token_telemetry_incomplete": 0,
+      "mean_wall_seconds": 12.72579212510027,
+      "p95_wall_seconds": 12.72579212510027,
+      "commits_delivered": 8
+    },
+    {
+      "architecture": "A",
+      "stratum": "9-16",
+      "observations": 1,
+      "exact": 0,
+      "exact_rate": 0.0,
+      "coverage": 0.0,
+      "valid_staging": 0,
+      "fm_known": 0,
+      "fs_known": 0,
+      "pair_metrics_unknown": 1,
+      "calls": 0,
+      "input_tokens_observed": 0,
+      "output_tokens_observed": 0,
+      "token_telemetry_incomplete": 0,
+      "mean_wall_seconds": 0.050222208024933934,
+      "p95_wall_seconds": 0.050222208024933934,
+      "commits_delivered": 0
+    },
+    {
+      "architecture": "baseline",
+      "stratum": "1-4",
+      "observations": 4,
+      "exact": 4,
+      "exact_rate": 1.0,
+      "coverage": 1.0,
+      "valid_staging": 4,
+      "fm_known": 0,
+      "fs_known": 0,
+      "pair_metrics_unknown": 0,
+      "calls": 12,
+      "input_tokens_observed": 29760,
+      "output_tokens_observed": 4060,
+      "token_telemetry_incomplete": 0,
+      "mean_wall_seconds": 73.06215498951497,
+      "p95_wall_seconds": 74.23146716621704,
+      "commits_delivered": 4
+    },
+    {
+      "architecture": "h23",
+      "stratum": "1-4",
+      "observations": 2,
+      "exact": 0,
+      "exact_rate": 0.0,
+      "coverage": 0.5,
+      "valid_staging": 1,
+      "fm_known": 0,
+      "fs_known": 19700,
+      "pair_metrics_unknown": 1,
+      "calls": 6,
+      "input_tokens_observed": 21402,
+      "output_tokens_observed": 1210,
+      "token_telemetry_incomplete": 1,
+      "mean_wall_seconds": 121.59740722959395,
+      "p95_wall_seconds": 123.10216495906934,
+      "commits_delivered": 4
+    },
+    {
+      "architecture": "h23",
+      "stratum": "5-8",
+      "observations": 2,
+      "exact": 0,
+      "exact_rate": 0.0,
+      "coverage": 0.0,
+      "valid_staging": 0,
+      "fm_known": 0,
+      "fs_known": 0,
+      "pair_metrics_unknown": 2,
+      "calls": 8,
+      "input_tokens_observed": 37672,
+      "output_tokens_observed": 2482,
+      "token_telemetry_incomplete": 0,
+      "mean_wall_seconds": 223.07219189591706,
+      "p95_wall_seconds": 227.05541141703725,
+      "commits_delivered": 0
+    },
+    {
+      "architecture": "h23",
+      "stratum": "9-16",
+      "observations": 2,
+      "exact": 0,
+      "exact_rate": 0.0,
+      "coverage": 0.0,
+      "valid_staging": 0,
+      "fm_known": 0,
+      "fs_known": 0,
+      "pair_metrics_unknown": 2,
+      "calls": 2,
+      "input_tokens_observed": 40140,
+      "output_tokens_observed": 0,
+      "token_telemetry_incomplete": 2,
+      "mean_wall_seconds": 1.4743535206653178,
+      "p95_wall_seconds": 1.8058108331169933,
+      "commits_delivered": 0
+    }
+  ],
+  "totals": [
+    {
+      "architecture": "A",
+      "cases": 6,
+      "exact": 2,
+      "exact_rate": 0.3333333333333333,
+      "complete": 5,
+      "wall_seconds": 17.897583957994357,
+      "calls": 0
+    },
+    {
+      "architecture": "baseline",
+      "cases": 4,
+      "exact": 4,
+      "exact_rate": 1.0,
+      "complete": 4,
+      "wall_seconds": 292.24861995805986,
+      "calls": 12
+    },
+    {
+      "architecture": "h23",
+      "cases": 6,
+      "exact": 0,
+      "exact_rate": 0.0,
+      "complete": 1,
+      "wall_seconds": 692.2879052923527,
+      "calls": 16
+    }
+  ],
+  "canonical_stops": [
+    {
+      "name": "any-migration-16",
+      "architecture": "A",
+      "reverse": null,
+      "canonical_kind": "structural_resource_unit_budget",
+      "raw_reason": "unit_budget"
+    },
+    {
+      "name": "any-migration-4",
+      "architecture": "h23",
+      "reverse": false,
+      "canonical_kind": "resource_timeout",
+      "raw_reason": "metadata_timeout"
+    },
+    {
+      "name": "any-migration-8",
+      "architecture": "h23",
+      "reverse": false,
+      "canonical_kind": "invalid_model_metadata_or_semantic_output",
+      "raw_reason": "invalid_metadata_value"
+    },
+    {
+      "name": "any-migration-8",
+      "architecture": "h23",
+      "reverse": true,
+      "canonical_kind": "invalid_model_metadata_or_semantic_output",
+      "raw_reason": "invalid_metadata_value"
+    },
+    {
+      "name": "any-migration-16",
+      "architecture": "h23",
+      "reverse": false,
+      "canonical_kind": "context_resource_limit_inferred_from_recorded_tokens",
+      "raw_reason": "global_grouping_not_final"
+    },
+    {
+      "name": "any-migration-16",
+      "architecture": "h23",
+      "reverse": true,
+      "canonical_kind": "context_resource_limit_inferred_from_recorded_tokens",
+      "raw_reason": "global_grouping_not_final"
+    }
+  ],
+  "target": "NOT_REACHED / current candidate NO-GO",
+  "production": "NO-GO; no implementation issue or rollout is authorized by these observations",
+  "final_verification_complete": false,
+  "limitations": [
+    "D primary has only positive, mostly single-purpose, public-history projections; negative/mixed/shared-test/weak-edge independent coverage remains incomplete.",
+    "C oracle stage is not independent semantic evaluation.",
+    "4/8/16 projections share one commit; no population-performance claim.",
+    "No retry, case exclusion, threshold relaxation or gold rewrite. Rejected 16-file remains in primary denominator.",
+    "All token sums are observed lower bounds when telemetry incomplete; null is not zero success."
+  ]
+}

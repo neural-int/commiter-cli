@@ -1,0 +1,35 @@
+package main
+
+import (
+ "encoding/json"
+ "os"
+ "github.com/natsuki0413/commiter-cli/internal/contextinput"
+ "github.com/natsuki0413/commiter-cli/internal/llm"
+ "github.com/natsuki0413/commiter-cli/internal/config"
+)
+
+type historicalInput struct {
+ Name string `json:"name"`
+ Architecture string `json:"architecture"`
+ Reverse bool `json:"reverse"`
+ Files []struct { ID string `json:"id"`; Path string `json:"path"`; Patch string `json:"public_patch"` } `json:"files"`
+ Expected [][]string `json:"expected"`
+}
+func main() {
+ var input historicalInput
+ if err:=json.NewDecoder(os.Stdin).Decode(&input);err!=nil { panic(err) }
+ f:=fixture{Name:input.Name,Expected:input.Expected}
+ for _,row:=range input.Files {
+  path:=row.Path
+  f.Files=append(f.Files,contextinput.File{ID:row.ID,Status:"modified",NewPath:&path,Language:"go",RawDiff:row.Patch})
+ }
+ if input.Reverse { for i,j:=0,len(f.Files)-1;i<j;i,j=i+1,j-1 {f.Files[i],f.Files[j]=f.Files[j],f.Files[i]} }
+ v:=config.Defaults().Values
+ base:=&measuredBackend{Executable:"/private/tmp/issue153-neutral-score-helper/.build/release/commiter-mlx-helper",Model:v.Model,Revision:v.ModelRevision,Path:"/Users/Natsuki/Library/Caches/commiter/mlx-models/2e02664365a6210fcdc0d0960b37cf2d5bb7cef3c7536ad35c582e3aee047b47"}
+ var b llm.OptionsBackend=base
+ if input.Architecture=="baseline" {json.NewEncoder(os.Stdout).Encode(baselineMode(f,b,true));return}
+ group:=&measuredBackend{Executable:base.Executable,Model:"mlx-community/Qwen3-8B-4bit",Revision:"545dc4251c05440727734bcd94334791f6ab0192",Path:"/Users/Natsuki/Library/Caches/commiter/mlx-models/8d8e620cfcdc2ce0416f0443adea1f985e052260292f3510f55a9cad165e7aa8"}
+ b=&groupingBackend{Group:group,Base:base,Profile:"bounded-routed-grouping",Output:1536}
+ if input.Architecture=="h23" {json.NewEncoder(os.Stdout).Encode(fullCycle(f,"proposal-records",b));return}
+ json.NewEncoder(os.Stdout).Encode(run(f,"proposal-records",b))
+}
