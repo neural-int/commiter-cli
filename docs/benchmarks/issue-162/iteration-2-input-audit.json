@@ -1,0 +1,454 @@
+{
+  "all_endpoints_valid": true,
+  "counterfactual_patterns_verified": true,
+  "model_calls": 0,
+  "seconds": 20.818413415923715,
+  "rows": [
+    {
+      "case": "trimmed-key-with-assertion",
+      "input_sha256": "1526f1d2124e84968ce0cd8315bdaa5bdbf0e0f475d78cd4176a515399798bb2",
+      "kind": "must_join",
+      "tests": {
+        "before": {
+          "selected": [],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.353s\n",
+          "log_sha256": "86c776db152a75fbebbdf206bc16c9cbe6f2f6d7362107b234359eab56e721ed"
+        },
+        "only_a": {
+          "selected": [
+            "EA"
+          ],
+          "pass": false,
+          "exit": 1,
+          "log": "--- FAIL: TestKey (0.00s)\n    key_test.go:4: ab\nFAIL\nFAIL\texample.test/reviewfixture\t0.357s\nFAIL\n",
+          "log_sha256": "d834699d69a73908a1bdcd2f22e6da12b9a9f8a0020cda323428abc84231f4a1"
+        },
+        "only_b": {
+          "selected": [
+            "EB"
+          ],
+          "pass": false,
+          "exit": 1,
+          "log": "--- FAIL: TestKey (0.00s)\n    key_test.go:4:  ab \nFAIL\nFAIL\texample.test/reviewfixture\t0.364s\nFAIL\n",
+          "log_sha256": "de2c3a3fa64467dd01db2152324fe7b27a46f2e13392b5f21271f414f0418964"
+        },
+        "both": {
+          "selected": [
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.360s\n",
+          "log_sha256": "c47e44b07cb40c26beca78b77c0adaa137fc1e7050c9890530dea6db936e583a"
+        },
+        "after": {
+          "selected": [
+            "E2",
+            "E3",
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.347s\n",
+          "log_sha256": "dacc846aa71a0463e0d86056d1a44408a54775a1963974193a7b027a57753b81"
+        }
+      }
+    },
+    {
+      "case": "negative-bucket-with-assertion",
+      "input_sha256": "a16702c7c59666586077e0dbb6d721dcc03f7d5cc9aa0aab2006380c0b6fc15f",
+      "kind": "must_join",
+      "tests": {
+        "before": {
+          "selected": [],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.357s\n",
+          "log_sha256": "c113d1be00bec106107a12a6c0eea362f70f007a3886d0a7dabd24e6c80d463c"
+        },
+        "only_a": {
+          "selected": [
+            "EA"
+          ],
+          "pass": false,
+          "exit": 1,
+          "log": "--- FAIL: TestBucket (0.00s)\n    bucket_test.go:4: -1\nFAIL\nFAIL\texample.test/reviewfixture\t0.358s\nFAIL\n",
+          "log_sha256": "8d54aca2e7c84d8b166df0dc53d2eff49ebfe8e2c2f2406486f6a80475669f20"
+        },
+        "only_b": {
+          "selected": [
+            "EB"
+          ],
+          "pass": false,
+          "exit": 1,
+          "log": "--- FAIL: TestBucket (0.00s)\n    bucket_test.go:4: 0\nFAIL\nFAIL\texample.test/reviewfixture\t0.351s\nFAIL\n",
+          "log_sha256": "2eb81577648e226c66b040e96ac26440e732574625ff6454f31d2b5aa442a66b"
+        },
+        "both": {
+          "selected": [
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.355s\n",
+          "log_sha256": "e2bda4df8e8f5d61595fcba051d014c441151f7396afefaae5cd1d4ec9553b7d"
+        },
+        "after": {
+          "selected": [
+            "E2",
+            "E3",
+            "E4",
+            "E5",
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.347s\n",
+          "log_sha256": "dacc846aa71a0463e0d86056d1a44408a54775a1963974193a7b027a57753b81"
+        }
+      }
+    },
+    {
+      "case": "shared-helper-independent",
+      "input_sha256": "3fcce1044d76010edd7621da46a801f4ca7b181680d0ebb356b3981c7dde3448",
+      "kind": "must_separate",
+      "tests": {
+        "before": {
+          "selected": [],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.360s\n",
+          "log_sha256": "c47e44b07cb40c26beca78b77c0adaa137fc1e7050c9890530dea6db936e583a"
+        },
+        "only_a": {
+          "selected": [
+            "EA"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.365s\n",
+          "log_sha256": "3e14645345d960d6aca3b6d030c4790e264625e1594258a34636f59587961871"
+        },
+        "only_b": {
+          "selected": [
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.363s\n",
+          "log_sha256": "72e77ea93c899667a316234761b8b8728e5d56b80c02c5291828157c0725432f"
+        },
+        "both": {
+          "selected": [
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.356s\n",
+          "log_sha256": "d75d7977cfa09709b502a6918356b4ca2fbac55d9528f226b08deb2ae9d50ba8"
+        },
+        "after": {
+          "selected": [
+            "E2",
+            "E3",
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.349s\n",
+          "log_sha256": "596185df582506f66ad4ab5499969ec197123c5f9a0e850f31faaa0a693b73fd"
+        }
+      }
+    },
+    {
+      "case": "same-package-independent",
+      "input_sha256": "5fba340b03cc5859cf24bd0cda7846a2bd71060c499dee0d39041f49c9e0bff1",
+      "kind": "must_separate",
+      "tests": {
+        "before": {
+          "selected": [],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.532s\n",
+          "log_sha256": "c227c51a23c11c4b951fcb9382ddbf1aa6133ab4422a2ae6a4665fa997a76758"
+        },
+        "only_a": {
+          "selected": [
+            "EA"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.451s\n",
+          "log_sha256": "2a6c106c38578866cfdee6584439b5b9dbe924412f8aef46fc27743824785d3b"
+        },
+        "only_b": {
+          "selected": [
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.352s\n",
+          "log_sha256": "512d29282728429c7601de0089d79803dc330160bad0be75557fa45eee3522c5"
+        },
+        "both": {
+          "selected": [
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.365s\n",
+          "log_sha256": "3e14645345d960d6aca3b6d030c4790e264625e1594258a34636f59587961871"
+        },
+        "after": {
+          "selected": [
+            "E2",
+            "E3",
+            "E4",
+            "E5",
+            "E6",
+            "E7",
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.365s\n",
+          "log_sha256": "3e14645345d960d6aca3b6d030c4790e264625e1594258a34636f59587961871"
+        }
+      }
+    },
+    {
+      "case": "provider-before-consumer",
+      "input_sha256": "299e8594a1fa9962923d6695c94166d3f316452cac933d428025935bb4dc130c",
+      "kind": "dependency",
+      "tests": {
+        "before": {
+          "selected": [],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.354s\n",
+          "log_sha256": "6c2b6756eb93ed1755558c5a065bcaaee6796dd8a3096b8b7eec78896692d92c"
+        },
+        "only_a": {
+          "selected": [
+            "EA"
+          ],
+          "pass": false,
+          "exit": 1,
+          "log": "FAIL\texample.test/reviewfixture [build failed]\nFAIL\n# example.test/reviewfixture [example.test/reviewfixture.test]\n./display.go:3:40: undefined: NewLabel\n",
+          "log_sha256": "9dfc03b608a56ce49460f64831a22730fa3fa785cbe5a2f8f8fa9413f6925359"
+        },
+        "only_b": {
+          "selected": [
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.408s\n",
+          "log_sha256": "88f695cd82e3f51d5f7a70146d060136bc09240aaff13f50e7291344a73833cd"
+        },
+        "both": {
+          "selected": [
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.361s\n",
+          "log_sha256": "eb2c929c112ec40b57e1887a076ac17e69f15458eb3df32bbcd2ededaaf6697f"
+        },
+        "after": {
+          "selected": [
+            "E2",
+            "E3",
+            "E4",
+            "E5",
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.359s\n",
+          "log_sha256": "e73380e638b2e4a6c47a47c4359477dde66dbc763c0fbc5b43fbc7716742e3de"
+        }
+      }
+    },
+    {
+      "case": "consumer-after-provider",
+      "input_sha256": "e270e27655c9519bc6c347635f6b3d64247b711eff939a3509075e4df4155df2",
+      "kind": "dependency",
+      "tests": {
+        "before": {
+          "selected": [],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.351s\n",
+          "log_sha256": "b1f2f40260c6883777de860b3120469b829ea80ee8a5f878ae65016620243d30"
+        },
+        "only_a": {
+          "selected": [
+            "EA"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.353s\n",
+          "log_sha256": "86c776db152a75fbebbdf206bc16c9cbe6f2f6d7362107b234359eab56e721ed"
+        },
+        "only_b": {
+          "selected": [
+            "EB"
+          ],
+          "pass": false,
+          "exit": 1,
+          "log": "FAIL\texample.test/reviewfixture [build failed]\nFAIL\n# example.test/reviewfixture [example.test/reviewfixture.test]\n./reader.go:3:37: undefined: PositiveNumber\n",
+          "log_sha256": "278be78f4e07a1d6a767a8971c6e9e8166b9f15577e4beac8afb9b167be8fb19"
+        },
+        "both": {
+          "selected": [
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.354s\n",
+          "log_sha256": "6c2b6756eb93ed1755558c5a065bcaaee6796dd8a3096b8b7eec78896692d92c"
+        },
+        "after": {
+          "selected": [
+            "E2",
+            "E3",
+            "E4",
+            "E5",
+            "E6",
+            "E7",
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.363s\n",
+          "log_sha256": "72e77ea93c899667a316234761b8b8728e5d56b80c02c5291828157c0725432f"
+        }
+      }
+    },
+    {
+      "case": "timeout-policy-multiple-valid",
+      "input_sha256": "4b3ae624ab4bd06810d43aafbf84a448aacca8124fbf50d220a80d9f7e26d82e",
+      "kind": "multiple_valid",
+      "tests": {
+        "before": {
+          "selected": [],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.452s\n",
+          "log_sha256": "31312e183ec8c8f1940b936f006840a626823b25a9c86e9426741df42fb46c58"
+        },
+        "only_a": {
+          "selected": [
+            "EA"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.355s\n",
+          "log_sha256": "e2bda4df8e8f5d61595fcba051d014c441151f7396afefaae5cd1d4ec9553b7d"
+        },
+        "only_b": {
+          "selected": [
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.368s\n",
+          "log_sha256": "3ac5559b458e23964b48417483d784eb1ad82516116536bfab6b10521da1ed1a"
+        },
+        "both": {
+          "selected": [
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.357s\n",
+          "log_sha256": "c113d1be00bec106107a12a6c0eea362f70f007a3886d0a7dabd24e6c80d463c"
+        },
+        "after": {
+          "selected": [
+            "E2",
+            "E3",
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.347s\n",
+          "log_sha256": "dacc846aa71a0463e0d86056d1a44408a54775a1963974193a7b027a57753b81"
+        }
+      }
+    },
+    {
+      "case": "feature-rollout-multiple-valid",
+      "input_sha256": "cd9239eb8efcfbf6e815723cf57f97f808213d15e0c71315d93c63f2ea2adf5c",
+      "kind": "multiple_valid",
+      "tests": {
+        "before": {
+          "selected": [],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.359s\n",
+          "log_sha256": "e73380e638b2e4a6c47a47c4359477dde66dbc763c0fbc5b43fbc7716742e3de"
+        },
+        "only_a": {
+          "selected": [
+            "EA"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.385s\n",
+          "log_sha256": "80f12d0549f30cf208031b2552705c99208889a97844c6adf16642416b338938"
+        },
+        "only_b": {
+          "selected": [
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.429s\n",
+          "log_sha256": "0147c43c5cb068d2aece52dcdae20e022d081ceeaa74589272a1d4b6d09c7a26"
+        },
+        "both": {
+          "selected": [
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.357s\n",
+          "log_sha256": "c113d1be00bec106107a12a6c0eea362f70f007a3886d0a7dabd24e6c80d463c"
+        },
+        "after": {
+          "selected": [
+            "E2",
+            "E3",
+            "E4",
+            "E5",
+            "EA",
+            "EB"
+          ],
+          "pass": true,
+          "exit": 0,
+          "log": "ok  \texample.test/reviewfixture\t0.356s\n",
+          "log_sha256": "d75d7977cfa09709b502a6918356b4ca2fbac55d9528f226b08deb2ae9d50ba8"
+        }
+      }
+    }
+  ]
+}

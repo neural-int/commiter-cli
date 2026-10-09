@@ -1,0 +1,132 @@
+{
+  "phase": "preparation before model calls",
+  "model_calls": 0,
+  "case": {
+    "name": "same-package-independent",
+    "selected_files": 8,
+    "kind": "must_separate",
+    "files": [
+      {
+        "id": "EA",
+        "path": "retry.go",
+        "before": "package fixture\n\nfunc AllowRetry(n int) bool { return n >= 0 }\n",
+        "after": "package fixture\n\nfunc AllowRetry(n int) bool { return n > 0 }\n"
+      },
+      {
+        "id": "EB",
+        "path": "readable.go",
+        "before": "package fixture\n\nimport \"strings\"\nfunc Readable(s string) bool { return len(s) > 0 }\n",
+        "after": "package fixture\n\nimport \"strings\"\nfunc Readable(s string) bool { return len(strings.TrimSpace(s)) > 0 }\n"
+      },
+      {
+        "id": "E2",
+        "path": "option_2.go",
+        "before": "package fixture\n\nconst Option2 = 2\n",
+        "after": "package fixture\n\nconst Option2 = 3\n"
+      },
+      {
+        "id": "E3",
+        "path": "option_3.go",
+        "before": "package fixture\n\nconst Option3 = 3\n",
+        "after": "package fixture\n\nconst Option3 = 4\n"
+      },
+      {
+        "id": "E4",
+        "path": "option_4.go",
+        "before": "package fixture\n\nconst Option4 = 4\n",
+        "after": "package fixture\n\nconst Option4 = 5\n"
+      },
+      {
+        "id": "E5",
+        "path": "option_5.go",
+        "before": "package fixture\n\nconst Option5 = 5\n",
+        "after": "package fixture\n\nconst Option5 = 6\n"
+      },
+      {
+        "id": "E6",
+        "path": "option_6.go",
+        "before": "package fixture\n\nconst Option6 = 6\n",
+        "after": "package fixture\n\nconst Option6 = 7\n"
+      },
+      {
+        "id": "E7",
+        "path": "option_7.go",
+        "before": "package fixture\n\nconst Option7 = 7\n",
+        "after": "package fixture\n\nconst Option7 = 8\n"
+      }
+    ],
+    "support": {
+      "go.mod": "module example.test/reviewfixture\n\ngo 1.27\n",
+      "support.go": "package fixture\n\nimport \"strings\"\nfunc Scrub(s string) string { return strings.TrimSpace(s) }\n",
+      "support_test.go": "package fixture\n\nimport \"testing\"\nfunc TestSupport(t *testing.T) { if Scrub(\" x \") != \"x\" { t.Fatal(\"support\") } }\n"
+    },
+    "input_sha256": "9d99f4024d18a256526a5c2b2b21b059b72024efe3a77acc564520c7240942f6",
+    "allowed_contract": {
+      "must_join": [],
+      "must_separate": [
+        [
+          "EA",
+          "EB"
+        ]
+      ],
+      "dependency": null,
+      "multiple_valid": false,
+      "other_changed_files": "singleton; this trial only groups EA/EB"
+    }
+  },
+  "observed": {
+    "before": {
+      "selected": [],
+      "pass": false,
+      "exit": 1,
+      "log": "FAIL\texample.test/reviewfixture [build failed]\nFAIL\n# example.test/reviewfixture [example.test/reviewfixture.test]\n./readable.go:3:8: \"strings\" imported and not used\n",
+      "log_sha256": "08edb7e1a8efc24ab41d9c466ffae4c73629a836d1349609ac2e65ae1f8c6539"
+    },
+    "only_a": {
+      "selected": [
+        "EA"
+      ],
+      "pass": false,
+      "exit": 1,
+      "log": "FAIL\texample.test/reviewfixture [build failed]\nFAIL\n# example.test/reviewfixture [example.test/reviewfixture.test]\n./readable.go:3:8: \"strings\" imported and not used\n",
+      "log_sha256": "08edb7e1a8efc24ab41d9c466ffae4c73629a836d1349609ac2e65ae1f8c6539"
+    },
+    "only_b": {
+      "selected": [
+        "EB"
+      ],
+      "pass": true,
+      "exit": 0,
+      "log": "ok  \texample.test/reviewfixture\t0.352s\n",
+      "log_sha256": "512d29282728429c7601de0089d79803dc330160bad0be75557fa45eee3522c5"
+    },
+    "both": {
+      "selected": [
+        "EA",
+        "EB"
+      ],
+      "pass": true,
+      "exit": 0,
+      "log": "ok  \texample.test/reviewfixture\t0.355s\n",
+      "log_sha256": "e2bda4df8e8f5d61595fcba051d014c441151f7396afefaae5cd1d4ec9553b7d"
+    },
+    "after": {
+      "selected": [
+        "E2",
+        "E3",
+        "E4",
+        "E5",
+        "E6",
+        "E7",
+        "EA",
+        "EB"
+      ],
+      "pass": true,
+      "exit": 0,
+      "log": "ok  \texample.test/reviewfixture\t0.351s\n",
+      "log_sha256": "b1f2f40260c6883777de860b3120469b829ea80ee8a5f878ae65016620243d30"
+    }
+  },
+  "cause": "readable.go before imports strings without using it; endpoint invalid",
+  "repair": "remove only unused before-state import; keep after-state import"
+}
