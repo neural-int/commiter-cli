@@ -1,0 +1,40 @@
+{
+  "observations": 8,
+  "partition_exact": 4,
+  "exact": 4,
+  "baseline_exact": 4,
+  "complete": 8,
+  "fm": 0,
+  "fs": 15738,
+  "baseline_fm": 0,
+  "baseline_fs": 15738,
+  "calls": 6,
+  "unobserved_call_tokens": 6,
+  "input_tokens_lower_bound": 0,
+  "output_tokens_lower_bound": 0,
+  "wall_total": 639.8972343318164,
+  "total_wall_budget": 600,
+  "total_wall_budget_pass": false,
+  "wall_mean": 79.98715429147705,
+  "wall_p95_lower": 113.72654595808126,
+  "reasons": {
+    "TimeoutExpired": 6,
+    "ValueError:presentation_budget": 2
+  },
+  "naive_observations": 0,
+  "naive_exact": 0,
+  "naive_fm": null,
+  "naive_fs": null,
+  "strata": {
+    "5-8": {
+      "cases": 4,
+      "exact": 2
+    },
+    "9-16": {
+      "cases": 4,
+      "exact": 2
+    }
+  },
+  "interpretation": "fixed B transfer only, does not reverse independent small-case NO-GO or change frozen D candidate/target; model failure still returns validated A2 fallback",
+  "budget_enforcement_limitation": "Inference deadline does not interrupt the subsequent mandatory temp-index audit; if total wall exceeds600, the experiment fails its resource gate. Raw partition matches are not bounded end-to-end successes."
+}
