@@ -213,25 +213,29 @@ func partitionQuality(f fixture, snapshot gitstate.Snapshot, plan planning.Plan)
 }
 
 type measurement struct {
-	Workload          string        `json:"workload"`
-	Files             int           `json:"files"`
-	Route             string        `json:"route"`
-	Repeat            int           `json:"repeat"`
-	Condition         string        `json:"condition"`
-	Snapshot          string        `json:"snapshot_sha256"`
-	Prepared          string        `json:"prepared_sha256"`
-	Wall              float64       `json:"wall_seconds"`
-	Replay            float64       `json:"replay_seconds"`
-	DiffBytes         int           `json:"diff_bytes"`
-	DiffLines         int           `json:"diff_lines"`
-	Groups            int           `json:"groups"`
-	Calls             []callMetric  `json:"calls"`
-	Status            string        `json:"status"`
-	Quality           *quality      `json:"quality"`
-	GitUnchanged      bool          `json:"git_unchanged"`
-	BoundaryUnchanged bool          `json:"boundary_unchanged"`
-	Before            resourceState `json:"resource_before"`
-	After             resourceState `json:"resource_after"`
+	Workload           string        `json:"workload"`
+	Files              int           `json:"files"`
+	Route              string        `json:"route"`
+	Repeat             int           `json:"repeat"`
+	Condition          string        `json:"condition"`
+	Snapshot           string        `json:"snapshot_sha256"`
+	Prepared           string        `json:"prepared_sha256"`
+	Wall               float64       `json:"wall_seconds"`
+	Replay             float64       `json:"replay_seconds"`
+	DiffBytes          int           `json:"diff_bytes"`
+	DiffLines          int           `json:"diff_lines"`
+	Groups             int           `json:"groups"`
+	Calls              []callMetric  `json:"calls"`
+	Status             string        `json:"status"`
+	FailureCodes       []string      `json:"failure_codes,omitempty"`
+	Diagnostic         bool          `json:"diagnostic,omitempty"`
+	ProvisionalGroups  int           `json:"provisional_group_count,omitempty"`
+	ProvisionalQuality *quality      `json:"provisional_quality,omitempty"`
+	Quality            *quality      `json:"quality"`
+	GitUnchanged       bool          `json:"git_unchanged"`
+	BoundaryUnchanged  bool          `json:"boundary_unchanged"`
+	Before             resourceState `json:"resource_before"`
+	After              resourceState `json:"resource_after"`
 }
 
 func run(f fixture, root string, snapshot gitstate.Snapshot, p contextinput.Prepared, route string, repeat, bytes, lines int, b *measuredBackend) measurement {
@@ -246,6 +250,7 @@ func run(f fixture, root string, snapshot gitstate.Snapshot, p contextinput.Prep
 	}
 	started := time.Now()
 	b.Calls = nil
+	b.ProvisionalGroups = nil
 	ctx, cancel := context.WithTimeout(context.Background(), planning.CandidateCycleTimeout)
 	defer cancel()
 	var preview gitstate.FileFirstPreview
@@ -274,6 +279,32 @@ func run(f fixture, root string, snapshot gitstate.Snapshot, p contextinput.Prep
 	m.Wall = time.Since(started).Seconds()
 	m.Calls = append([]callMetric{}, b.Calls...)
 	m.After = resources()
+	if b.Diagnose {
+		groups := b.ProvisionalGroups
+		if route == "file-first" && len(preview.Groups) == len(snapshot.Changes) {
+			groups = nil
+			for _, g := range preview.Groups {
+				groups = append(groups, []string{g.FileID})
+			}
+		}
+		seen := map[string]int{}
+		provisional := planning.Plan{}
+		for _, group := range groups {
+			for _, id := range group {
+				seen[id]++
+			}
+			provisional.Commits = append(provisional.Commits, planning.Commit{FileIDs: group})
+		}
+		complete := len(seen) == len(snapshot.Changes)
+		for _, change := range snapshot.Changes {
+			complete = complete && seen[change.ID] == 1
+		}
+		if complete {
+			q := partitionQuality(f, snapshot, provisional)
+			m.ProvisionalQuality = &q
+			m.ProvisionalGroups = len(groups)
+		}
+	}
 	after, digestErr := repositoryDigest(root)
 	m.GitUnchanged = digestErr == nil && before == after
 	if !m.GitUnchanged {
@@ -282,6 +313,7 @@ func run(f fixture, root string, snapshot gitstate.Snapshot, p contextinput.Prep
 	}
 	if e != nil {
 		m.Status = "planner_failed"
+		m.FailureCodes = failureCodes(e)
 		if ctx.Err() != nil {
 			m.Status = "cycle_timeout"
 		}
@@ -320,8 +352,21 @@ func main() {
 	helper := flag.String("helper", "", "instrumented helper executable")
 	cache := flag.String("cache", "", "installed MLX model cache")
 	filter := flag.String("fixture", "", "one preregistered fixture, default all")
+	diagnostic := flag.Bool("diagnostic", false, "one repetition with numeric failure diagnostics for one fixed fixture")
+	structures := flag.Bool("structure-only", false, "verify fixed fixture receipts and static singleton references without a model")
 	flag.Parse()
+	if *diagnostic && *filter == "" {
+		fmt.Fprintln(os.Stderr, "diagnostic requires one explicit preregistered fixture")
+		os.Exit(2)
+	}
 	selected := fixtures()
+	if *structures {
+		if err := runStructures(selected, *filter); err != nil {
+			fmt.Fprintln(os.Stderr, "structural observation failed")
+			os.Exit(1)
+		}
+		return
+	}
 	if *manifest {
 		data, _ := json.Marshal(selected)
 		fmt.Println(string(data))
@@ -341,6 +386,7 @@ func main() {
 	_ = os.Setenv("GIT_CONFIG_NOSYSTEM", "1")
 	_ = os.Setenv("GIT_CONFIG_GLOBAL", "/dev/null")
 	b := &measuredBackend{Helper: *helper, Model: v.Model + "@" + v.ModelRevision, Path: modelPath}
+	b.Diagnose = *diagnostic
 	encoder := json.NewEncoder(os.Stdout)
 	found := false
 	for _, f := range selected {
@@ -363,7 +409,11 @@ func main() {
 			fmt.Fprintln(os.Stderr, "fixture preparation failed")
 			os.Exit(1)
 		}
-		for repeat := 0; repeat < 3; repeat++ {
+		repetitions := 3
+		if *diagnostic {
+			repetitions = 1
+		}
+		for repeat := 0; repeat < repetitions; repeat++ {
 			routes := []string{"file-first"}
 			if len(f.Files) <= 4 {
 				routes = []string{"three-phase", "file-first"}
@@ -373,6 +423,10 @@ func main() {
 			}
 			for _, route := range routes {
 				m := run(f, root, snapshot, p, route, repeat, bytes, lines, b)
+				m.Diagnostic = *diagnostic
+				if *diagnostic {
+					m.Condition = "diagnostic-after-main-matrix"
+				}
 				if e = encoder.Encode(m); e != nil {
 					panic(e)
 				}

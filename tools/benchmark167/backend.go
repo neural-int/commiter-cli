@@ -16,20 +16,23 @@ import (
 )
 
 type callMetric struct {
-	Profile     string   `json:"profile"`
-	WallSeconds float64  `json:"wall_seconds"`
-	Stop        string   `json:"stop"`
-	Input       *int     `json:"input_tokens"`
-	Output      *int     `json:"output_tokens"`
-	Load        *float64 `json:"load_seconds"`
-	TTFT        *float64 `json:"runtime_ttft_seconds"`
-	Peak        *int64   `json:"mlx_peak_bytes"`
-	RSS         *int64   `json:"helper_peak_rss_bytes"`
+	Profile     string          `json:"profile"`
+	WallSeconds float64         `json:"wall_seconds"`
+	Stop        string          `json:"stop"`
+	Input       *int            `json:"input_tokens"`
+	Output      *int            `json:"output_tokens"`
+	Load        *float64        `json:"load_seconds"`
+	TTFT        *float64        `json:"runtime_ttft_seconds"`
+	Peak        *int64          `json:"mlx_peak_bytes"`
+	RSS         *int64          `json:"helper_peak_rss_bytes"`
+	Text        *textDiagnostic `json:"text_diagnostic,omitempty"`
 }
 
 type measuredBackend struct {
 	Helper, Model, Path string
 	Calls               []callMetric
+	Diagnose            bool
+	ProvisionalGroups   [][]string
 }
 
 type cappedOutput struct {
@@ -50,6 +53,18 @@ func (b *measuredBackend) Chat(context.Context, []llm.Message, json.RawMessage) 
 var rssLine = regexp.MustCompile(`(?m)^\s*(\d+)\s+maximum resident set size\s*$`)
 
 func (b *measuredBackend) ChatWithOptions(ctx context.Context, messages []llm.Message, schema json.RawMessage, options llm.Options) (llm.Response, error) {
+	if b.Diagnose && options.GenerationProfile == "bounded-category" {
+		var payload struct {
+			Groups []struct {
+				FileIDs []string `json:"file_ids"`
+			} `json:"groups"`
+		}
+		if json.Unmarshal([]byte(messages[1].Content), &payload) == nil {
+			for _, g := range payload.Groups {
+				b.ProvisionalGroups = append(b.ProvisionalGroups, append([]string(nil), g.FileIDs...))
+			}
+		}
+	}
 	request, err := json.Marshal(mlx.Request{Messages: messages, Schema: schema, Model: b.Model, ModelPath: b.Path, GenerationProfile: options.GenerationProfile, ContextTokens: options.ContextTokens, OutputTokens: options.OutputTokens})
 	if err != nil || len(request) > mlx.DefaultMaxRequestBytes {
 		return llm.Response{}, errors.New("measurement request limit")
@@ -97,6 +112,9 @@ func (b *measuredBackend) ChatWithOptions(ctx context.Context, messages []llm.Me
 	metric.Load = response.Load
 	metric.TTFT = response.TTFT
 	metric.Peak = response.Peak
+	if b.Diagnose && options.GenerationProfile == "bounded-text" {
+		metric.Text = diagnoseText(schema, response.GeneratedJSON)
+	}
 	if response.GenerationProfile != options.GenerationProfile && response.OK {
 		return llm.Response{}, errors.New("measurement profile mismatch")
 	}
