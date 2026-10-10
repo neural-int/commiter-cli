@@ -58,7 +58,15 @@ H2について、方向欄と整合に必要な指示2断片の削除だけで�
 ## Next Steps
 
 - 本固定診断で調査を終了し、追加生成・prompt調整・case追加・新モデル・C対策へ拡張しない。2介入の出力分布不変と副作用を最大32call内で記録でき、追加研究はこのIssueの範囲外のため。
-- 全6成果条件とIssueチェックを証拠に照合し、その後goal.mdの最終品質ゲートを実施する。診断の終了とrepository品質確認を別に証明するため。
+- 本結果を保存してIssueを終了する。全6成果条件と本文チェック、後続の最終品質ゲートが検証済みであり、本固定診断の追加生成は不要のため。
 - 最終commit/push、GitHub成果物の一致、Issue closureを確認する。localの成果だけでは外部への保存と終了状態を証明できないため。
 
 生成前登録 `1217e86b4a7ae99a58f81a69c4642da1944403d6`、生成時HEAD `e1727ac512d60228a788ffbdd6dcb3d4e3da1c51`。再監査は同digestのローカル資産で `PYTHONDONTWRITEBYTECODE=1 python3 tools/benchmark166/audit_results.py`（既存派生ファイルはexclusive-createにより上書きせず、別copyで比較する）。原raw・登録・goldは変更しない。#163/#164/#165のNO-GO、本番資格、4file上限を保持する。
+
+## 最終品質ゲートと保存
+
+Issue本文の6チェックを確認した後、Go test20package、Go vet/build、CLI build、既存release-notes Python tests25件、同digest helperの既存Swift Testing32件（8+24）、入力差分/5構造拒否/不存在引用拒否、旧構造preflight、resource lifecycle、Python構文、diff検査がPASS。全48rawから再集計したsummary/case-evidence/result-auditは保存済み派生ファイルとbyte一致。生成の追加0、unit tests追加0、不要テストなし。
+
+SwiftPMは外側network拒否sandbox内で自身のsandbox適用が拒否され、テスト開始前に一度失敗した。初回ログを保存し、SwiftPMの内側sandbox適用だけを省いた再検査では、外側deny networkを維持して32件PASS。skip-buildと自動依存解決禁止を維持し、テスト/validatorを無効化していない。helper/model/source digestも一致。`final-quality-gates.json` に初回失敗と最終PASSを併記する。
+
+GitHub上の結果commitについてreport/raw/case別証拠/集計/reason/登録/完了監査/資源/安全の9artifactを取得し、localとのbyte一致を検証した。最終品質証跡は後続commitへ保存し、remote headとtreeも最終監査する。成果の保存とIssue closureをもってこの診断を終了し、production採用や4file拡張は行わない。

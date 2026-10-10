@@ -1,0 +1,593 @@
+{
+  "all_pass": true,
+  "derived_results_byte_identical": {
+    "summary.json": true,
+    "case-evidence.json": true,
+    "result-audit.json": true
+  },
+  "full_raw_rows_reaudited": 48,
+  "existing_structural_preflight": {
+    "issue": 163,
+    "model_calls": 0,
+    "semantic_qualification": "not_evaluated",
+    "all_pass": true,
+    "checks": [
+      {
+        "case": "valid_global",
+        "expected": "completed",
+        "observed": {
+          "accepted": true,
+          "raw_sha256": "e3f1955ec9e26f9253f797aada8d20eec01518a753df8bb692a1c4ee817bbb9d",
+          "stop_reason": "completed",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "answer": {
+            "decision": "partition",
+            "groups": [
+              [
+                "EA"
+              ],
+              [
+                "EB"
+              ]
+            ],
+            "evidence_refs": [
+              "EA",
+              "EB"
+            ]
+          },
+          "status": "completed"
+        },
+        "pass": true,
+        "raw": "{\"generated_json\":\"{\\\"decision\\\": \\\"partition\\\", \\\"groups\\\": [[\\\"EA\\\"], [\\\"EB\\\"]], \\\"evidence_refs\\\": [\\\"EA\\\", \\\"EB\\\"]}\",\"ok\":true,\"stop_reason\":\"completed\"}"
+      },
+      {
+        "case": "not_completed",
+        "expected": "backend_stop",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "55b92e529fb1cd76107889fc4cb95cc3f7e397ef8478a6f5f503a6ad7d8ff1cc",
+          "stop_reason": "max_tokens",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "backend_stop"
+        },
+        "pass": true,
+        "raw": "{\"ok\":true,\"stop_reason\":\"max_tokens\"}"
+      },
+      {
+        "case": "context_exceeded",
+        "expected": "context_exceeded",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "6d60b53414f4e2a2a1df8ddc62500e065c9db6328dae2e2ead6dfeb3e0e1cfd4",
+          "stop_reason": "input_too_large",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "context_exceeded"
+        },
+        "pass": true,
+        "raw": "{\"ok\":false,\"stop_reason\":\"input_too_large\"}"
+      },
+      {
+        "case": "timeout",
+        "expected": "timeout",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "aa872904ac7df52f9abd4f3c6725eebf0ca031a78c08d3118bcaf2b98a109aae",
+          "stop_reason": "timeout",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "timeout"
+        },
+        "pass": true,
+        "raw": "{\"ok\":false,\"stop_reason\":\"timeout\"}"
+      },
+      {
+        "case": "helper_error",
+        "expected": "backend_stop",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "52e79af9a27b38862263ec8b127ad88b55d6a3bd070d59ded82f8484d0547b9e",
+          "stop_reason": "completed",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "backend_stop"
+        },
+        "pass": true,
+        "raw": "{\"ok\":false,\"stop_reason\":\"completed\"}"
+      },
+      {
+        "case": "invalid_outer_json",
+        "expected": "invalid_json",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "021fb596db81e6d02bf3d2586ee3981fe519f275c0ac9ca76bbcf2ebb4097d96",
+          "stop_reason": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "invalid_json"
+        },
+        "pass": true,
+        "raw": "{"
+      },
+      {
+        "case": "invalid_inner_json",
+        "expected": "invalid_json",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "0dc54135fa41b1916cae0cf96931b752a19095e6e6d8dadfca961a9bb63132fe",
+          "stop_reason": "completed",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "invalid_json"
+        },
+        "pass": true,
+        "raw": "{\"generated_json\":\"{\",\"ok\":true,\"stop_reason\":\"completed\"}"
+      },
+      {
+        "case": "duplicate_json_key",
+        "expected": "invalid_json",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "c97f47157356e2e675354bcbf8479a8777efad2201dd1e7e9bff48bec74f5ed0",
+          "stop_reason": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "invalid_json"
+        },
+        "pass": true,
+        "raw": "{\"ok\":true,\"ok\":false}"
+      },
+      {
+        "case": "invalid_schema",
+        "expected": "invalid_schema",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "d06be1aa48a7f44f89350c9cb8522e44bd4e47047ed5b45478585abd54729927",
+          "stop_reason": "completed",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "invalid_schema"
+        },
+        "pass": true,
+        "raw": "{\"generated_json\":\"{\\\"decision\\\": \\\"partition\\\"}\",\"ok\":true,\"stop_reason\":\"completed\"}"
+      },
+      {
+        "case": "missing_id",
+        "expected": "invalid_assignment",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "de7443d4ae940e78fefefbf9a7b6b2e64903cead2343bb08cc71917c585222fd",
+          "stop_reason": "completed",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "invalid_assignment"
+        },
+        "pass": true,
+        "raw": "{\"generated_json\":\"{\\\"decision\\\": \\\"partition\\\", \\\"groups\\\": [[\\\"EA\\\"]], \\\"evidence_refs\\\": [\\\"EA\\\", \\\"EB\\\"]}\",\"ok\":true,\"stop_reason\":\"completed\"}"
+      },
+      {
+        "case": "duplicate_id",
+        "expected": "invalid_assignment",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "924ec0d6de050fe829e538e8e081133d2757427df0fa2a73fef3cdfaefd296e1",
+          "stop_reason": "completed",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "invalid_assignment"
+        },
+        "pass": true,
+        "raw": "{\"generated_json\":\"{\\\"decision\\\": \\\"partition\\\", \\\"groups\\\": [[\\\"EA\\\"], [\\\"EA\\\", \\\"EB\\\"]], \\\"evidence_refs\\\": [\\\"EA\\\", \\\"EB\\\"]}\",\"ok\":true,\"stop_reason\":\"completed\"}"
+      },
+      {
+        "case": "unknown_id",
+        "expected": "invalid_assignment",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "59a2c228cbba63fa60aa753728e9ea65c78c5061c33934172d90086c7389f6b1",
+          "stop_reason": "completed",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "invalid_assignment"
+        },
+        "pass": true,
+        "raw": "{\"generated_json\":\"{\\\"decision\\\": \\\"partition\\\", \\\"groups\\\": [[\\\"EA\\\"], [\\\"XX\\\"]], \\\"evidence_refs\\\": [\\\"EA\\\", \\\"EB\\\"]}\",\"ok\":true,\"stop_reason\":\"completed\"}"
+      },
+      {
+        "case": "empty_group",
+        "expected": "invalid_assignment",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "e21cdf978dd1f147bfd7dca63d3f953bce509cdcd32214e47ba5e209be690bee",
+          "stop_reason": "completed",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "invalid_assignment"
+        },
+        "pass": true,
+        "raw": "{\"generated_json\":\"{\\\"decision\\\": \\\"partition\\\", \\\"groups\\\": [[], [\\\"EA\\\", \\\"EB\\\"]], \\\"evidence_refs\\\": [\\\"EA\\\", \\\"EB\\\"]}\",\"ok\":true,\"stop_reason\":\"completed\"}"
+      },
+      {
+        "case": "unknown_evidence",
+        "expected": "invalid_evidence_refs",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "9161433a94ba287980607a814e19a34310be891b361f19c2871f608a7360fb11",
+          "stop_reason": "completed",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "invalid_evidence_refs"
+        },
+        "pass": true,
+        "raw": "{\"generated_json\":\"{\\\"decision\\\": \\\"partition\\\", \\\"groups\\\": [[\\\"EA\\\"], [\\\"EB\\\"]], \\\"evidence_refs\\\": [\\\"EA\\\", \\\"XX\\\"]}\",\"ok\":true,\"stop_reason\":\"completed\"}"
+      },
+      {
+        "case": "duplicate_evidence",
+        "expected": "invalid_evidence_refs",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "087385c7216b383e008e4ff3accddb8f7b55f549fdf28ee04918f9132c423616",
+          "stop_reason": "completed",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "invalid_evidence_refs"
+        },
+        "pass": true,
+        "raw": "{\"generated_json\":\"{\\\"decision\\\": \\\"partition\\\", \\\"groups\\\": [[\\\"EA\\\"], [\\\"EB\\\"]], \\\"evidence_refs\\\": [\\\"EA\\\", \\\"EA\\\"]}\",\"ok\":true,\"stop_reason\":\"completed\"}"
+      },
+      {
+        "case": "missing_evidence",
+        "expected": "missing_target_evidence",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "f7186b536570397ead134f44a2e7e5108c49cca0366c173104299d7eada181bb",
+          "stop_reason": "completed",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "missing_target_evidence"
+        },
+        "pass": true,
+        "raw": "{\"generated_json\":\"{\\\"decision\\\": \\\"partition\\\", \\\"groups\\\": [[\\\"EA\\\"], [\\\"EB\\\"]], \\\"evidence_refs\\\": [\\\"EA\\\"]}\",\"ok\":true,\"stop_reason\":\"completed\"}"
+      },
+      {
+        "case": "unresolved",
+        "expected": "unresolved",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "3036833684570f3d4cd7fb8e565153bb55b09fa558afa8dd91586713fde6de7d",
+          "stop_reason": "completed",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "answer": {
+            "decision": "defer",
+            "groups": [],
+            "evidence_refs": []
+          },
+          "status": "unresolved"
+        },
+        "pass": true,
+        "raw": "{\"generated_json\":\"{\\\"decision\\\": \\\"defer\\\", \\\"groups\\\": [], \\\"evidence_refs\\\": []}\",\"ok\":true,\"stop_reason\":\"completed\"}"
+      },
+      {
+        "case": "valid_local",
+        "expected": "completed",
+        "observed": {
+          "accepted": true,
+          "raw_sha256": "a74c9720136c57cc6d369c1b8808db4f1cc4be810d5cfbadd18e1057d5861048",
+          "stop_reason": "completed",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "answer": {
+            "decision": "merge",
+            "evidence_refs": [
+              "EA",
+              "EB"
+            ]
+          },
+          "status": "completed"
+        },
+        "pass": true,
+        "raw": "{\"generated_json\":\"{\\\"decision\\\": \\\"merge\\\", \\\"evidence_refs\\\": [\\\"EA\\\", \\\"EB\\\"]}\",\"ok\":true,\"stop_reason\":\"completed\"}"
+      },
+      {
+        "case": "local_missing_evidence",
+        "expected": "missing_target_evidence",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "b67bc4d9308dfd5152fa28a03423029328f574ee638e2c094d831b8a8ea998b8",
+          "stop_reason": "completed",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "status": "missing_target_evidence"
+        },
+        "pass": true,
+        "raw": "{\"generated_json\":\"{\\\"decision\\\": \\\"merge\\\", \\\"evidence_refs\\\": [\\\"EA\\\"]}\",\"ok\":true,\"stop_reason\":\"completed\"}"
+      },
+      {
+        "case": "local_unresolved",
+        "expected": "unresolved",
+        "observed": {
+          "accepted": false,
+          "raw_sha256": "debce97c39bc9358a7037b6cc18a5efe145a73f31b6ed103d74c6615321f847d",
+          "stop_reason": "completed",
+          "input_tokens": null,
+          "output_tokens": null,
+          "fallback": false,
+          "answer": {
+            "decision": "defer",
+            "evidence_refs": []
+          },
+          "status": "unresolved"
+        },
+        "pass": true,
+        "raw": "{\"generated_json\":\"{\\\"decision\\\": \\\"defer\\\", \\\"evidence_refs\\\": []}\",\"ok\":true,\"stop_reason\":\"completed\"}"
+      },
+      {
+        "case": "authority_valid",
+        "expected": true,
+        "observed": {
+          "valid": true,
+          "violations": []
+        },
+        "pass": true
+      },
+      {
+        "case": "authority_missing",
+        "expected": false,
+        "observed": {
+          "valid": false,
+          "violations": [
+            "invalid_assignment"
+          ]
+        },
+        "pass": true
+      },
+      {
+        "case": "authority_duplicate",
+        "expected": false,
+        "observed": {
+          "valid": false,
+          "violations": [
+            "invalid_assignment"
+          ]
+        },
+        "pass": true
+      },
+      {
+        "case": "authority_unknown",
+        "expected": false,
+        "observed": {
+          "valid": false,
+          "violations": [
+            "invalid_assignment"
+          ]
+        },
+        "pass": true
+      },
+      {
+        "case": "source_facts",
+        "observed": [
+          {
+            "id": "EA",
+            "before": {
+              "package": "example",
+              "definitions": [
+                "Old"
+              ],
+              "calls": []
+            },
+            "after": {
+              "package": "example",
+              "definitions": [
+                "Added",
+                "Old"
+              ],
+              "calls": []
+            }
+          },
+          {
+            "id": "EB",
+            "before": {
+              "package": "example",
+              "definitions": [
+                "User"
+              ],
+              "calls": [
+                "Old"
+              ]
+            },
+            "after": {
+              "package": "example",
+              "definitions": [
+                "User"
+              ],
+              "calls": [
+                "Added"
+              ]
+            }
+          }
+        ],
+        "pass": true
+      },
+      {
+        "case": "byte_tree_reconstruction",
+        "observed": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "7bd3fb750a16902346502d8615f76ac668ad0d09"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA"
+              ],
+              "tree": "29a3eaa1e118c1f7820e92ea8f88d4b5481b1e53"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EB"
+              ],
+              "tree": "facd26489bb022f07c02013fbee397cc05c92a50"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EB"
+              ],
+              "tree": "29a3eaa1e118c1f7820e92ea8f88d4b5481b1e53"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA"
+              ],
+              "tree": "7bd3fb750a16902346502d8615f76ac668ad0d09"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "pass": true
+      },
+      {
+        "case": "source_reconstruction_failure",
+        "observed": "source_reconstruction_failed",
+        "pass": true
+      }
+    ],
+    "source_sha256": {
+      "tools/benchmark163/harness.py": "e86fca202db85f08ac213a4ec32f7a975166b9e43ad7aa22ccf729bc3edf20df",
+      "tools/benchmark163/sourcefacts/main.go": "6e1651430ec6b4e26ae6365d0d9f161691796bc45a9711b4d0aba5fdfb6596ab",
+      "tools/benchmark163/validate/main.go": "3955da8ea1a1e123145e10e44ef7890eb976efbf9dd5f014436ea66f23e31130"
+    },
+    "binary_sha256": {
+      "validator": "354cf1de38dc344d960a5cdc51b79e3bc864e22bdf90231fbd03bf82f3fd3bc1",
+      "facts": "d83dee4cbbb17e7e7fbb4568e7e53d815cdd3ec36d563d0560aef61d65fd0c74"
+    }
+  },
+  "resource_lifecycle": {
+    "exit": 0,
+    "timed_out": false,
+    "stdout": "measurement lifecycle\n",
+    "stderr": "",
+    "total_seconds": 0.3558911250438541,
+    "sample_interval_seconds": 0.1,
+    "samples": [
+      {
+        "available": true,
+        "footprint_bytes": 213136,
+        "rss_bytes": 180224,
+        "lifetime_peak_footprint_bytes": 311440,
+        "elapsed_seconds": 0.0032192079816013575
+      },
+      {
+        "available": true,
+        "footprint_bytes": 6898096,
+        "rss_bytes": 15106048,
+        "lifetime_peak_footprint_bytes": 6898096,
+        "elapsed_seconds": 0.11458549997769296
+      },
+      {
+        "available": true,
+        "footprint_bytes": 6898096,
+        "rss_bytes": 15106048,
+        "lifetime_peak_footprint_bytes": 6898096,
+        "elapsed_seconds": 0.21604650001972914
+      },
+      {
+        "available": true,
+        "footprint_bytes": 6898096,
+        "rss_bytes": 15106048,
+        "lifetime_peak_footprint_bytes": 6898096,
+        "elapsed_seconds": 0.31997687509283423
+      }
+    ],
+    "pressure_samples": [
+      {
+        "elapsed_seconds": 0.0032211251091212034,
+        "level": 2
+      }
+    ],
+    "sampled_peak_footprint_bytes": 6898096,
+    "observed_lifetime_peak_footprint_bytes": 6898096,
+    "sampled_peak_rss_bytes": 15106048,
+    "system_before": {
+      "vm_stat": {
+        "exit": 0,
+        "stdout": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    10924.\nPages active:                                 225460.\nPages inactive:                               212747.\nPages speculative:                             11852.\nPages throttled:                                   0.\nPages wired down:                             179463.\nPages purgeable:                                   4.\n\"Translation faults\":                     7508083013.\nPages copy-on-write:                       445809209.\nPages zero filled:                        7168426967.\nPages reactivated:                         969951997.\nPages purged:                              192999696.\nFile-backed pages:                            174696.\nAnonymous pages:                              275363.\nPages stored in compressor:                  1387179.\nPages occupied by compressor:                 371098.\nDecompressions:                           1490207376.\nCompressions:                             1872831157.\nPageins:                                  1041965626.\nPageouts:                                    2946081.\nSwapins:                                    32308149.\nSwapouts:                                   54150242.\n",
+        "stderr": ""
+      },
+      "swap": {
+        "exit": 0,
+        "stdout": "vm.swapusage: total = 5120.00M  used = 4004.06M  free = 1115.94M  (encrypted)\n",
+        "stderr": ""
+      },
+      "pressure": {
+        "exit": 0,
+        "stdout": "The system has 17179869184 (1048576 pages with a page size of 16384).\nSystem-wide memory free percentage: 45%\n",
+        "stderr": ""
+      },
+      "pressure_level": {
+        "exit": 0,
+        "stdout": "2\n",
+        "stderr": ""
+      }
+    },
+    "system_after": {
+      "vm_stat": {
+        "exit": 0,
+        "stdout": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    12457.\nPages active:                                 223544.\nPages inactive:                               212192.\nPages speculative:                             12478.\nPages throttled:                                   0.\nPages wired down:                             180060.\nPages purgeable:                                   6.\n\"Translation faults\":                     7508119358.\nPages copy-on-write:                       445811813.\nPages zero filled:                        7168446193.\nPages reactivated:                         969951997.\nPages purged:                              192999696.\nFile-backed pages:                            179311.\nAnonymous pages:                              268903.\nPages stored in compressor:                  1386045.\nPages occupied by compressor:                 370678.\nDecompressions:                           1490208247.\nCompressions:                             1872831157.\nPageins:                                  1041971150.\nPageouts:                                    2946081.\nSwapins:                                    32308149.\nSwapouts:                                   54150242.\n",
+        "stderr": ""
+      },
+      "swap": {
+        "exit": 0,
+        "stdout": "vm.swapusage: total = 5120.00M  used = 4004.06M  free = 1115.94M  (encrypted)\n",
+        "stderr": ""
+      },
+      "pressure": {
+        "exit": 0,
+        "stdout": "The system has 17179869184 (1048576 pages with a page size of 16384).\nSystem-wide memory free percentage: 45%\n",
+        "stderr": ""
+      },
+      "pressure_level": {
+        "exit": 0,
+        "stdout": "2\n",
+        "stderr": ""
+      }
+    },
+    "mlx_active_bytes": null,
+    "mlx_peak_bytes": null,
+    "mlx_cache_bytes": null,
+    "metal_allocation_bytes": null,
+    "ttft_seconds": null,
+    "resource_qualification": "not_assessed",
+    "limitation": "API lifetime peak and sampled observations may miss the final exit interval; MLX/Metal/TTFT need helper instrumentation"
+  },
+  "generation_calls": 0,
+  "preliminary_audit_syntax_failure_fixed": true,
+  "elapsed_seconds": 2.9246704999823123
+}
