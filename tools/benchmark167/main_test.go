@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"testing"
 
 	"github.com/natsuki0413/commiter-cli/internal/gitstate"
@@ -17,6 +18,9 @@ func TestPreregisteredBoundaryUsesSameBaseBytes(t *testing.T) {
 }
 
 func TestBenchmarkPreservesRealSnapshotThroughMetadataAndReplay(t *testing.T) {
+	if runtime.GOOS != "darwin" {
+		t.Skip("numeric helper measurement requires macOS time -l")
+	}
 	t.Setenv("GIT_CONFIG_NOSYSTEM", "1")
 	t.Setenv("GIT_CONFIG_GLOBAL", os.DevNull)
 	f := fixtures()[1]

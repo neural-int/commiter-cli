@@ -58,6 +58,7 @@ func (b *measuredBackend) ChatWithOptions(ctx context.Context, messages []llm.Me
 	started := time.Now()
 	defer func() { metric.WallSeconds = time.Since(started).Seconds(); b.Calls = append(b.Calls, metric) }()
 	cmd := exec.CommandContext(ctx, "/usr/bin/time", "-l", b.Helper)
+	configureMeasurementProcess(cmd)
 	cmd.Stdin = bytes.NewReader(append(request, '\n'))
 	out := &cappedOutput{Limit: mlx.DefaultMaxResponseBytes}
 	diagnostic := &cappedOutput{Limit: 128 * 1024}
