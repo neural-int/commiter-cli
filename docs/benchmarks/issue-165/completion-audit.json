@@ -1,0 +1,111 @@
+{
+  "issue": 165,
+  "requirements": [
+    {
+      "requirement": 1,
+      "name": "責務差・固定revision・旧規範",
+      "achieved": true,
+      "evidence": [
+        "contract.md",
+        "report.md",
+        "preregistered.json"
+      ],
+      "reason": "Inspected current artifacts; not model/architecture adoption."
+    },
+    {
+      "requirement": 2,
+      "name": "case別監査・人手基準事実",
+      "achieved": false,
+      "evidence": [
+        "source-audit.json",
+        "fact-review.json"
+      ],
+      "reason": "Codex source audit is done; independent human review of 19 fixed facts requested but unconfirmed."
+    },
+    {
+      "requirement": 3,
+      "name": "生成前のschema・条件・予算・commit/push",
+      "achieved": true,
+      "evidence": [
+        "preregistered.json",
+        "remote-registration.json",
+        "native-token-audit.json",
+        "input-contract-audit.json"
+      ],
+      "reason": "Inspected current artifacts; not model/architecture adoption."
+    },
+    {
+      "requirement": 4,
+      "name": "ASTとA、B、Cの独立評価",
+      "achieved": true,
+      "evidence": [
+        "machine-baseline.json",
+        "fact-review.json",
+        "summary.json",
+        "case-evidence.json"
+      ],
+      "reason": "Semantic judgments remain explicitly provisional under agent-audited reference facts."
+    },
+    {
+      "requirement": 5,
+      "name": "Oracle変化・漏洩・量・不足の区別",
+      "achieved": true,
+      "evidence": [
+        "report.md",
+        "case-evidence.json"
+      ],
+      "reason": "Inspected current artifacts; not model/architecture adoption."
+    },
+    {
+      "requirement": 6,
+      "name": "失敗原因の支持・反証・未識別",
+      "achieved": true,
+      "evidence": [
+        "report.md",
+        "case-evidence.json"
+      ],
+      "reason": "Inspected current artifacts; not model/architecture adoption."
+    },
+    {
+      "requirement": 7,
+      "name": "raw/source/hash/summary/resource/fee/safety",
+      "achieved": true,
+      "evidence": [
+        "results.jsonl",
+        "source-audit.json",
+        "result-audit.json",
+        "resource-audit.json"
+      ],
+      "reason": "Inspected current artifacts; not model/architecture adoption."
+    },
+    {
+      "requirement": 8,
+      "name": "識別範囲・最小次仮説・非production・品質",
+      "achieved": true,
+      "evidence": [
+        "report.md",
+        "targeted-quality-checks.json",
+        "preliminary-quality-gates.json"
+      ],
+      "reason": "Inspected current artifacts; not model/architecture adoption."
+    }
+  ],
+  "issue_complete": false,
+  "goal_complete": false,
+  "independent_human_review": "pending; no approval presumed",
+  "final_goal_quality_gate": "not run until all Issue Verification conditions and checkboxes are verified",
+  "diagnostic_generation_calls": 80,
+  "retries": 0,
+  "production_changed": false,
+  "Go_successful_packages": 20,
+  "Swift_test_summaries": [
+    "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds",
+    "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds",
+    "Test run with 8 tests in 2 suites passed after 0.002 seconds.",
+    "Test run with 24 tests in 3 suites passed after 0.018 seconds."
+  ],
+  "preliminary_checks_all_pass": true,
+  "raw_sha256": "f09bb2c4b7d50168b4d48cfbffb4b4c020df91a6cb3ad7e3135adf1dcbf14730",
+  "manifest_sha256": "42e2a27833e79f6f0254ef01fc4e9631d03e3b553e7640effa992e6c35ace6b0",
+  "timing_scope": "preparation timer stops before final manifest writes/harness preflight; run timer before final identity hash; reported 728.167 seconds is the recorded phase sum, not exact end-to-end work duration; post-audit recorded separately. No claim of exact global elapsed cost."
+}

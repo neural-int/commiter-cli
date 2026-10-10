@@ -1,0 +1,1056 @@
+[
+  {
+    "case": "nil-slice-corresponding-assertion",
+    "expected_relation": "corresponding",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "gold_basis": "Clone(nil) changes observable nilness and its directly corresponding assertion changes; either partial tree fails.",
+    "source_sha256": "22394c013424883a5c74e83e5578fc44200b8134717fb7f44e851b92d18c45ff",
+    "multiple_boundary": false,
+    "external_information": "Hidden author intent is not supplied and not a required target.",
+    "observations": [
+      {
+        "reverse": false,
+        "fact_verdicts": {
+          "F1": "partial",
+          "F2": "partial"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": false,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": false,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": true
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": true
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "defer"
+        },
+        "oracle_relation_changed": false,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "fact-missing",
+          "relation-wrong",
+          "unsupported-or-ambiguous",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      },
+      {
+        "reverse": true,
+        "fact_verdicts": {
+          "F1": "partial",
+          "F2": "wrong"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": false,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": true
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": true
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "defer"
+        },
+        "oracle_relation_changed": false,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "fact-missing",
+          "fact-wrong",
+          "relation-wrong",
+          "unsupported-or-ambiguous",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      }
+    ]
+  },
+  {
+    "case": "shared-bound-independent-ui-and-batch",
+    "expected_relation": "independent",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "gold_basis": "Display padding and batch capacity are distinct observable behaviors. Unchanged Bound alone creates no required adaptation.",
+    "source_sha256": "5eaa05922e348d29f0fda20e26defe30cba83410f92fcdf3416f63c3dd62c865",
+    "multiple_boundary": false,
+    "external_information": "Hidden author intent is not supplied and not a required target.",
+    "observations": [
+      {
+        "reverse": false,
+        "fact_verdicts": {
+          "F1": "partial",
+          "F2": "partial",
+          "F3": "missing"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "none",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract by adjusting the return value of `DisplayWidth` to include an additional 2.",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "none",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract by modifying the return value of DisplayWidth to include an additional 2.",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": false
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": false
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "defer"
+        },
+        "oracle_relation_changed": false,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "fact-missing",
+          "relation-wrong",
+          "boundary-wrong",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      },
+      {
+        "reverse": true,
+        "fact_verdicts": {
+          "F1": "present_correct",
+          "F2": "present_correct",
+          "F3": "missing"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": false,
+            "reason": "Changes preserve an explicit joint behavior contract by adjusting the return value of `DisplayWidth` to include an additional 2 units.",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": false
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": false
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "merge"
+        },
+        "oracle_relation_changed": false,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "fact-missing",
+          "relation-wrong",
+          "boundary-wrong",
+          "unsupported-or-ambiguous",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      }
+    ]
+  },
+  {
+    "case": "same-package-independent-time-and-permission",
+    "expected_relation": "independent",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "gold_basis": "Deadline equality and role permission are separately reviewable behaviors with no shared contract or call relationship.",
+    "source_sha256": "b92fe077618f705b51629c5058176077ae50ccba5b9643e14226a2ca70cbf72a",
+    "multiple_boundary": false,
+    "external_information": "Hidden author intent is not supplied and not a required target.",
+    "observations": [
+      {
+        "reverse": false,
+        "fact_verdicts": {
+          "F1": "partial",
+          "F2": "partial"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": false,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": false
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": false
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "defer"
+        },
+        "oracle_relation_changed": false,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "fact-missing",
+          "relation-wrong",
+          "boundary-wrong",
+          "unsupported-or-ambiguous",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      },
+      {
+        "reverse": true,
+        "fact_verdicts": {
+          "F1": "partial",
+          "F2": "partial"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": false,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "EA",
+            "consumer": "EB",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": false,
+            "reason": "Changes preserve an explicit joint behavior contract by adding 'editor' to the accepted roles.",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": false
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": false
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "merge"
+        },
+        "oracle_relation_changed": true,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "fact-missing",
+          "relation-wrong",
+          "boundary-wrong",
+          "unsupported-or-ambiguous",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      }
+    ]
+  },
+  {
+    "case": "shared-import-independent-search-and-sort",
+    "expected_relation": "independent",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "gold_basis": "Case-insensitive search and descending ordering change separate outputs; sharing strings import establishes no compensation.",
+    "source_sha256": "eb8e82b21959f4db6e0bc8cdb2d0f32b11db60c6bce0977269e2d4035d8c3c58",
+    "multiple_boundary": false,
+    "external_information": "Hidden author intent is not supplied and not a required target.",
+    "observations": [
+      {
+        "reverse": false,
+        "fact_verdicts": {
+          "F1": "partial",
+          "F2": "partial"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract by altering the comparison logic.",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "none",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract by converting both arguments to lowercase before checking for containment.",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": false
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": false
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "defer"
+        },
+        "oracle_relation_changed": true,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "fact-missing",
+          "fact-wrong",
+          "relation-wrong",
+          "boundary-wrong",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      },
+      {
+        "reverse": true,
+        "fact_verdicts": {
+          "F1": "partial",
+          "F2": "partial"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": false,
+            "reason": "Changes preserve an explicit joint behavior contract by modifying the `Contains` function to use `strings.ToLower`.",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": false
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": false
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "defer"
+        },
+        "oracle_relation_changed": false,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "fact-missing",
+          "relation-wrong",
+          "boundary-wrong",
+          "unsupported-or-ambiguous",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      }
+    ]
+  },
+  {
+    "case": "boolean-polarity-compensation",
+    "expected_relation": "compensation",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "gold_basis": "Encoding/decoding polarity changes compensate to preserve an explicit source contract; both partial trees fail the invariant test.",
+    "source_sha256": "9654334def3ec4ec7b054887bc3293b892dbd511166a983874a5e305839bf3b9",
+    "multiple_boundary": false,
+    "external_information": "Hidden author intent is not supplied and not a required target.",
+    "observations": [
+      {
+        "reverse": false,
+        "fact_verdicts": {
+          "F1": "partial",
+          "F2": "wrong",
+          "F3": "missing"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": true,
+            "direction_correct": false,
+            "citations_exist": false,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": true,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": true,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": true,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": true
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": true
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "defer"
+        },
+        "oracle_relation_changed": false,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "fact-missing",
+          "fact-wrong",
+          "relation-wrong",
+          "unsupported-or-ambiguous",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      },
+      {
+        "reverse": true,
+        "fact_verdicts": {
+          "F1": "wrong",
+          "F2": "wrong",
+          "F3": "missing"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": true,
+            "direction_correct": false,
+            "citations_exist": false,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": true,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": true,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": true,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": true
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": true
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "defer"
+        },
+        "oracle_relation_changed": false,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "fact-missing",
+          "fact-wrong",
+          "relation-wrong",
+          "unsupported-or-ambiguous",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      }
+    ]
+  },
+  {
+    "case": "new-round-provider-eb",
+    "expected_relation": "dependency",
+    "expected_direction": {
+      "provider": "EB",
+      "consumer": "EA"
+    },
+    "gold_basis": "New RoundToTen provider EB must precede consumer EA if split; merge and provider-first separation are both allowed.",
+    "source_sha256": "15da10f456fb8c2d5ac1967c4fd192c83d70308d13a3203aa43cb93c7028c376",
+    "multiple_boundary": true,
+    "external_information": "Hidden author intent is not supplied and not a required target.",
+    "observations": [
+      {
+        "reverse": false,
+        "fact_verdicts": {
+          "F1": "partial",
+          "F2": "partial"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": true,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract by replacing the original Total function with RoundToTen.",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": true,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": true
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": true
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "defer"
+        },
+        "oracle_relation_changed": false,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "fact-missing",
+          "fact-wrong",
+          "relation-wrong",
+          "unsupported-or-ambiguous",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      },
+      {
+        "reverse": true,
+        "fact_verdicts": {
+          "F1": "partial",
+          "F2": "missing"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": true,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": true,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": true
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": true
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "merge"
+        },
+        "oracle_relation_changed": false,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "fact-missing",
+          "relation-wrong",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      }
+    ]
+  },
+  {
+    "case": "cache-expiry-multiple-boundaries",
+    "expected_relation": "multiple_defensible",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "gold_basis": "Two cache policies may be jointly reviewed as one expiry adjustment or separately; no unique hidden intent or mandatory linkage is asserted.",
+    "source_sha256": "7f3686f78e54a7d16ee48764c2c320039f11b51bcca39dc5ab5dcddf3d62f9a7",
+    "multiple_boundary": true,
+    "external_information": "Hidden author intent is not supplied and not a required target.",
+    "observations": [
+      {
+        "reverse": false,
+        "fact_verdicts": {
+          "F1": "present_correct",
+          "F2": "present_correct"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "none",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract by updating TTL constants in both `image.go` and `document.go`.",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": true
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": true
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "defer"
+        },
+        "oracle_relation_changed": true,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "relation-wrong",
+          "unsupported-or-ambiguous",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      },
+      {
+        "reverse": true,
+        "fact_verdicts": {
+          "F1": "present_correct",
+          "F2": "present_correct"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": false,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "EA",
+            "consumer": "EB",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": true
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": true
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "merge"
+        },
+        "oracle_relation_changed": true,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "relation-wrong",
+          "unsupported-or-ambiguous",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      }
+    ]
+  },
+  {
+    "case": "unknown-admission-contract",
+    "expected_relation": "insufficient",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "gold_basis": "The unknown client admission policy may couple reservations; input cannot identify a mandatory adaptation or independence. Diagnostic requires defer.",
+    "source_sha256": "87986a5cd9588f4b356ac584c01ce2a16c12a4d6f4eb8b9fefb058360af34408",
+    "multiple_boundary": false,
+    "external_information": "Client Admission implementation and cross-resource constraints.",
+    "observations": [
+      {
+        "reverse": false,
+        "fact_verdicts": {
+          "F1": "partial",
+          "F2": "partial",
+          "F3": "missing"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": false
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": false
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "merge"
+        },
+        "oracle_relation_changed": false,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "fact-missing",
+          "relation-wrong",
+          "boundary-wrong",
+          "unsupported-or-ambiguous",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      },
+      {
+        "reverse": true,
+        "fact_verdicts": {
+          "F1": "present_correct",
+          "F2": "present_correct",
+          "F3": "missing"
+        },
+        "external_missing_recognized": false,
+        "B": {
+          "B1": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": false,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          },
+          "B2": {
+            "relation": "compensation",
+            "provider": "EB",
+            "consumer": "EA",
+            "label_correct": false,
+            "direction_correct": false,
+            "citations_exist": true,
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "reason_source_supported": false,
+            "reason_support_audit": "Explicit codec roundtrip supports compensation; generic assertion of joint contract in other cases is not a source-proven justification."
+          }
+        },
+        "C": {
+          "C1": {
+            "decision": "merge",
+            "allowed": false
+          },
+          "C2": {
+            "decision": "merge",
+            "allowed": false
+          }
+        },
+        "historical164": {
+          "baseline": "merge",
+          "policy": "merge"
+        },
+        "oracle_relation_changed": false,
+        "oracle_boundary_changed": false,
+        "baseline_historical_reproduced": true,
+        "provisional_failure_categories": [
+          "fact-missing",
+          "relation-wrong",
+          "boundary-wrong",
+          "unsupported-or-ambiguous",
+          "undetermined"
+        ],
+        "supported": "Output omissions/false claims, relationship/direction errors and boundary disagreements are independently observable.",
+        "counterevidence": "Correct C on positive cases can coexist with imperfect A/B; oracle facts do not identify a sole missing-fact cause.",
+        "undetermined": "Internal thought, schema wording/class bias, format/length/salience effects, and historical policy-specific defer cause cannot be localized by this design."
+      }
+    ]
+  }
+]

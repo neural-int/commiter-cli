@@ -1,0 +1,117 @@
+{
+  "issue": 165,
+  "phase": "preliminary",
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "go-test",
+      "command": [
+        "go",
+        "test",
+        "./..."
+      ],
+      "cwd": "/Users/Natsuki/.codex/worktrees/issue-165-stage-diagnostic/commiter-cli",
+      "exit": 0,
+      "pass": true,
+      "log_sha256": "ca5f2f3a212c4aea77408fc23db768e5ae2682f14a69d68b33480521c909f93d",
+      "log_path": "/tmp/issue165-preliminary-go-test.log",
+      "elapsed_seconds": 40.91775041609071,
+      "output": "?   \tgithub.com/natsuki0413/commiter-cli/cmd/commiter\t[no test files]\nok  \tgithub.com/natsuki0413/commiter-cli/internal/cli\t36.393s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/commitexec\t28.235s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/config\t1.453s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/contextinput\t1.504s\n?   \tgithub.com/natsuki0413/commiter-cli/internal/exitcode\t[no test files]\nok  \tgithub.com/natsuki0413/commiter-cli/internal/gitstate\t8.035s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/interaction\t2.716s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/llm\t3.478s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/metrics\t2.296s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/mlx\t17.982s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/mlxmodel\t3.643s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/ollama\t3.227s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/output\t3.116s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/planning\t5.881s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/pushexec\t3.760s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/relation\t3.190s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/repository\t6.319s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/syntax\t2.331s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/trust\t2.183s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/updatecheck\t2.331s\nok  \tgithub.com/natsuki0413/commiter-cli/internal/verification\t9.578s\n?   \tgithub.com/natsuki0413/commiter-cli/tools/benchmark110\t[no test files]\n?   \tgithub.com/natsuki0413/commiter-cli/tools/benchmark163/sourcefacts\t[no test files]\n?   \tgithub.com/natsuki0413/commiter-cli/tools/benchmark163/validate\t[no test files]\n"
+    },
+    {
+      "check": "go-vet",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "cwd": "/Users/Natsuki/.codex/worktrees/issue-165-stage-diagnostic/commiter-cli",
+      "exit": 0,
+      "pass": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_path": "/tmp/issue165-preliminary-go-vet.log",
+      "elapsed_seconds": 3.822275875136256,
+      "output": ""
+    },
+    {
+      "check": "go-build",
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "cwd": "/Users/Natsuki/.codex/worktrees/issue-165-stage-diagnostic/commiter-cli",
+      "exit": 0,
+      "pass": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_path": "/tmp/issue165-preliminary-go-build.log",
+      "elapsed_seconds": 4.421122834086418,
+      "output": ""
+    },
+    {
+      "check": "cli-build",
+      "command": [
+        "go",
+        "build",
+        "-o",
+        "/tmp/issue165-preliminary-commiter",
+        "./cmd/commiter"
+      ],
+      "cwd": "/Users/Natsuki/.codex/worktrees/issue-165-stage-diagnostic/commiter-cli",
+      "exit": 0,
+      "pass": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_path": "/tmp/issue165-preliminary-cli-build.log",
+      "elapsed_seconds": 4.311116583878174,
+      "output": ""
+    },
+    {
+      "check": "release-notes-tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        ".github/scripts/release-notes",
+        "-p",
+        "test_*.py"
+      ],
+      "cwd": "/Users/Natsuki/.codex/worktrees/issue-165-stage-diagnostic/commiter-cli",
+      "exit": 0,
+      "pass": true,
+      "log_sha256": "d623b09a92f14c66ae2a8839b747cbda5d74f727aee56c73d9971ddb2cf11e36",
+      "log_path": "/tmp/issue165-preliminary-release-notes-tests.log",
+      "elapsed_seconds": 1.5891464580781758,
+      "output": ".........................\n----------------------------------------------------------------------\nRan 25 tests in 1.403s\n\nOK\n"
+    },
+    {
+      "check": "swift-tests",
+      "command": [
+        "swift",
+        "test",
+        "-c",
+        "release",
+        "--skip-build",
+        "--disable-automatic-resolution"
+      ],
+      "cwd": "/tmp/issue163-helper",
+      "exit": 0,
+      "pass": true,
+      "log_sha256": "1410dd14d6d22267166c73e941e29f49020a5734ff6bd4bd00d966ca15f95485",
+      "log_path": "/tmp/issue165-preliminary-swift-tests.log",
+      "elapsed_seconds": 20.567281415918842,
+      "output": "Test Suite 'All tests' started at 2026-10-10 18:52:36.681.\nTest Suite 'All tests' passed at 2026-10-10 18:52:36.683.\n\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds\nTest Suite 'All tests' started at 2026-10-10 18:52:37.144.\nTest Suite 'All tests' passed at 2026-10-10 18:52:37.145.\n\t Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds\n􀟈  Test run started.\n􀄵  Testing Library Version: 2084\n􀄵  Target Platform: arm64e-apple-macos14.0\n􀟈  Suite \"Candidate final-channel boundary\" started.\n􀟈  Suite \"IPC framing\" started.\n􀟈  Test permitsSingleJSONFenceButNoProseOrPartialOutput() started.\n􀟈  Test rejectsMissingOrRepeatedFinalChannel() started.\n􀟈  Test \"accepts one bounded line followed by EOF\" started.\n􀟈  Test discardsNativeContent() started.\n􀟈  Test \"rejects a line that exceeds the bound\" started.\n􀟈  Test \"rejects a non-empty line without a delimiter\" started.\n􀟈  Test \"rejects trailing bytes in a later chunk\" started.\n􀟈  Test \"rejects trailing bytes in the same chunk\" started.\n􁁛  Test discardsNativeContent() passed after 0.001 seconds.\n􁁛  Test rejectsMissingOrRepeatedFinalChannel() passed after 0.001 seconds.\n􁁛  Test \"rejects trailing bytes in a later chunk\" passed after 0.001 seconds.\n􁁛  Test permitsSingleJSONFenceButNoProseOrPartialOutput() passed after 0.001 seconds.\n􁁛  Suite \"Candidate final-channel boundary\" passed after 0.001 seconds.\n􁁛  Test \"rejects trailing bytes in the same chunk\" passed after 0.001 seconds.\n􁁛  Test \"rejects a line that exceeds the bound\" passed after 0.001 seconds.\n􁁛  Test \"accepts one bounded line followed by EOF\" passed after 0.002 seconds.\n􁁛  Test \"rejects a non-empty line without a delimiter\" passed after 0.002 seconds.\n􁁛  Suite \"IPC framing\" passed after 0.002 seconds.\n􁁛  Test run with 8 tests in 2 suites passed after 0.002 seconds.\n􀟈  Test run started.\n􀄵  Testing Library Version: 2084\n􀄵  Target Platform: arm64e-apple-macos14.0\n􀟈  Suite \"Sampling grammar state\" started.\n􀟈  Suite \"Full prompt and output reservation\" started.\n􀟈  Suite \"Bounded native thought transition\" started.\n􀟈  Test copyHasIndependentMatcher() started.\n􀟈  Test diagnosticMarksUnterminatedAndUnavailableStates() started.\n􀟈  Test runtimeStopCountsDistinguishAllowedWhitespaceFromEOS() started.\n􀟈  Test rejectsEarlyStop() started.\n􀟈  Test diagnosticSeparatesBoundsCommitAndPrefetchFailures() started.\n􀟈  Test enforcesLengthAndStop() started.\n􀟈  Test bothBooleanValuesAreAllowed() started.\n􀟈  Test sharedTokenizerKeepsSchemaMatchersIndependent() started.\n􀟈  Test topLevelBooleanIsStrictAndTerminal() started.\n􀟈  Test maximumCountsAvoidOverflow() started.\n􀟈  Test negativeCountsFail() started.\n􀟈  Test alignedRuntimeStopsPreserveJSONAndTerminalEOS() started.\n􀟈  Test promptExceedsContextFails() started.\n􀟈  Test exactBoundaryFits() started.\n􀟈  Test unspecifiedContextRetainsLegacyBehavior() started.\n􀟈  Test ministralMarkersCloseBeforeStrictBooleanResponse() started.\n􀟈  Test diagnosticSeparatesNativeTransitionsAndResponseFailure() started.\n􀟈  Test measuredA136RequiresLargerContext() started.\n􀟈  Test oneTokenOverFails() started.\n􀟈  Test copiesDoNotSharePhaseState() started.\n􀟈  Test earlyEOSAndMissingChannelFailClosed() started.\n􀟈  Test naturalBoundaryIsNotForced() started.\n􀟈  Test forcedOpenAndCopiedBoundaryRemainIndependent() started.\n􀟈  Test forcesBoundaryThenValidatesResponse() started.\n􁁛  Test enforcesLengthAndStop() passed after 0.008 seconds.\n􁁛  Test copyHasIndependentMatcher() passed after 0.008 seconds.\n􁁛  Test diagnosticMarksUnterminatedAndUnavailableStates() passed after 0.008 seconds.\n􁁛  Test rejectsEarlyStop() passed after 0.008 seconds.\n􁁛  Test maximumCountsAvoidOverflow() passed after 0.008 seconds.\n􁁛  Test promptExceedsContextFails() passed after 0.008 seconds.\n􁁛  Test exactBoundaryFits() passed after 0.008 seconds.\n􁁛  Test unspecifiedContextRetainsLegacyBehavior() passed after 0.008 seconds.\n􁁛  Test negativeCountsFail() passed after 0.008 seconds.\n􁁛  Test sharedTokenizerKeepsSchemaMatchersIndependent() passed after 0.008 seconds.\n􁁛  Test measuredA136RequiresLargerContext() passed after 0.008 seconds.\n􁁛  Test oneTokenOverFails() passed after 0.008 seconds.\n􁁛  Test ministralMarkersCloseBeforeStrictBooleanResponse() passed after 0.008 seconds.\n􁁛  Test diagnosticSeparatesBoundsCommitAndPrefetchFailures() passed after 0.008 seconds.\n􁁛  Test topLevelBooleanIsStrictAndTerminal() passed after 0.008 seconds.\n􁁛  Test runtimeStopCountsDistinguishAllowedWhitespaceFromEOS() passed after 0.008 seconds.\n􁁛  Test naturalBoundaryIsNotForced() passed after 0.008 seconds.\n􁁛  Suite \"Full prompt and output reservation\" passed after 0.008 seconds.\n􁁛  Test copiesDoNotSharePhaseState() passed after 0.009 seconds.\n􁁛  Test earlyEOSAndMissingChannelFailClosed() passed after 0.010 seconds.\n􁁛  Test forcesBoundaryThenValidatesResponse() passed after 0.010 seconds.\n􁁛  Test alignedRuntimeStopsPreserveJSONAndTerminalEOS() passed after 0.011 seconds.\n􁁛  Test forcedOpenAndCopiedBoundaryRemainIndependent() passed after 0.010 seconds.\n􁁛  Test diagnosticSeparatesNativeTransitionsAndResponseFailure() passed after 0.012 seconds.\n􁁛  Suite \"Bounded native thought transition\" passed after 0.012 seconds.\n􁁛  Test bothBooleanValuesAreAllowed() passed after 0.018 seconds.\n􁁛  Suite \"Sampling grammar state\" passed after 0.018 seconds.\n􁁛  Test run with 24 tests in 3 suites passed after 0.018 seconds.\n"
+    }
+  ],
+  "syntax": {
+    "tools/benchmark165/audit_results.py": true,
+    "tools/benchmark165/diagnose.py": true
+  },
+  "diff_check": true,
+  "new_unit_tests": 0,
+  "production_changed": false,
+  "additional_model_generations": 0,
+  "helper_tests": "existing pinned experimental helper source and release build; skip-build tests; no rebuild/download/new dependency",
+  "purpose": "Issue deliverable quality evidence; not Goal final gate because human reference audit and all Issue checkboxes are pending"
+}

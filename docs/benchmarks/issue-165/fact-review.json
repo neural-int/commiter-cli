@@ -1,0 +1,485 @@
+{
+  "issue": 165,
+  "reviewer": "Codex agent manual static source review; not an independent human reviewer",
+  "reference_audit": "19 fixed source facts manually audited by Codex before generation; independent human review requested and pending; no reference/gold changes after generation",
+  "rubric": "Human source audit against preregistered F items; exact provenance checked mechanically, semantic truth manually; all missing/wrong/partial/unsupported facts retained.",
+  "partial_definition": "Recognized correct after behavior or fragment, but omitted essential before/after contrast or explicit contract; accurate but insufficient for the registered fact item.",
+  "quote_policy": "Byte/line/ID validity is evaluated separately. No normalization or repair of raw quotes.",
+  "rows": [
+    {
+      "case": "nil-slice-corresponding-assertion",
+      "reverse": false,
+      "answer_sha256": "a7ca685f7ff6e10e59f14a01a9e032e17c7e6fbe8afe008bd93db0cb6546174b",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "partial",
+          "claim_indices": [
+            1
+          ],
+          "reason": "nil判定追加は正しいが、beforeの非nil空sliceとafterのnil戻り値を完全には記述していない。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "partial",
+          "claim_indices": [
+            2
+          ],
+          "reason": "afterのnon-nil失敗条件への言及はあるがbefore条件と期待nilの対応が欠ける。"
+        }
+      ],
+      "extra_claims": [],
+      "external_missing_recognized": false,
+      "citation_validity_separate": false
+    },
+    {
+      "case": "nil-slice-corresponding-assertion",
+      "reverse": true,
+      "answer_sha256": "9b58eae806a10f50c28b3e0bddcd71d4fd3caf7f64877139c4b13508d039b7dc",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "partial",
+          "claim_indices": [
+            1
+          ],
+          "reason": "afterのnil戻り値は正しいがbeforeの非nil空sliceが欠ける。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "wrong",
+          "claim_indices": [
+            3,
+            4
+          ],
+          "reason": "afterはClone(nil)がnon-nilの場合に失敗する。claim3はnilなら失敗すると逆転して記述し、claim4のbefore記述と混同している。"
+        }
+      ],
+      "extra_claims": [
+        {
+          "claim_index": 2,
+          "verdict": "accurate_but_unchanged",
+          "reason": "appendによるコピーはbeforeにも存在し、追加の変更事実ではない。"
+        }
+      ],
+      "external_missing_recognized": false,
+      "citation_validity_separate": false
+    },
+    {
+      "case": "shared-bound-independent-ui-and-batch",
+      "reverse": false,
+      "answer_sha256": "b86006a7115debc82f804c0866078310857f41ac11b71829e117e59932fae2f5",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "partial",
+          "claim_indices": [
+            1
+          ],
+          "reason": "afterの+2は正しいがbeforeとの差分と引数不変の明示が不足。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "partial",
+          "claim_indices": [
+            2
+          ],
+          "reason": "afterの上限16は正しいがbefore上限32が欠ける。"
+        },
+        {
+          "fact_id": "F3",
+          "verdict": "missing",
+          "claim_indices": [],
+          "reason": "Bound本体の分岐と不変性を抽出していない。"
+        }
+      ],
+      "extra_claims": [],
+      "external_missing_recognized": false,
+      "citation_validity_separate": true
+    },
+    {
+      "case": "shared-bound-independent-ui-and-batch",
+      "reverse": true,
+      "answer_sha256": "444eedab8a5b29cd3064f5ece8fb56c1f645e54b85273885055714c1649b9d00",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "present_correct",
+          "claim_indices": [
+            2
+          ],
+          "reason": "Bound(n,80)から+2へのbefore/afterを正しく記述。引用の閉じ括弧前空白が原sourceと異なるため引用実在性とは分ける。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "present_correct",
+          "claim_indices": [
+            1
+          ],
+          "reason": "32から16への引数差分を正しく記述。"
+        },
+        {
+          "fact_id": "F3",
+          "verdict": "missing",
+          "claim_indices": [],
+          "reason": "Bound本体の分岐と不変性を抽出していない。"
+        }
+      ],
+      "extra_claims": [],
+      "external_missing_recognized": false,
+      "citation_validity_separate": false
+    },
+    {
+      "case": "same-package-independent-time-and-permission",
+      "reverse": false,
+      "answer_sha256": "248d34927b8311a59fc2059bad3245ffe3b706628fe72992f0965079193b43df",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "partial",
+          "claim_indices": [
+            1
+          ],
+          "reason": "after >= は正しいがbefore > と境界の差分が欠ける。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "partial",
+          "claim_indices": [
+            2
+          ],
+          "reason": "afterのowner/editorは正しいがbefore owner限定との差分が欠ける。"
+        }
+      ],
+      "extra_claims": [],
+      "external_missing_recognized": false,
+      "citation_validity_separate": false
+    },
+    {
+      "case": "same-package-independent-time-and-permission",
+      "reverse": true,
+      "answer_sha256": "f5ace3b62139172cb98f4c3877fb0e2c71c2d2942007612b3c226928a9e60eaa",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "partial",
+          "claim_indices": [
+            1
+          ],
+          "reason": "after >= は正しいがbefore > が欠ける。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "partial",
+          "claim_indices": [
+            2
+          ],
+          "reason": "after owner/editorは正しいがbefore owner限定が欠ける。"
+        }
+      ],
+      "extra_claims": [],
+      "external_missing_recognized": false,
+      "citation_validity_separate": false
+    },
+    {
+      "case": "shared-import-independent-search-and-sort",
+      "reverse": false,
+      "answer_sha256": "850c01b49d7b6de64037e9665ea51ae47ca8d2b81cad12d598d59b22c26aed75",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "partial",
+          "claim_indices": [
+            1
+          ],
+          "reason": "afterの両引数小文字化は正しいがbefore直接Containsが欠ける。claimのfixture.goというpathは入力と異なる。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "partial",
+          "claim_indices": [
+            2
+          ],
+          "reason": "after > は正しいがbefore < を明示していない。"
+        }
+      ],
+      "extra_claims": [
+        {
+          "claim_index": 1,
+          "verdict": "wrong",
+          "reason": "Containsのsource pathはfind.goでありfixture.goではない。主たる動作の部分正解とlocation誤記を別に保存。"
+        }
+      ],
+      "external_missing_recognized": false,
+      "citation_validity_separate": true
+    },
+    {
+      "case": "shared-import-independent-search-and-sort",
+      "reverse": true,
+      "answer_sha256": "391022b8cf9f3ab4012c9f678cc81a880f43ca5602aed52678a61a60591c41db",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "partial",
+          "claim_indices": [
+            2
+          ],
+          "reason": "afterの両引数小文字化は正しいがbefore直接Containsが欠ける。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "partial",
+          "claim_indices": [
+            1
+          ],
+          "reason": "after > は正しいがbefore < が欠け、引用IDもEAではなくEBである。"
+        }
+      ],
+      "extra_claims": [],
+      "external_missing_recognized": false,
+      "citation_validity_separate": false
+    },
+    {
+      "case": "boolean-polarity-compensation",
+      "reverse": false,
+      "answer_sha256": "b0831b6c765cb996ad250baf909ad454c1e3c44f199583a11a23a654e0187e9e",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "partial",
+          "claim_indices": [
+            1
+          ],
+          "reason": "after true→0は正しいがfalse→1とbefore極性が欠ける。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "wrong",
+          "claim_indices": [
+            2
+          ],
+          "reason": "DecodeFlagはboolを返す。n=0でtrueであり、0というintを返すという記述は誤り。"
+        },
+        {
+          "fact_id": "F3",
+          "verdict": "missing",
+          "claim_indices": [],
+          "reason": "明示roundtrip契約と両boolean条件を抽出していない。"
+        }
+      ],
+      "extra_claims": [],
+      "external_missing_recognized": false,
+      "citation_validity_separate": false
+    },
+    {
+      "case": "boolean-polarity-compensation",
+      "reverse": true,
+      "answer_sha256": "4db3f0e87c7f7ad843df8a8eb6a3ff7a9d342d924f9b3587a40254e90a269a5e",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "wrong",
+          "claim_indices": [
+            1
+          ],
+          "reason": "afterはtrue→0/false→1であり、出力claimはbeforeのtrue→1/false→0をafterへ誤適用。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "wrong",
+          "claim_indices": [
+            2
+          ],
+          "reason": "DecodeFlagの戻り値型と意味をint恒等写像と誤記している。"
+        },
+        {
+          "fact_id": "F3",
+          "verdict": "missing",
+          "claim_indices": [],
+          "reason": "明示roundtrip契約と両boolean条件を抽出していない。"
+        }
+      ],
+      "extra_claims": [],
+      "external_missing_recognized": false,
+      "citation_validity_separate": false
+    },
+    {
+      "case": "new-round-provider-eb",
+      "reverse": false,
+      "answer_sha256": "92c001ed21b184ec9e1968b08a31e3f97af6398ce0d5dff7b7ec68fdc6f7c465",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "partial",
+          "claim_indices": [
+            1
+          ],
+          "reason": "afterのRoundToTen callは正しいがbefore return nが欠ける。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "partial",
+          "claim_indices": [
+            3
+          ],
+          "reason": "RoundToTen追加は正しいが式(n+9)/10*10をclaimで説明していない。"
+        }
+      ],
+      "extra_claims": [
+        {
+          "claim_index": 2,
+          "verdict": "wrong",
+          "reason": "Unchangedはbefore/afterの両方にあり追加ではない。"
+        }
+      ],
+      "external_missing_recognized": false,
+      "citation_validity_separate": false
+    },
+    {
+      "case": "new-round-provider-eb",
+      "reverse": true,
+      "answer_sha256": "dc39b91d29018572775b7a4ed56b66de2437d6dfc759b4b5ec04078663c9ec74",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "partial",
+          "claim_indices": [
+            1
+          ],
+          "reason": "afterのcallは正しいがbefore return nが欠ける。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "missing",
+          "claim_indices": [],
+          "reason": "新provider RoundToTenの追加と式を抽出していない。"
+        }
+      ],
+      "extra_claims": [
+        {
+          "claim_index": 2,
+          "verdict": "accurate_but_unchanged",
+          "reason": "Unchangedの不変性は正しいが新providerの抽出を代替しない。"
+        }
+      ],
+      "external_missing_recognized": false,
+      "citation_validity_separate": true
+    },
+    {
+      "case": "cache-expiry-multiple-boundaries",
+      "reverse": false,
+      "answer_sha256": "683a9704183de735b4e57b5f84a54ac62e32c43a557f0d28e0ba8a3fe1f19a4e",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "present_correct",
+          "claim_indices": [
+            1
+          ],
+          "reason": "60→120の両版と引用が正しい。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "present_correct",
+          "claim_indices": [
+            2
+          ],
+          "reason": "90→180の両版と引用が正しい。"
+        }
+      ],
+      "extra_claims": [],
+      "external_missing_recognized": false,
+      "citation_validity_separate": true
+    },
+    {
+      "case": "cache-expiry-multiple-boundaries",
+      "reverse": true,
+      "answer_sha256": "ae9a2b434550a899011313c6992f302aa641266119ac82d5aecaabbd02a596a4",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "present_correct",
+          "claim_indices": [
+            2
+          ],
+          "reason": "60→120の両版と引用が正しい。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "present_correct",
+          "claim_indices": [
+            1
+          ],
+          "reason": "90→180の両版と引用が正しい。"
+        }
+      ],
+      "extra_claims": [],
+      "external_missing_recognized": false,
+      "citation_validity_separate": true
+    },
+    {
+      "case": "unknown-admission-contract",
+      "reverse": false,
+      "answer_sha256": "e7e1031309fddaa383160a1d32494136db5327d0a140ae90b070e9d7aacb3e71",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "partial",
+          "claim_indices": [
+            1
+          ],
+          "reason": "after 3は正しいがbefore 2が欠ける。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "partial",
+          "claim_indices": [
+            2
+          ],
+          "reason": "after 6は正しいがbefore 4が欠ける。"
+        },
+        {
+          "fact_id": "F3",
+          "verdict": "missing",
+          "claim_indices": [],
+          "reason": "client Admissionとcross-resource制約の不足を抽出せず、missing_informationも空。"
+        }
+      ],
+      "extra_claims": [],
+      "external_missing_recognized": false,
+      "citation_validity_separate": true
+    },
+    {
+      "case": "unknown-admission-contract",
+      "reverse": true,
+      "answer_sha256": "7e590e16c465bd4fee543e0029954be822c7b92f033b1c76788efd216d9f53d6",
+      "fact_reviews": [
+        {
+          "fact_id": "F1",
+          "verdict": "present_correct",
+          "claim_indices": [
+            1
+          ],
+          "reason": "2→3のclaimは正しい。ただしEA/EB引用IDが逆でgroundingは不成立。"
+        },
+        {
+          "fact_id": "F2",
+          "verdict": "present_correct",
+          "claim_indices": [
+            2
+          ],
+          "reason": "4→6のclaimは正しい。ただしEA/EB引用IDが逆でgroundingは不成立。"
+        },
+        {
+          "fact_id": "F3",
+          "verdict": "missing",
+          "claim_indices": [],
+          "reason": "client Admissionとcross-resource制約の不足を抽出せず、missing_informationも空。"
+        }
+      ],
+      "extra_claims": [],
+      "external_missing_recognized": false,
+      "citation_validity_separate": false
+    }
+  ]
+}

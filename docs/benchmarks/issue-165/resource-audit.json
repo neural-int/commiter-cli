@@ -1,0 +1,40 @@
+{
+  "all_calls": 80,
+  "pressure_warning_calls": 80,
+  "pressure_level_counts": {
+    "1": 2,
+    "2": 823
+  },
+  "swap_increase_calls": [
+    {
+      "case": "boolean-polarity-compensation",
+      "stage": "B1",
+      "reverse": false,
+      "approx_delta_bytes": 14942208.0
+    },
+    {
+      "case": "boolean-polarity-compensation",
+      "stage": "B2",
+      "reverse": false,
+      "approx_delta_bytes": 56098816.0
+    },
+    {
+      "case": "boolean-polarity-compensation",
+      "stage": "C2",
+      "reverse": false,
+      "approx_delta_bytes": 16378757.119999886
+    }
+  ],
+  "footprint_max_bytes": 2865973552,
+  "observed_lifetime_footprint_max_bytes": 2865973552,
+  "global_swap_before": "vm.swapusage: total = 4096.00M  used = 3805.25M  free = 290.75M  (encrypted)\n",
+  "global_swap_after": "vm.swapusage: total = 5120.00M  used = 3872.62M  free = 1247.38M  (encrypted)\n",
+  "resource_qualification": "failed normal-pressure condition in all calls; do not attribute global system pressure/swap solely to model",
+  "footprint_within_5GB_calls": 80,
+  "monetary_api_cost": 0,
+  "new_download_bytes": 0,
+  "electricity_cost": "not measured",
+  "sample_interval_ms": 100,
+  "metal_independent_allocation": null,
+  "limitations": "Developer apps coexisted. Swap deltas are approximations from two-decimal system outputs, not exact per-process allocations. Sampling can miss exit peaks; RSS/MLX/Metal must not be added."
+}
