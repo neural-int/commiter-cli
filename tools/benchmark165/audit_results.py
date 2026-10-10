@@ -94,12 +94,13 @@ def audit():
     assert summary['post_identity_match'] and summary['all_native_tokens_match']
     total=summary['preparation_seconds']+summary['run_seconds']
     assert total<=fixed['whole_seconds']
-    scope=d.command(['git','diff','--name-only',d.BASE]).stdout.decode().splitlines()
+    scope=d.command(['git','diff','--name-only',d.BASE]).stdout.decode().splitlines()+d.command(['git','ls-files','--others','--exclude-standard']).stdout.decode().splitlines()
     assert all(p.startswith(('docs/benchmarks/issue-165/','tools/benchmark165/')) for p in scope)
     d.write('case-evidence.json',comparisons)
     d.write('result-audit.json',dict(issue=165,all_pass=True,scope=scope,checked_rows=checks,
                                     calls=80,retries=0,additional_generations=0,fact_counts=dict(fact_counts),extra_counts=dict(extra_counts),
-                                    exact_quote_claims=sum(all(e['exists'] for e in d.citation_audit(r['answer'],cases[r['case']],'A')) for r in rows if r['stage']=='A'),
+                                    exact_quote_rows=sum(all(e['exists'] for e in d.citation_audit(r['answer'],cases[r['case']],'A')) for r in rows if r['stage']=='A'),
+                                    exact_quote_claims=sum(all(e['exists'] for e in d.citation_audit({'facts':[f]},cases[r['case']],'A')) for r in rows if r['stage']=='A' for f in r['answer']['facts']),
                                     fresh_plan_checks={c:dict(authoritative=v['authoritative'],reconstruction=v['reconstruction'],all_ordered_pass=v['all_ordered_pass']) for (c,_),v in cache.items()},
                                     total_experiment_seconds=total,post_audit_seconds=time.monotonic()-start,
                                     reference_audit=manual['reference_audit'],semantic_review_by=manual['reviewer'],

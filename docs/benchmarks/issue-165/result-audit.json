@@ -2,16 +2,29 @@
   "issue": 165,
   "all_pass": true,
   "scope": [
+    "docs/benchmarks/issue-165/case-evidence.json",
+    "docs/benchmarks/issue-165/completion-audit.json",
     "docs/benchmarks/issue-165/contract.md",
+    "docs/benchmarks/issue-165/delivery-audit.json",
+    "docs/benchmarks/issue-165/fact-review.json",
     "docs/benchmarks/issue-165/goal-source.json",
     "docs/benchmarks/issue-165/input-contract-audit.json",
     "docs/benchmarks/issue-165/issue-source.json",
     "docs/benchmarks/issue-165/machine-baseline.json",
     "docs/benchmarks/issue-165/native-token-audit.json",
     "docs/benchmarks/issue-165/preflight.json",
+    "docs/benchmarks/issue-165/preliminary-quality-gates.json",
     "docs/benchmarks/issue-165/preregistered.json",
     "docs/benchmarks/issue-165/remote-registration.json",
+    "docs/benchmarks/issue-165/report.md",
+    "docs/benchmarks/issue-165/resource-audit.json",
+    "docs/benchmarks/issue-165/resource-preflight.json",
+    "docs/benchmarks/issue-165/result-audit.json",
+    "docs/benchmarks/issue-165/results.jsonl",
     "docs/benchmarks/issue-165/source-audit.json",
+    "docs/benchmarks/issue-165/summary.json",
+    "docs/benchmarks/issue-165/targeted-quality-checks.json",
+    "tools/benchmark165/audit_results.py",
     "tools/benchmark165/diagnose.py"
   ],
   "checked_rows": [
@@ -749,7 +762,7 @@
     "accurate_but_unchanged": 2,
     "wrong": 2
   },
-  "exact_quote_claims": 6,
+  "exact_quote_claims": 19,
   "fresh_plan_checks": {
     "nil-slice-corresponding-assertion": {
       "authoritative": {
@@ -1032,5 +1045,11 @@
   "results_sha256": "f09bb2c4b7d50168b4d48cfbffb4b4c020df91a6cb3ad7e3135adf1dcbf14730",
   "summary_sha256": "6d73cc0cda7720a99c972fd296730010d3f9f5e96e5050eae9c23d12e4769bfb",
   "production_changed": false,
-  "limits": "Known exploratory corpus only. Separate output tasks, not within-chain causality. Oracle facts confound textual format, length, salience and information; no relation labels/boundary gold/test results in facts. No adoption Gate."
+  "limits": "Known exploratory corpus only. Separate output tasks, not within-chain causality. Oracle facts confound textual format, length, salience and information; no relation labels/boundary gold/test results in facts. No adoption Gate.",
+  "exact_quote_rows": 6,
+  "post_metric_name_correction": {
+    "original_result_audit_sha256": "479773c99d8ba8e8e51dd4079e8ebd332a48af85eff12fbe0a4ab2acf21b3c7c",
+    "explanation": "Originally named exact_quote_claims counted whole response rows. Rename row count to exact_quote_rows=6; independently recomputed claim count=19. Raw, prompts, facts, verdicts and thresholds unchanged. Added full final file scope including formerly untracked analysis artifacts.",
+    "additional_generations": 0
+  }
 }
