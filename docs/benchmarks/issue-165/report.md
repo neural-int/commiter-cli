@@ -88,7 +88,7 @@ correctはpresent_correctの略。完全claimでも引用ID/空白/引用符が�
 
 ### 費用・資源・安全
 
-準備39.746秒＋生成/構造監査688.421秒＝728.167秒、post再集計/確定案再監査6.122秒。準備/生成80callは3600秒の実験上限内で、post監査400秒の予約内。API/model料金0、download0bytes、新依存0。電気料金は未計測。
+記録された準備39.746秒＋生成/構造監査688.421秒＝728.167秒、post再集計/確定案再監査6.122秒。準備timerの終端後にmanifest保存/既存preflight、run timerの終端後に最終identity hash確認があるため、728.167秒を全作業の厳密なwall timeとは扱わない。準備/生成80callは3600秒の実験上限内で、post監査400秒の予約内。API/model料金0、download0bytes、新依存0。電気料金は未計測。
 
 | 条件 | input / output tokens | TTFT中央値 秒 | process wall中央値 秒 | 採取footprint最大 bytes |
 |---|---:|---:|---:|---:|
@@ -133,4 +133,4 @@ correctはpresent_correctの略。完全claimでも引用ID/空白/引用符が�
 
 targeted checksは構造拒否27件、入力差/引用/schema拒否5件、全80応答照合、8確定案のauthoritative/完全割当/再構築/ordered fixture tests、resource計測器lifecycle、Python構文、diff検査がPASS。研究専用docs/tools以外の変更0、main HEADと既存 `.gitignore` 変更を保持、production/default/4file/staging/metadata/依存変更0。unit tests追加0、機能更新/削除なしなので既存テストの削除は不要。
 
-Issue成果条件の品質証拠として既存Go test/vet/build、CLI build、release-notes Python tests、固定helperのSwift testsを確認する。結果は `preliminary-quality-gates.json` に保存し、goal.mdの最終品質ゲートとは区別する。人間レビューと全Issueチェックの成立前にGoal完了や最終Gate実施済みとは報告しない。
+Issue成果条件の品質証拠としてGo test 20package、Go vet/build、CLI build、release-notes Python tests 25件、固定helperのSwift Testing 32件（8+24）がすべてPASSした。結果は `preliminary-quality-gates.json` に保存し、goal.mdの最終品質ゲートとは区別する。人間レビューと全Issueチェックの成立前にGoal完了や最終Gate実施済みとは報告しない。
