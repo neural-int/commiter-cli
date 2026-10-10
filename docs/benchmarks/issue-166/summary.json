@@ -1,0 +1,364 @@
+{
+  "issue": 166,
+  "conditions": {
+    "B1": {
+      "rows": 16,
+      "calls": 16,
+      "schema_valid": 16,
+      "statuses": {
+        "completed": 16
+      },
+      "label_distribution": {
+        "compensation": 16
+      },
+      "relation_correct": 2,
+      "independent_correct": 0,
+      "independent_rows": 6,
+      "citation_all_exist_rows": 7,
+      "exact_citation_claims": 10,
+      "citation_claims": 22,
+      "label_order_stable": 8,
+      "input_tokens": 16044,
+      "output_tokens": 1681,
+      "direction_gold_correct": 2,
+      "nondependency_direction_violations": 16,
+      "direction_fields_present_rows": 16,
+      "direction_comparability": "gold direction and output rule violations separately",
+      "pressure_warning_calls": 16,
+      "pressure_levels": {
+        "2": 194
+      },
+      "swap_increase_calls": 1,
+      "ttft_seconds_median": 6.420982480049133,
+      "total_seconds_median": 10.397358208429068,
+      "sampled_peak_footprint_bytes_max": 2787461424,
+      "observed_lifetime_peak_footprint_bytes_max": 2792130888,
+      "sampled_peak_rss_bytes_max": 1923563520,
+      "mlx_peak_bytes_max": 2296856464,
+      "reason_source_support": {
+        "unsupported": 9,
+        "partially_supported": 5,
+        "supported": 2
+      }
+    },
+    "T1": {
+      "rows": 16,
+      "calls": 16,
+      "schema_valid": 16,
+      "statuses": {
+        "completed": 16
+      },
+      "label_distribution": {
+        "compensation": 16
+      },
+      "relation_correct": 2,
+      "independent_correct": 0,
+      "independent_rows": 6,
+      "citation_all_exist_rows": 7,
+      "exact_citation_claims": 9,
+      "citation_claims": 21,
+      "label_order_stable": 8,
+      "input_tokens": 16044,
+      "output_tokens": 1586,
+      "direction_gold_correct": 2,
+      "nondependency_direction_violations": 16,
+      "direction_fields_present_rows": 16,
+      "direction_comparability": "gold direction and output rule violations separately",
+      "pressure_warning_calls": 16,
+      "pressure_levels": {
+        "1": 2,
+        "2": 166
+      },
+      "swap_increase_calls": 0,
+      "ttft_seconds_median": 5.112426459789276,
+      "total_seconds_median": 8.256301771034487,
+      "sampled_peak_footprint_bytes_max": 2794293576,
+      "observed_lifetime_peak_footprint_bytes_max": 2794293576,
+      "sampled_peak_rss_bytes_max": 1927200768,
+      "mlx_peak_bytes_max": 2296856464,
+      "reason_source_support": {
+        "unsupported": 13,
+        "supported": 2,
+        "partially_supported": 1
+      }
+    },
+    "T2": {
+      "rows": 16,
+      "calls": 16,
+      "schema_valid": 16,
+      "statuses": {
+        "completed": 16
+      },
+      "label_distribution": {
+        "compensation": 16
+      },
+      "relation_correct": 2,
+      "independent_correct": 0,
+      "independent_rows": 6,
+      "citation_all_exist_rows": 3,
+      "exact_citation_claims": 20,
+      "citation_claims": 42,
+      "label_order_stable": 8,
+      "input_tokens": 15276,
+      "output_tokens": 2445,
+      "direction_gold_correct": null,
+      "nondependency_direction_violations": null,
+      "direction_fields_present_rows": 0,
+      "direction_comparability": "not scored; schema omission is not accuracy improvement",
+      "pressure_warning_calls": 16,
+      "pressure_levels": {
+        "2": 193
+      },
+      "swap_increase_calls": 0,
+      "ttft_seconds_median": 5.227368950843811,
+      "total_seconds_median": 10.096989999525249,
+      "sampled_peak_footprint_bytes_max": 2757593416,
+      "observed_lifetime_peak_footprint_bytes_max": 2757609800,
+      "sampled_peak_rss_bytes_max": 1923235840,
+      "mlx_peak_bytes_max": 2318385192,
+      "reason_source_support": {
+        "partially_supported": 10,
+        "unsupported": 6
+      }
+    }
+  },
+  "comparisons": {
+    "T1": {
+      "classification": "no material change",
+      "complete_contract": true,
+      "label_changed_rows": 0,
+      "reason_changed_rows": 5,
+      "evidence_changed_rows": 2,
+      "native_input_delta_rows": [
+        {
+          "case": "nil-slice-corresponding-assertion",
+          "reverse": false,
+          "delta": 0
+        },
+        {
+          "case": "nil-slice-corresponding-assertion",
+          "reverse": true,
+          "delta": 0
+        },
+        {
+          "case": "shared-bound-independent-ui-and-batch",
+          "reverse": false,
+          "delta": 0
+        },
+        {
+          "case": "shared-bound-independent-ui-and-batch",
+          "reverse": true,
+          "delta": 0
+        },
+        {
+          "case": "same-package-independent-time-and-permission",
+          "reverse": false,
+          "delta": 0
+        },
+        {
+          "case": "same-package-independent-time-and-permission",
+          "reverse": true,
+          "delta": 0
+        },
+        {
+          "case": "shared-import-independent-search-and-sort",
+          "reverse": false,
+          "delta": 0
+        },
+        {
+          "case": "shared-import-independent-search-and-sort",
+          "reverse": true,
+          "delta": 0
+        },
+        {
+          "case": "boolean-polarity-compensation",
+          "reverse": false,
+          "delta": 0
+        },
+        {
+          "case": "boolean-polarity-compensation",
+          "reverse": true,
+          "delta": 0
+        },
+        {
+          "case": "new-round-provider-eb",
+          "reverse": false,
+          "delta": 0
+        },
+        {
+          "case": "new-round-provider-eb",
+          "reverse": true,
+          "delta": 0
+        },
+        {
+          "case": "cache-expiry-multiple-boundaries",
+          "reverse": false,
+          "delta": 0
+        },
+        {
+          "case": "cache-expiry-multiple-boundaries",
+          "reverse": true,
+          "delta": 0
+        },
+        {
+          "case": "unknown-admission-contract",
+          "reverse": false,
+          "delta": 0
+        },
+        {
+          "case": "unknown-admission-contract",
+          "reverse": true,
+          "delta": 0
+        }
+      ],
+      "limit": "historical baseline and known exploratory corpus; dual schema/grammar and T2 prompt/length effects not isolated"
+    },
+    "T2": {
+      "classification": "no material change",
+      "complete_contract": true,
+      "label_changed_rows": 0,
+      "reason_changed_rows": 12,
+      "evidence_changed_rows": 14,
+      "native_input_delta_rows": [
+        {
+          "case": "nil-slice-corresponding-assertion",
+          "reverse": false,
+          "delta": -48
+        },
+        {
+          "case": "nil-slice-corresponding-assertion",
+          "reverse": true,
+          "delta": -48
+        },
+        {
+          "case": "shared-bound-independent-ui-and-batch",
+          "reverse": false,
+          "delta": -48
+        },
+        {
+          "case": "shared-bound-independent-ui-and-batch",
+          "reverse": true,
+          "delta": -48
+        },
+        {
+          "case": "same-package-independent-time-and-permission",
+          "reverse": false,
+          "delta": -48
+        },
+        {
+          "case": "same-package-independent-time-and-permission",
+          "reverse": true,
+          "delta": -48
+        },
+        {
+          "case": "shared-import-independent-search-and-sort",
+          "reverse": false,
+          "delta": -48
+        },
+        {
+          "case": "shared-import-independent-search-and-sort",
+          "reverse": true,
+          "delta": -48
+        },
+        {
+          "case": "boolean-polarity-compensation",
+          "reverse": false,
+          "delta": -48
+        },
+        {
+          "case": "boolean-polarity-compensation",
+          "reverse": true,
+          "delta": -48
+        },
+        {
+          "case": "new-round-provider-eb",
+          "reverse": false,
+          "delta": -48
+        },
+        {
+          "case": "new-round-provider-eb",
+          "reverse": true,
+          "delta": -48
+        },
+        {
+          "case": "cache-expiry-multiple-boundaries",
+          "reverse": false,
+          "delta": -48
+        },
+        {
+          "case": "cache-expiry-multiple-boundaries",
+          "reverse": true,
+          "delta": -48
+        },
+        {
+          "case": "unknown-admission-contract",
+          "reverse": false,
+          "delta": -48
+        },
+        {
+          "case": "unknown-admission-contract",
+          "reverse": true,
+          "delta": -48
+        }
+      ],
+      "limit": "historical baseline and known exploratory corpus; dual schema/grammar and T2 prompt/length effects not isolated"
+    }
+  },
+  "run_metadata": {
+    "registration_commit": "e1727ac512d60228a788ffbdd6dcb3d4e3da1c51",
+    "generation_calls": 32,
+    "run_seconds": 307.9437643329147,
+    "retries": 0,
+    "stop_reason": null,
+    "system_before": {
+      "vm_stat": {
+        "exit": 0,
+        "stdout": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     5486.\nPages active:                                 239739.\nPages inactive:                               231932.\nPages speculative:                              7202.\nPages throttled:                                   0.\nPages wired down:                             177636.\nPages purgeable:                                  13.\n\"Translation faults\":                     7491897865.\nPages copy-on-write:                       444519196.\nPages zero filled:                        7156477863.\nPages reactivated:                         968438889.\nPages purged:                              192770798.\nFile-backed pages:                            175078.\nAnonymous pages:                              303795.\nPages stored in compressor:                  1338911.\nPages occupied by compressor:                 349046.\nDecompressions:                           1487999605.\nCompressions:                             1870440648.\nPageins:                                  1040586575.\nPageouts:                                    2943974.\nSwapins:                                    32306630.\nSwapouts:                                   54150242.\n",
+        "stderr": ""
+      },
+      "swap": {
+        "exit": 0,
+        "stdout": "vm.swapusage: total = 5120.00M  used = 4020.06M  free = 1099.94M  (encrypted)\n",
+        "stderr": ""
+      },
+      "pressure": {
+        "exit": 0,
+        "stdout": "The system has 17179869184 (1048576 pages with a page size of 16384).\nSystem-wide memory free percentage: 47%\n",
+        "stderr": ""
+      },
+      "pressure_level": {
+        "exit": 0,
+        "stdout": "1\n",
+        "stderr": ""
+      }
+    },
+    "system_after": {
+      "vm_stat": {
+        "exit": 0,
+        "stdout": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                   163059.\nPages active:                                 160021.\nPages inactive:                               157315.\nPages speculative:                              2188.\nPages throttled:                                   0.\nPages wired down:                             179279.\nPages purgeable:                                3510.\n\"Translation faults\":                     7498961534.\nPages copy-on-write:                       444783783.\nPages zero filled:                        7163779764.\nPages reactivated:                         969681770.\nPages purged:                              192980367.\nFile-backed pages:                            143837.\nAnonymous pages:                              175687.\nPages stored in compressor:                  1346786.\nPages occupied by compressor:                 349157.\nDecompressions:                           1489847939.\nCompressions:                             1872414573.\nPageins:                                  1041620100.\nPageouts:                                    2945625.\nSwapins:                                    32307591.\nSwapouts:                                   54150242.\n",
+        "stderr": ""
+      },
+      "swap": {
+        "exit": 0,
+        "stdout": "vm.swapusage: total = 5120.00M  used = 4012.06M  free = 1107.94M  (encrypted)\n",
+        "stderr": ""
+      },
+      "pressure": {
+        "exit": 0,
+        "stdout": "The system has 17179869184 (1048576 pages with a page size of 16384).\nSystem-wide memory free percentage: 47%\n",
+        "stderr": ""
+      },
+      "pressure_level": {
+        "exit": 0,
+        "stdout": "2\n",
+        "stderr": ""
+      }
+    },
+    "post_identity_matches": true
+  },
+  "raw_sha256": "1921aba51b980123e79a50a7a7edd6f4cb81da8537ee7309b6165e1d364bcf07",
+  "generated_retries": 0,
+  "tokenizer_calls": 33,
+  "initial_preparation_observation_gap": true,
+  "production_changed": false
+}

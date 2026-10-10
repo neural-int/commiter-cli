@@ -1,0 +1,2377 @@
+{
+  "reviewer": "Codex source audit; not independent human review",
+  "rubric": "Review ALL B1/T1/T2 rows against unchanged source; supported / partially_supported / unsupported / unavailable. Exact quote existence separate from relation truth; no string-overlap scoring. Agent audit, not independent human gold.",
+  "overlap_scoring": false,
+  "rows": [
+    {
+      "case": "nil-slice-corresponding-assertion",
+      "arm": "B1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "95471d6cbebdb6471fb17863b32dda7fd162d0a0cbe7b74f323c71e4c02ff9f7",
+      "verdict": "unsupported",
+      "explanation": "nilnessとassertion期待値そのものが変わる。既存joint behavior保存の主張は成立せず、関係は対応実装/assertion。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Clone(nil) before returns a non-nil empty slice; after explicitly returns nil for nil input.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return append([]int{}, v...)"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "if v == nil { return nil }"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "TestNil calls Clone(nil); before fails on nil, after fails on non-nil.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 4,
+              "quote": "if Clone(nil) == nil"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "if Clone(nil) != nil"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "nil-slice-corresponding-assertion",
+      "arm": "B1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "32bce3fdebddc1592c60b81e59d6c5fa56f923c8fc56547c8295e2dce7e01603",
+      "verdict": "unsupported",
+      "explanation": "同左。引用のbeforeにもafterの振る舞いを記載しており、版の帰属も誤る。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Clone(nil) before returns a non-nil empty slice; after explicitly returns nil for nil input.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return append([]int{}, v...)"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "if v == nil { return nil }"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "TestNil calls Clone(nil); before fails on nil, after fails on non-nil.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 4,
+              "quote": "if Clone(nil) == nil"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "if Clone(nil) != nil"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "shared-bound-independent-ui-and-batch",
+      "arm": "B1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract by adjusting the return value of `DisplayWidth` to include an additional 2.",
+      "answer_sha256": "0a742853a390947ce095a8db13cf83a29074a3e07e4da5bf4b680ca11fba9802",
+      "verdict": "partially_supported",
+      "explanation": "DisplayWidthの+2は正しいがBatchSizeとのjoint contractはsourceにない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "DisplayWidth adds 2 to Bound(n,80) after the change; its Bound arguments stay the same.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return Bound(n, 80)"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return Bound(n, 80) + 2"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "BatchSize changes the Bound maximum argument from 32 to 16.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "Bound(n, 32)"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "Bound(n, 16)"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "Bound returns max when n > max, otherwise n; this helper is unchanged.",
+          "evidence": [
+            {
+              "source": "context:bound.go",
+              "line": 3,
+              "quote": "if n > max { return max }; return n"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "shared-bound-independent-ui-and-batch",
+      "arm": "B1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract by adjusting the return value of `DisplayWidth` to include an additional 2 units.",
+      "answer_sha256": "8aadb55800bb748135c02fcbb0cc78f68d3fd071399a490088f6a5637a5d25f5",
+      "verdict": "partially_supported",
+      "explanation": "DisplayWidthの+2は正しいがBatchSizeとのjoint contractはsourceにない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "DisplayWidth adds 2 to Bound(n,80) after the change; its Bound arguments stay the same.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return Bound(n, 80)"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return Bound(n, 80) + 2"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "BatchSize changes the Bound maximum argument from 32 to 16.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "Bound(n, 32)"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "Bound(n, 16)"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "Bound returns max when n > max, otherwise n; this helper is unchanged.",
+          "evidence": [
+            {
+              "source": "context:bound.go",
+              "line": 3,
+              "quote": "if n > max { return max }; return n"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "same-package-independent-time-and-permission",
+      "arm": "B1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "b652ba19beb70a4a6edd4cc7b29684fd04f6ce35b5418ae8dfe111a40ee2e5db",
+      "verdict": "unsupported",
+      "explanation": "期限比較の等号と編集role拡張は別の出力。共同契約はsourceにない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Expired changes > to >=, making equality return true after the change.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "now > deadline"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "now >= deadline"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "CanEdit adds editor alongside owner to accepted roles.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "role == \"owner\""
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "role == \"owner\" || role == \"editor\""
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "same-package-independent-time-and-permission",
+      "arm": "B1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "a9886695ad38af52ced33f58c160041695c1ec621eb741a93e05b9ce1ea13497",
+      "verdict": "unsupported",
+      "explanation": "期限比較の等号と編集role拡張は別の出力。共同契約はsourceにない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Expired changes > to >=, making equality return true after the change.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "now > deadline"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "now >= deadline"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "CanEdit adds editor alongside owner to accepted roles.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "role == \"owner\""
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "role == \"owner\" || role == \"editor\""
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "shared-import-independent-search-and-sort",
+      "arm": "B1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract by altering the comparison logic.",
+      "answer_sha256": "5ad2164d1220cf317ae3b5f7f05366ff3fa093b5e9f1fb84abd337da386999c8",
+      "verdict": "partially_supported",
+      "explanation": "比較の変更はsourceにあるが、検索と並び順の共同保存契約はない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Contains lowercases both arguments before strings.Contains after the change.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 4,
+              "quote": "strings.Contains(s, q)"
+            },
+            {
+              "source": "EA:after",
+              "line": 4,
+              "quote": "strings.Contains(strings.ToLower(s), strings.ToLower(q))"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "Before changes strings.Compare(a,b) < 0 to > 0.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 4,
+              "quote": "strings.Compare(a, b) < 0"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "strings.Compare(a, b) > 0"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "shared-import-independent-search-and-sort",
+      "arm": "B1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract by modifying the `Contains` function to use `strings.ToLower`.",
+      "answer_sha256": "1b7a0761adaeb9ffc4630c5d19869cdfd4db237c9531f4dd09cba8dc749abdb8",
+      "verdict": "partially_supported",
+      "explanation": "ContainsのToLower追加は正しいが、検索と並び順の共同保存契約はない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Contains lowercases both arguments before strings.Contains after the change.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 4,
+              "quote": "strings.Contains(s, q)"
+            },
+            {
+              "source": "EA:after",
+              "line": 4,
+              "quote": "strings.Contains(strings.ToLower(s), strings.ToLower(q))"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "Before changes strings.Compare(a,b) < 0 to > 0.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 4,
+              "quote": "strings.Compare(a, b) < 0"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "strings.Compare(a, b) > 0"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "boolean-polarity-compensation",
+      "arm": "B1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "334a7a2e7411af995dc619746a20c8c6bd4e4ad3e091b9e25b9e4afbca4c1980",
+      "verdict": "supported",
+      "explanation": "明示された両booleanのFlagRoundtrip契約が補償変更で保たれる。理由は一般的だがsource支持あり。引用の実在は別判定。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "EncodeFlag maps true/false to 1/0 before and 0/1 after.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "if v { return 1 }; return 0"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "if v { return 0 }; return 1"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "DecodeFlag changes the true condition from n == 1 to n == 0.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "n == 1"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "n == 0"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "The source requires FlagRoundtrip for both booleans; FlagRoundtrip compares DecodeFlag(EncodeFlag(v)) with v.",
+          "evidence": [
+            {
+              "source": "context:contract.go",
+              "line": 3,
+              "quote": "// The local flag codec contract requires"
+            },
+            {
+              "source": "context:contract.go",
+              "line": 4,
+              "quote": "DecodeFlag(EncodeFlag(v)) == v"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "boolean-polarity-compensation",
+      "arm": "B1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "8838771f0351afa96afad292bacffa7bbbafea5af5824e4387ee14ef76166a26",
+      "verdict": "supported",
+      "explanation": "明示された両booleanのFlagRoundtrip契約が補償変更で保たれる。理由は一般的だがsource支持あり。引用の実在は別判定。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "EncodeFlag maps true/false to 1/0 before and 0/1 after.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "if v { return 1 }; return 0"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "if v { return 0 }; return 1"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "DecodeFlag changes the true condition from n == 1 to n == 0.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "n == 1"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "n == 0"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "The source requires FlagRoundtrip for both booleans; FlagRoundtrip compares DecodeFlag(EncodeFlag(v)) with v.",
+          "evidence": [
+            {
+              "source": "context:contract.go",
+              "line": 3,
+              "quote": "// The local flag codec contract requires"
+            },
+            {
+              "source": "context:contract.go",
+              "line": 4,
+              "quote": "DecodeFlag(EncodeFlag(v)) == v"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "new-round-provider-eb",
+      "arm": "B1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract by replacing the original Total function with RoundToTen.",
+      "answer_sha256": "b01e52cbe4b237a3dae53d1924d187c95aaa73336312dd8ba3dad47374f84bee",
+      "verdict": "unsupported",
+      "explanation": "Totalの関数自体は残り、新RoundToTenを呼ぶ依存へ変わる。関数置換とjoint behavior保存の主張は成立しない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Total changes from returning n to calling RoundToTen(n).",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return n"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return RoundToTen(n)"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "RoundToTen is absent before and added in EB after; it returns (n+9)/10*10.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "func Unchanged()"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "func RoundToTen(n int) int { return (n + 9) / 10 * 10 }"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "new-round-provider-eb",
+      "arm": "B1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "f80bdf74d569bdbe72275b586466d308c108475e3d7f4c0f0e4383e9520765ea",
+      "verdict": "unsupported",
+      "explanation": "EB新providerをEAが呼ぶ方向依存。既存joint behavior保存のsource契約はない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Total changes from returning n to calling RoundToTen(n).",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return n"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return RoundToTen(n)"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "RoundToTen is absent before and added in EB after; it returns (n+9)/10*10.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "func Unchanged()"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "func RoundToTen(n int) int { return (n + 9) / 10 * 10 }"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "cache-expiry-multiple-boundaries",
+      "arm": "B1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract by updating TTL constants in both `image.go` and `document.go`.",
+      "answer_sha256": "87660d1739254f895ecef0e5e1af89a0121e9dbbc427728899c465ba098ec3c7",
+      "verdict": "partially_supported",
+      "explanation": "双方TTL定数の更新は正しい。共同保存契約や唯一の作者意図はsourceにない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "ImageTTL changes 60 to 120.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "ImageTTL = 60"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "ImageTTL = 120"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "DocumentTTL changes 90 to 180.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "DocumentTTL = 90"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "DocumentTTL = 180"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "cache-expiry-multiple-boundaries",
+      "arm": "B1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "485f3de7888a272859f3185f9a0a0b9e900d19e887e5f12b636242d5e1f3824f",
+      "verdict": "unsupported",
+      "explanation": "TTL倍増だけからjoint behavior保存契約は識別できない。複数許容のレビュー規範。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "ImageTTL changes 60 to 120.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "ImageTTL = 60"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "ImageTTL = 120"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "DocumentTTL changes 90 to 180.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "DocumentTTL = 90"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "DocumentTTL = 180"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "unknown-admission-contract",
+      "arm": "B1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "22284150989fdfed2528833329d168d54293feaae57df4eba83d0b740b710a7c",
+      "verdict": "unsupported",
+      "explanation": "clientのAdmissionとcross-resource制約が欠ける。共同契約保存は識別できない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "CPUReservation changes 2 to 3.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return 2"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return 3"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "MemoryReservation changes 4 to 6.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "return 4"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "return 6"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "Admitted passes both reservations to a client-supplied Admission function; its cross-resource constraints are unavailable.",
+          "evidence": [
+            {
+              "source": "context:admission.go",
+              "line": 3,
+              "quote": "// Admission is supplied by clients; its cross-resource constraints are unavailable."
+            },
+            {
+              "source": "context:admission.go",
+              "line": 5,
+              "quote": "check(CPUReservation(), MemoryReservation())"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "unknown-admission-contract",
+      "arm": "B1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "7562063db5fa2ab6cea37b76d54491e4a62b5028608c57418f405e52398780b0",
+      "verdict": "unsupported",
+      "explanation": "clientのAdmissionとcross-resource制約が欠ける。共同契約保存は識別できない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "CPUReservation changes 2 to 3.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return 2"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return 3"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "MemoryReservation changes 4 to 6.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "return 4"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "return 6"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "Admitted passes both reservations to a client-supplied Admission function; its cross-resource constraints are unavailable.",
+          "evidence": [
+            {
+              "source": "context:admission.go",
+              "line": 3,
+              "quote": "// Admission is supplied by clients; its cross-resource constraints are unavailable."
+            },
+            {
+              "source": "context:admission.go",
+              "line": 5,
+              "quote": "check(CPUReservation(), MemoryReservation())"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "nil-slice-corresponding-assertion",
+      "arm": "T1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "bf9daa9f0111f23a2f4e825c1f6dfe47175c265fc7eecaf3e4fbcc23d33e46d3",
+      "verdict": "unsupported",
+      "explanation": "nilnessとassertion期待値が変わるため既存joint behavior保存を主張できない。beforeへafter引用。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Clone(nil) before returns a non-nil empty slice; after explicitly returns nil for nil input.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return append([]int{}, v...)"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "if v == nil { return nil }"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "TestNil calls Clone(nil); before fails on nil, after fails on non-nil.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 4,
+              "quote": "if Clone(nil) == nil"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "if Clone(nil) != nil"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "nil-slice-corresponding-assertion",
+      "arm": "T1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "32bce3fdebddc1592c60b81e59d6c5fa56f923c8fc56547c8295e2dce7e01603",
+      "verdict": "unsupported",
+      "explanation": "同じ既存joint behavior保存の過剰主張。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Clone(nil) before returns a non-nil empty slice; after explicitly returns nil for nil input.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return append([]int{}, v...)"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "if v == nil { return nil }"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "TestNil calls Clone(nil); before fails on nil, after fails on non-nil.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 4,
+              "quote": "if Clone(nil) == nil"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "if Clone(nil) != nil"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "shared-bound-independent-ui-and-batch",
+      "arm": "T1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "80ff59962274cdd8019a762465eb72c084891238fb005eb9bd2ad49be2dae188",
+      "verdict": "unsupported",
+      "explanation": "独立したdisplay加算とbatch上限変更に明示joint contractなし。Bound共有のみ。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "DisplayWidth adds 2 to Bound(n,80) after the change; its Bound arguments stay the same.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return Bound(n, 80)"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return Bound(n, 80) + 2"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "BatchSize changes the Bound maximum argument from 32 to 16.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "Bound(n, 32)"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "Bound(n, 16)"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "Bound returns max when n > max, otherwise n; this helper is unchanged.",
+          "evidence": [
+            {
+              "source": "context:bound.go",
+              "line": 3,
+              "quote": "if n > max { return max }; return n"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "shared-bound-independent-ui-and-batch",
+      "arm": "T1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "56f29485f59a650b37ab95488fd380d297f89ddc8f6d279a4b096e07ee53e40e",
+      "verdict": "unsupported",
+      "explanation": "独立したdisplay加算とbatch上限変更に明示joint contractなし。Bound共有のみ。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "DisplayWidth adds 2 to Bound(n,80) after the change; its Bound arguments stay the same.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return Bound(n, 80)"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return Bound(n, 80) + 2"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "BatchSize changes the Bound maximum argument from 32 to 16.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "Bound(n, 32)"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "Bound(n, 16)"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "Bound returns max when n > max, otherwise n; this helper is unchanged.",
+          "evidence": [
+            {
+              "source": "context:bound.go",
+              "line": 3,
+              "quote": "if n > max { return max }; return n"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "same-package-independent-time-and-permission",
+      "arm": "T1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "b652ba19beb70a4a6edd4cc7b29684fd04f6ce35b5418ae8dfe111a40ee2e5db",
+      "verdict": "unsupported",
+      "explanation": "期限比較の等号と編集role拡張は別の出力。共同契約はsourceにない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Expired changes > to >=, making equality return true after the change.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "now > deadline"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "now >= deadline"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "CanEdit adds editor alongside owner to accepted roles.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "role == \"owner\""
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "role == \"owner\" || role == \"editor\""
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "same-package-independent-time-and-permission",
+      "arm": "T1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "a9886695ad38af52ced33f58c160041695c1ec621eb741a93e05b9ce1ea13497",
+      "verdict": "unsupported",
+      "explanation": "期限比較の等号と編集role拡張は別の出力。共同契約はsourceにない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Expired changes > to >=, making equality return true after the change.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "now > deadline"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "now >= deadline"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "CanEdit adds editor alongside owner to accepted roles.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "role == \"owner\""
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "role == \"owner\" || role == \"editor\""
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "shared-import-independent-search-and-sort",
+      "arm": "T1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "16b4a68dfa0ce41b3d645d81a94ebd68872e2dc9dddefd5ffe8762d1e2e5be27",
+      "verdict": "unsupported",
+      "explanation": "独立した検索/並び順変更にjoint behavior契約はない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Contains lowercases both arguments before strings.Contains after the change.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 4,
+              "quote": "strings.Contains(s, q)"
+            },
+            {
+              "source": "EA:after",
+              "line": 4,
+              "quote": "strings.Contains(strings.ToLower(s), strings.ToLower(q))"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "Before changes strings.Compare(a,b) < 0 to > 0.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 4,
+              "quote": "strings.Compare(a, b) < 0"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "strings.Compare(a, b) > 0"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "shared-import-independent-search-and-sort",
+      "arm": "T1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "584b5a82973dbdc2ec1b6bfd7840dbd1cec0ee8b70e2c14fb38c65b738f5b822",
+      "verdict": "unsupported",
+      "explanation": "独立した検索/並び順変更にjoint behavior契約はない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Contains lowercases both arguments before strings.Contains after the change.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 4,
+              "quote": "strings.Contains(s, q)"
+            },
+            {
+              "source": "EA:after",
+              "line": 4,
+              "quote": "strings.Contains(strings.ToLower(s), strings.ToLower(q))"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "Before changes strings.Compare(a,b) < 0 to > 0.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 4,
+              "quote": "strings.Compare(a, b) < 0"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "strings.Compare(a, b) > 0"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "boolean-polarity-compensation",
+      "arm": "T1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "7c3cd1b61392d1629b095b83baeca74d9c54d357e2788eeabc03cb1a047024a7",
+      "verdict": "supported",
+      "explanation": "明示された両booleanのFlagRoundtrip契約が補償変更で保たれる。理由は一般的だがsource支持あり。引用の実在は別判定。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "EncodeFlag maps true/false to 1/0 before and 0/1 after.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "if v { return 1 }; return 0"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "if v { return 0 }; return 1"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "DecodeFlag changes the true condition from n == 1 to n == 0.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "n == 1"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "n == 0"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "The source requires FlagRoundtrip for both booleans; FlagRoundtrip compares DecodeFlag(EncodeFlag(v)) with v.",
+          "evidence": [
+            {
+              "source": "context:contract.go",
+              "line": 3,
+              "quote": "// The local flag codec contract requires"
+            },
+            {
+              "source": "context:contract.go",
+              "line": 4,
+              "quote": "DecodeFlag(EncodeFlag(v)) == v"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "boolean-polarity-compensation",
+      "arm": "T1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "8838771f0351afa96afad292bacffa7bbbafea5af5824e4387ee14ef76166a26",
+      "verdict": "supported",
+      "explanation": "明示された両booleanのFlagRoundtrip契約が補償変更で保たれる。理由は一般的だがsource支持あり。引用の実在は別判定。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "EncodeFlag maps true/false to 1/0 before and 0/1 after.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "if v { return 1 }; return 0"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "if v { return 0 }; return 1"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "DecodeFlag changes the true condition from n == 1 to n == 0.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "n == 1"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "n == 0"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "The source requires FlagRoundtrip for both booleans; FlagRoundtrip compares DecodeFlag(EncodeFlag(v)) with v.",
+          "evidence": [
+            {
+              "source": "context:contract.go",
+              "line": 3,
+              "quote": "// The local flag codec contract requires"
+            },
+            {
+              "source": "context:contract.go",
+              "line": 4,
+              "quote": "DecodeFlag(EncodeFlag(v)) == v"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "new-round-provider-eb",
+      "arm": "T1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "f80bdf74d569bdbe72275b586466d308c108475e3d7f4c0f0e4383e9520765ea",
+      "verdict": "unsupported",
+      "explanation": "EB新providerをEAが呼ぶ方向依存。既存joint behavior保存のsource契約はない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Total changes from returning n to calling RoundToTen(n).",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return n"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return RoundToTen(n)"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "RoundToTen is absent before and added in EB after; it returns (n+9)/10*10.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "func Unchanged()"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "func RoundToTen(n int) int { return (n + 9) / 10 * 10 }"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "new-round-provider-eb",
+      "arm": "T1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "f80bdf74d569bdbe72275b586466d308c108475e3d7f4c0f0e4383e9520765ea",
+      "verdict": "unsupported",
+      "explanation": "EB新providerをEAが呼ぶ方向依存。既存joint behavior保存のsource契約はない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Total changes from returning n to calling RoundToTen(n).",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return n"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return RoundToTen(n)"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "RoundToTen is absent before and added in EB after; it returns (n+9)/10*10.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "func Unchanged()"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "func RoundToTen(n int) int { return (n + 9) / 10 * 10 }"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "cache-expiry-multiple-boundaries",
+      "arm": "T1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract by updating TTL constants in both `image.go` and `document.go`.",
+      "answer_sha256": "87660d1739254f895ecef0e5e1af89a0121e9dbbc427728899c465ba098ec3c7",
+      "verdict": "partially_supported",
+      "explanation": "双方TTL定数の更新は正しい。共同保存契約や唯一の作者意図はsourceにない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "ImageTTL changes 60 to 120.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "ImageTTL = 60"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "ImageTTL = 120"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "DocumentTTL changes 90 to 180.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "DocumentTTL = 90"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "DocumentTTL = 180"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "cache-expiry-multiple-boundaries",
+      "arm": "T1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "485f3de7888a272859f3185f9a0a0b9e900d19e887e5f12b636242d5e1f3824f",
+      "verdict": "unsupported",
+      "explanation": "TTL倍増だけからjoint behavior保存契約は識別できない。複数許容のレビュー規範。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "ImageTTL changes 60 to 120.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "ImageTTL = 60"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "ImageTTL = 120"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "DocumentTTL changes 90 to 180.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "DocumentTTL = 90"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "DocumentTTL = 180"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "unknown-admission-contract",
+      "arm": "T1",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "22284150989fdfed2528833329d168d54293feaae57df4eba83d0b740b710a7c",
+      "verdict": "unsupported",
+      "explanation": "clientのAdmissionとcross-resource制約が欠ける。共同契約保存は識別できない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "CPUReservation changes 2 to 3.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return 2"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return 3"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "MemoryReservation changes 4 to 6.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "return 4"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "return 6"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "Admitted passes both reservations to a client-supplied Admission function; its cross-resource constraints are unavailable.",
+          "evidence": [
+            {
+              "source": "context:admission.go",
+              "line": 3,
+              "quote": "// Admission is supplied by clients; its cross-resource constraints are unavailable."
+            },
+            {
+              "source": "context:admission.go",
+              "line": 5,
+              "quote": "check(CPUReservation(), MemoryReservation())"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "unknown-admission-contract",
+      "arm": "T1",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "7562063db5fa2ab6cea37b76d54491e4a62b5028608c57418f405e52398780b0",
+      "verdict": "unsupported",
+      "explanation": "clientのAdmissionとcross-resource制約が欠ける。共同契約保存は識別できない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "CPUReservation changes 2 to 3.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return 2"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return 3"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "MemoryReservation changes 4 to 6.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "return 4"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "return 6"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "Admitted passes both reservations to a client-supplied Admission function; its cross-resource constraints are unavailable.",
+          "evidence": [
+            {
+              "source": "context:admission.go",
+              "line": 3,
+              "quote": "// Admission is supplied by clients; its cross-resource constraints are unavailable."
+            },
+            {
+              "source": "context:admission.go",
+              "line": 5,
+              "quote": "check(CPUReservation(), MemoryReservation())"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "nil-slice-corresponding-assertion",
+      "arm": "T2",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract by altering the behavior of the Clone function to handle nil input.",
+      "answer_sha256": "a798b1a785ff613cc0b2b90a59606e51e81a9827de325536ddc54608ec1aa4e4",
+      "verdict": "partially_supported",
+      "explanation": "Cloneのnil入力処理変更はsourceにある。一方、既存joint behavior保存ではなくassertion期待値も変わる。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Clone(nil) before returns a non-nil empty slice; after explicitly returns nil for nil input.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return append([]int{}, v...)"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "if v == nil { return nil }"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "TestNil calls Clone(nil); before fails on nil, after fails on non-nil.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 4,
+              "quote": "if Clone(nil) == nil"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "if Clone(nil) != nil"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "nil-slice-corresponding-assertion",
+      "arm": "T2",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "ea52e93588ecdd7b11f988646bfca5141414210241358d82eb2c221ea6d68703",
+      "verdict": "unsupported",
+      "explanation": "一般的なjoint behavior保存のみで、変更されたnilness/assertionの関係を説明しない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Clone(nil) before returns a non-nil empty slice; after explicitly returns nil for nil input.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return append([]int{}, v...)"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "if v == nil { return nil }"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "TestNil calls Clone(nil); before fails on nil, after fails on non-nil.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 4,
+              "quote": "if Clone(nil) == nil"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "if Clone(nil) != nil"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "shared-bound-independent-ui-and-batch",
+      "arm": "T2",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract by adjusting the return value of `DisplayWidth` and `BatchSize` to include an additional 2 units.",
+      "answer_sha256": "085d59fb308a5d3ef6de6abaf25ac400204de144e013f00c09adc8e6d35ad962",
+      "verdict": "unsupported",
+      "explanation": "BatchSizeにも+2を加えると述べるが、実際はBoundのmax引数32→16。joint contractもない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "DisplayWidth adds 2 to Bound(n,80) after the change; its Bound arguments stay the same.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return Bound(n, 80)"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return Bound(n, 80) + 2"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "BatchSize changes the Bound maximum argument from 32 to 16.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "Bound(n, 32)"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "Bound(n, 16)"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "Bound returns max when n > max, otherwise n; this helper is unchanged.",
+          "evidence": [
+            {
+              "source": "context:bound.go",
+              "line": 3,
+              "quote": "if n > max { return max }; return n"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "shared-bound-independent-ui-and-batch",
+      "arm": "T2",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract by modifying the return value of `DisplayWidth` and `BatchSize` functions to include an additional 2 units.",
+      "answer_sha256": "8201bd56a828dd5ee84e606193176e2c2fd37f6dd2703dd4787aab1786d02888",
+      "verdict": "unsupported",
+      "explanation": "BatchSizeにも+2を加えるという誤記を維持。joint contractもない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "DisplayWidth adds 2 to Bound(n,80) after the change; its Bound arguments stay the same.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return Bound(n, 80)"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return Bound(n, 80) + 2"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "BatchSize changes the Bound maximum argument from 32 to 16.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "Bound(n, 32)"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "Bound(n, 16)"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "Bound returns max when n > max, otherwise n; this helper is unchanged.",
+          "evidence": [
+            {
+              "source": "context:bound.go",
+              "line": 3,
+              "quote": "if n > max { return max }; return n"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "same-package-independent-time-and-permission",
+      "arm": "T2",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "129382d90e6e6ee7be9c443bf9f2743edd1453e04a6d794205787bdf8cf1d28b",
+      "verdict": "unsupported",
+      "explanation": "期限比較の等号と編集role拡張は別の出力。共同契約はsourceにない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Expired changes > to >=, making equality return true after the change.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "now > deadline"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "now >= deadline"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "CanEdit adds editor alongside owner to accepted roles.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "role == \"owner\""
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "role == \"owner\" || role == \"editor\""
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "same-package-independent-time-and-permission",
+      "arm": "T2",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract",
+      "answer_sha256": "3b677fad7d67e4bcd5bbdc1e48f6295c5c0b58b20de3e2eaf93d27a6b492cc08",
+      "verdict": "unsupported",
+      "explanation": "期限比較の等号と編集role拡張は別の出力。共同契約はsourceにない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Expired changes > to >=, making equality return true after the change.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "now > deadline"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "now >= deadline"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "CanEdit adds editor alongside owner to accepted roles.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "role == \"owner\""
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "role == \"owner\" || role == \"editor\""
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "shared-import-independent-search-and-sort",
+      "arm": "T2",
+      "reverse": false,
+      "reason": "Both changes preserve the same behavior by modifying the `Contains` function to handle case insensitivity and the `Before` function to reverse the comparison result.",
+      "answer_sha256": "08bbbdc718c6657d886f8a5b9669fd2d6b0aab96abd21c2e3b61a5a83a8ce9a2",
+      "verdict": "partially_supported",
+      "explanation": "大小文字非区別と比較反転の記述はsourceで確認できる。しかし双方の同じbehavior保存という主張は誤る。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Contains lowercases both arguments before strings.Contains after the change.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 4,
+              "quote": "strings.Contains(s, q)"
+            },
+            {
+              "source": "EA:after",
+              "line": 4,
+              "quote": "strings.Contains(strings.ToLower(s), strings.ToLower(q))"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "Before changes strings.Compare(a,b) < 0 to > 0.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 4,
+              "quote": "strings.Compare(a, b) < 0"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "strings.Compare(a, b) > 0"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "shared-import-independent-search-and-sort",
+      "arm": "T2",
+      "reverse": true,
+      "reason": "Both changes preserve the same behavior by modifying the `Contains` function to handle case insensitivity and the `Before` function to change the comparison logic.",
+      "answer_sha256": "66b597eb588ccbe3eaf572f4e8a9d6c6e8228233c0e34fe879df820530a96681",
+      "verdict": "partially_supported",
+      "explanation": "大小文字非区別と比較変更はsourceで確認できる。しかし共同behavior保存という主張は誤る。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Contains lowercases both arguments before strings.Contains after the change.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 4,
+              "quote": "strings.Contains(s, q)"
+            },
+            {
+              "source": "EA:after",
+              "line": 4,
+              "quote": "strings.Contains(strings.ToLower(s), strings.ToLower(q))"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "Before changes strings.Compare(a,b) < 0 to > 0.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 4,
+              "quote": "strings.Compare(a, b) < 0"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "strings.Compare(a, b) > 0"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "boolean-polarity-compensation",
+      "arm": "T2",
+      "reverse": false,
+      "reason": "Both changes preserve the same behavior by swapping the return values of EncodeFlag and DecodeFlag.",
+      "answer_sha256": "7f1653b8a926335485bdeb6050e18f31b51f99dbf582377a7afd21620ef07866",
+      "verdict": "partially_supported",
+      "explanation": "共同roundtrip保存は正しい。一方「両関数のreturn valuesをswapping」は不正確。Encodeはint 0/1の対応を反転、Decodeはboolの真になるn条件を1→0へ変える。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "EncodeFlag maps true/false to 1/0 before and 0/1 after.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "if v { return 1 }; return 0"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "if v { return 0 }; return 1"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "DecodeFlag changes the true condition from n == 1 to n == 0.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "n == 1"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "n == 0"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "The source requires FlagRoundtrip for both booleans; FlagRoundtrip compares DecodeFlag(EncodeFlag(v)) with v.",
+          "evidence": [
+            {
+              "source": "context:contract.go",
+              "line": 3,
+              "quote": "// The local flag codec contract requires"
+            },
+            {
+              "source": "context:contract.go",
+              "line": 4,
+              "quote": "DecodeFlag(EncodeFlag(v)) == v"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "boolean-polarity-compensation",
+      "arm": "T2",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract by swapping the return values of EncodeFlag and DecodeFlag.",
+      "answer_sha256": "8f4c3c9cd5b889a979f54b1239b1ac5a705e7e765af41eb7d68a4190bf547969",
+      "verdict": "partially_supported",
+      "explanation": "共同roundtrip保存は正しい。一方「両関数のreturn valuesをswapping」は不正確。Encodeはint 0/1の対応を反転、Decodeはboolの真になるn条件を1→0へ変える。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "EncodeFlag maps true/false to 1/0 before and 0/1 after.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "if v { return 1 }; return 0"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "if v { return 0 }; return 1"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "DecodeFlag changes the true condition from n == 1 to n == 0.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "n == 1"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "n == 0"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "The source requires FlagRoundtrip for both booleans; FlagRoundtrip compares DecodeFlag(EncodeFlag(v)) with v.",
+          "evidence": [
+            {
+              "source": "context:contract.go",
+              "line": 3,
+              "quote": "// The local flag codec contract requires"
+            },
+            {
+              "source": "context:contract.go",
+              "line": 4,
+              "quote": "DecodeFlag(EncodeFlag(v)) == v"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "new-round-provider-eb",
+      "arm": "T2",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract by replacing the original Total function with RoundToTen.",
+      "answer_sha256": "cad7e556a32227b81e24ec13075002b67a8db2aa43b0208ad019bf7be8aad36b",
+      "verdict": "unsupported",
+      "explanation": "Totalの関数自体は残り、新RoundToTenを呼ぶ依存へ変わる。関数置換とjoint behavior保存の主張は成立しない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Total changes from returning n to calling RoundToTen(n).",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return n"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return RoundToTen(n)"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "RoundToTen is absent before and added in EB after; it returns (n+9)/10*10.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "func Unchanged()"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "func RoundToTen(n int) int { return (n + 9) / 10 * 10 }"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "new-round-provider-eb",
+      "arm": "T2",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract by introducing a new function `RoundToTen` that is used in `Total`.",
+      "answer_sha256": "02056a95ed1a47f4aad2bc4347134b47f9c482c84d334c29504be1853699b123",
+      "verdict": "partially_supported",
+      "explanation": "新RoundToTenがTotalで使われる点は正しい。既存joint behavior保存の契約を推定する部分はsourceにない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "Total changes from returning n to calling RoundToTen(n).",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return n"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return RoundToTen(n)"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "RoundToTen is absent before and added in EB after; it returns (n+9)/10*10.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "func Unchanged()"
+            },
+            {
+              "source": "EB:after",
+              "line": 4,
+              "quote": "func RoundToTen(n int) int { return (n + 9) / 10 * 10 }"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "cache-expiry-multiple-boundaries",
+      "arm": "T2",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract by updating TTL constants in both `image.go` and `document.go` files.",
+      "answer_sha256": "235573d763c5a173d81475223e585c22f50d05306b2631b16d3d038c682f741f",
+      "verdict": "partially_supported",
+      "explanation": "TTL定数更新は正しい。共同保存契約や唯一の作者意図はsourceにない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "ImageTTL changes 60 to 120.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "ImageTTL = 60"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "ImageTTL = 120"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "DocumentTTL changes 90 to 180.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "DocumentTTL = 90"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "DocumentTTL = 180"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "cache-expiry-multiple-boundaries",
+      "arm": "T2",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract by updating TTL constants in different files.",
+      "answer_sha256": "00aac4f48eaa5cdb61e36b0fef8cce66d5ab19938796dbd09840bc25883b61f9",
+      "verdict": "partially_supported",
+      "explanation": "TTL定数更新は正しい。共同保存契約や唯一の作者意図はsourceにない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "ImageTTL changes 60 to 120.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "ImageTTL = 60"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "ImageTTL = 120"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "DocumentTTL changes 90 to 180.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "DocumentTTL = 90"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "DocumentTTL = 180"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    },
+    {
+      "case": "unknown-admission-contract",
+      "arm": "T2",
+      "reverse": false,
+      "reason": "Changes preserve an explicit joint behavior contract by updating the return values of the CPUReservation and MemoryReservation functions.",
+      "answer_sha256": "6c29632a77d3543792f7068a40bcc32b70b5ac9075311aa5e602261a21da5b47",
+      "verdict": "partially_supported",
+      "explanation": "CPU/Memoryのreturn値変更は正しい。外部Admissionの制約が欠けるためjoint behavior保存を判定できない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "CPUReservation changes 2 to 3.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return 2"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return 3"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "MemoryReservation changes 4 to 6.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "return 4"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "return 6"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "Admitted passes both reservations to a client-supplied Admission function; its cross-resource constraints are unavailable.",
+          "evidence": [
+            {
+              "source": "context:admission.go",
+              "line": 3,
+              "quote": "// Admission is supplied by clients; its cross-resource constraints are unavailable."
+            },
+            {
+              "source": "context:admission.go",
+              "line": 5,
+              "quote": "check(CPUReservation(), MemoryReservation())"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": false
+    },
+    {
+      "case": "unknown-admission-contract",
+      "arm": "T2",
+      "reverse": true,
+      "reason": "Changes preserve an explicit joint behavior contract by modifying the CPUReservation and MemoryReservation functions to return different values.",
+      "answer_sha256": "2fb86afbd712877c59ebd17ebbaca57b62edb050ea01a1c4c632de07203b60d3",
+      "verdict": "partially_supported",
+      "explanation": "CPU/Memoryのreturn値変更は正しい。外部Admissionの制約が欠けるためjoint behavior保存を判定できない。",
+      "source_basis": [
+        {
+          "fact_id": "F1",
+          "claim": "CPUReservation changes 2 to 3.",
+          "evidence": [
+            {
+              "source": "EA:before",
+              "line": 3,
+              "quote": "return 2"
+            },
+            {
+              "source": "EA:after",
+              "line": 3,
+              "quote": "return 3"
+            }
+          ]
+        },
+        {
+          "fact_id": "F2",
+          "claim": "MemoryReservation changes 4 to 6.",
+          "evidence": [
+            {
+              "source": "EB:before",
+              "line": 3,
+              "quote": "return 4"
+            },
+            {
+              "source": "EB:after",
+              "line": 3,
+              "quote": "return 6"
+            }
+          ]
+        },
+        {
+          "fact_id": "F3",
+          "claim": "Admitted passes both reservations to a client-supplied Admission function; its cross-resource constraints are unavailable.",
+          "evidence": [
+            {
+              "source": "context:admission.go",
+              "line": 3,
+              "quote": "// Admission is supplied by clients; its cross-resource constraints are unavailable."
+            },
+            {
+              "source": "context:admission.go",
+              "line": 5,
+              "quote": "check(CPUReservation(), MemoryReservation())"
+            }
+          ]
+        }
+      ],
+      "citation_validity_separately": true
+    }
+  ]
+}

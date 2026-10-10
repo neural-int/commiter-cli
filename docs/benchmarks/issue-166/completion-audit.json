@@ -1,0 +1,61 @@
+{
+  "issue": 166,
+  "all_issue_deliverables_verified": true,
+  "criteria": [
+    {
+      "requirement": "基準#165の条件と出力スキーマ差分を事前登録",
+      "achieved": true,
+      "evidence": [
+        "preregistered.json",
+        "diff-audit.json",
+        "remote-registration.json"
+      ]
+    },
+    {
+      "requirement": "T1/T2を独立対照として固定し、最大32call内で実施",
+      "achieved": true,
+      "evidence": [
+        "results.jsonl",
+        "run-metadata.json",
+        "input-contract-audit.json"
+      ]
+    },
+    {
+      "requirement": "一律compensation、不要directionの変化と副作用をcase別に記録",
+      "achieved": true,
+      "evidence": [
+        "case-evidence.json",
+        "summary.json",
+        "reason-review.json"
+      ]
+    },
+    {
+      "requirement": "形式依存と意味識別を分け、残る未識別要因を報告",
+      "achieved": true,
+      "evidence": [
+        "report.md",
+        "reason-review.json"
+      ]
+    },
+    {
+      "requirement": "費用・資源・安全と既存production非変更を確認",
+      "achieved": true,
+      "evidence": [
+        "resource-audit.json",
+        "safety-audit.json"
+      ]
+    },
+    {
+      "requirement": "調査をここで終了し、追加研究へ自動拡張しない",
+      "achieved": true,
+      "evidence": [
+        "report.md",
+        "run-metadata.json"
+      ]
+    }
+  ],
+  "goal_final_quality_gate": "not yet executed; only after all Issue checks",
+  "research_ended": true,
+  "remaining_internal_causes": "reported undetermined, not a requirement for unique cause identification",
+  "preparation_missing_raw_disclosed": true
+}

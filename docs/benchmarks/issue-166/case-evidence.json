@@ -1,0 +1,1942 @@
+[
+  {
+    "case": "nil-slice-corresponding-assertion",
+    "expected_relation": "corresponding",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "records": {
+      "B1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...)}",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func Clone(v []int) []int { return append([]int{}, v...)}",
+                "source": "EA:before"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...)}",
+              "source": "EA:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func Clone(v []int) []int { return append([]int{}, v...)}",
+              "source": "EA:before",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1048,
+          "output_tokens": 136,
+          "direction_gold_correct": false
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...)}",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...)}",
+                "source": "EA:before"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...)}",
+              "source": "EA:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...)}",
+              "source": "EA:before",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1048,
+          "output_tokens": 144,
+          "direction_gold_correct": false
+        }
+      ],
+      "T1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...) }",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...) }",
+                "source": "EA:before"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...) }",
+              "source": "EA:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...) }",
+              "source": "EA:before",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1048,
+          "output_tokens": 146,
+          "direction_gold_correct": false
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...)}",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...)}",
+                "source": "EA:before"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...)}",
+              "source": "EA:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...)}",
+              "source": "EA:before",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1048,
+          "output_tokens": 144,
+          "direction_gold_correct": false
+        }
+      ],
+      "T2": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Clone(v []int) []int { if v== nil{ return nil }; return append([]int{}, v...)}",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func Clone(v []int) []int { return append([]int{}, v...)}",
+                "source": "EA:before"
+              },
+              {
+                "line": 4,
+                "quote": "func TestNil(t *testing.T) { if Clone(nil) != nil { t.Fatal(“non-nil”) }}",
+                "source": "EB:after"
+              },
+              {
+                "line": 4,
+                "quote": "func TestNil(t *testing.T) { if Clone(nil) == nil { t.Fatal(“nil”) }}",
+                "source": "EB:before"
+              }
+            ],
+            "reason": "Changes preserve an explicit joint behavior contract by altering the behavior of the Clone function to handle nil input.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Clone(v []int) []int { if v== nil{ return nil }; return append([]int{}, v...)}",
+              "source": "EA:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func Clone(v []int) []int { return append([]int{}, v...)}",
+              "source": "EA:before",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 4,
+              "quote": "func TestNil(t *testing.T) { if Clone(nil) != nil { t.Fatal(“non-nil”) }}",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 4,
+              "quote": "func TestNil(t *testing.T) { if Clone(nil) == nil { t.Fatal(“nil”) }}",
+              "source": "EB:before",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1000,
+          "output_tokens": 232,
+          "direction_gold_correct": null
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...)}",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...)}",
+                "source": "EA:before"
+              },
+              {
+                "line": 3,
+                "quote": "func TestNil(t *testing.T) { if Clone(nil) != nil { t.Fatal(“non-nil”) }}",
+                "source": "EB:after"
+              },
+              {
+                "line": 3,
+                "quote": "func TestNil(t *testing.T) { if Clone(nil) == nil { t.Fatal(“nil”) }}",
+                "source": "EB:before"
+              }
+            ],
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...)}",
+              "source": "EA:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func Clone(v []int) []int { if v== nil { return nil }; return append([]int{}, v...)}",
+              "source": "EA:before",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func TestNil(t *testing.T) { if Clone(nil) != nil { t.Fatal(“non-nil”) }}",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func TestNil(t *testing.T) { if Clone(nil) == nil { t.Fatal(“nil”) }}",
+              "source": "EB:before",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1000,
+          "output_tokens": 228,
+          "direction_gold_correct": null
+        }
+      ]
+    },
+    "semantic_truth": "see separately audited reason-review.json; exact citations alone do not prove relation truth"
+  },
+  {
+    "case": "shared-bound-independent-ui-and-batch",
+    "expected_relation": "independent",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "records": {
+      "B1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "return Bound(n, 80) + 2",
+                "source": "EA:after"
+              }
+            ],
+            "provider": "none",
+            "reason": "Changes preserve an explicit joint behavior contract by adjusting the return value of `DisplayWidth` to include an additional 2.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "return Bound(n, 80) + 2",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1037,
+          "output_tokens": 98,
+          "direction_gold_correct": false
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func DisplayWidth(n int) int { return Bound(n, 80) + 2}",
+                "source": "EA:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract by adjusting the return value of `DisplayWidth` to include an additional 2 units.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func DisplayWidth(n int) int { return Bound(n, 80) + 2}",
+              "source": "EA:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1037,
+          "output_tokens": 107,
+          "direction_gold_correct": false
+        }
+      ],
+      "T1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "return Bound(n, 80) + 2",
+                "source": "EA:after"
+              }
+            ],
+            "provider": "none",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "return Bound(n, 80) + 2",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1037,
+          "output_tokens": 82,
+          "direction_gold_correct": false
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func DisplayWidth(n int) int { return Bound(n, 80) + 2}",
+                "source": "EA:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func DisplayWidth(n int) int { return Bound(n, 80) + 2}",
+              "source": "EA:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1037,
+          "output_tokens": 90,
+          "direction_gold_correct": false
+        }
+      ],
+      "T2": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func DisplayWidth(n int) int { return Bound(n, 80) + 2 }",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func BatchSize(n int) int { return Bound(n, 16) }",
+                "source": "EB:after"
+              }
+            ],
+            "reason": "Changes preserve an explicit joint behavior contract by adjusting the return value of `DisplayWidth` and `BatchSize` to include an additional 2 units.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func DisplayWidth(n int) int { return Bound(n, 80) + 2 }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func BatchSize(n int) int { return Bound(n, 16) }",
+              "source": "EB:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 989,
+          "output_tokens": 142,
+          "direction_gold_correct": null
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func DisplayWidth(n int) int { return Bound(n, 80) + 2}",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func BatchSize(n int) int { return Bound(n, 16)}",
+                "source": "EB:after"
+              }
+            ],
+            "reason": "Changes preserve an explicit joint behavior contract by modifying the return value of `DisplayWidth` and `BatchSize` functions to include an additional 2 units.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func DisplayWidth(n int) int { return Bound(n, 80) + 2}",
+              "source": "EA:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func BatchSize(n int) int { return Bound(n, 16)}",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 989,
+          "output_tokens": 141,
+          "direction_gold_correct": null
+        }
+      ]
+    },
+    "semantic_truth": "see separately audited reason-review.json; exact citations alone do not prove relation truth"
+  },
+  {
+    "case": "same-package-independent-time-and-permission",
+    "expected_relation": "independent",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "records": {
+      "B1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Expired(now, deadline int) bool { return now >= deadline }",
+                "source": "EA:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Expired(now, deadline int) bool { return now >= deadline }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 933,
+          "output_tokens": 86,
+          "direction_gold_correct": false
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "return now >= deadline",
+                "source": "EB:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "return now >= deadline",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 933,
+          "output_tokens": 75,
+          "direction_gold_correct": false
+        }
+      ],
+      "T1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Expired(now, deadline int) bool { return now >= deadline }",
+                "source": "EA:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Expired(now, deadline int) bool { return now >= deadline }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 933,
+          "output_tokens": 86,
+          "direction_gold_correct": false
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "return now >= deadline",
+                "source": "EB:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "return now >= deadline",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 933,
+          "output_tokens": 75,
+          "direction_gold_correct": false
+        }
+      ],
+      "T2": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Expired(now, deadline int) bool { return now >= deadline }",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func CanEdit(role string) bool { return role==  owner|| role==  editor",
+                "source": "EB:after"
+              }
+            ],
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Expired(now, deadline int) bool { return now >= deadline }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func CanEdit(role string) bool { return role==  owner|| role==  editor",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 885,
+          "output_tokens": 116,
+          "direction_gold_correct": null
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Expired(now, deadline int) bool { return now >= deadline }",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func CanEdit(role string) bool { return role==  owner|| role==  editor ",
+                "source": "EB:after"
+              }
+            ],
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Expired(now, deadline int) bool { return now >= deadline }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func CanEdit(role string) bool { return role==  owner|| role==  editor ",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 885,
+          "output_tokens": 117,
+          "direction_gold_correct": null
+        }
+      ]
+    },
+    "semantic_truth": "see separately audited reason-review.json; exact citations alone do not prove relation truth"
+  },
+  {
+    "case": "shared-import-independent-search-and-sort",
+    "expected_relation": "independent",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "records": {
+      "B1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 4,
+                "quote": "return strings.Contains(strings.ToLower(s), strings.ToLower(q))",
+                "source": "EA:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract by altering the comparison logic.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 4,
+              "quote": "return strings.Contains(strings.ToLower(s), strings.ToLower(q))",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1039,
+          "output_tokens": 87,
+          "direction_gold_correct": false
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 4,
+                "quote": "func Contains(s, q string) bool { return strings.Contains(strings.ToLower(s), strings.ToLower(q))}",
+                "source": "EA:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract by modifying the `Contains` function to use `strings.ToLower`.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 4,
+              "quote": "func Contains(s, q string) bool { return strings.Contains(strings.ToLower(s), strings.ToLower(q))}",
+              "source": "EA:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1039,
+          "output_tokens": 104,
+          "direction_gold_correct": false
+        }
+      ],
+      "T1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 4,
+                "quote": "return strings.Contains(strings.ToLower(s), strings.ToLower(q))",
+                "source": "EA:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 4,
+              "quote": "return strings.Contains(strings.ToLower(s), strings.ToLower(q))",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1039,
+          "output_tokens": 82,
+          "direction_gold_correct": false
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 4,
+                "quote": "func Contains(s, q string) bool { return strings.Contains(strings.ToLower(s), strings.ToLower(q))}",
+                "source": "EA:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 4,
+              "quote": "func Contains(s, q string) bool { return strings.Contains(strings.ToLower(s), strings.ToLower(q))}",
+              "source": "EA:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1039,
+          "output_tokens": 91,
+          "direction_gold_correct": false
+        }
+      ],
+      "T2": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 4,
+                "quote": "func Contains(s, q string) bool { return strings.Contains(strings.ToLower(s), strings.ToLower(q)) }",
+                "source": "EA:after"
+              },
+              {
+                "line": 4,
+                "quote": "func Before(a, b string) bool { return strings.Compare(a, b) > 0}",
+                "source": "EB:after"
+              }
+            ],
+            "reason": "Both changes preserve the same behavior by modifying the `Contains` function to handle case insensitivity and the `Before` function to reverse the comparison result.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 4,
+              "quote": "func Contains(s, q string) bool { return strings.Contains(strings.ToLower(s), strings.ToLower(q)) }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 4,
+              "quote": "func Before(a, b string) bool { return strings.Compare(a, b) > 0}",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 991,
+          "output_tokens": 145,
+          "direction_gold_correct": null
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 4,
+                "quote": "func Contains(s, q string) bool { return strings.Contains(strings.ToLower(s), strings.ToLower(q))}",
+                "source": "EA:after"
+              },
+              {
+                "line": 4,
+                "quote": "func Before(a, b string) bool { return strings.Compare(a, b) > 0}",
+                "source": "EB:after"
+              }
+            ],
+            "reason": "Both changes preserve the same behavior by modifying the `Contains` function to handle case insensitivity and the `Before` function to change the comparison logic.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 4,
+              "quote": "func Contains(s, q string) bool { return strings.Contains(strings.ToLower(s), strings.ToLower(q))}",
+              "source": "EA:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 4,
+              "quote": "func Before(a, b string) bool { return strings.Compare(a, b) > 0}",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 991,
+          "output_tokens": 144,
+          "direction_gold_correct": null
+        }
+      ]
+    },
+    "semantic_truth": "see separately audited reason-review.json; exact citations alone do not prove relation truth"
+  },
+  {
+    "case": "boolean-polarity-compensation",
+    "expected_relation": "compensation",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "records": {
+      "B1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func EncodeFlag(v bool) int { if v { return 0 }; return 1 }",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func DecodeFlag(n int) bool { return n== 0}",
+                "source": "EB:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func EncodeFlag(v bool) int { if v { return 0 }; return 1 }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func DecodeFlag(n int) bool { return n== 0}",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1184,
+          "output_tokens": 129,
+          "direction_gold_correct": false
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func EncodeFlag(v bool) int { if v { return 0 }; return 1}",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func DecodeFlag(n int) bool { return n== 0}",
+                "source": "EB:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func EncodeFlag(v bool) int { if v { return 0 }; return 1}",
+              "source": "EA:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func DecodeFlag(n int) bool { return n== 0}",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1184,
+          "output_tokens": 128,
+          "direction_gold_correct": false
+        }
+      ],
+      "T1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 1,
+                "quote": "The local flag codec contract requires FlagRoundtrip for both boolean values.",
+                "source": "context:contract.go"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 1,
+              "quote": "The local flag codec contract requires FlagRoundtrip for both boolean values.",
+              "source": "context:contract.go",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1184,
+          "output_tokens": 85,
+          "direction_gold_correct": false
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func EncodeFlag(v bool) int { if v { return 0 }; return 1}",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func DecodeFlag(n int) bool { return n== 0}",
+                "source": "EB:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func EncodeFlag(v bool) int { if v { return 0 }; return 1}",
+              "source": "EA:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func DecodeFlag(n int) bool { return n== 0}",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1184,
+          "output_tokens": 128,
+          "direction_gold_correct": false
+        }
+      ],
+      "T2": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func EncodeFlag(v bool) int { if v { return 0 }; return 1 }",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func DecodeFlag(n int) bool { return n== 0}",
+                "source": "EB:after"
+              }
+            ],
+            "reason": "Both changes preserve the same behavior by swapping the return values of EncodeFlag and DecodeFlag.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func EncodeFlag(v bool) int { if v { return 0 }; return 1 }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func DecodeFlag(n int) bool { return n== 0}",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1136,
+          "output_tokens": 125,
+          "direction_gold_correct": null
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func EncodeFlag(v bool) int { if v { return 0 }; return 1}",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func DecodeFlag(n int) bool { return n== 0}",
+                "source": "EB:after"
+              }
+            ],
+            "reason": "Changes preserve an explicit joint behavior contract by swapping the return values of EncodeFlag and DecodeFlag.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func EncodeFlag(v bool) int { if v { return 0 }; return 1}",
+              "source": "EA:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func DecodeFlag(n int) bool { return n== 0}",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 1136,
+          "output_tokens": 125,
+          "direction_gold_correct": null
+        }
+      ]
+    },
+    "semantic_truth": "see separately audited reason-review.json; exact citations alone do not prove relation truth"
+  },
+  {
+    "case": "new-round-provider-eb",
+    "expected_relation": "dependency",
+    "expected_direction": {
+      "provider": "EB",
+      "consumer": "EA"
+    },
+    "records": {
+      "B1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Total(n int) int { return RoundToTen(n) }",
+                "source": "EA:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract by replacing the original Total function with RoundToTen.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Total(n int) int { return RoundToTen(n) }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 953,
+          "output_tokens": 95,
+          "direction_gold_correct": true
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Total(n int) int { return RoundToTen(n) }",
+                "source": "EA:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Total(n int) int { return RoundToTen(n) }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 953,
+          "output_tokens": 85,
+          "direction_gold_correct": true
+        }
+      ],
+      "T1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Total(n int) int { return RoundToTen(n) }",
+                "source": "EA:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Total(n int) int { return RoundToTen(n) }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 953,
+          "output_tokens": 85,
+          "direction_gold_correct": true
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Total(n int) int { return RoundToTen(n) }",
+                "source": "EA:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Total(n int) int { return RoundToTen(n) }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 953,
+          "output_tokens": 85,
+          "direction_gold_correct": true
+        }
+      ],
+      "T2": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Total(n int) int { return RoundToTen(n) }",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func Total(n int) int { return n }",
+                "source": "EA:before"
+              },
+              {
+                "line": 4,
+                "quote": "func RoundToTen(n int) int { return (n+9)/10*10}",
+                "source": "EB:after"
+              }
+            ],
+            "reason": "Changes preserve an explicit joint behavior contract by replacing the original Total function with RoundToTen.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Total(n int) int { return RoundToTen(n) }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func Total(n int) int { return n }",
+              "source": "EA:before",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 4,
+              "quote": "func RoundToTen(n int) int { return (n+9)/10*10}",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 905,
+          "output_tokens": 162,
+          "direction_gold_correct": null
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func Total(n int) int { return RoundToTen(n) }",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func Total(n int) int { return n }",
+                "source": "EA:before"
+              },
+              {
+                "line": 4,
+                "quote": "func RoundToTen(n int) int { return (n+9)/10*10}",
+                "source": "EB:after"
+              }
+            ],
+            "reason": "Changes preserve an explicit joint behavior contract by introducing a new function `RoundToTen` that is used in `Total`.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func Total(n int) int { return RoundToTen(n) }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func Total(n int) int { return n }",
+              "source": "EA:before",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 4,
+              "quote": "func RoundToTen(n int) int { return (n+9)/10*10}",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 905,
+          "output_tokens": 169,
+          "direction_gold_correct": null
+        }
+      ]
+    },
+    "semantic_truth": "see separately audited reason-review.json; exact citations alone do not prove relation truth"
+  },
+  {
+    "case": "cache-expiry-multiple-boundaries",
+    "expected_relation": "multiple_defensible",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "records": {
+      "B1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "const ImageTTL = 120",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "const DocumentTTL = 180",
+                "source": "EB:after"
+              }
+            ],
+            "provider": "none",
+            "reason": "Changes preserve an explicit joint behavior contract by updating TTL constants in both `image.go` and `document.go`.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "const ImageTTL = 120",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "const DocumentTTL = 180",
+              "source": "EB:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 829,
+          "output_tokens": 130,
+          "direction_gold_correct": false
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "const ImageTTL = 120",
+                "source": "EB:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "const ImageTTL = 120",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 829,
+          "output_tokens": 80,
+          "direction_gold_correct": false
+        }
+      ],
+      "T1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "const ImageTTL = 120",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "const DocumentTTL = 180",
+                "source": "EB:after"
+              }
+            ],
+            "provider": "none",
+            "reason": "Changes preserve an explicit joint behavior contract by updating TTL constants in both `image.go` and `document.go`.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "const ImageTTL = 120",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "const DocumentTTL = 180",
+              "source": "EB:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 829,
+          "output_tokens": 130,
+          "direction_gold_correct": false
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "const ImageTTL = 120",
+                "source": "EB:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "const ImageTTL = 120",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 829,
+          "output_tokens": 80,
+          "direction_gold_correct": false
+        }
+      ],
+      "T2": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "const ImageTTL = 120",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "const DocumentTTL= 180",
+                "source": "EB:after"
+              }
+            ],
+            "reason": "Changes preserve an explicit joint behavior contract by updating TTL constants in both `image.go` and `document.go` files.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "const ImageTTL = 120",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "const DocumentTTL= 180",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 781,
+          "output_tokens": 117,
+          "direction_gold_correct": null
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "const ImageTTL = 120",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "const DocumentTTL = 180",
+                "source": "EB:after"
+              }
+            ],
+            "reason": "Changes preserve an explicit joint behavior contract by updating TTL constants in different files.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "const ImageTTL = 120",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "const DocumentTTL = 180",
+              "source": "EB:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 781,
+          "output_tokens": 108,
+          "direction_gold_correct": null
+        }
+      ]
+    },
+    "semantic_truth": "see separately audited reason-review.json; exact citations alone do not prove relation truth"
+  },
+  {
+    "case": "unknown-admission-contract",
+    "expected_relation": "insufficient",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "records": {
+      "B1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func CPUReservation() int { return 3 }",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func CPUReservation() int { return 2 }",
+                "source": "EA:before"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func CPUReservation() int { return 3 }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func CPUReservation() int { return 2 }",
+              "source": "EA:before",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 999,
+          "output_tokens": 116,
+          "direction_gold_correct": false
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func CPUReservation() int { return 3 }",
+                "source": "EB:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func CPUReservation() int { return 3 }",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 999,
+          "output_tokens": 81,
+          "direction_gold_correct": false
+        }
+      ],
+      "T1": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func CPUReservation() int { return 3 }",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func CPUReservation() int { return 2 }",
+                "source": "EA:before"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func CPUReservation() int { return 3 }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func CPUReservation() int { return 2 }",
+              "source": "EA:before",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 999,
+          "output_tokens": 116,
+          "direction_gold_correct": false
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "consumer": "EA",
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func CPUReservation() int { return 3 }",
+                "source": "EB:after"
+              }
+            ],
+            "provider": "EB",
+            "reason": "Changes preserve an explicit joint behavior contract",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func CPUReservation() int { return 3 }",
+              "source": "EB:after",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 999,
+          "output_tokens": 81,
+          "direction_gold_correct": false
+        }
+      ],
+      "T2": [
+        {
+          "reverse": false,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func CPUReservation() int { return 3 }",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func CPUReservation() int { return 3 }",
+                "source": "EA:before"
+              },
+              {
+                "line": 3,
+                "quote": "func MemoryReservation() int { return 6 }",
+                "source": "EB:after"
+              },
+              {
+                "line": 3,
+                "quote": "func MemoryReservation() int { return 4 }",
+                "source": "EB:before"
+              }
+            ],
+            "reason": "Changes preserve an explicit joint behavior contract by updating the return values of the CPUReservation and MemoryReservation functions.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func CPUReservation() int { return 3 }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func CPUReservation() int { return 3 }",
+              "source": "EA:before",
+              "exists": false,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func MemoryReservation() int { return 6 }",
+              "source": "EB:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func MemoryReservation() int { return 4 }",
+              "source": "EB:before",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 951,
+          "output_tokens": 186,
+          "direction_gold_correct": null
+        },
+        {
+          "reverse": true,
+          "status": "completed",
+          "answer": {
+            "evidence": [
+              {
+                "line": 3,
+                "quote": "func CPUReservation() int { return 3 }",
+                "source": "EA:after"
+              },
+              {
+                "line": 3,
+                "quote": "func CPUReservation() int { return 2 }",
+                "source": "EA:before"
+              },
+              {
+                "line": 3,
+                "quote": "func MemoryReservation() int { return 6 }",
+                "source": "EB:after"
+              },
+              {
+                "line": 3,
+                "quote": "func MemoryReservation() int { return 4 }",
+                "source": "EB:before"
+              }
+            ],
+            "reason": "Changes preserve an explicit joint behavior contract by modifying the CPUReservation and MemoryReservation functions to return different values.",
+            "relation": "compensation"
+          },
+          "citation_audit": [
+            {
+              "line": 3,
+              "quote": "func CPUReservation() int { return 3 }",
+              "source": "EA:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func CPUReservation() int { return 2 }",
+              "source": "EA:before",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func MemoryReservation() int { return 6 }",
+              "source": "EB:after",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            },
+            {
+              "line": 3,
+              "quote": "func MemoryReservation() int { return 4 }",
+              "source": "EB:before",
+              "exists": true,
+              "proves_claim": "requires semantic audit"
+            }
+          ],
+          "input_tokens": 951,
+          "output_tokens": 188,
+          "direction_gold_correct": null
+        }
+      ]
+    },
+    "semantic_truth": "see separately audited reason-review.json; exact citations alone do not prove relation truth"
+  }
+]
