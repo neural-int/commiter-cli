@@ -1,0 +1,87 @@
+{
+  "issue": 164,
+  "phase": "preliminary",
+  "after_remote_all_checkbox_verification": false,
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "go-test",
+      "command": "go test ./...",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "f8aa90a752d62cf81044e01aa8dcedc691f283e984b5760015fa2e8c7f7031a7",
+      "elapsed_seconds": 40.60805737506598
+    },
+    {
+      "check": "go-vet",
+      "command": "go vet ./...",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsed_seconds": 0.3814875001553446
+    },
+    {
+      "check": "go-build",
+      "command": "go build ./...",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsed_seconds": 1.4668165831826627
+    },
+    {
+      "check": "cli-build",
+      "command": "cli-build",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsed_seconds": 1.1083906251005828
+    },
+    {
+      "check": "release-notes-tests",
+      "command": "python3 -m unittest discover -s .github/scripts/release-notes -p test_*.py",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "fed5234a24f89b25194b9ff51ca8b4d444a62761c5c13e2502901135c31e4280",
+      "elapsed_seconds": 0.339135916903615
+    },
+    {
+      "check": "swift-tests",
+      "command": "swift test -c release --skip-build --disable-automatic-resolution",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "7c40e240ad762f0cbe32b7dee0bc15613e5760325031b6f9464c370b5f485cdb",
+      "elapsed_seconds": 8.223295624833554
+    },
+    {
+      "check": "harness-preflight",
+      "command": "harness-preflight",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "9756bcc4a6e8221062f2bc6850bf4176b25407dfcd2591cd2672d92d41469daf",
+      "elapsed_seconds": 0.452555833151564
+    },
+    {
+      "check": "resource-preflight",
+      "command": "resource-preflight",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "2bc589b7c2072096e80c786f0624cdcd353efa1a915ef98eb5e9ad01178d7b3a",
+      "elapsed_seconds": 0.4194680000655353
+    },
+    {
+      "check": "diff-check",
+      "command": "git diff --check",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsed_seconds": 0.024279291043058038
+    },
+    {
+      "check": "evaluator-syntax",
+      "pass_": true
+    }
+  ],
+  "new_unit_test_cases": 0,
+  "unnecessary_tests": "production functions unchanged; existing regression tests retained; no mirror/unit tests added",
+  "additional_model_generations": 0
+}

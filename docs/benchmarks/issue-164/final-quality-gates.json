@@ -1,0 +1,99 @@
+{
+  "issue": 164,
+  "phase": "final",
+  "after_remote_all_checkbox_verification": true,
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "go-test",
+      "command": "go test ./...",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "c448eb83d42ed256073f4911c4590debceeebb79da738571800a642c55987a4c",
+      "elapsed_seconds": 0.9325274580623955
+    },
+    {
+      "check": "go-vet",
+      "command": "go vet ./...",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsed_seconds": 0.15730216703377664
+    },
+    {
+      "check": "go-build",
+      "command": "go build ./...",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsed_seconds": 1.9745475419331342
+    },
+    {
+      "check": "cli-build",
+      "command": "cli-build",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsed_seconds": 1.3849159579258412
+    },
+    {
+      "check": "release-notes-tests",
+      "command": "python3 -m unittest discover -s .github/scripts/release-notes -p test_*.py",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "d0c46887d6a08c2729076f08e7f2ca36780e36a0c3fe1bf552afc56e07180d79",
+      "elapsed_seconds": 0.2965579158626497
+    },
+    {
+      "check": "swift-tests",
+      "command": "swift test -c release --skip-build --disable-automatic-resolution",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "d4c2acdff9e919e6e225b42742da738d96b3a10feacedcc9e38ff924aea2ed32",
+      "elapsed_seconds": 3.0910482921171933
+    },
+    {
+      "check": "harness-preflight",
+      "command": "harness-preflight",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "9756bcc4a6e8221062f2bc6850bf4176b25407dfcd2591cd2672d92d41469daf",
+      "elapsed_seconds": 0.5875489169266075
+    },
+    {
+      "check": "resource-preflight",
+      "command": "resource-preflight",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "2bc589b7c2072096e80c786f0624cdcd353efa1a915ef98eb5e9ad01178d7b3a",
+      "elapsed_seconds": 0.41924395808018744
+    },
+    {
+      "check": "diff-check",
+      "command": "git diff --check",
+      "exit": 0,
+      "pass_": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsed_seconds": 0.01624825014732778
+    },
+    {
+      "check": "evaluator-syntax",
+      "pass_": true
+    }
+  ],
+  "new_unit_test_cases": 0,
+  "unnecessary_tests": "production functions unchanged; existing regression tests retained; no mirror/unit tests added",
+  "additional_model_generations": 0,
+  "go_test_packages": 20,
+  "go_test_cached_packages": 20,
+  "python_tests": 25,
+  "swift_tests": 32,
+  "harness_preflight_checks": 27,
+  "purpose": "final Goal quality gate run after eight Issue conditions and remote checkboxes were confirmed; preliminary suite retained separately because completion update first lacked quality evidence",
+  "evaluated_commit": "c95b3b9e33710a932e224d55ae31eba16d720443",
+  "source_and_model_and_helper_post_match": true,
+  "candidate_decision": "NO-GO",
+  "research_complete": true,
+  "production_changed": false,
+  "issue_checkbox_snapshot_sha256": "f3b46a054be8e35cc373343340525140b9f2365ea4cc5a43b84e4d49156bb219"
+}
