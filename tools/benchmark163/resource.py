@@ -30,7 +30,8 @@ def usage(pid):
 def system():
     result = {}
     for name, args in [('vm_stat', ['vm_stat']), ('swap', ['sysctl', 'vm.swapusage']),
-                       ('pressure', ['memory_pressure', '-Q'])]:
+                       ('pressure', ['memory_pressure', '-Q']),
+                       ('pressure_level', ['sysctl', '-n', 'kern.memorystatus_vm_pressure_level'])]:
         try:
             p = subprocess.run(args, capture_output=True, timeout=10)
             result[name] = {'exit': p.returncode, 'stdout': p.stdout.decode(errors='replace'),
@@ -46,11 +47,22 @@ def observed_call(command, payload, timeout, interval=0.1):
     proc = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                             env=dict(os.environ, HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1'))
     samples = []
+    pressure_samples = []
     stop = threading.Event()
 
     def sample():
+        last_pressure = -1.0
         while not stop.is_set():
             samples.append(dict(usage(proc.pid), elapsed_seconds=time.monotonic() - started))
+            now = time.monotonic() - started
+            if now - last_pressure >= 1:
+                try:
+                    observed = subprocess.run(['sysctl', '-n', 'kern.memorystatus_vm_pressure_level'], capture_output=True, timeout=2)
+                    level = int(observed.stdout) if observed.returncode == 0 else None
+                except (ValueError, subprocess.TimeoutExpired):
+                    level = None
+                pressure_samples.append({'elapsed_seconds': now, 'level': level})
+                last_pressure = now
             stop.wait(interval)
 
     worker = threading.Thread(target=sample)
@@ -69,7 +81,7 @@ def observed_call(command, payload, timeout, interval=0.1):
     valid = [row for row in samples if row['available']]
     return {'exit': proc.returncode, 'timed_out': timed_out, 'stdout': stdout.decode(errors='replace'),
             'stderr': stderr.decode(errors='replace'), 'total_seconds': elapsed,
-            'sample_interval_seconds': interval, 'samples': samples,
+            'sample_interval_seconds': interval, 'samples': samples, 'pressure_samples': pressure_samples,
             'sampled_peak_footprint_bytes': max((r['footprint_bytes'] for r in valid), default=None),
             'observed_lifetime_peak_footprint_bytes': max((r['lifetime_peak_footprint_bytes'] for r in valid), default=None),
             'sampled_peak_rss_bytes': max((r['rss_bytes'] for r in valid), default=None),

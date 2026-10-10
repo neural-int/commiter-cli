@@ -1,0 +1,117 @@
+{
+  "archive_commit": "82a179a11e0c75562fadd595f208584f7a43cdb0",
+  "archive_path": "docs/benchmarks/issue-156/measured-helper-source-archive.json",
+  "source": {
+    "Package.swift": {
+      "before_sha256": "247b5e3ded85c2be92584c472da503ace05026460c2af728ceb5d17f46f97e92",
+      "after_sha256": "247b5e3ded85c2be92584c472da503ace05026460c2af728ceb5d17f46f97e92"
+    },
+    "Package.resolved": {
+      "before_sha256": "b62d4f3b6f7df30d7f8c955eb5fe02deb067dda9ce24afc9a0c04abf1b0286cc",
+      "after_sha256": "b62d4f3b6f7df30d7f8c955eb5fe02deb067dda9ce24afc9a0c04abf1b0286cc"
+    },
+    "Sources/BoundedGeneration/GrammarSampling.swift": {
+      "before_sha256": "1fb602590e1c45a3815bb1c069d7ee856116f082d5acf3c3e6c548854556e42b",
+      "after_sha256": "1fb602590e1c45a3815bb1c069d7ee856116f082d5acf3c3e6c548854556e42b"
+    },
+    "Sources/BoundedGeneration/NativeThoughtBudget.swift": {
+      "before_sha256": "adbe5a6229ecbe408a32494bd1a543c05c1f591a6d837808e03866d5166ad6c6",
+      "after_sha256": "adbe5a6229ecbe408a32494bd1a543c05c1f591a6d837808e03866d5166ad6c6"
+    },
+    "Sources/BoundedGeneration/TokenBudget.swift": {
+      "before_sha256": "cf72caffafff9835c386c0e48050c25a57d7a3391b156b1738360ed0fba06185",
+      "after_sha256": "cf72caffafff9835c386c0e48050c25a57d7a3391b156b1738360ed0fba06185"
+    },
+    "Sources/CommiterMLXHelperProtocol/CandidateOutput.swift": {
+      "before_sha256": "eb552d4d5f7ac57d33c2a70831683dbb0557bfbd85c96a50ae0e5f9c80f6b7dc",
+      "after_sha256": "eb552d4d5f7ac57d33c2a70831683dbb0557bfbd85c96a50ae0e5f9c80f6b7dc"
+    },
+    "Sources/CommiterMLXHelperProtocol/Framing.swift": {
+      "before_sha256": "5e5a467fbba0d3393b4728844897175abbdfd2bbe62da9dce66d8e47a3d41295",
+      "after_sha256": "5e5a467fbba0d3393b4728844897175abbdfd2bbe62da9dce66d8e47a3d41295"
+    },
+    "Sources/commiter-mlx-helper/CommiterMLXHelper.swift": {
+      "before_sha256": "5e3ea31565b5f51cfc8ec925393dae96ff268440f9335ef1ce34bf3485743bf0",
+      "after_sha256": "82eea7a814c0886eca3cb34c1b5c1647554c41b3b4b1d916c8139410b450b08d"
+    },
+    "Tests/BoundedGenerationTests/GrammarSamplingTests.swift": {
+      "before_sha256": "dd6b8c98fa7d91daa932aba7b88d47f6f2ee1779bb9a1c3a310e61607240ed70",
+      "after_sha256": "dd6b8c98fa7d91daa932aba7b88d47f6f2ee1779bb9a1c3a310e61607240ed70"
+    },
+    "Tests/BoundedGenerationTests/NativeThoughtBudgetTests.swift": {
+      "before_sha256": "97cdb0289795775192459d903923b1570d6cf8f39a6452cce5e81b0d75a0b689",
+      "after_sha256": "97cdb0289795775192459d903923b1570d6cf8f39a6452cce5e81b0d75a0b689"
+    },
+    "Tests/BoundedGenerationTests/TokenBudgetTests.swift": {
+      "before_sha256": "a6aaf78066203c8ca2098e223ec453f194324a84c0b99d36cbd201651b4dff91",
+      "after_sha256": "a6aaf78066203c8ca2098e223ec453f194324a84c0b99d36cbd201651b4dff91"
+    },
+    "Tests/CommiterMLXHelperProtocolTests/CandidateOutputTests.swift": {
+      "before_sha256": "10471fad82122e56d5a7da558722ffdcdcb9027bffabf2ddd9fda7c4bd4e1c25",
+      "after_sha256": "10471fad82122e56d5a7da558722ffdcdcb9027bffabf2ddd9fda7c4bd4e1c25"
+    },
+    "Tests/CommiterMLXHelperProtocolTests/FramingTests.swift": {
+      "before_sha256": "bdaec1b0cc619e03e540676ddb350e6c6392d2ae479171eb952c5da5b41ecb86",
+      "after_sha256": "bdaec1b0cc619e03e540676ddb350e6c6392d2ae479171eb952c5da5b41ecb86"
+    }
+  },
+  "production_modified": false,
+  "new_dependencies": false,
+  "changes": [
+    {
+      "before": "[\"mlx-community/Qwen3.5-4B-MLX-4bit@",
+      "after": "[\"mlx-community/Qwen2.5-Coder-3B-Instruct-4bit@3dd939c621c08e5753d5b89f35a2642cd83b98ca\",\"mlx-community/Qwen3.5-4B-MLX-4bit@",
+      "occurrences": 1
+    },
+    {
+      "before": "    var output: Int? = nil\n",
+      "after": "    var output: Int? = nil\n    let started = Date()\n    var loadedSeconds: Double? = nil\n    var preparedSeconds: Double? = nil\n    var firstChunkSeconds: Double? = nil\n    var firstTokenSeconds: Double? = nil\n    var prefillSeconds: Double? = nil\n    var decodeSeconds: Double? = nil\n",
+      "occurrences": 1
+    },
+    {
+      "before": "    var benchmarkOutputTokens: Int? = nil\n",
+      "after": "    var benchmarkOutputTokens: Int? = nil\n    var benchmarkLoadSeconds: Double? = nil\n    var benchmarkPreparedSeconds: Double? = nil\n    var benchmarkFirstChunkSeconds: Double? = nil\n    var benchmarkTTFTSeconds: Double? = nil\n    var benchmarkPrefillSeconds: Double? = nil\n    var benchmarkDecodeSeconds: Double? = nil\n    var benchmarkMLXActiveBytes: Int? = nil\n    var benchmarkMLXPeakBytes: Int? = nil\n    var benchmarkMLXCacheBytes: Int? = nil\n",
+      "occurrences": 1
+    },
+    {
+      "before": "        case benchmarkOutputTokens = \"benchmark_output_tokens\"\n",
+      "after": "        case benchmarkOutputTokens = \"benchmark_output_tokens\"\n        case benchmarkLoadSeconds = \"benchmark_load_seconds\"\n        case benchmarkPreparedSeconds = \"benchmark_prepared_seconds\"\n        case benchmarkFirstChunkSeconds = \"benchmark_first_chunk_seconds\"\n        case benchmarkTTFTSeconds = \"benchmark_ttft_seconds\"\n        case benchmarkPrefillSeconds = \"benchmark_prefill_seconds\"\n        case benchmarkDecodeSeconds = \"benchmark_decode_seconds\"\n        case benchmarkMLXActiveBytes = \"benchmark_mlx_active_bytes\"\n        case benchmarkMLXPeakBytes = \"benchmark_mlx_peak_bytes\"\n        case benchmarkMLXCacheBytes = \"benchmark_mlx_cache_bytes\"\n",
+      "occurrences": 1
+    },
+    {
+      "before": "            let outputBox = OutputBox()\n",
+      "after": "            benchmarkCounts.loadedSeconds = Date().timeIntervalSince(benchmarkCounts.started)\n            let outputBox = OutputBox()\n",
+      "occurrences": 1
+    },
+    {
+      "before": "                benchmarkOutputTokens: benchmarkCounts.output\n",
+      "after": "                benchmarkOutputTokens: benchmarkCounts.output,\n                benchmarkLoadSeconds: benchmarkCounts.loadedSeconds,\n                benchmarkPreparedSeconds: benchmarkCounts.preparedSeconds,\n                benchmarkFirstChunkSeconds: benchmarkCounts.firstChunkSeconds,\n                benchmarkTTFTSeconds: benchmarkCounts.firstTokenSeconds,\n                benchmarkPrefillSeconds: benchmarkCounts.prefillSeconds,\n                benchmarkDecodeSeconds: benchmarkCounts.decodeSeconds,\n                benchmarkMLXActiveBytes: Memory.activeMemory,\n                benchmarkMLXPeakBytes: Memory.peakMemory,\n                benchmarkMLXCacheBytes: Memory.cacheMemory\n",
+      "occurrences": 2
+    },
+    {
+      "before": "        counts.input = input.text.tokens.size\n",
+      "after": "        counts.preparedSeconds = Date().timeIntervalSince(counts.started)\n        counts.input = input.text.tokens.size\n",
+      "occurrences": 1
+    },
+    {
+      "before": "            case .chunk(let chunk): output += chunk\n",
+      "after": "            case .chunk(let chunk):\n                if counts.firstChunkSeconds == nil { counts.firstChunkSeconds = Date().timeIntervalSince(counts.started) }\n                output += chunk\n",
+      "occurrences": 1
+    },
+    {
+      "before": "components = GenerationComponents(logitProcessorFactory: { GrammarSamplingProcessor(state: state) })",
+      "after": "components = GenerationComponents(logitProcessorFactory: { MeasuredGrammarProcessor(state: state, counts: counts) })",
+      "occurrences": 1
+    },
+    {
+      "before": "                counts.output = info.generationTokenCount",
+      "after": "                counts.prefillSeconds = info.promptTime\n                counts.decodeSeconds = info.generateTime\n                counts.output = info.generationTokenCount",
+      "occurrences": 1
+    },
+    {
+      "before": "private struct Response: Encodable {",
+      "after": "// Experiment-only observation wrapper. Mask/commit/copy semantics match the pinned processor.\nprivate struct MeasuredGrammarProcessor: LogitProcessor {\n    let state: GrammarSamplingState\n    let counts: BenchmarkCounts\n    mutating func prompt(_ prompt: MLXArray) {}\n    func process(logits: MLXArray) -> MLXArray {\n        logits + MLXArray(state.maskValues(count: logits.dim(-1)))\n    }\n    mutating func didSample(token: MLXArray) {\n        let value = token.item(Int.self)\n        if counts.firstTokenSeconds == nil { counts.firstTokenSeconds = Date().timeIntervalSince(counts.started) }\n        state.commit(value)\n    }\n    func copy() -> Self { Self(state: state.independentCopy(), counts: counts) }\n}\n\nprivate struct Response: Encodable {",
+      "occurrences": 1
+    }
+  ]
+}
