@@ -1,0 +1,52 @@
+{
+  "recorded_at": "2026-10-10T16:27:41.753802+00:00",
+  "validated_source_commit": "a4c176e44fef9ee6991d43e5aa5a82c27ece1e9c",
+  "go_version": "go version go1.27.1 darwin/arm64",
+  "verification": "all 13 issue conditions accounted for with explicit Gate 2 failure and Phase 3 gated-out",
+  "gates": {
+    "phase_1": "supported regular file contract passed",
+    "phase_2": "failed",
+    "phase_3": "gated-out",
+    "production_go": false
+  },
+  "commands": [
+    {
+      "command": "go test ./... -count=1 -json",
+      "exit_code": 0,
+      "packages_passed": 22,
+      "packages_without_tests": 3,
+      "failed_events": 0
+    },
+    {
+      "command": "go vet ./...",
+      "exit_code": 0
+    },
+    {
+      "command": "go build ./...",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 -m unittest discover -s .github/scripts/release-notes -p 'test_*.py'",
+      "exit_code": 0,
+      "tests": 25
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "test_review": {
+    "obsolete_tests_from_feature_removal": false,
+    "tests_added_for_boundary_failure_git_preservation_and_measurement_lifecycle": true,
+    "mock_success_not_model_semantic_success": true
+  },
+  "local_validation_only": true,
+  "remote_ci": "not run; no PR created, workflow triggers main push or main-target PR",
+  "log_sha256": {
+    "commiter-167-final-test.jsonl": "0afad13cbd2bfe7367a4b3026a43948030432dade5f0ec6aefc7b0b99ace2b1f",
+    "commiter-167-final-test.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "commiter-167-final-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "commiter-167-final-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "commiter-167-final-release.log": "cb8524fab4ae0b061956af26b471126144bf662f925026f9fe58a679b787a806"
+  }
+}

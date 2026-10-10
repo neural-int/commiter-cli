@@ -19,7 +19,7 @@
 | 自動切替なし、default / 5+拒否維持 | CLI/executor の変更なし。`CandidateMaxFiles = 4` と既存 Three-phase の拒否・生成 profile の回帰テストを保持 |
 | 過剰分割と事前 production 採否 | 構造参照8 fixtureで exact3/8、FM0、FS45。独立精度として扱わない。完全 plan と資源条件で Gate 2 fail、production GO なし。#160 の80%未達を変更しない |
 | 1〜4非回帰、安全/local-only/Git | 既存 Three-phase 回帰テストと repository テスト。44推論 runで原状態保持。ローカル helperのみ、測定成果物に prompt/生成値を保存しない。実モデルの両方式失敗を意味品質の非回帰証明とは呼ばない |
-| テストと品質 Gate | Phase 1/2で repository Go test/vet/build、release notes25テスト、diff整合が成功。検証結果確定後に最終品質 Gateを再実行し `final-validation.json` に記録する |
+| テストと品質 Gate | Phase 1/2で repository Go test/vet/build、release notes25テスト、diff整合が成功。検証結果確定後の最終品質 Gateも成功。Go testは22 package pass / 3 packageテストなし、vet/build、release notes25テスト、diff整合の結果を `final-validation.json` に記録 |
 | 偽の成功にせず Issue 記録 | 主計測と追加診断を別成果物に保存、Issue Iteration 1〜4、decision と `verification-audit.json` で失敗・未評価・停止条件を記録 |
 
 ## 停止条件と残余リスク
