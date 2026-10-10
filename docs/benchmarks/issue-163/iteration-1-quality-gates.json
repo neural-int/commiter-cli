@@ -1,0 +1,43 @@
+{
+  "purpose": "iteration preparation regression; not final Goal quality gate",
+  "checks": [
+    {
+      "command": "go test ./...",
+      "exit": 0,
+      "pass": true
+    },
+    {
+      "command": "go vet ./...",
+      "exit": 0,
+      "pass": true
+    },
+    {
+      "command": "go build ./...",
+      "exit": 0,
+      "pass": true
+    },
+    {
+      "command": "python3 -m unittest discover -s .github/scripts/release-notes -p 'test_*.py'",
+      "exit": 0,
+      "pass": true,
+      "tests": 25
+    },
+    {
+      "command": "harness.py preflight",
+      "exit": 0,
+      "pass": true,
+      "checks": 27
+    },
+    {
+      "command": "resource.py lifecycle preflight",
+      "exit": 0,
+      "pass": true,
+      "child_samples": 4
+    }
+  ],
+  "new_unit_test_cases": 0,
+  "meaningful_negative_checks": "assignment/schema/stop/source reconstruction refusal and macOS measurement lifecycle",
+  "swift_tests": "not run; production Swift source unchanged; experiment helper not yet built",
+  "model_calls": 0,
+  "goal_verification_complete": false
+}
