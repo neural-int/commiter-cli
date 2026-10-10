@@ -1,0 +1,49 @@
+{
+  "goal_workflow": {
+    "url": "https://github.com/neural-int/goals/blob/main/goal.md",
+    "blob_sha": "ad92785ee8b4f4d04ded9c5755c4450cf02281ca"
+  },
+  "checks": {
+    "main_source_matches_preregistered_commit": true,
+    "raw_sha_matches_summary": true,
+    "main_matrix_complete": true,
+    "paired_same_snapshot": true,
+    "diagnostics_exactly_one_per_route_and_fixture": true,
+    "all_original_git_states_preserved": true,
+    "failures_not_discarded": true
+  },
+  "source_checks": {
+    "tools/benchmark167/fixtures.go": true,
+    "docs/benchmarks/issue-167/phase-2-fixtures.json": true,
+    "docs/benchmarks/issue-167/phase-2-preregistration.md": true,
+    "internal/planning/file_first.go": true,
+    "internal/planning/three_phase.go": true,
+    "tools/benchmark167/backend.go": true,
+    "tools/benchmark167/main.go": true
+  },
+  "main_commit": "f7bcbb16e4a97f10c3ff3617a842ef9616db3e98",
+  "diagnostic_commit": "4531a5207ebe75f7a8f000400cdc778650f4e023",
+  "gate_1": "pass_with_supported_regular_file_contract",
+  "gate_2": "failed",
+  "gate_3": "gated_out_pending_gate_2",
+  "production_go": false,
+  "complete_validated_plan_semantic_quality": null,
+  "provisional_quality_is_final_plan_quality": false,
+  "required_unreachable_evaluations": [
+    "CLI opt-in and actual commit mutation",
+    "partial failure delivery",
+    "independent holdout including mixed-intent/new API/weak evidence",
+    "intermediate build/revert validity",
+    "successful 16-group total metadata cost"
+  ],
+  "completion_condition_mapping": "completion-audit.md",
+  "verification_disposition": "completed_with_gate_2_failed_and_phase_3_explicitly_gated_out",
+  "issue_report": "https://github.com/neural-int/commiter-cli/issues/167#issuecomment-6099647635",
+  "artifact_sha256": {
+    "phase-2-diagnostics.jsonl": "0ce84995464c273ac2f4a432b3df8cd2b8343f16e8803635ad269090cd732380",
+    "phase-2-diagnostic-environment.json": "89444de089102863558f1321ded8ea727735cbb5d059085ff2ce1783ce8bb7b3",
+    "phase-2-structure.jsonl": "598edc42da9fe25951179d61b12eae545f5e573613e522334afe5161616411cb",
+    "phase-2-summary.json": "c683ccc4bca0d05008d7b2116ee0aad19017443ee7a450317bec180edd67e12f",
+    "completion-audit.md": "2fd28de280cbbe6aa98e71bddcb4301f4e7f6994fd9a864b069168c5bc8dc0f9"
+  }
+}
