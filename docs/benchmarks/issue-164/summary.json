@@ -1,0 +1,126 @@
+{
+  "issue": 164,
+  "fresh": {
+    "baseline": {
+      "total": 16,
+      "valid": 16,
+      "allowed": 8,
+      "false_merge": 6,
+      "false_split": 0,
+      "defer": 0,
+      "insufficient_defer": 0,
+      "decidable_coverage": 14,
+      "order_stable": 8,
+      "cases": 8,
+      "statuses": {
+        "completed": 16
+      },
+      "safe": true,
+      "input_tokens": 9676,
+      "output_tokens": 208,
+      "walltime_median": 2.5033620216418058,
+      "ttft_median": 2.0991634726524353,
+      "footprint_max": 2602879208,
+      "rss_max": 1887191040,
+      "mlx_peak_max": 2316564552,
+      "resource_pass": 15
+    },
+    "policy": {
+      "total": 16,
+      "valid": 16,
+      "allowed": 2,
+      "false_merge": 2,
+      "false_split": 0,
+      "defer": 10,
+      "insufficient_defer": 0,
+      "decidable_coverage": 4,
+      "order_stable": 4,
+      "cases": 8,
+      "statuses": {
+        "unresolved": 10,
+        "completed": 6
+      },
+      "safe": true,
+      "input_tokens": 13180,
+      "output_tokens": 208,
+      "walltime_median": 2.866853958577849,
+      "ttft_median": 2.4442954659461975,
+      "footprint_max": 2683980032,
+      "rss_max": 1887600640,
+      "mlx_peak_max": 2318810424,
+      "resource_pass": 16
+    }
+  },
+  "known_exploratory": {
+    "baseline": {
+      "total": 20,
+      "valid": 20,
+      "allowed": 14,
+      "false_merge": 4,
+      "false_split": 0,
+      "defer": 0,
+      "insufficient_defer": 0,
+      "decidable_coverage": 18,
+      "order_stable": 10,
+      "cases": 10,
+      "statuses": {
+        "completed": 20
+      },
+      "safe": true,
+      "input_tokens": 12216,
+      "output_tokens": 260,
+      "walltime_median": 2.384368187515065,
+      "ttft_median": 1.9846225380897522,
+      "footprint_max": 2593179952,
+      "rss_max": 1886339072,
+      "mlx_peak_max": 2404464668,
+      "resource_pass": 20
+    },
+    "policy": {
+      "total": 20,
+      "valid": 20,
+      "allowed": 13,
+      "false_merge": 2,
+      "false_split": 0,
+      "defer": 3,
+      "insufficient_defer": 0,
+      "decidable_coverage": 15,
+      "order_stable": 7,
+      "cases": 10,
+      "statuses": {
+        "completed": 17,
+        "unresolved": 3
+      },
+      "safe": true,
+      "input_tokens": 16596,
+      "output_tokens": 260,
+      "walltime_median": 5.249089021002874,
+      "ttft_median": 4.811779022216797,
+      "footprint_max": 2731133304,
+      "rss_max": 1890435072,
+      "mlx_peak_max": 2313698832,
+      "resource_pass": 20
+    }
+  },
+  "gates": {
+    "structure": true,
+    "policy_allowed": false,
+    "false_merge": false,
+    "false_split": true,
+    "defer": false,
+    "coverage": false,
+    "order": false,
+    "safety": true,
+    "resource": false,
+    "cost": true,
+    "identity": true,
+    "whole_budget": true,
+    "all_generation_rows": true
+  },
+  "decision": "NO-GO",
+  "generation_calls": 52,
+  "elapsed_seconds": 308.579195166938,
+  "preparation_seconds": 51.0755116250366,
+  "post_identity_match": true,
+  "limits": "self-authored correlated 8case paired comparison, not 16file/80% exact/metadata/production qualification; known historical baseline is not concurrent"
+}
