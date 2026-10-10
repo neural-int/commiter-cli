@@ -1,0 +1,1850 @@
+[
+  {
+    "case": "nil-slice-corresponding-assertion",
+    "probes": {
+      "before": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "9c1ae22539c150ed0397f432af3d0ea59c9616eb57df94292d23c0ed4ca86f55",
+        "log": "ok  \texample.test/issue164fixture\t0.557s\n"
+      },
+      "only_a": {
+        "pass": false,
+        "exit": 1,
+        "raw_sha256": "b4d8c2b980a24467b710011ddc8b0d5a6e05dd6bf4211393049130922b059ffd",
+        "log": "--- FAIL: TestNil (0.00s)\n    copy_test.go:4: nil\nFAIL\nFAIL\texample.test/issue164fixture\t0.352s\nFAIL\n"
+      },
+      "only_b": {
+        "pass": false,
+        "exit": 1,
+        "raw_sha256": "53f5733e169f7021a9eb6fc90ad8d845331ada87c8717e3af10f3a547717d11d",
+        "log": "--- FAIL: TestNil (0.00s)\n    copy_test.go:4: non-nil\nFAIL\nFAIL\texample.test/issue164fixture\t0.357s\nFAIL\n"
+      },
+      "after": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "6208cf9eecb72330b54b18771646ca0b201c26be338516ef0e12a12d84fc748d",
+        "log": "ok  \texample.test/issue164fixture\t0.363s\n"
+      }
+    },
+    "plans": {
+      "merge": {
+        "review_valid": true,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "61ba94e4387f25d9e2f03469684b61a7e34e0225"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "cbdb0343b76b4efe010b4fd71d857493de713c6e"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "61ba94e4387f25d9e2f03469684b61a7e34e0225"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "4b962df99b52a712042c0091f301ff3daff363cbee47f3b262782cf19c9c358a",
+              "log": "ok  \texample.test/issue164fixture\t0.359s\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "221944886a07e0b46f6ffecfbe25cf9e3fccd82587cac539f252be5038408a12",
+              "log": "ok  \texample.test/issue164fixture\t0.358s\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "d6e3f4646855c3e445dac887cbba344bdc50530091d286083cacc27cce664d6a",
+              "log": "ok  \texample.test/issue164fixture\t0.362s\n"
+            }
+          }
+        ],
+        "all_ordered_pass": true,
+        "all_independent_revert_pass": true
+      },
+      "ordered_split": {
+        "review_valid": false,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "61ba94e4387f25d9e2f03469684b61a7e34e0225"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA"
+              ],
+              "tree": "8d753c25ab3edf0c04a465ab573808232240dd28"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EB"
+              ],
+              "tree": "cbdb0343b76b4efe010b4fd71d857493de713c6e"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EB"
+              ],
+              "tree": "8d753c25ab3edf0c04a465ab573808232240dd28"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA"
+              ],
+              "tree": "61ba94e4387f25d9e2f03469684b61a7e34e0225"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": false,
+              "exit": 1,
+              "raw_sha256": "4d790b76d433abe9803080bc753a895903fae8f6c8c046213804cc2b3bd70832",
+              "log": "--- FAIL: TestNil (0.00s)\n    copy_test.go:4: nil\nFAIL\nFAIL\texample.test/issue164fixture\t0.360s\nFAIL\n"
+            }
+          },
+          {
+            "phase": "apply",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "6208cf9eecb72330b54b18771646ca0b201c26be338516ef0e12a12d84fc748d",
+              "log": "ok  \texample.test/issue164fixture\t0.363s\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": false,
+              "exit": 1,
+              "raw_sha256": "a9260f60160588985ccd96798a48f837a9f261196ca738ac2cb3238b405883b7",
+              "log": "--- FAIL: TestNil (0.00s)\n    copy_test.go:4: nil\nFAIL\nFAIL\texample.test/issue164fixture\t0.363s\nFAIL\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "53e30799c1f28a9493b9dd9eff1577c23327d789be4dd21a3714a7f170736f86",
+              "log": "ok  \texample.test/issue164fixture\t0.366s\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": false,
+              "exit": 1,
+              "raw_sha256": "08ca2bbaed5be1033af2ef16262bd583a3657e6dbcc533b86c745c0b004b4ead",
+              "log": "--- FAIL: TestNil (0.00s)\n    copy_test.go:4: non-nil\nFAIL\nFAIL\texample.test/issue164fixture\t0.364s\nFAIL\n"
+            }
+          },
+          {
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": false,
+              "exit": 1,
+              "raw_sha256": "4d790b76d433abe9803080bc753a895903fae8f6c8c046213804cc2b3bd70832",
+              "log": "--- FAIL: TestNil (0.00s)\n    copy_test.go:4: nil\nFAIL\nFAIL\texample.test/issue164fixture\t0.360s\nFAIL\n"
+            }
+          }
+        ],
+        "all_ordered_pass": false,
+        "all_independent_revert_pass": false
+      }
+    }
+  },
+  {
+    "case": "shared-bound-independent-ui-and-batch",
+    "probes": {
+      "before": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "only_a": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "only_b": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "after": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      }
+    },
+    "plans": {
+      "merge": {
+        "review_valid": false,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "022c6209b9c800f31c91f51cd77d16da3cc27ec4"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "587d31dee5df1b34a70f1606cf5133d140bd4d61"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "022c6209b9c800f31c91f51cd77d16da3cc27ec4"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "all_ordered_pass": true,
+        "all_independent_revert_pass": true
+      },
+      "ordered_split": {
+        "review_valid": true,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "022c6209b9c800f31c91f51cd77d16da3cc27ec4"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA"
+              ],
+              "tree": "d036aa2d4680b90afac7084d49158d47fe961b8b"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EB"
+              ],
+              "tree": "587d31dee5df1b34a70f1606cf5133d140bd4d61"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EB"
+              ],
+              "tree": "d036aa2d4680b90afac7084d49158d47fe961b8b"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA"
+              ],
+              "tree": "022c6209b9c800f31c91f51cd77d16da3cc27ec4"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "apply",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "all_ordered_pass": true,
+        "all_independent_revert_pass": true
+      }
+    }
+  },
+  {
+    "case": "same-package-independent-time-and-permission",
+    "probes": {
+      "before": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "only_a": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "only_b": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "after": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      }
+    },
+    "plans": {
+      "merge": {
+        "review_valid": false,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "39741d202f725f35e71e5310c8921cc2eedd5773"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "05df93a1704bb3d0eef7a779bc3c7838a5404b4d"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "39741d202f725f35e71e5310c8921cc2eedd5773"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "all_ordered_pass": true,
+        "all_independent_revert_pass": true
+      },
+      "ordered_split": {
+        "review_valid": true,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "39741d202f725f35e71e5310c8921cc2eedd5773"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA"
+              ],
+              "tree": "c9d50fdbf593ba93e02c739e4cb0b3bb04c64dda"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EB"
+              ],
+              "tree": "05df93a1704bb3d0eef7a779bc3c7838a5404b4d"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EB"
+              ],
+              "tree": "c9d50fdbf593ba93e02c739e4cb0b3bb04c64dda"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA"
+              ],
+              "tree": "39741d202f725f35e71e5310c8921cc2eedd5773"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "apply",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "all_ordered_pass": true,
+        "all_independent_revert_pass": true
+      }
+    }
+  },
+  {
+    "case": "shared-import-independent-search-and-sort",
+    "probes": {
+      "before": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "only_a": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "only_b": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "after": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      }
+    },
+    "plans": {
+      "merge": {
+        "review_valid": false,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "b9fca091550dbf439930809ecfbedc9357ada6e8"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "b20973e9c61d760b47418231f3c9f1cba1c05949"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "b9fca091550dbf439930809ecfbedc9357ada6e8"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "all_ordered_pass": true,
+        "all_independent_revert_pass": true
+      },
+      "ordered_split": {
+        "review_valid": true,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "b9fca091550dbf439930809ecfbedc9357ada6e8"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA"
+              ],
+              "tree": "007235540b7ce045c8bce17d3578cdd06b4c2221"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EB"
+              ],
+              "tree": "b20973e9c61d760b47418231f3c9f1cba1c05949"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EB"
+              ],
+              "tree": "007235540b7ce045c8bce17d3578cdd06b4c2221"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA"
+              ],
+              "tree": "b9fca091550dbf439930809ecfbedc9357ada6e8"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "apply",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "all_ordered_pass": true,
+        "all_independent_revert_pass": true
+      }
+    }
+  },
+  {
+    "case": "boolean-polarity-compensation",
+    "probes": {
+      "before": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "2dd63fa781c49809ff0a3dd2311e26ac2c507964a59c60644345ad7b73fb2717",
+        "log": "ok  \texample.test/issue164fixture\t0.361s\n"
+      },
+      "only_a": {
+        "pass": false,
+        "exit": 1,
+        "raw_sha256": "bd805875bf495f1620f259983877f5d8f9a39eaeea6de1303955f547f782788e",
+        "log": "--- FAIL: TestCodec (0.00s)\n    codec_test.go:4: roundtrip\nFAIL\nFAIL\texample.test/issue164fixture\t0.359s\nFAIL\n"
+      },
+      "only_b": {
+        "pass": false,
+        "exit": 1,
+        "raw_sha256": "bd805875bf495f1620f259983877f5d8f9a39eaeea6de1303955f547f782788e",
+        "log": "--- FAIL: TestCodec (0.00s)\n    codec_test.go:4: roundtrip\nFAIL\nFAIL\texample.test/issue164fixture\t0.359s\nFAIL\n"
+      },
+      "after": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "80d02b46bdce8c56d1b725d5ef3ca1775f73e67c7750488c002d11b62f92b657",
+        "log": "ok  \texample.test/issue164fixture\t0.357s\n"
+      }
+    },
+    "plans": {
+      "merge": {
+        "review_valid": true,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "0b91623d19b75f518cd63114f373ae3c2a622d07"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "252f5e8e722b55be72ea753d2193ecd45abcb78c"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "0b91623d19b75f518cd63114f373ae3c2a622d07"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "4b962df99b52a712042c0091f301ff3daff363cbee47f3b262782cf19c9c358a",
+              "log": "ok  \texample.test/issue164fixture\t0.359s\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "d6e3f4646855c3e445dac887cbba344bdc50530091d286083cacc27cce664d6a",
+              "log": "ok  \texample.test/issue164fixture\t0.362s\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "2db5260dce3b81ed570bcafd3e92a220d7f5e6103aca6f0c4490b027239db987",
+              "log": "ok  \texample.test/issue164fixture\t0.367s\n"
+            }
+          }
+        ],
+        "all_ordered_pass": true,
+        "all_independent_revert_pass": true
+      },
+      "ordered_split": {
+        "review_valid": false,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "0b91623d19b75f518cd63114f373ae3c2a622d07"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA"
+              ],
+              "tree": "0495c432df53aa5261a0f7284f38d62b1f5fde66"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EB"
+              ],
+              "tree": "252f5e8e722b55be72ea753d2193ecd45abcb78c"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EB"
+              ],
+              "tree": "0495c432df53aa5261a0f7284f38d62b1f5fde66"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA"
+              ],
+              "tree": "0b91623d19b75f518cd63114f373ae3c2a622d07"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": false,
+              "exit": 1,
+              "raw_sha256": "7a81fb1709e682ce732d7a06246514009e67ef88f7e64f2fda2a9afdb6dd04e7",
+              "log": "--- FAIL: TestCodec (0.00s)\n    codec_test.go:4: roundtrip\nFAIL\nFAIL\texample.test/issue164fixture\t0.360s\nFAIL\n"
+            }
+          },
+          {
+            "phase": "apply",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "0fc07a93aa1635b2d370fc35546afab98da303acd237602e12737bee0a90624a",
+              "log": "ok  \texample.test/issue164fixture\t0.341s\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": false,
+              "exit": 1,
+              "raw_sha256": "cc014ad41d5ed48182dc55e99550c43d96a0955da3440e87be863894711da07f",
+              "log": "--- FAIL: TestCodec (0.00s)\n    codec_test.go:4: roundtrip\nFAIL\nFAIL\texample.test/issue164fixture\t0.358s\nFAIL\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "6208cf9eecb72330b54b18771646ca0b201c26be338516ef0e12a12d84fc748d",
+              "log": "ok  \texample.test/issue164fixture\t0.363s\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": false,
+              "exit": 1,
+              "raw_sha256": "245a775d4b07d11755494a45ae55dd3440a80608a2b744205110c761a43a962d",
+              "log": "--- FAIL: TestCodec (0.00s)\n    codec_test.go:4: roundtrip\nFAIL\nFAIL\texample.test/issue164fixture\t0.365s\nFAIL\n"
+            }
+          },
+          {
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": false,
+              "exit": 1,
+              "raw_sha256": "7e7d2cfaadb2fb0cdbf045107963e1dc35193b043c0844d1e0b7d2bc46b7f5cd",
+              "log": "--- FAIL: TestCodec (0.00s)\n    codec_test.go:4: roundtrip\nFAIL\nFAIL\texample.test/issue164fixture\t0.371s\nFAIL\n"
+            }
+          }
+        ],
+        "all_ordered_pass": false,
+        "all_independent_revert_pass": false
+      }
+    }
+  },
+  {
+    "case": "new-round-provider-eb",
+    "probes": {
+      "before": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "only_a": {
+        "pass": false,
+        "exit": 1,
+        "raw_sha256": "ab682d9e80aad8e7288c84e10a782f8f1abbd79245ec5ca3b337ee8e897e6439",
+        "log": "FAIL\texample.test/issue164fixture [build failed]\nFAIL\n# example.test/issue164fixture\n./total.go:3:32: undefined: RoundToTen\n"
+      },
+      "only_b": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "after": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      }
+    },
+    "plans": {
+      "merge": {
+        "review_valid": true,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "c6947ad0cb82e732f56870c7808bf782317162dd"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "e945f2032dbbe66a00a4e03b87dd74af981446d0"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "c6947ad0cb82e732f56870c7808bf782317162dd"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "all_ordered_pass": true,
+        "all_independent_revert_pass": true
+      },
+      "ordered_split": {
+        "review_valid": true,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "c6947ad0cb82e732f56870c7808bf782317162dd"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EB"
+              ],
+              "tree": "8346b9d77abfbc5f8d72b2b3350f2a7b8dd9cedc"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA"
+              ],
+              "tree": "e945f2032dbbe66a00a4e03b87dd74af981446d0"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA"
+              ],
+              "tree": "8346b9d77abfbc5f8d72b2b3350f2a7b8dd9cedc"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EB"
+              ],
+              "tree": "c6947ad0cb82e732f56870c7808bf782317162dd"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "apply",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": false,
+              "exit": 1,
+              "raw_sha256": "ab682d9e80aad8e7288c84e10a782f8f1abbd79245ec5ca3b337ee8e897e6439",
+              "log": "FAIL\texample.test/issue164fixture [build failed]\nFAIL\n# example.test/issue164fixture\n./total.go:3:32: undefined: RoundToTen\n"
+            }
+          },
+          {
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "all_ordered_pass": true,
+        "all_independent_revert_pass": false
+      }
+    }
+  },
+  {
+    "case": "cache-expiry-multiple-boundaries",
+    "probes": {
+      "before": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "only_a": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "only_b": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "after": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      }
+    },
+    "plans": {
+      "merge": {
+        "review_valid": true,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "10a7cac10904d3db616e4c6fdbe2e30f6f2caacb"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "211dcd1fccb5e8a17d1a4ac4cb268b5e7b3d9386"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "10a7cac10904d3db616e4c6fdbe2e30f6f2caacb"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "all_ordered_pass": true,
+        "all_independent_revert_pass": true
+      },
+      "ordered_split": {
+        "review_valid": true,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "10a7cac10904d3db616e4c6fdbe2e30f6f2caacb"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA"
+              ],
+              "tree": "ca4a666e376d9d2a5a8b8986ab1e8179c05bfaf7"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EB"
+              ],
+              "tree": "211dcd1fccb5e8a17d1a4ac4cb268b5e7b3d9386"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EB"
+              ],
+              "tree": "ca4a666e376d9d2a5a8b8986ab1e8179c05bfaf7"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA"
+              ],
+              "tree": "10a7cac10904d3db616e4c6fdbe2e30f6f2caacb"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "apply",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "all_ordered_pass": true,
+        "all_independent_revert_pass": true
+      }
+    }
+  },
+  {
+    "case": "unknown-admission-contract",
+    "probes": {
+      "before": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "only_a": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "only_b": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      },
+      "after": {
+        "pass": true,
+        "exit": 0,
+        "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+        "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+      }
+    },
+    "plans": {
+      "merge": {
+        "review_valid": false,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "e8d3c62db5a2a3a695588904f9fc15f8ff142c0a"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "f7612bc9aee62536c8f4afda72c4fb6b5fe5d9ba"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA",
+                "EB"
+              ],
+              "tree": "e8d3c62db5a2a3a695588904f9fc15f8ff142c0a"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EA",
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "all_ordered_pass": true,
+        "all_independent_revert_pass": true
+      },
+      "ordered_split": {
+        "review_valid": false,
+        "authoritative": {
+          "valid": true,
+          "violations": []
+        },
+        "reconstruction": {
+          "exact": true,
+          "trees": [
+            {
+              "phase": "before",
+              "group": [],
+              "tree": "e8d3c62db5a2a3a695588904f9fc15f8ff142c0a"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EA"
+              ],
+              "tree": "4351f5c77cac0fad94b18c289943512542e902f3"
+            },
+            {
+              "phase": "apply",
+              "group": [
+                "EB"
+              ],
+              "tree": "f7612bc9aee62536c8f4afda72c4fb6b5fe5d9ba"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EB"
+              ],
+              "tree": "4351f5c77cac0fad94b18c289943512542e902f3"
+            },
+            {
+              "phase": "revert",
+              "group": [
+                "EA"
+              ],
+              "tree": "e8d3c62db5a2a3a695588904f9fc15f8ff142c0a"
+            }
+          ],
+          "semantic_or_behavioral_proof": false
+        },
+        "ordered": [
+          {
+            "phase": "apply",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "apply",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "phase": "ordered_revert",
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "independent_revert": [
+          {
+            "group": [
+              "EA"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          },
+          {
+            "group": [
+              "EB"
+            ],
+            "test": {
+              "pass": true,
+              "exit": 0,
+              "raw_sha256": "7c14fddd1e2259d836f2b5087bfb0167ed3184a7cc2def286570f965ec9efbb8",
+              "log": "?   \texample.test/issue164fixture\t[no test files]\n"
+            }
+          }
+        ],
+        "all_ordered_pass": true,
+        "all_independent_revert_pass": true
+      }
+    }
+  }
+]
