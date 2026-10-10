@@ -1,0 +1,129 @@
+{
+  "issue": 163,
+  "purpose": "final Goal quality gate after all eight Issue completion criteria were checked",
+  "evaluated_head": "d1c197770e2cd8e83b4a40c72380a9539c73c854",
+  "all_pass": true,
+  "checks": [
+    {
+      "command": "go test ./...",
+      "exit": 0,
+      "pass": true,
+      "log_sha256": "c448eb83d42ed256073f4911c4590debceeebb79da738571800a642c55987a4c",
+      "tested_packages": 20,
+      "no_test_packages": 5,
+      "cached_results": true
+    },
+    {
+      "command": "go vet ./...",
+      "exit": 0,
+      "pass": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "go build ./...",
+      "exit": 0,
+      "pass": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "go build ./cmd/commiter",
+      "exit": 0,
+      "pass": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "python3 -m unittest discover -s .github/scripts/release-notes -p 'test_*.py'",
+      "exit": 0,
+      "pass": true,
+      "log_sha256": "33b248360fa309a4117612a09df854a1ba7e7412d7f535fd7cb125dbf12912f4",
+      "tests": 25
+    },
+    {
+      "command": "swift test -c release --skip-build --disable-automatic-resolution (research helper)",
+      "exit": 0,
+      "pass": true,
+      "log_sha256": "6c7ed5a2ac568a7754896fccb54348a1de65389826d8f0fc72f9057f42689c63",
+      "tests": 32
+    },
+    {
+      "command": "fixed harness preflight",
+      "exit": 0,
+      "pass": true,
+      "checks": 27,
+      "model_calls": 0
+    },
+    {
+      "command": "resource sampler lifecycle preflight",
+      "exit": 0,
+      "pass": true,
+      "child_samples": 4,
+      "model_calls": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0,
+      "pass": true
+    }
+  ],
+  "issue_completion_criteria": {
+    "total": 8,
+    "checked": 8,
+    "meaning": "verification complete under allowed NO-GO; global qualified only if local GO"
+  },
+  "source_and_helper_digests_match_registration": true,
+  "original_helper_unchanged": true,
+  "scope_only_benchmark163": true,
+  "main_head_unchanged": true,
+  "main_existing_gitignore_diff_preserved": true,
+  "new_software_dependencies": 0,
+  "new_unit_test_cases": 0,
+  "test_cleanup": "production functions not updated or deleted; existing tests retained; meaningful preflight refusals and measurement lifecycle checked",
+  "additional_generation_calls": 0,
+  "decision": {
+    "gemma_resource": "NO-GO",
+    "coder_resource": "GO for tested local inputs",
+    "local": "NO-GO for both models",
+    "global": "gated-out",
+    "production_or_four_file_expansion_achieved": false
+  },
+  "artifacts_sha256": {
+    "docs/benchmarks/issue-163/decision.json": "876a617a42f0c83b1b7c8c28efd7d55ac26b6cc23491f19aab09159912ee174a",
+    "docs/benchmarks/issue-163/final-preflight.json": "a49f25f326810b7e9ef34bce79c0b87d89688d0fbeaa176ac40ff55d3138299b",
+    "docs/benchmarks/issue-163/final-resource-preflight.json": "1d26b013ba6ee1068cdf9c28012bb821e93bc4af2c0a84387686996960e18c75",
+    "docs/benchmarks/issue-163/global-gated-out.json": "df00aa85577fb2a7792301aecc9c3db4068a22a0ecffbbb0e35852a3a144da13",
+    "docs/benchmarks/issue-163/iteration-1-contract.md": "61a7610215693024398be8e895cfd630c68489909f16be277a27f36aa7aef61e",
+    "docs/benchmarks/issue-163/iteration-1-environment.json": "4f7bcb652bc31f2fafe9c99e16e153b3c0457cc74756ebf37c6ce933c2d6f67c",
+    "docs/benchmarks/issue-163/iteration-1-final-preflight.json": "a49f25f326810b7e9ef34bce79c0b87d89688d0fbeaa176ac40ff55d3138299b",
+    "docs/benchmarks/issue-163/iteration-1-model-audit.json": "c76b98b105040e705efc76d3da380b8e749cd42a70f1911bdfc0b59475fa4af6",
+    "docs/benchmarks/issue-163/iteration-1-preflight.json": "ca774d99f72e7e3239329ef3ed1e2d72016b53dcded1c1fbac3060de79a23f1a",
+    "docs/benchmarks/issue-163/iteration-1-quality-gates.json": "f03fc3bcd1d548ff74532d07be35b7a12c310895aef1f6ac6c024ff4f7ba2d34",
+    "docs/benchmarks/issue-163/iteration-1-report.md": "ee7f73a670877ba6ad975d809ce7b04e288bace6628ee0434a421bfd2727a196",
+    "docs/benchmarks/issue-163/iteration-1-resource-preflight.json": "d6ff5eaf1397638a8c43eaae416cf5f692095809a4ea800b2ee25c976585ec23",
+    "docs/benchmarks/issue-163/iteration-2-before-token-preregistered.json": "e624b127683fefa73aa8eb83e1ffaf38ac4e33e5a43561470b1e464146a2c995",
+    "docs/benchmarks/issue-163/iteration-2-cache-path-preregistered.json": "0497b93ca0107b01ccfdf472ba918288e5bc9e60ffdc59315899e4a2892e5687",
+    "docs/benchmarks/issue-163/iteration-2-contract.md": "0c8450ba2d230e5ebb10b7668f8b6e7e4a591f77317e36a0a93651eb4cf3653c",
+    "docs/benchmarks/issue-163/iteration-2-download.json": "a9105983f74f834c5beae56f22783d2707df2e0929301f37fb2e2bd3c189c232",
+    "docs/benchmarks/issue-163/iteration-2-draft-preregistered.json": "48438d1ecd45830e6d199afc4f56e2168238ecbc6fa4763fd9667b6d5d265d44",
+    "docs/benchmarks/issue-163/iteration-2-final-helper-source.json": "f6e16452983914b8a4d35901869573a758efc0ff859b95d7c02a4ee795c90b38",
+    "docs/benchmarks/issue-163/iteration-2-helper-source.json": "422839f36092bb0abce09b25f516db27fdd0bc57a6c410688284320ad2fc4561",
+    "docs/benchmarks/issue-163/iteration-2-input-audit.json": "d50ef95c8d6105da76a1dfe37f745ec43e427ac63aa168e8a2dd4c31d4e379d0",
+    "docs/benchmarks/issue-163/iteration-2-preparation.json": "db4e3e60735d86e97a4fc1252852fbec58659e3052e8cc33e265548304a396c0",
+    "docs/benchmarks/issue-163/iteration-2-preregistered.json": "4baeb88da3d55f9d6c411f417779b20212ddce1b91f9610695ba2c8d535379ff",
+    "docs/benchmarks/issue-163/iteration-2-report.md": "2eec8616367538fc22545283cc7e3d8e514f59e3f5a5bdb25e5942531421aedf",
+    "docs/benchmarks/issue-163/iteration-2-resource-preflight.json": "2991242975cdb472de09647385a116cbcc5e7c029824c692198d9d3e0a969abf",
+    "docs/benchmarks/issue-163/iteration-2-result-audit.json": "248c353a47ad2484b0c98e2dd8560da351afa1d82819e801059af469607f3c5a",
+    "docs/benchmarks/issue-163/iteration-2-results.jsonl": "6842d33e06fc7816ac7236372e19892dcc4a44a2c6511b69fd06208b2ad5d0e4",
+    "docs/benchmarks/issue-163/iteration-2-summary.json": "8adf1936a5da944a8a3954db4c5b82b17a2546d80177f37d5b5991786f4dbadc",
+    "docs/benchmarks/issue-163/iteration-2-token-audit.json": "d3b76c8d3072dcbe872502d6519eebd2787495617c19d841d18e9cb626f800cf",
+    "docs/benchmarks/issue-163/iteration-2-token-helper-fixed-source.json": "9e788a93a3a639936f2b816c73d8e13465855c56e84909e49c97f7a0074a2803",
+    "docs/benchmarks/issue-163/iteration-2-token-helper-source.json": "fe9e878f2dbd26bdebc4f04aec379d86b848f1b6f5e5fa94c9fb49767d9fe3ea",
+    "docs/benchmarks/issue-163/reused-source.json": "982b978d2cefa0a7d13562b2c7db002128e752108c47cc20a661aa1aaced27ba",
+    "tools/benchmark163/harness.py": "e86fca202db85f08ac213a4ec32f7a975166b9e43ad7aa22ccf729bc3edf20df",
+    "tools/benchmark163/local_trial.py": "00ec1309360fddce44a4daa374c1c29a63e37d04c976065b9dbe4d323d6e79b4",
+    "tools/benchmark163/prepare_helper.py": "6c647c1cc3eb6afdaedda06211e11268319b29ad8ef33abb721d728fb8b68fb0",
+    "tools/benchmark163/resource.py": "476749226f42084f4e90ca05577e62359fb01d999ecdd02bf32ffc840ee9aecb",
+    "tools/benchmark163/sourcefacts/main.go": "6e1651430ec6b4e26ae6365d0d9f161691796bc45a9711b4d0aba5fdfb6596ab",
+    "tools/benchmark163/token_audit.py": "a615d95c41caa9338ed3e65d32f7361013d1e855778a50c7fec3541d9c51d4ef",
+    "tools/benchmark163/validate/main.go": "3955da8ea1a1e123145e10e44ef7890eb976efbf9dd5f014436ea66f23e31130"
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "model_calls": 0,
+  "self": {
+    "available": true,
+    "footprint_bytes": 14254536,
+    "rss_bytes": 23396352,
+    "lifetime_peak_footprint_bytes": 14254536
+  },
+  "child": {
+    "exit": 0,
+    "timed_out": false,
+    "stdout": "resource preflight\n",
+    "stderr": "",
+    "total_seconds": 0.3323011670727283,
+    "sample_interval_seconds": 0.1,
+    "samples": [
+      {
+        "available": true,
+        "footprint_bytes": 213064,
+        "rss_bytes": 688128,
+        "lifetime_peak_footprint_bytes": 229448,
+        "elapsed_seconds": 0.0009982080664485693
+      },
+      {
+        "available": true,
+        "footprint_bytes": 7012784,
+        "rss_bytes": 15220736,
+        "lifetime_peak_footprint_bytes": 7012784,
+        "elapsed_seconds": 0.11148283304646611
+      },
+      {
+        "available": true,
+        "footprint_bytes": 7012784,
+        "rss_bytes": 15220736,
+        "lifetime_peak_footprint_bytes": 7012784,
+        "elapsed_seconds": 0.22180045791901648
+      },
+      {
+        "available": true,
+        "footprint_bytes": 7029168,
+        "rss_bytes": 15237120,
+        "lifetime_peak_footprint_bytes": 7029168,
+        "elapsed_seconds": 0.3283092500641942
+      }
+    ],
+    "pressure_samples": [
+      {
+        "elapsed_seconds": 0.0009997920133173466,
+        "level": 1
+      }
+    ],
+    "sampled_peak_footprint_bytes": 7029168,
+    "observed_lifetime_peak_footprint_bytes": 7029168,
+    "sampled_peak_rss_bytes": 15237120,
+    "system_before": {
+      "vm_stat": {
+        "exit": 0,
+        "stdout": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     5921.\nPages active:                                 357924.\nPages inactive:                               351904.\nPages speculative:                              5223.\nPages throttled:                                   0.\nPages wired down:                             154857.\nPages purgeable:                                3789.\n\"Translation faults\":                     7341617614.\nPages copy-on-write:                       437433145.\nPages zero filled:                        7014766745.\nPages reactivated:                         947911217.\nPages purged:                              189024863.\nFile-backed pages:                            188698.\nAnonymous pages:                              526353.\nPages stored in compressor:                  1640888.\nPages occupied by compressor:                 135264.\nDecompressions:                           1461385679.\nCompressions:                             1840477416.\nPageins:                                  1031927032.\nPageouts:                                    2888132.\nSwapins:                                    31638893.\nSwapouts:                                   53599477.\n",
+        "stderr": ""
+      },
+      "swap": {
+        "exit": 0,
+        "stdout": "vm.swapusage: total = 11264.00M  used = 10096.62M  free = 1167.38M  (encrypted)\n",
+        "stderr": ""
+      },
+      "pressure": {
+        "exit": 0,
+        "stdout": "The system has 17179869184 (1048576 pages with a page size of 16384).\nSystem-wide memory free percentage: 71%\n",
+        "stderr": ""
+      },
+      "pressure_level": {
+        "exit": 0,
+        "stdout": "1\n",
+        "stderr": ""
+      }
+    },
+    "system_after": {
+      "vm_stat": {
+        "exit": 0,
+        "stdout": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     5715.\nPages active:                                 357842.\nPages inactive:                               352005.\nPages speculative:                              5235.\nPages throttled:                                   0.\nPages wired down:                             154857.\nPages purgeable:                                3789.\n\"Translation faults\":                     7341622051.\nPages copy-on-write:                       437434020.\nPages zero filled:                        7014767458.\nPages reactivated:                         947911234.\nPages purged:                              189024863.\nFile-backed pages:                            188718.\nAnonymous pages:                              526364.\nPages stored in compressor:                  1640882.\nPages occupied by compressor:                 135263.\nDecompressions:                           1461385685.\nCompressions:                             1840477416.\nPageins:                                  1031927078.\nPageouts:                                    2888132.\nSwapins:                                    31638893.\nSwapouts:                                   53599477.\n",
+        "stderr": ""
+      },
+      "swap": {
+        "exit": 0,
+        "stdout": "vm.swapusage: total = 11264.00M  used = 10096.62M  free = 1167.38M  (encrypted)\n",
+        "stderr": ""
+      },
+      "pressure": {
+        "exit": 0,
+        "stdout": "The system has 17179869184 (1048576 pages with a page size of 16384).\nSystem-wide memory free percentage: 71%\n",
+        "stderr": ""
+      },
+      "pressure_level": {
+        "exit": 0,
+        "stdout": "1\n",
+        "stderr": ""
+      }
+    },
+    "mlx_active_bytes": null,
+    "mlx_peak_bytes": null,
+    "mlx_cache_bytes": null,
+    "metal_allocation_bytes": null,
+    "ttft_seconds": null,
+    "resource_qualification": "not_assessed",
+    "limitation": "API lifetime peak and sampled observations may miss the final exit interval; MLX/Metal/TTFT need helper instrumentation"
+  },
+  "pass": true,
+  "semantic_or_model_resource_qualification": "not_evaluated"
+}
