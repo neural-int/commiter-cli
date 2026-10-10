@@ -108,7 +108,7 @@ def state(case, selected):
         for f in case['files']: pathlib.Path(work, f['path']).write_text(f['after' if f['id'] in selected else 'before'])
         proc = subprocess.run(['/usr/bin/sandbox-exec', '-p', '(version 1)(allow default)(deny network*)', 'go', 'test', './...'],
                               cwd=work, capture_output=True, timeout=30,
-                              env=dict(git_env(), GOCACHE='/private/tmp/issue163-fixture-go-cache'))
+                              env=dict(git_env(), GOCACHE=str(pathlib.Path(tempfile.gettempdir()) / 'issue163-fixture-go-cache')))
         raw = proc.stdout + proc.stderr
         return {'pass': proc.returncode == 0, 'exit': proc.returncode, 'raw_sha256': sha(raw),
                 'log': re.sub(r'/(?:private/)?(?:tmp|var/folders)/[^\s:]+', '<temporary>', raw.decode(errors='replace'))}
