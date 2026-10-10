@@ -1,0 +1,35 @@
+{
+  "issue": 163,
+  "local_qualified_models": [],
+  "status": "gated_out",
+  "global_model_calls": 0,
+  "sizes": [
+    8,
+    16
+  ],
+  "cause": {
+    "gemma": [
+      "local allowed15/20; independent false merge3/4; insufficient defer0/2; order stability7/10",
+      "local resource footprint exceeds5e9 and pressure/swap gate unmet"
+    ],
+    "coder": [
+      "local allowed14/20; independent false merge4/4; insufficient defer0/2; order stability10/10",
+      "resource gate passes for tested local prompt lengths only"
+    ]
+  },
+  "unproven": [
+    "all-file membership generation without preselected pairs/groups",
+    "8/16file raw source context and memory/latency fit",
+    "unseen independent repository/change-family acceptable partition rate",
+    "mixed-file file-only infeasibility limits at full workload scale",
+    "all-group dependency order and independent revert across full8/16file workloads",
+    "metadata generation and production path"
+  ],
+  "resume_requirements": [
+    "new justified configuration with preregistered pins/template/schema/prompt/budgets, not retrospective tuning of these10cases",
+    "fresh audited qualification source/gold covering independent shared-helper changes, weak-test compensation, new API, multiple-valid/insufficient; previous corpus remains used diagnostic",
+    "local validity, negative merge0, necessary split0, order stability and measured resource gate on real prompt lengths must all pass",
+    "separate unused8/16file global input registration; audit repository/change-family independence before adoption claims"
+  ],
+  "scope": "no production/default/4file/SRS/validator/staging changes; no new candidate downloads/dependencies or automatic new Issue"
+}
