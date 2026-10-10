@@ -1,0 +1,102 @@
+{
+  "original_helper_source_sha256": "ba2e6629dd9f7002d6b647050dac4b36622008d4d23c9a64a7df2cf2a6958201",
+  "instrumented_helper_source_sha256": "18bc2affba8f687be47ef6a7cecde6b4eb9d85ccf94ea3321527df9a671b35d7",
+  "measurement": "input.text.tokens.size and info.generationTokenCount; output includes native thought and channel tokens",
+  "ttft_definition": "handle setup through stream setup + runtime promptTime (prefill through first generated token); excludes process startup",
+  "recorded_before_inference": "2026-10-10T15:09:26.963781+00:00",
+  "commit": "f7bcbb16e4a97f10c3ff3617a842ef9616db3e98",
+  "helper_binary_sha256": "758421dd1847c45565b4c8b95099e0b9981f0e868c9b44c5e9c655eb8766d6e0",
+  "model": "mlx-community/gemma-4-E4B-it-4bit",
+  "model_revision": "475b9088d29754a3379866cf5aeb6b41acd313c2",
+  "quantization": "4bit",
+  "context_tokens": 16384,
+  "output_category": 512,
+  "output_text": 768,
+  "max_cycle_seconds": 120,
+  "repetitions": 3,
+  "model_downloaded": false,
+  "helper_build": "standard SwiftPM, cached pinned dependencies",
+  "xcode_graph_probe": "failed missing macro/plugin targets; no inference performed",
+  "source_sha256": {
+    "tools/benchmark167/fixtures.go": "292e5547ed7e89bbe0b40f6f3862fa6ea37bc4a9ac434d33d952128b8b9cca09",
+    "docs/benchmarks/issue-167/phase-2-fixtures.json": "54779f6af763e8892dd0adac64e9d0fe70bbcedbfc3f754de3aaf0cd79bdbb25",
+    "docs/benchmarks/issue-167/phase-2-preregistration.md": "b6d6360082cecc509e30095f0ce74c004ec577ea63102ca6c22a20dc3fb024a0",
+    "internal/planning/file_first.go": "ff9273fa45af660a88a2b0fa3ae47dfda070f972602ad8bc3245b1d91a0c8b4d",
+    "internal/planning/three_phase.go": "7e549f262728560c483683b186357a392dc535cb251d30235bec508e8bcce14e",
+    "tools/benchmark167/backend.go": "0f639bd6fbbec161c8e10ed89e6b688e125263dba1583580632f025554c1d961",
+    "tools/benchmark167/main.go": "2eee8aea4fc9426b33a4b8830a02ffe8153862e019347066652e48c85ad7c218"
+  },
+  "host_before_inference": {
+    "machdep.cpu.brand_string": "Apple M3",
+    "hw.memsize": "17179869184",
+    "kern.memorystatus_vm_pressure_level": "1",
+    "vm.swapusage": "total = 5120.00M  used = 4168.12M  free = 951.88M  (encrypted)"
+  },
+  "dependencies": {
+    "eventsource": {
+      "expected": "86b5096ac59ab46e66bd1f6377c604bc1dab0bc2",
+      "actual": "86b5096ac59ab46e66bd1f6377c604bc1dab0bc2",
+      "matches": true
+    },
+    "mlx-swift": {
+      "expected": "0bb916c67f4b9e5c682cbe02a42c701c93ab5021",
+      "actual": "0bb916c67f4b9e5c682cbe02a42c701c93ab5021",
+      "matches": true
+    },
+    "mlx-swift-lm": {
+      "expected": "c6446cf7bfb7cea76408013b614d4b2c530eaa03",
+      "actual": "c6446cf7bfb7cea76408013b614d4b2c530eaa03",
+      "matches": true
+    },
+    "swift-argument-parser": {
+      "expected": "6a52f3251125d74daf04fcbd5e6f08a75d074382",
+      "actual": "6a52f3251125d74daf04fcbd5e6f08a75d074382",
+      "matches": true
+    },
+    "swift-asn1": {
+      "expected": "3b6410f7dee09eb33cdd26260c5fd47fda19b0e2",
+      "actual": "3b6410f7dee09eb33cdd26260c5fd47fda19b0e2",
+      "matches": true
+    },
+    "swift-collections": {
+      "expected": "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
+      "actual": "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
+      "matches": true
+    },
+    "swift-crypto": {
+      "expected": "da9d28d69ebe3894b18376c8f2395c2f37b8448f",
+      "actual": "da9d28d69ebe3894b18376c8f2395c2f37b8448f",
+      "matches": true
+    },
+    "swift-huggingface": {
+      "expected": "f2f99991f2d7d8fdb3187e4fd539cd2facf5c13d",
+      "actual": "f2f99991f2d7d8fdb3187e4fd539cd2facf5c13d",
+      "matches": true
+    },
+    "swift-jinja": {
+      "expected": "4588064a20f3fc093c95f2f7d3359999bf30cae5",
+      "actual": "4588064a20f3fc093c95f2f7d3359999bf30cae5",
+      "matches": true
+    },
+    "swift-numerics": {
+      "expected": "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
+      "actual": "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
+      "matches": true
+    },
+    "swift-syntax": {
+      "expected": "79e4b74a295b6eb74a8b585e3a39d29e70c1dbd1",
+      "actual": "79e4b74a295b6eb74a8b585e3a39d29e70c1dbd1",
+      "matches": true
+    },
+    "swift-transformers": {
+      "expected": "c21fdcde390313a6d98d8e33a346f2c3486c3ab0",
+      "actual": "c21fdcde390313a6d98d8e33a346f2c3486c3ab0",
+      "matches": true
+    },
+    "yyjson": {
+      "expected": "8b4a38dc994a110abaec8a400615567bd996105f",
+      "actual": "8b4a38dc994a110abaec8a400615567bd996105f",
+      "matches": true
+    }
+  }
+}

@@ -1,0 +1,1978 @@
+{
+  "issue": 167,
+  "phase": 2,
+  "matrix_complete": true,
+  "attempts": 36,
+  "successes": 0,
+  "workloads": [
+    {
+      "workload": "one-independent",
+      "route": "three-phase",
+      "files": 1,
+      "attempts": 3,
+      "successes": 0,
+      "statuses": {
+        "planner_failed": 3
+      },
+      "attempt_wall_seconds": {
+        "n": 3,
+        "p50": 37.912549375,
+        "p95": 50.668205625,
+        "values": [
+          50.668205625,
+          35.646153583,
+          37.912549375
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successful_wall_seconds": null,
+      "stage_wall_seconds": {
+        "bounded-text": {
+          "n": 3,
+          "p50": 7.018935083,
+          "p95": 7.022528458,
+          "values": [
+            7.022528458,
+            6.307436583,
+            7.018935083
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-category": {
+          "n": 3,
+          "p50": 21.16398875,
+          "p95": 29.1493495,
+          "values": [
+            29.1493495,
+            19.817199416,
+            21.16398875
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-grouping": {
+          "n": 3,
+          "p50": 9.729188583,
+          "p95": 14.44032875,
+          "values": [
+            14.44032875,
+            9.518995958,
+            9.729188583
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "replay_seconds": {
+        "n": 3,
+        "p50": 0,
+        "p95": 0,
+        "values": [
+          0,
+          0,
+          0
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "call_counts": [
+        3,
+        3,
+        3
+      ],
+      "tokens": {
+        "input_tokens": {
+          "n": 3,
+          "p50": 3172,
+          "p95": 3172,
+          "values": [
+            3172,
+            3172,
+            3172
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "output_tokens": {
+          "n": 3,
+          "p50": 575,
+          "p95": 575,
+          "values": [
+            575,
+            575,
+            575
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "runtime_ttft_seconds": {
+        "n": 9,
+        "p50": 5.160297852127075,
+        "p95": 10.466992488731385,
+        "values": [
+          8.34628089613324,
+          10.466992488731385,
+          5.173262188804992,
+          4.471960073059082,
+          5.033622933166686,
+          4.567542070381164,
+          4.66567529858435,
+          5.160297852127075,
+          5.260295532196411
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "load_seconds": {
+        "n": 9,
+        "p50": 1.979580875,
+        "p95": 5.461025709,
+        "values": [
+          4.263468666,
+          5.461025709,
+          2.521798,
+          1.754685792,
+          1.979580875,
+          1.950263833,
+          1.934007666,
+          1.91914175,
+          2.385685125
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "helper_peak_rss_bytes": 3927818240,
+      "mlx_peak_bytes": 5149225852,
+      "swap_increase_mib": [
+        2753.6900000000005,
+        -136.0,
+        -3.6900000000005093
+      ],
+      "pressure_levels": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "diff_bytes": 277,
+      "diff_lines": 7,
+      "validated_plan_groups": [
+        null,
+        null,
+        null
+      ],
+      "semantic_quality_of_validated_plans": [
+        null,
+        null,
+        null
+      ],
+      "semantic_unavailable_reason": "no complete validated plan",
+      "git_unchanged": true
+    },
+    {
+      "workload": "one-independent",
+      "route": "file-first",
+      "files": 1,
+      "attempts": 3,
+      "successes": 0,
+      "statuses": {
+        "planner_failed": 3
+      },
+      "attempt_wall_seconds": {
+        "n": 3,
+        "p50": 29.212996375,
+        "p95": 35.756593292,
+        "values": [
+          28.392782209,
+          29.212996375,
+          35.756593292
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successful_wall_seconds": null,
+      "stage_wall_seconds": {
+        "bounded-category": {
+          "n": 3,
+          "p50": 21.374878709,
+          "p95": 26.48121275,
+          "values": [
+            20.389433709,
+            21.374878709,
+            26.48121275
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-text": {
+          "n": 3,
+          "p50": 6.469098083,
+          "p95": 7.602340125,
+          "values": [
+            6.469098083,
+            6.354889417,
+            7.602340125
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "replay_seconds": {
+        "n": 3,
+        "p50": 1.533711458,
+        "p95": 1.671666125,
+        "values": [
+          1.533711458,
+          1.482383834,
+          1.671666125
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "call_counts": [
+        2,
+        2,
+        2
+      ],
+      "tokens": {
+        "input_tokens": {
+          "n": 3,
+          "p50": 2211,
+          "p95": 2211,
+          "values": [
+            2211,
+            2211,
+            2211
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "output_tokens": {
+          "n": 3,
+          "p50": 451,
+          "p95": 451,
+          "values": [
+            451,
+            451,
+            451
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "runtime_ttft_seconds": {
+        "n": 6,
+        "p50": 5.115851340934936,
+        "p95": 5.782316973259155,
+        "values": [
+          5.115851340934936,
+          4.659106237937927,
+          5.120714642006103,
+          4.56250349906195,
+          5.358070369911194,
+          5.782316973259155
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "load_seconds": {
+        "n": 6,
+        "p50": 1.998606708,
+        "p95": 2.585832667,
+        "values": [
+          2.012071417,
+          2.070682667,
+          1.991022084,
+          1.998606708,
+          1.911656208,
+          2.585832667
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "helper_peak_rss_bytes": 3805970432,
+      "mlx_peak_bytes": 5149225852,
+      "swap_increase_mib": [
+        -181.6900000000005,
+        158.1900000000005,
+        -48.0
+      ],
+      "pressure_levels": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "diff_bytes": 277,
+      "diff_lines": 7,
+      "validated_plan_groups": [
+        null,
+        null,
+        null
+      ],
+      "semantic_quality_of_validated_plans": [
+        null,
+        null,
+        null
+      ],
+      "semantic_unavailable_reason": "no complete validated plan",
+      "git_unchanged": true
+    },
+    {
+      "workload": "source-test-pair",
+      "route": "three-phase",
+      "files": 2,
+      "attempts": 3,
+      "successes": 0,
+      "statuses": {
+        "planner_failed": 3
+      },
+      "attempt_wall_seconds": {
+        "n": 3,
+        "p50": 76.6276815,
+        "p95": 99.177095166,
+        "values": [
+          76.6276815,
+          68.631199208,
+          99.177095166
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successful_wall_seconds": null,
+      "stage_wall_seconds": {
+        "bounded-text": {
+          "n": 3,
+          "p50": 10.70011425,
+          "p95": 14.677775792,
+          "values": [
+            10.70011425,
+            9.570067541,
+            14.677775792
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-category": {
+          "n": 3,
+          "p50": 30.907537834,
+          "p95": 36.972746708,
+          "values": [
+            30.907537834,
+            27.78966775,
+            36.972746708
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-grouping": {
+          "n": 3,
+          "p50": 35.014330291,
+          "p95": 47.513963792,
+          "values": [
+            35.014330291,
+            31.270243375,
+            47.513963792
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "replay_seconds": {
+        "n": 3,
+        "p50": 0,
+        "p95": 0,
+        "values": [
+          0,
+          0,
+          0
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "call_counts": [
+        3,
+        3,
+        3
+      ],
+      "tokens": {
+        "input_tokens": {
+          "n": 3,
+          "p50": 6605,
+          "p95": 6605,
+          "values": [
+            6605,
+            6605,
+            6605
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "output_tokens": {
+          "n": 3,
+          "p50": 921,
+          "p95": 921,
+          "values": [
+            921,
+            921,
+            921
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "runtime_ttft_seconds": {
+        "n": 9,
+        "p50": 8.750955158706665,
+        "p95": 11.926576445724853,
+        "values": [
+          8.05155386901056,
+          10.610665028999511,
+          8.955357957137878,
+          8.083345121032531,
+          8.750955158706665,
+          7.896157510795593,
+          8.300113129104615,
+          11.926576445724853,
+          11.199559164169495
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "load_seconds": {
+        "n": 9,
+        "p50": 2.421574791,
+        "p95": 4.009135417,
+        "values": [
+          2.167138583,
+          3.198573084,
+          2.779587583,
+          2.098994917,
+          2.421574791,
+          2.311576667,
+          2.399638916,
+          4.009135417,
+          3.597796
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "helper_peak_rss_bytes": 4065361920,
+      "mlx_peak_bytes": 5149225852,
+      "swap_increase_mib": [
+        284.7600000000002,
+        135.0,
+        -173.3799999999992
+      ],
+      "pressure_levels": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "diff_bytes": 591,
+      "diff_lines": 14,
+      "validated_plan_groups": [
+        null,
+        null,
+        null
+      ],
+      "semantic_quality_of_validated_plans": [
+        null,
+        null,
+        null
+      ],
+      "semantic_unavailable_reason": "no complete validated plan",
+      "git_unchanged": true
+    },
+    {
+      "workload": "source-test-pair",
+      "route": "file-first",
+      "files": 2,
+      "attempts": 3,
+      "successes": 0,
+      "statuses": {
+        "planner_failed": 3
+      },
+      "attempt_wall_seconds": {
+        "n": 3,
+        "p50": 48.236212084,
+        "p95": 54.180316375,
+        "values": [
+          48.236212084,
+          46.018268375,
+          54.180316375
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successful_wall_seconds": null,
+      "stage_wall_seconds": {
+        "bounded-category": {
+          "n": 3,
+          "p50": 31.420046292,
+          "p95": 35.350661666,
+          "values": [
+            31.420046292,
+            30.509005167,
+            35.350661666
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-text": {
+          "n": 3,
+          "p50": 14.421918084,
+          "p95": 16.289093709,
+          "values": [
+            14.421918084,
+            13.428722875,
+            16.289093709
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "replay_seconds": {
+        "n": 3,
+        "p50": 2.392986125,
+        "p95": 2.5386070419999998,
+        "values": [
+          2.392986125,
+          2.079064,
+          2.5386070419999998
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "call_counts": [
+        2,
+        2,
+        2
+      ],
+      "tokens": {
+        "input_tokens": {
+          "n": 3,
+          "p50": 4622,
+          "p95": 4622,
+          "values": [
+            4622,
+            4622,
+            4622
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "output_tokens": {
+          "n": 3,
+          "p50": 514,
+          "p95": 514,
+          "values": [
+            514,
+            514,
+            514
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "runtime_ttft_seconds": {
+        "n": 6,
+        "p50": 9.146317032562255,
+        "p95": 11.421969491111756,
+        "values": [
+          8.5735175785141,
+          9.18997422084027,
+          9.146317032562255,
+          9.006106616615112,
+          9.934387393654053,
+          11.421969491111756
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "load_seconds": {
+        "n": 6,
+        "p50": 2.277520541,
+        "p95": 3.032735084,
+        "values": [
+          2.0516475,
+          3.032735084,
+          2.177264792,
+          2.650142208,
+          2.277520541,
+          2.77486875
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "helper_peak_rss_bytes": 3633037312,
+      "mlx_peak_bytes": 5149225852,
+      "swap_increase_mib": [
+        241.5,
+        55.05999999999949,
+        563.3199999999997
+      ],
+      "pressure_levels": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "diff_bytes": 591,
+      "diff_lines": 14,
+      "validated_plan_groups": [
+        null,
+        null,
+        null
+      ],
+      "semantic_quality_of_validated_plans": [
+        null,
+        null,
+        null
+      ],
+      "semantic_unavailable_reason": "no complete validated plan",
+      "git_unchanged": true
+    },
+    {
+      "workload": "cross-directory-purpose",
+      "route": "three-phase",
+      "files": 3,
+      "attempts": 3,
+      "successes": 0,
+      "statuses": {
+        "planner_failed": 3
+      },
+      "attempt_wall_seconds": {
+        "n": 3,
+        "p50": 82.121227209,
+        "p95": 89.879080542,
+        "values": [
+          80.31541875,
+          82.121227209,
+          89.879080542
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successful_wall_seconds": null,
+      "stage_wall_seconds": {
+        "bounded-text": {
+          "n": 3,
+          "p50": 11.933518083,
+          "p95": 12.934849666,
+          "values": [
+            11.786005875,
+            11.933518083,
+            12.934849666
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-category": {
+          "n": 3,
+          "p50": 33.055841917,
+          "p95": 35.759897834,
+          "values": [
+            33.055841917,
+            32.8822055,
+            35.759897834
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-grouping": {
+          "n": 3,
+          "p50": 37.303951959,
+          "p95": 41.175491583,
+          "values": [
+            35.47080175,
+            37.303951959,
+            41.175491583
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "replay_seconds": {
+        "n": 3,
+        "p50": 0,
+        "p95": 0,
+        "values": [
+          0,
+          0,
+          0
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "call_counts": [
+        3,
+        3,
+        3
+      ],
+      "tokens": {
+        "input_tokens": {
+          "n": 3,
+          "p50": 8253,
+          "p95": 8253,
+          "values": [
+            8253,
+            8253,
+            8253
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "output_tokens": {
+          "n": 3,
+          "p50": 922,
+          "p95": 922,
+          "values": [
+            922,
+            922,
+            922
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "runtime_ttft_seconds": {
+        "n": 9,
+        "p50": 10.78644861994934,
+        "p95": 13.87917417612439,
+        "values": [
+          10.17494132041205,
+          11.458796705490295,
+          10.005096159454347,
+          11.580552718529114,
+          10.78644861994934,
+          10.137353722968871,
+          12.305698079307556,
+          13.87917417612439,
+          9.804940965530395
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "load_seconds": {
+        "n": 9,
+        "p50": 2.718811542,
+        "p95": 3.341343208,
+        "values": [
+          2.305051916,
+          2.718811542,
+          2.550514625,
+          2.662455791,
+          2.819028833,
+          2.742069208,
+          2.979671041,
+          3.341343208,
+          2.416704958
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "helper_peak_rss_bytes": 3623026688,
+      "mlx_peak_bytes": 5149225852,
+      "swap_increase_mib": [
+        -446.7600000000002,
+        -0.13000000000010914,
+        438.6300000000001
+      ],
+      "pressure_levels": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "diff_bytes": 855,
+      "diff_lines": 21,
+      "validated_plan_groups": [
+        null,
+        null,
+        null
+      ],
+      "semantic_quality_of_validated_plans": [
+        null,
+        null,
+        null
+      ],
+      "semantic_unavailable_reason": "no complete validated plan",
+      "git_unchanged": true
+    },
+    {
+      "workload": "cross-directory-purpose",
+      "route": "file-first",
+      "files": 3,
+      "attempts": 3,
+      "successes": 0,
+      "statuses": {
+        "planner_failed": 3
+      },
+      "attempt_wall_seconds": {
+        "n": 3,
+        "p50": 55.79129075,
+        "p95": 58.11455,
+        "values": [
+          58.11455,
+          55.79129075,
+          55.171752417
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successful_wall_seconds": null,
+      "stage_wall_seconds": {
+        "bounded-category": {
+          "n": 3,
+          "p50": 35.073518917,
+          "p95": 36.634332708,
+          "values": [
+            36.634332708,
+            35.073518917,
+            34.414592791
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-text": {
+          "n": 3,
+          "p50": 18.133694792,
+          "p95": 18.557506375,
+          "values": [
+            18.557506375,
+            18.133694792,
+            18.014488541
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "replay_seconds": {
+        "n": 3,
+        "p50": 2.741933708,
+        "p95": 2.921360208,
+        "values": [
+          2.921360208,
+          2.581452916,
+          2.741933708
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "call_counts": [
+        2,
+        2,
+        2
+      ],
+      "tokens": {
+        "input_tokens": {
+          "n": 3,
+          "p50": 5887,
+          "p95": 5887,
+          "values": [
+            5887,
+            5887,
+            5887
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "output_tokens": {
+          "n": 3,
+          "p50": 570,
+          "p95": 570,
+          "values": [
+            570,
+            570,
+            570
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "runtime_ttft_seconds": {
+        "n": 6,
+        "p50": 10.786007770141968,
+        "p95": 11.557459242210388,
+        "values": [
+          11.046028214668091,
+          11.557459242210388,
+          10.654115974739074,
+          11.28639248906726,
+          10.57087012129956,
+          10.786007770141968
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "load_seconds": {
+        "n": 6,
+        "p50": 2.155961208,
+        "p95": 3.287794083,
+        "values": [
+          1.964132459,
+          3.287794083,
+          2.06341,
+          2.976428583,
+          2.155961208,
+          2.733677791
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "helper_peak_rss_bytes": 3472228352,
+      "mlx_peak_bytes": 5149225852,
+      "swap_increase_mib": [
+        218.6300000000001,
+        -198.5,
+        -56.0
+      ],
+      "pressure_levels": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "diff_bytes": 855,
+      "diff_lines": 21,
+      "validated_plan_groups": [
+        null,
+        null,
+        null
+      ],
+      "semantic_quality_of_validated_plans": [
+        null,
+        null,
+        null
+      ],
+      "semantic_unavailable_reason": "no complete validated plan",
+      "git_unchanged": true
+    },
+    {
+      "workload": "boundary-base",
+      "route": "three-phase",
+      "files": 4,
+      "attempts": 3,
+      "successes": 0,
+      "statuses": {
+        "planner_failed": 3
+      },
+      "attempt_wall_seconds": {
+        "n": 3,
+        "p50": 89.479752625,
+        "p95": 95.164931542,
+        "values": [
+          89.205026792,
+          89.479752625,
+          95.164931542
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successful_wall_seconds": null,
+      "stage_wall_seconds": {
+        "bounded-text": {
+          "n": 3,
+          "p50": 14.110508417,
+          "p95": 15.901627083,
+          "values": [
+            14.110508417,
+            15.901627083,
+            13.550726667
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-category": {
+          "n": 3,
+          "p50": 36.896782125,
+          "p95": 41.985168792,
+          "values": [
+            36.896782125,
+            36.116518542,
+            41.985168792
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-grouping": {
+          "n": 3,
+          "p50": 38.182910292,
+          "p95": 39.623475792,
+          "values": [
+            38.182910292,
+            37.458257,
+            39.623475792
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "replay_seconds": {
+        "n": 3,
+        "p50": 0,
+        "p95": 0,
+        "values": [
+          0,
+          0,
+          0
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "call_counts": [
+        3,
+        3,
+        3
+      ],
+      "tokens": {
+        "input_tokens": {
+          "n": 3,
+          "p50": 10777,
+          "p95": 10777,
+          "values": [
+            10777,
+            10777,
+            10777
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "output_tokens": {
+          "n": 3,
+          "p50": 800,
+          "p95": 800,
+          "values": [
+            800,
+            800,
+            800
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "runtime_ttft_seconds": {
+        "n": 9,
+        "p50": 14.497511917724609,
+        "p95": 18.511853538589293,
+        "values": [
+          15.191458557846254,
+          15.181652355529602,
+          12.102797915771484,
+          14.497511917724609,
+          13.023815512008484,
+          12.79257486776715,
+          14.980809393722351,
+          18.511853538589293,
+          11.844882959228515
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "load_seconds": {
+        "n": 9,
+        "p50": 2.7318855,
+        "p95": 3.22513425,
+        "values": [
+          2.300166375,
+          3.178206916,
+          2.672719583,
+          3.22513425,
+          2.544839875,
+          2.639324667,
+          2.7318855,
+          3.144467416,
+          2.735585833
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "helper_peak_rss_bytes": 3442786304,
+      "mlx_peak_bytes": 5149225852,
+      "swap_increase_mib": [
+        -190.0,
+        -52.56999999999971,
+        176.8800000000001
+      ],
+      "pressure_levels": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "diff_bytes": 1108,
+      "diff_lines": 28,
+      "validated_plan_groups": [
+        null,
+        null,
+        null
+      ],
+      "semantic_quality_of_validated_plans": [
+        null,
+        null,
+        null
+      ],
+      "semantic_unavailable_reason": "no complete validated plan",
+      "git_unchanged": true
+    },
+    {
+      "workload": "boundary-base",
+      "route": "file-first",
+      "files": 4,
+      "attempts": 3,
+      "successes": 0,
+      "statuses": {
+        "planner_failed": 3
+      },
+      "attempt_wall_seconds": {
+        "n": 3,
+        "p50": 68.242706334,
+        "p95": 71.131369625,
+        "values": [
+          68.242706334,
+          71.131369625,
+          65.099790458
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successful_wall_seconds": null,
+      "stage_wall_seconds": {
+        "bounded-category": {
+          "n": 3,
+          "p50": 38.98194075,
+          "p95": 45.161818667,
+          "values": [
+            38.98194075,
+            45.161818667,
+            38.8434515
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-text": {
+          "n": 3,
+          "p50": 22.935063583,
+          "p95": 26.072224333,
+          "values": [
+            26.072224333,
+            21.852247334,
+            22.935063583
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "replay_seconds": {
+        "n": 3,
+        "p50": 3.319481791,
+        "p95": 4.110250625,
+        "values": [
+          3.185476875,
+          4.110250625,
+          3.319481791
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "call_counts": [
+        2,
+        2,
+        2
+      ],
+      "tokens": {
+        "input_tokens": {
+          "n": 3,
+          "p50": 7710,
+          "p95": 7710,
+          "values": [
+            7710,
+            7710,
+            7710
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "output_tokens": {
+          "n": 3,
+          "p50": 625,
+          "p95": 625,
+          "values": [
+            625,
+            625,
+            625
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "runtime_ttft_seconds": {
+        "n": 6,
+        "p50": 13.099600923942383,
+        "p95": 16.448123210289,
+        "values": [
+          12.976745340950378,
+          13.099600923942383,
+          16.448123210289,
+          12.904182711120239,
+          13.253883776916688,
+          14.116003462318421
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "load_seconds": {
+        "n": 6,
+        "p50": 2.524404375,
+        "p95": 2.751009,
+        "values": [
+          1.906151791,
+          2.751009,
+          2.524404375,
+          2.64460925,
+          2.085474125,
+          2.699734958
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "helper_peak_rss_bytes": 3674472448,
+      "mlx_peak_bytes": 5149225852,
+      "swap_increase_mib": [
+        -184.0,
+        668.4399999999996,
+        169.8099999999995
+      ],
+      "pressure_levels": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "diff_bytes": 1108,
+      "diff_lines": 28,
+      "validated_plan_groups": [
+        null,
+        null,
+        null
+      ],
+      "semantic_quality_of_validated_plans": [
+        null,
+        null,
+        null
+      ],
+      "semantic_unavailable_reason": "no complete validated plan",
+      "git_unchanged": true
+    },
+    {
+      "workload": "boundary-plus-consumer",
+      "route": "file-first",
+      "files": 5,
+      "attempts": 3,
+      "successes": 0,
+      "statuses": {
+        "planner_failed": 3
+      },
+      "attempt_wall_seconds": {
+        "n": 3,
+        "p50": 83.589393625,
+        "p95": 100.686129667,
+        "values": [
+          73.445405208,
+          100.686129667,
+          83.589393625
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successful_wall_seconds": null,
+      "stage_wall_seconds": {
+        "bounded-category": {
+          "n": 3,
+          "p50": 52.880949542,
+          "p95": 66.404050416,
+          "values": [
+            42.108878792,
+            66.404050416,
+            52.880949542
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-text": {
+          "n": 3,
+          "p50": 28.14724075,
+          "p95": 30.130718666,
+          "values": [
+            28.14724075,
+            30.130718666,
+            26.947449416
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "replay_seconds": {
+        "n": 3,
+        "p50": 3.7560320000000003,
+        "p95": 4.141086875,
+        "values": [
+          3.185416333,
+          4.141086875,
+          3.7560320000000003
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "call_counts": [
+        2,
+        2,
+        2
+      ],
+      "tokens": {
+        "input_tokens": {
+          "n": 3,
+          "p50": 8280,
+          "p95": 8280,
+          "values": [
+            8280,
+            8280,
+            8280
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "output_tokens": {
+          "n": 3,
+          "p50": 636,
+          "p95": 636,
+          "values": [
+            636,
+            636,
+            636
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "runtime_ttft_seconds": {
+        "n": 6,
+        "p50": 16.51129150002307,
+        "p95": 24.62790543251001,
+        "values": [
+          13.916101534996216,
+          16.51129150002307,
+          24.62790543251001,
+          16.711490980002992,
+          21.268427956199464,
+          15.253928080299378
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "load_seconds": {
+        "n": 6,
+        "p50": 2.829216875,
+        "p95": 3.241756333,
+        "values": [
+          2.344516917,
+          3.241756333,
+          2.832023542,
+          3.182311375,
+          2.429338792,
+          2.829216875
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "helper_peak_rss_bytes": 3591012352,
+      "mlx_peak_bytes": 5149225852,
+      "swap_increase_mib": [
+        -119.99999999999909,
+        -33.0600000000004,
+        291.4400000000005
+      ],
+      "pressure_levels": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "diff_bytes": 1430,
+      "diff_lines": 35,
+      "validated_plan_groups": [
+        null,
+        null,
+        null
+      ],
+      "semantic_quality_of_validated_plans": [
+        null,
+        null,
+        null
+      ],
+      "semantic_unavailable_reason": "no complete validated plan",
+      "git_unchanged": true
+    },
+    {
+      "workload": "four-source-test-pairs",
+      "route": "file-first",
+      "files": 8,
+      "attempts": 3,
+      "successes": 0,
+      "statuses": {
+        "cycle_timeout": 3
+      },
+      "attempt_wall_seconds": {
+        "n": 3,
+        "p50": 120.137834416,
+        "p95": 120.2045665,
+        "values": [
+          120.2045665,
+          120.1104395,
+          120.137834416
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successful_wall_seconds": null,
+      "stage_wall_seconds": {
+        "bounded-category": {
+          "n": 3,
+          "p50": 87.87244687500001,
+          "p95": 87.997001875,
+          "values": [
+            87.997001875,
+            87.87244687500001,
+            87.33674954099999
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-text": {
+          "n": 3,
+          "p50": 27.761219709,
+          "p95": 27.836111584,
+          "values": [
+            27.836111584,
+            27.397926917,
+            27.761219709
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "replay_seconds": {
+        "n": 3,
+        "p50": 4.836183417,
+        "p95": 5.03631375,
+        "values": [
+          4.362032542,
+          4.836183417,
+          5.03631375
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "call_counts": [
+        3,
+        3,
+        3
+      ],
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null
+      },
+      "runtime_ttft_seconds": {
+        "n": 6,
+        "p50": 17.521750434700195,
+        "p95": 20.62179549006653,
+        "values": [
+          17.3156697793125,
+          16.78814081764984,
+          20.62179549006653,
+          17.521750434700195,
+          19.02701217671985,
+          17.691992114189333
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "load_seconds": {
+        "n": 6,
+        "p50": 2.482919,
+        "p95": 3.108045667,
+        "values": [
+          2.400487875,
+          3.108045667,
+          2.463518042,
+          3.045203583,
+          2.482919,
+          2.942801667
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "helper_peak_rss_bytes": 3567452160,
+      "mlx_peak_bytes": 5149225852,
+      "swap_increase_mib": [
+        -282.1300000000001,
+        98.6899999999996,
+        4.559999999999491
+      ],
+      "pressure_levels": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "diff_bytes": 2364,
+      "diff_lines": 56,
+      "validated_plan_groups": [
+        null,
+        null,
+        null
+      ],
+      "semantic_quality_of_validated_plans": [
+        null,
+        null,
+        null
+      ],
+      "semantic_unavailable_reason": "no complete validated plan",
+      "git_unchanged": true
+    },
+    {
+      "workload": "cross-directory-scale",
+      "route": "file-first",
+      "files": 9,
+      "attempts": 3,
+      "successes": 0,
+      "statuses": {
+        "planner_failed": 3
+      },
+      "attempt_wall_seconds": {
+        "n": 3,
+        "p50": 81.899344792,
+        "p95": 89.309092,
+        "values": [
+          89.309092,
+          81.899344792,
+          77.489172458
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successful_wall_seconds": null,
+      "stage_wall_seconds": {
+        "bounded-category": {
+          "n": 3,
+          "p50": 51.621773,
+          "p95": 54.064010459,
+          "values": [
+            54.064010459,
+            51.621773,
+            47.291789541
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-text": {
+          "n": 3,
+          "p50": 25.398222666,
+          "p95": 30.613760625,
+          "values": [
+            30.613760625,
+            25.27088875,
+            25.398222666
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "replay_seconds": {
+        "n": 3,
+        "p50": 4.797369833,
+        "p95": 5.001672875,
+        "values": [
+          4.629308208,
+          5.001672875,
+          4.797369833
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "call_counts": [
+        2,
+        2,
+        2
+      ],
+      "tokens": {
+        "input_tokens": {
+          "n": 3,
+          "p50": 7718,
+          "p95": 7718,
+          "values": [
+            7718,
+            7718,
+            7718
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "output_tokens": {
+          "n": 3,
+          "p50": 629,
+          "p95": 629,
+          "values": [
+            629,
+            629,
+            629
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "runtime_ttft_seconds": {
+        "n": 6,
+        "p50": 15.716086002914794,
+        "p95": 18.540513247261046,
+        "values": [
+          17.242302870452697,
+          18.278391360687074,
+          18.540513247261046,
+          14.116977227539245,
+          15.716086002914794,
+          14.790038068069641
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "load_seconds": {
+        "n": 6,
+        "p50": 2.319779125,
+        "p95": 3.701447083,
+        "values": [
+          2.319779125,
+          3.701447083,
+          1.993570292,
+          2.559645709,
+          2.048561916,
+          2.702851291
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "helper_peak_rss_bytes": 3960389632,
+      "mlx_peak_bytes": 5149225852,
+      "swap_increase_mib": [
+        115.81000000000131,
+        670.3799999999992,
+        -312
+      ],
+      "pressure_levels": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "diff_bytes": 2565,
+      "diff_lines": 63,
+      "validated_plan_groups": [
+        null,
+        null,
+        null
+      ],
+      "semantic_quality_of_validated_plans": [
+        null,
+        null,
+        null
+      ],
+      "semantic_unavailable_reason": "no complete validated plan",
+      "git_unchanged": true
+    },
+    {
+      "workload": "independent-scale",
+      "route": "file-first",
+      "files": 16,
+      "attempts": 3,
+      "successes": 0,
+      "statuses": {
+        "planner_failed": 3
+      },
+      "attempt_wall_seconds": {
+        "n": 3,
+        "p50": 81.3857515,
+        "p95": 81.950006709,
+        "values": [
+          81.950006709,
+          81.3857515,
+          80.386238333
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successful_wall_seconds": null,
+      "stage_wall_seconds": {
+        "bounded-category": {
+          "n": 3,
+          "p50": 46.473503875,
+          "p95": 46.724951,
+          "values": [
+            46.724951,
+            46.473503875,
+            44.153508542
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "bounded-text": {
+          "n": 3,
+          "p50": 28.195479542,
+          "p95": 28.644078,
+          "values": [
+            28.195479542,
+            27.416322583,
+            28.644078
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "replay_seconds": {
+        "n": 3,
+        "p50": 7.4923224170000005,
+        "p95": 7.587366542,
+        "values": [
+          7.028452792,
+          7.4923224170000005,
+          7.587366542
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "call_counts": [
+        2,
+        2,
+        2
+      ],
+      "tokens": {
+        "input_tokens": {
+          "n": 3,
+          "p50": 7768,
+          "p95": 7768,
+          "values": [
+            7768,
+            7768,
+            7768
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        },
+        "output_tokens": {
+          "n": 3,
+          "p50": 651,
+          "p95": 651,
+          "values": [
+            651,
+            651,
+            651
+          ],
+          "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+        }
+      },
+      "runtime_ttft_seconds": {
+        "n": 6,
+        "p50": 14.098913724044984,
+        "p95": 15.191596080360595,
+        "values": [
+          14.005007331665222,
+          15.191596080360595,
+          14.098913724044984,
+          14.290864056892396,
+          13.958017837898254,
+          15.009746155800048
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "load_seconds": {
+        "n": 6,
+        "p50": 2.165205583,
+        "p95": 2.984259875,
+        "values": [
+          2.165205583,
+          2.984259875,
+          1.967300166,
+          2.767473625,
+          1.932504959,
+          2.823391459
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "helper_peak_rss_bytes": 4113399808,
+      "mlx_peak_bytes": 5149225852,
+      "swap_increase_mib": [
+        -176.0599999999995,
+        -836.3800000000001,
+        -142.9400000000005
+      ],
+      "pressure_levels": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "diff_bytes": 4468,
+      "diff_lines": 112,
+      "validated_plan_groups": [
+        null,
+        null,
+        null
+      ],
+      "semantic_quality_of_validated_plans": [
+        null,
+        null,
+        null
+      ],
+      "semantic_unavailable_reason": "no complete validated plan",
+      "git_unchanged": true
+    }
+  ],
+  "paired": [
+    {
+      "workload": "one-independent",
+      "files": 1,
+      "same_snapshot_and_prepared": true,
+      "file_first_minus_default_attempt_seconds": {
+        "n": 3,
+        "p50": -6.433157208000001,
+        "p95": -2.1559560829999995,
+        "values": [
+          -22.275423416,
+          -6.433157208000001,
+          -2.1559560829999995
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successes": {
+        "three-phase": 0,
+        "file-first": 0
+      },
+      "interpretation": "attempt/failure latency; not usable-plan latency when either route fails"
+    },
+    {
+      "workload": "source-test-pair",
+      "files": 2,
+      "same_snapshot_and_prepared": true,
+      "file_first_minus_default_attempt_seconds": {
+        "n": 3,
+        "p50": -28.391469415999993,
+        "p95": -22.612930833,
+        "values": [
+          -28.391469415999993,
+          -22.612930833,
+          -44.996778791000004
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successes": {
+        "three-phase": 0,
+        "file-first": 0
+      },
+      "interpretation": "attempt/failure latency; not usable-plan latency when either route fails"
+    },
+    {
+      "workload": "cross-directory-purpose",
+      "files": 3,
+      "same_snapshot_and_prepared": true,
+      "file_first_minus_default_attempt_seconds": {
+        "n": 3,
+        "p50": -26.329936458999995,
+        "p95": -22.200868750000005,
+        "values": [
+          -22.200868750000005,
+          -26.329936458999995,
+          -34.707328125
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successes": {
+        "three-phase": 0,
+        "file-first": 0
+      },
+      "interpretation": "attempt/failure latency; not usable-plan latency when either route fails"
+    },
+    {
+      "workload": "boundary-base",
+      "files": 4,
+      "same_snapshot_and_prepared": true,
+      "file_first_minus_default_attempt_seconds": {
+        "n": 3,
+        "p50": -20.962320457999994,
+        "p95": -18.348383,
+        "values": [
+          -20.962320457999994,
+          -18.348383,
+          -30.065141084000004
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "successes": {
+        "three-phase": 0,
+        "file-first": 0
+      },
+      "interpretation": "attempt/failure latency; not usable-plan latency when either route fails"
+    }
+  ],
+  "four_to_five": {
+    "same_base_before_after_bytes": true,
+    "same_file_first_route_increment": {
+      "right_minus_left_attempt_seconds": {
+        "n": 3,
+        "p50": 18.489603167,
+        "p95": 29.554760041999998,
+        "values": [
+          5.202698873999992,
+          29.554760041999998,
+          18.489603167
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "complete_success_pairs": 0
+    },
+    "route_and_input_change": {
+      "right_minus_left_attempt_seconds": {
+        "n": 3,
+        "p50": -11.575537917000005,
+        "p95": 11.206377042,
+        "values": [
+          -15.759621584000001,
+          11.206377042,
+          -11.575537917000005
+        ],
+        "method": "nearest-rank; n=3 p95 is maximum, not a production tail estimate"
+      },
+      "complete_success_pairs": 0
+    },
+    "interpretation": "includes added dependent test and packet composition; route contrast also changes planner; not file-count-only causality"
+  },
+  "git_unchanged_count": 36,
+  "runtime_bounds_satisfied_count": 26,
+  "metadata_gate_pass": false,
+  "swap_threshold_violation_count": 7,
+  "phase_3": "gated_out",
+  "production_go": false,
+  "limits": [
+    "authored synthetic fixtures; no independent Phase 3 holdout",
+    "failed attempts retained; no semantic scores invented for absent final plans",
+    "model reload on each call; true storage-cold and resident-model warm not controlled",
+    "shared host; pressure/swap before-after changes are not solely attributable to the measured process",
+    "initial matrix lacks detailed failure codes; separate bounded numeric diagnostics required",
+    "n=3 does not support a stable production p95 claim"
+  ],
+  "raw_measurements_sha256": "9799daada37170e8c2e6bb89691e2946c534dc8559256e3af73b5fb80d33bd5e"
+}
