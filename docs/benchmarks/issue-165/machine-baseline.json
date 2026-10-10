@@ -1,0 +1,355 @@
+[
+  {
+    "case": "nil-slice-corresponding-assertion",
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "Clone"
+          ],
+          "calls": [
+            "append"
+          ]
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "Clone"
+          ],
+          "calls": [
+            "append"
+          ]
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "TestNil"
+          ],
+          "calls": [
+            "Clone"
+          ]
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "TestNil"
+          ],
+          "calls": [
+            "Clone"
+          ]
+        }
+      }
+    ],
+    "edges": [],
+    "semantic_behavior_facts": "not extracted by this AST; literal/operator/assertion/contracts not represented",
+    "limitation": "bare identifier calls only; selector calls such as strings.ToLower/strings.Compare are absent"
+  },
+  {
+    "case": "shared-bound-independent-ui-and-batch",
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "DisplayWidth"
+          ],
+          "calls": [
+            "Bound"
+          ]
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "DisplayWidth"
+          ],
+          "calls": [
+            "Bound"
+          ]
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "BatchSize"
+          ],
+          "calls": [
+            "Bound"
+          ]
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "BatchSize"
+          ],
+          "calls": [
+            "Bound"
+          ]
+        }
+      }
+    ],
+    "edges": [],
+    "semantic_behavior_facts": "not extracted by this AST; literal/operator/assertion/contracts not represented",
+    "limitation": "bare identifier calls only; selector calls such as strings.ToLower/strings.Compare are absent"
+  },
+  {
+    "case": "same-package-independent-time-and-permission",
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "Expired"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "Expired"
+          ],
+          "calls": []
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "CanEdit"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "CanEdit"
+          ],
+          "calls": []
+        }
+      }
+    ],
+    "edges": [],
+    "semantic_behavior_facts": "not extracted by this AST; literal/operator/assertion/contracts not represented",
+    "limitation": "bare identifier calls only; selector calls such as strings.ToLower/strings.Compare are absent"
+  },
+  {
+    "case": "shared-import-independent-search-and-sort",
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "Contains"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "Contains"
+          ],
+          "calls": []
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "Before"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "Before"
+          ],
+          "calls": []
+        }
+      }
+    ],
+    "edges": [],
+    "semantic_behavior_facts": "not extracted by this AST; literal/operator/assertion/contracts not represented",
+    "limitation": "bare identifier calls only; selector calls such as strings.ToLower/strings.Compare are absent"
+  },
+  {
+    "case": "boolean-polarity-compensation",
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "EncodeFlag"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "EncodeFlag"
+          ],
+          "calls": []
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "DecodeFlag"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "DecodeFlag"
+          ],
+          "calls": []
+        }
+      }
+    ],
+    "edges": [],
+    "semantic_behavior_facts": "not extracted by this AST; literal/operator/assertion/contracts not represented",
+    "limitation": "bare identifier calls only; selector calls such as strings.ToLower/strings.Compare are absent"
+  },
+  {
+    "case": "new-round-provider-eb",
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "Total"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "Total"
+          ],
+          "calls": [
+            "RoundToTen"
+          ]
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "Unchanged"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "RoundToTen",
+            "Unchanged"
+          ],
+          "calls": []
+        }
+      }
+    ],
+    "edges": [
+      {
+        "provider": "EB",
+        "consumer": "EA",
+        "symbol": "RoundToTen"
+      }
+    ],
+    "semantic_behavior_facts": "not extracted by this AST; literal/operator/assertion/contracts not represented",
+    "limitation": "bare identifier calls only; selector calls such as strings.ToLower/strings.Compare are absent"
+  },
+  {
+    "case": "cache-expiry-multiple-boundaries",
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [],
+          "calls": []
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [],
+          "calls": []
+        }
+      }
+    ],
+    "edges": [],
+    "semantic_behavior_facts": "not extracted by this AST; literal/operator/assertion/contracts not represented",
+    "limitation": "bare identifier calls only; selector calls such as strings.ToLower/strings.Compare are absent"
+  },
+  {
+    "case": "unknown-admission-contract",
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "CPUReservation"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "CPUReservation"
+          ],
+          "calls": []
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "MemoryReservation"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "MemoryReservation"
+          ],
+          "calls": []
+        }
+      }
+    ],
+    "edges": [],
+    "semantic_behavior_facts": "not extracted by this AST; literal/operator/assertion/contracts not represented",
+    "limitation": "bare identifier calls only; selector calls such as strings.ToLower/strings.Compare are absent"
+  }
+]

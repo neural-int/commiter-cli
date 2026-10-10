@@ -1,0 +1,906 @@
+[
+  {
+    "name": "nil-slice-corresponding-assertion",
+    "kind": "join",
+    "files": [
+      {
+        "path": "copy.go",
+        "before": "package fixture\n\nfunc Clone(v []int) []int { return append([]int{}, v...) }\n",
+        "after": "package fixture\n\nfunc Clone(v []int) []int { if v == nil { return nil }; return append([]int{}, v...) }\n",
+        "id": "EA"
+      },
+      {
+        "path": "copy_test.go",
+        "before": "package fixture\n\nimport \"testing\"\nfunc TestNil(t *testing.T) { if Clone(nil) == nil { t.Fatal(\"nil\") } }\n",
+        "after": "package fixture\n\nimport \"testing\"\nfunc TestNil(t *testing.T) { if Clone(nil) != nil { t.Fatal(\"non-nil\") } }\n",
+        "id": "EB"
+      }
+    ],
+    "support": {
+      "go.mod": "module example.test/issue164fixture\n\ngo 1.23.0\n"
+    },
+    "gold_basis": "Clone(nil) changes observable nilness and its directly corresponding assertion changes; either partial tree fails.",
+    "input_sha256": "22394c013424883a5c74e83e5578fc44200b8134717fb7f44e851b92d18c45ff",
+    "used_before_registration": true,
+    "prior_changed_source_matches": [],
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "Clone"
+          ],
+          "calls": [
+            "append"
+          ]
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "Clone"
+          ],
+          "calls": [
+            "append"
+          ]
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "TestNil"
+          ],
+          "calls": [
+            "Clone"
+          ]
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "TestNil"
+          ],
+          "calls": [
+            "Clone"
+          ]
+        }
+      }
+    ],
+    "edges": [],
+    "audit_facts": [
+      {
+        "fact_id": "F1",
+        "claim": "Clone(nil) before returns a non-nil empty slice; after explicitly returns nil for nil input.",
+        "evidence": [
+          {
+            "source": "EA:before",
+            "line": 3,
+            "quote": "return append([]int{}, v...)"
+          },
+          {
+            "source": "EA:after",
+            "line": 3,
+            "quote": "if v == nil { return nil }"
+          }
+        ]
+      },
+      {
+        "fact_id": "F2",
+        "claim": "TestNil calls Clone(nil); before fails on nil, after fails on non-nil.",
+        "evidence": [
+          {
+            "source": "EB:before",
+            "line": 4,
+            "quote": "if Clone(nil) == nil"
+          },
+          {
+            "source": "EB:after",
+            "line": 4,
+            "quote": "if Clone(nil) != nil"
+          }
+        ]
+      }
+    ],
+    "expected_relation": "corresponding",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "missing_external": "Hidden author intent is not supplied and not a required target.",
+    "multiple_boundary": false,
+    "fact_rubric": "Each F item: present_correct / missing / wrong / partial; accept equivalent wording only if all essential before/after semantics and source support hold. Record every unsupported extra claim. No word overlap scoring.",
+    "relation_rubric": "Label and direction scored separately from semantic support of reason/citations; label alone is not evidence of understanding. multiple_defensible is a diagnostic review convention, not an observable author fact."
+  },
+  {
+    "name": "shared-bound-independent-ui-and-batch",
+    "kind": "separate",
+    "files": [
+      {
+        "path": "display.go",
+        "before": "package fixture\n\nfunc DisplayWidth(n int) int { return Bound(n, 80) }\n",
+        "after": "package fixture\n\nfunc DisplayWidth(n int) int { return Bound(n, 80) + 2 }\n",
+        "id": "EA"
+      },
+      {
+        "path": "batch.go",
+        "before": "package fixture\n\nfunc BatchSize(n int) int { return Bound(n, 32) }\n",
+        "after": "package fixture\n\nfunc BatchSize(n int) int { return Bound(n, 16) }\n",
+        "id": "EB"
+      }
+    ],
+    "support": {
+      "bound.go": "package fixture\n\nfunc Bound(n, max int) int { if n > max { return max }; return n }\n",
+      "go.mod": "module example.test/issue164fixture\n\ngo 1.23.0\n"
+    },
+    "gold_basis": "Display padding and batch capacity are distinct observable behaviors. Unchanged Bound alone creates no required adaptation.",
+    "input_sha256": "5eaa05922e348d29f0fda20e26defe30cba83410f92fcdf3416f63c3dd62c865",
+    "used_before_registration": true,
+    "prior_changed_source_matches": [],
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "DisplayWidth"
+          ],
+          "calls": [
+            "Bound"
+          ]
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "DisplayWidth"
+          ],
+          "calls": [
+            "Bound"
+          ]
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "BatchSize"
+          ],
+          "calls": [
+            "Bound"
+          ]
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "BatchSize"
+          ],
+          "calls": [
+            "Bound"
+          ]
+        }
+      }
+    ],
+    "edges": [],
+    "audit_facts": [
+      {
+        "fact_id": "F1",
+        "claim": "DisplayWidth adds 2 to Bound(n,80) after the change; its Bound arguments stay the same.",
+        "evidence": [
+          {
+            "source": "EA:before",
+            "line": 3,
+            "quote": "return Bound(n, 80)"
+          },
+          {
+            "source": "EA:after",
+            "line": 3,
+            "quote": "return Bound(n, 80) + 2"
+          }
+        ]
+      },
+      {
+        "fact_id": "F2",
+        "claim": "BatchSize changes the Bound maximum argument from 32 to 16.",
+        "evidence": [
+          {
+            "source": "EB:before",
+            "line": 3,
+            "quote": "Bound(n, 32)"
+          },
+          {
+            "source": "EB:after",
+            "line": 3,
+            "quote": "Bound(n, 16)"
+          }
+        ]
+      },
+      {
+        "fact_id": "F3",
+        "claim": "Bound returns max when n > max, otherwise n; this helper is unchanged.",
+        "evidence": [
+          {
+            "source": "context:bound.go",
+            "line": 3,
+            "quote": "if n > max { return max }; return n"
+          }
+        ]
+      }
+    ],
+    "expected_relation": "independent",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "missing_external": "Hidden author intent is not supplied and not a required target.",
+    "multiple_boundary": false,
+    "fact_rubric": "Each F item: present_correct / missing / wrong / partial; accept equivalent wording only if all essential before/after semantics and source support hold. Record every unsupported extra claim. No word overlap scoring.",
+    "relation_rubric": "Label and direction scored separately from semantic support of reason/citations; label alone is not evidence of understanding. multiple_defensible is a diagnostic review convention, not an observable author fact."
+  },
+  {
+    "name": "same-package-independent-time-and-permission",
+    "kind": "separate",
+    "files": [
+      {
+        "path": "time.go",
+        "before": "package fixture\n\nfunc Expired(now, deadline int) bool { return now > deadline }\n",
+        "after": "package fixture\n\nfunc Expired(now, deadline int) bool { return now >= deadline }\n",
+        "id": "EA"
+      },
+      {
+        "path": "permission.go",
+        "before": "package fixture\n\nfunc CanEdit(role string) bool { return role == \"owner\" }\n",
+        "after": "package fixture\n\nfunc CanEdit(role string) bool { return role == \"owner\" || role == \"editor\" }\n",
+        "id": "EB"
+      }
+    ],
+    "support": {
+      "go.mod": "module example.test/issue164fixture\n\ngo 1.23.0\n"
+    },
+    "gold_basis": "Deadline equality and role permission are separately reviewable behaviors with no shared contract or call relationship.",
+    "input_sha256": "b92fe077618f705b51629c5058176077ae50ccba5b9643e14226a2ca70cbf72a",
+    "used_before_registration": true,
+    "prior_changed_source_matches": [],
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "Expired"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "Expired"
+          ],
+          "calls": []
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "CanEdit"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "CanEdit"
+          ],
+          "calls": []
+        }
+      }
+    ],
+    "edges": [],
+    "audit_facts": [
+      {
+        "fact_id": "F1",
+        "claim": "Expired changes > to >=, making equality return true after the change.",
+        "evidence": [
+          {
+            "source": "EA:before",
+            "line": 3,
+            "quote": "now > deadline"
+          },
+          {
+            "source": "EA:after",
+            "line": 3,
+            "quote": "now >= deadline"
+          }
+        ]
+      },
+      {
+        "fact_id": "F2",
+        "claim": "CanEdit adds editor alongside owner to accepted roles.",
+        "evidence": [
+          {
+            "source": "EB:before",
+            "line": 3,
+            "quote": "role == \"owner\""
+          },
+          {
+            "source": "EB:after",
+            "line": 3,
+            "quote": "role == \"owner\" || role == \"editor\""
+          }
+        ]
+      }
+    ],
+    "expected_relation": "independent",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "missing_external": "Hidden author intent is not supplied and not a required target.",
+    "multiple_boundary": false,
+    "fact_rubric": "Each F item: present_correct / missing / wrong / partial; accept equivalent wording only if all essential before/after semantics and source support hold. Record every unsupported extra claim. No word overlap scoring.",
+    "relation_rubric": "Label and direction scored separately from semantic support of reason/citations; label alone is not evidence of understanding. multiple_defensible is a diagnostic review convention, not an observable author fact."
+  },
+  {
+    "name": "shared-import-independent-search-and-sort",
+    "kind": "separate",
+    "files": [
+      {
+        "path": "find.go",
+        "before": "package fixture\n\nimport \"strings\"\nfunc Contains(s, q string) bool { return strings.Contains(s, q) }\n",
+        "after": "package fixture\n\nimport \"strings\"\nfunc Contains(s, q string) bool { return strings.Contains(strings.ToLower(s), strings.ToLower(q)) }\n",
+        "id": "EA"
+      },
+      {
+        "path": "order.go",
+        "before": "package fixture\n\nimport \"strings\"\nfunc Before(a, b string) bool { return strings.Compare(a, b) < 0 }\n",
+        "after": "package fixture\n\nimport \"strings\"\nfunc Before(a, b string) bool { return strings.Compare(a, b) > 0 }\n",
+        "id": "EB"
+      }
+    ],
+    "support": {
+      "go.mod": "module example.test/issue164fixture\n\ngo 1.23.0\n"
+    },
+    "gold_basis": "Case-insensitive search and descending ordering change separate outputs; sharing strings import establishes no compensation.",
+    "input_sha256": "eb8e82b21959f4db6e0bc8cdb2d0f32b11db60c6bce0977269e2d4035d8c3c58",
+    "used_before_registration": true,
+    "prior_changed_source_matches": [],
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "Contains"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "Contains"
+          ],
+          "calls": []
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "Before"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "Before"
+          ],
+          "calls": []
+        }
+      }
+    ],
+    "edges": [],
+    "audit_facts": [
+      {
+        "fact_id": "F1",
+        "claim": "Contains lowercases both arguments before strings.Contains after the change.",
+        "evidence": [
+          {
+            "source": "EA:before",
+            "line": 4,
+            "quote": "strings.Contains(s, q)"
+          },
+          {
+            "source": "EA:after",
+            "line": 4,
+            "quote": "strings.Contains(strings.ToLower(s), strings.ToLower(q))"
+          }
+        ]
+      },
+      {
+        "fact_id": "F2",
+        "claim": "Before changes strings.Compare(a,b) < 0 to > 0.",
+        "evidence": [
+          {
+            "source": "EB:before",
+            "line": 4,
+            "quote": "strings.Compare(a, b) < 0"
+          },
+          {
+            "source": "EB:after",
+            "line": 4,
+            "quote": "strings.Compare(a, b) > 0"
+          }
+        ]
+      }
+    ],
+    "expected_relation": "independent",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "missing_external": "Hidden author intent is not supplied and not a required target.",
+    "multiple_boundary": false,
+    "fact_rubric": "Each F item: present_correct / missing / wrong / partial; accept equivalent wording only if all essential before/after semantics and source support hold. Record every unsupported extra claim. No word overlap scoring.",
+    "relation_rubric": "Label and direction scored separately from semantic support of reason/citations; label alone is not evidence of understanding. multiple_defensible is a diagnostic review convention, not an observable author fact."
+  },
+  {
+    "name": "boolean-polarity-compensation",
+    "kind": "join",
+    "files": [
+      {
+        "path": "encode.go",
+        "before": "package fixture\n\nfunc EncodeFlag(v bool) int { if v { return 1 }; return 0 }\n",
+        "after": "package fixture\n\nfunc EncodeFlag(v bool) int { if v { return 0 }; return 1 }\n",
+        "id": "EA"
+      },
+      {
+        "path": "decode.go",
+        "before": "package fixture\n\nfunc DecodeFlag(n int) bool { return n == 1 }\n",
+        "after": "package fixture\n\nfunc DecodeFlag(n int) bool { return n == 0 }\n",
+        "id": "EB"
+      }
+    ],
+    "support": {
+      "contract.go": "package fixture\n\n// The local flag codec contract requires FlagRoundtrip for both boolean values.\nfunc FlagRoundtrip(v bool) bool { return DecodeFlag(EncodeFlag(v)) == v }\n",
+      "codec_test.go": "package fixture\n\nimport \"testing\"\nfunc TestCodec(t *testing.T) { if !FlagRoundtrip(false) || !FlagRoundtrip(true) { t.Fatal(\"roundtrip\") } }\n",
+      "go.mod": "module example.test/issue164fixture\n\ngo 1.23.0\n"
+    },
+    "gold_basis": "Encoding/decoding polarity changes compensate to preserve an explicit source contract; both partial trees fail the invariant test.",
+    "input_sha256": "9654334def3ec4ec7b054887bc3293b892dbd511166a983874a5e305839bf3b9",
+    "used_before_registration": true,
+    "prior_changed_source_matches": [],
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "EncodeFlag"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "EncodeFlag"
+          ],
+          "calls": []
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "DecodeFlag"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "DecodeFlag"
+          ],
+          "calls": []
+        }
+      }
+    ],
+    "edges": [],
+    "audit_facts": [
+      {
+        "fact_id": "F1",
+        "claim": "EncodeFlag maps true/false to 1/0 before and 0/1 after.",
+        "evidence": [
+          {
+            "source": "EA:before",
+            "line": 3,
+            "quote": "if v { return 1 }; return 0"
+          },
+          {
+            "source": "EA:after",
+            "line": 3,
+            "quote": "if v { return 0 }; return 1"
+          }
+        ]
+      },
+      {
+        "fact_id": "F2",
+        "claim": "DecodeFlag changes the true condition from n == 1 to n == 0.",
+        "evidence": [
+          {
+            "source": "EB:before",
+            "line": 3,
+            "quote": "n == 1"
+          },
+          {
+            "source": "EB:after",
+            "line": 3,
+            "quote": "n == 0"
+          }
+        ]
+      },
+      {
+        "fact_id": "F3",
+        "claim": "The source requires FlagRoundtrip for both booleans; FlagRoundtrip compares DecodeFlag(EncodeFlag(v)) with v.",
+        "evidence": [
+          {
+            "source": "context:contract.go",
+            "line": 3,
+            "quote": "// The local flag codec contract requires"
+          },
+          {
+            "source": "context:contract.go",
+            "line": 4,
+            "quote": "DecodeFlag(EncodeFlag(v)) == v"
+          }
+        ]
+      }
+    ],
+    "expected_relation": "compensation",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "missing_external": "Hidden author intent is not supplied and not a required target.",
+    "multiple_boundary": false,
+    "fact_rubric": "Each F item: present_correct / missing / wrong / partial; accept equivalent wording only if all essential before/after semantics and source support hold. Record every unsupported extra claim. No word overlap scoring.",
+    "relation_rubric": "Label and direction scored separately from semantic support of reason/citations; label alone is not evidence of understanding. multiple_defensible is a diagnostic review convention, not an observable author fact."
+  },
+  {
+    "name": "new-round-provider-eb",
+    "kind": "dependency",
+    "files": [
+      {
+        "path": "total.go",
+        "before": "package fixture\n\nfunc Total(n int) int { return n }\n",
+        "after": "package fixture\n\nfunc Total(n int) int { return RoundToTen(n) }\n",
+        "id": "EA"
+      },
+      {
+        "path": "round.go",
+        "before": "package fixture\n\nfunc Unchanged() int { return 10 }\n",
+        "after": "package fixture\n\nfunc Unchanged() int { return 10 }\nfunc RoundToTen(n int) int { return (n + 9) / 10 * 10 }\n",
+        "id": "EB"
+      }
+    ],
+    "support": {
+      "go.mod": "module example.test/issue164fixture\n\ngo 1.23.0\n"
+    },
+    "gold_basis": "New RoundToTen provider EB must precede consumer EA if split; merge and provider-first separation are both allowed.",
+    "input_sha256": "15da10f456fb8c2d5ac1967c4fd192c83d70308d13a3203aa43cb93c7028c376",
+    "used_before_registration": true,
+    "prior_changed_source_matches": [],
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "Total"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "Total"
+          ],
+          "calls": [
+            "RoundToTen"
+          ]
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "Unchanged"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "RoundToTen",
+            "Unchanged"
+          ],
+          "calls": []
+        }
+      }
+    ],
+    "edges": [
+      {
+        "provider": "EB",
+        "consumer": "EA",
+        "symbol": "RoundToTen"
+      }
+    ],
+    "audit_facts": [
+      {
+        "fact_id": "F1",
+        "claim": "Total changes from returning n to calling RoundToTen(n).",
+        "evidence": [
+          {
+            "source": "EA:before",
+            "line": 3,
+            "quote": "return n"
+          },
+          {
+            "source": "EA:after",
+            "line": 3,
+            "quote": "return RoundToTen(n)"
+          }
+        ]
+      },
+      {
+        "fact_id": "F2",
+        "claim": "RoundToTen is absent before and added in EB after; it returns (n+9)/10*10.",
+        "evidence": [
+          {
+            "source": "EB:before",
+            "line": 3,
+            "quote": "func Unchanged()"
+          },
+          {
+            "source": "EB:after",
+            "line": 4,
+            "quote": "func RoundToTen(n int) int { return (n + 9) / 10 * 10 }"
+          }
+        ]
+      }
+    ],
+    "expected_relation": "dependency",
+    "expected_direction": {
+      "provider": "EB",
+      "consumer": "EA"
+    },
+    "missing_external": "Hidden author intent is not supplied and not a required target.",
+    "multiple_boundary": true,
+    "fact_rubric": "Each F item: present_correct / missing / wrong / partial; accept equivalent wording only if all essential before/after semantics and source support hold. Record every unsupported extra claim. No word overlap scoring.",
+    "relation_rubric": "Label and direction scored separately from semantic support of reason/citations; label alone is not evidence of understanding. multiple_defensible is a diagnostic review convention, not an observable author fact."
+  },
+  {
+    "name": "cache-expiry-multiple-boundaries",
+    "kind": "multiple",
+    "files": [
+      {
+        "path": "image.go",
+        "before": "package fixture\n\nconst ImageTTL = 60\n",
+        "after": "package fixture\n\nconst ImageTTL = 120\n",
+        "id": "EA"
+      },
+      {
+        "path": "document.go",
+        "before": "package fixture\n\nconst DocumentTTL = 90\n",
+        "after": "package fixture\n\nconst DocumentTTL = 180\n",
+        "id": "EB"
+      }
+    ],
+    "support": {
+      "go.mod": "module example.test/issue164fixture\n\ngo 1.23.0\n"
+    },
+    "gold_basis": "Two cache policies may be jointly reviewed as one expiry adjustment or separately; no unique hidden intent or mandatory linkage is asserted.",
+    "input_sha256": "7f3686f78e54a7d16ee48764c2c320039f11b51bcca39dc5ab5dcddf3d62f9a7",
+    "used_before_registration": true,
+    "prior_changed_source_matches": [],
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [],
+          "calls": []
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [],
+          "calls": []
+        }
+      }
+    ],
+    "edges": [],
+    "audit_facts": [
+      {
+        "fact_id": "F1",
+        "claim": "ImageTTL changes 60 to 120.",
+        "evidence": [
+          {
+            "source": "EA:before",
+            "line": 3,
+            "quote": "ImageTTL = 60"
+          },
+          {
+            "source": "EA:after",
+            "line": 3,
+            "quote": "ImageTTL = 120"
+          }
+        ]
+      },
+      {
+        "fact_id": "F2",
+        "claim": "DocumentTTL changes 90 to 180.",
+        "evidence": [
+          {
+            "source": "EB:before",
+            "line": 3,
+            "quote": "DocumentTTL = 90"
+          },
+          {
+            "source": "EB:after",
+            "line": 3,
+            "quote": "DocumentTTL = 180"
+          }
+        ]
+      }
+    ],
+    "expected_relation": "multiple_defensible",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "missing_external": "Hidden author intent is not supplied and not a required target.",
+    "multiple_boundary": true,
+    "fact_rubric": "Each F item: present_correct / missing / wrong / partial; accept equivalent wording only if all essential before/after semantics and source support hold. Record every unsupported extra claim. No word overlap scoring.",
+    "relation_rubric": "Label and direction scored separately from semantic support of reason/citations; label alone is not evidence of understanding. multiple_defensible is a diagnostic review convention, not an observable author fact."
+  },
+  {
+    "name": "unknown-admission-contract",
+    "kind": "insufficient",
+    "files": [
+      {
+        "path": "cpu.go",
+        "before": "package fixture\n\nfunc CPUReservation() int { return 2 }\n",
+        "after": "package fixture\n\nfunc CPUReservation() int { return 3 }\n",
+        "id": "EA"
+      },
+      {
+        "path": "memory.go",
+        "before": "package fixture\n\nfunc MemoryReservation() int { return 4 }\n",
+        "after": "package fixture\n\nfunc MemoryReservation() int { return 6 }\n",
+        "id": "EB"
+      }
+    ],
+    "support": {
+      "admission.go": "package fixture\n\n// Admission is supplied by clients; its cross-resource constraints are unavailable.\ntype Admission func(cpu, memory int) bool\nfunc Admitted(check Admission) bool { return check(CPUReservation(), MemoryReservation()) }\n",
+      "go.mod": "module example.test/issue164fixture\n\ngo 1.23.0\n"
+    },
+    "gold_basis": "The unknown client admission policy may couple reservations; input cannot identify a mandatory adaptation or independence. Diagnostic requires defer.",
+    "input_sha256": "87986a5cd9588f4b356ac584c01ce2a16c12a4d6f4eb8b9fefb058360af34408",
+    "used_before_registration": true,
+    "prior_changed_source_matches": [],
+    "facts": [
+      {
+        "id": "EA",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "CPUReservation"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "CPUReservation"
+          ],
+          "calls": []
+        }
+      },
+      {
+        "id": "EB",
+        "before": {
+          "package": "fixture",
+          "definitions": [
+            "MemoryReservation"
+          ],
+          "calls": []
+        },
+        "after": {
+          "package": "fixture",
+          "definitions": [
+            "MemoryReservation"
+          ],
+          "calls": []
+        }
+      }
+    ],
+    "edges": [],
+    "audit_facts": [
+      {
+        "fact_id": "F1",
+        "claim": "CPUReservation changes 2 to 3.",
+        "evidence": [
+          {
+            "source": "EA:before",
+            "line": 3,
+            "quote": "return 2"
+          },
+          {
+            "source": "EA:after",
+            "line": 3,
+            "quote": "return 3"
+          }
+        ]
+      },
+      {
+        "fact_id": "F2",
+        "claim": "MemoryReservation changes 4 to 6.",
+        "evidence": [
+          {
+            "source": "EB:before",
+            "line": 3,
+            "quote": "return 4"
+          },
+          {
+            "source": "EB:after",
+            "line": 3,
+            "quote": "return 6"
+          }
+        ]
+      },
+      {
+        "fact_id": "F3",
+        "claim": "Admitted passes both reservations to a client-supplied Admission function; its cross-resource constraints are unavailable.",
+        "evidence": [
+          {
+            "source": "context:admission.go",
+            "line": 3,
+            "quote": "// Admission is supplied by clients; its cross-resource constraints are unavailable."
+          },
+          {
+            "source": "context:admission.go",
+            "line": 5,
+            "quote": "check(CPUReservation(), MemoryReservation())"
+          }
+        ]
+      }
+    ],
+    "expected_relation": "insufficient",
+    "expected_direction": {
+      "provider": "none",
+      "consumer": "none"
+    },
+    "missing_external": "Client Admission implementation and cross-resource constraints.",
+    "multiple_boundary": false,
+    "fact_rubric": "Each F item: present_correct / missing / wrong / partial; accept equivalent wording only if all essential before/after semantics and source support hold. Record every unsupported extra claim. No word overlap scoring.",
+    "relation_rubric": "Label and direction scored separately from semantic support of reason/citations; label alone is not evidence of understanding. multiple_defensible is a diagnostic review convention, not an observable author fact."
+  }
+]
