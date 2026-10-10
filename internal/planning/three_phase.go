@@ -96,60 +96,10 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 		visible[i] = id
 		labels[i] = fmt.Sprintf("G%03d", i+1)
 	}
-	// Evidence must be host-provided, unique, nonempty and bound to selected IDs.
-	evidenceByID := map[string]BreakingEvidence{}
-	for _, e := range g.Evidence {
-		if e.ID == "" || e.ID == "none" || e.ID == "unresolved" || e.Fact == "" || len(e.FileIDs) == 0 {
-			return result, errors.New("invalid host breaking evidence")
-		}
-		if _, exists := evidenceByID[e.ID]; exists {
-			return result, errors.New("duplicate host breaking evidence")
-		}
-		seen := map[string]bool{}
-		for _, id := range e.FileIDs {
-			if !containsString(ids, id) || seen[id] {
-				return result, errors.New("host breaking evidence is not bound to selected files")
-			}
-			seen[id] = true
-		}
-		evidenceByID[e.ID] = e
+	if err := validateCandidateEvidence(g.Evidence, ids); err != nil {
+		return result, err
 	}
-	invoke := func(system string, payload any, schema any, profile string, budget int, output any) error {
-		if ctx.Err() != nil {
-			return generationError([]Violation{IncompleteOutput})
-		}
-		encoded, e := json.Marshal(payload)
-		if e != nil {
-			return errors.New("cannot encode candidate input")
-		}
-		shape, e := json.Marshal(schema)
-		if e != nil {
-			return errors.New("cannot encode candidate schema")
-		}
-		system += schemaInstructionPrefix + string(shape)
-		// Bound every actual phase prompt independently, including dynamic schemas.
-		// The helper also checks exact tokenized prompt+output before generation.
-		if len(system)+len(encoded)+contextinput.TemplateReserve+budget > prepared.Budget.ContextTokens {
-			return contextinput.ErrTooLarge
-		}
-		result.Calls++
-		response, e := client.ChatWithOptions(ctx, []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: string(encoded)}}, shape, llm.Options{ContextTokens: prepared.Budget.ContextTokens, OutputTokens: budget, GenerationProfile: profile})
-		if e != nil {
-			return generationError(nil)
-		}
-		result.Telemetry.add(response, result.Calls == 1)
-		if ctx.Err() != nil || response.StopReason != "completed" {
-			return generationError([]Violation{IncompleteOutput})
-		}
-		candidate := []byte(response.Content)
-		if sensitive.Contains(candidate) {
-			return generationError([]Violation{SensitiveOutput})
-		}
-		if e := strictCandidateJSON(candidate, output); e != nil {
-			return generationError([]Violation{InvalidSchema})
-		}
-		return nil
-	}
+	invoke := candidateInvocation(ctx, client, prepared.Budget.ContextTokens, sensitive, &result)
 	properties := map[string]any{}
 	for _, id := range visible {
 		properties[id] = map[string]any{"type": "string", "enum": labels}
@@ -187,14 +137,22 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 			return result, generationError([]Violation{InvalidAssignment})
 		}
 	}
+	result.Plan, err = candidateMetadata(ctx, groups, ids, g.Evidence, original, language, sensitive, invoke)
+	return result, err
+}
+
+type candidateInvoke func(string, any, any, string, int, any) error
+
+// candidateMetadata is shared by both planners. Membership is host-fixed.
+func candidateMetadata(ctx context.Context, groups []candidateGroup, ids []string, evidence []BreakingEvidence, original map[string]json.RawMessage, language Language, sensitive SensitiveValues, invoke candidateInvoke) (Plan, error) {
 	names := make([]string, len(groups))
-	properties = map[string]any{}
+	properties := map[string]any{}
 	allowedRefs := map[string][]string{}
 	for i, group := range groups {
 		names[i] = group.ID
 		refs := []string{"none", "unresolved"}
 		types := allowedTypes
-		for _, e := range g.Evidence {
+		for _, e := range evidence {
 			applies := false
 			for _, id := range e.FileIDs {
 				if containsString(group.FileIDs, id) {
@@ -214,7 +172,7 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 		}
 		properties[group.ID] = candidateObject(map[string]any{"type": map[string]any{"type": "string", "enum": types}, "breaking_evidence_ref": map[string]any{"type": "string", "enum": refs}}, []string{"type", "breaking_evidence_ref"})
 	}
-	metadata := map[string]any{"task": "Generate metadata without changing finalized groups.", "groups": groups, "breaking_evidence_candidates": g.Evidence, "evidence_pool_limitation": "The host evidence pool is limited, not a complete API/CLI/configuration/stored-format observer. Absence is not proof of compatibility.", "summary_language": language}
+	metadata := map[string]any{"task": "Generate metadata without changing finalized groups.", "groups": groups, "breaking_evidence_candidates": evidence, "evidence_pool_limitation": "The host evidence pool is limited, not a complete API/CLI/configuration/stored-format observer. Absence is not proof of compatibility.", "summary_language": language}
 	if feedback, ok := original["regeneration_feedback"]; ok {
 		metadata["regeneration_feedback"] = feedback
 	}
@@ -224,21 +182,21 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 	}
 	var categories map[string]category
 	if err := invoke(categorySystem, metadata, candidateObject(properties, names), "bounded-category", 512, &categories); err != nil {
-		return result, err
+		return Plan{}, err
 	}
 	if len(categories) != len(groups) {
-		return result, generationError([]Violation{InvalidSchema})
+		return Plan{}, generationError([]Violation{InvalidSchema})
 	}
 	for _, group := range groups {
 		c, ok := categories[group.ID]
 		if !ok || !containsString(allowedTypes, c.Type) || !containsString(allowedRefs[group.ID], c.Reference) {
-			return result, generationError([]Violation{InvalidSchema})
+			return Plan{}, generationError([]Violation{InvalidSchema})
 		}
 		if c.Reference == "unresolved" {
-			return result, exitcode.New(exitcode.LLM, "three-phase planner stopped: unresolved_breaking_evidence")
+			return Plan{}, exitcode.New(exitcode.LLM, "three-phase planner stopped: unresolved_breaking_evidence")
 		}
 		if candidateTestOnly(group) && c.Type != "test" {
-			return result, generationError([]Violation{InvalidType})
+			return Plan{}, generationError([]Violation{InvalidType})
 		}
 	}
 	properties = map[string]any{}
@@ -251,16 +209,16 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 	}
 	var texts map[string]text
 	if err := invoke(textSystem, metadata, candidateObject(properties, names), "bounded-text", 768, &texts); err != nil {
-		return result, err
+		return Plan{}, err
 	}
 	if len(texts) != len(groups) {
-		return result, generationError([]Violation{InvalidSchema})
+		return Plan{}, generationError([]Violation{InvalidSchema})
 	}
 	plan := Plan{SchemaVersion: SchemaVersion}
 	for _, group := range groups {
 		t, ok := texts[group.ID]
 		if !ok || utf8.RuneCountInString(t.Scope) > 16 || utf8.RuneCountInString(t.Summary) > 48 {
-			return result, generationError([]Violation{InvalidSchema})
+			return Plan{}, generationError([]Violation{InvalidSchema})
 		}
 		c := categories[group.ID]
 		plan.Commits = append(plan.Commits, Commit{Type: c.Type, Scope: t.Scope, Breaking: c.Reference != "none", Summary: t.Summary, FileIDs: group.FileIDs})
@@ -269,13 +227,12 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 	encoded, _ := json.Marshal(plan)
 	final, violations := Validate(encoded, ids, sensitive, language)
 	if ctx.Err() != nil {
-		return result, generationError([]Violation{IncompleteOutput})
+		return Plan{}, generationError([]Violation{IncompleteOutput})
 	}
 	if len(violations) != 0 {
-		return result, generationError(violations)
+		return Plan{}, generationError(violations)
 	}
-	result.Plan = final
-	return result, nil
+	return final, nil
 }
 
 func candidatePath(file contextinput.File) string {
@@ -358,4 +315,65 @@ func strictCandidateJSON(data []byte, target any) error {
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
 	return decoder.Decode(target)
+}
+
+func validateCandidateEvidence(evidence []BreakingEvidence, ids []string) error {
+	// Evidence must be host-provided, unique, nonempty and bound to selected IDs.
+	evidenceByID := map[string]BreakingEvidence{}
+	for _, e := range evidence {
+		if e.ID == "" || e.ID == "none" || e.ID == "unresolved" || e.Fact == "" || len(e.FileIDs) == 0 {
+			return errors.New("invalid host breaking evidence")
+		}
+		if _, exists := evidenceByID[e.ID]; exists {
+			return errors.New("duplicate host breaking evidence")
+		}
+		seen := map[string]bool{}
+		for _, id := range e.FileIDs {
+			if !containsString(ids, id) || seen[id] {
+				return errors.New("host breaking evidence is not bound to selected files")
+			}
+			seen[id] = true
+		}
+		evidenceByID[e.ID] = e
+	}
+	return nil
+}
+
+func candidateInvocation(ctx context.Context, client optionsChatClient, contextTokens int, sensitive SensitiveValues, result *Result) candidateInvoke {
+	return func(system string, payload any, schema any, profile string, budget int, output any) error {
+		if ctx.Err() != nil {
+			return generationError([]Violation{IncompleteOutput})
+		}
+		encoded, e := json.Marshal(payload)
+		if e != nil {
+			return errors.New("cannot encode candidate input")
+		}
+		shape, e := json.Marshal(schema)
+		if e != nil {
+			return errors.New("cannot encode candidate schema")
+		}
+		system += schemaInstructionPrefix + string(shape)
+		// Bound every actual phase prompt independently, including dynamic schemas.
+		// The helper also checks exact tokenized prompt+output before generation.
+		if len(system)+len(encoded)+contextinput.TemplateReserve+budget > contextTokens {
+			return contextinput.ErrTooLarge
+		}
+		result.Calls++
+		response, e := client.ChatWithOptions(ctx, []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: string(encoded)}}, shape, llm.Options{ContextTokens: contextTokens, OutputTokens: budget, GenerationProfile: profile})
+		if e != nil {
+			return generationError(nil)
+		}
+		result.Telemetry.add(response, result.Calls == 1)
+		if ctx.Err() != nil || response.StopReason != "completed" {
+			return generationError([]Violation{IncompleteOutput})
+		}
+		candidate := []byte(response.Content)
+		if sensitive.Contains(candidate) {
+			return generationError([]Violation{SensitiveOutput})
+		}
+		if e := strictCandidateJSON(candidate, output); e != nil {
+			return generationError([]Violation{InvalidSchema})
+		}
+		return nil
+	}
 }

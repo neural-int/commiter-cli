@@ -61,3 +61,15 @@ Phase 1 の対応範囲では Gate 1 を満たした。1〜16 files の全16ケ�
 3. `planning.Validate()` と前後の snapshot 無変更を確認する。Gate 2 が成立してから明示 opt-in CLI と既存 executor を接続する。Gate 3 の独立品質評価なしに default 化しない。
 
 Issue 全体は未完了。Phase 2/3 の未実装・未計測を Gate 成功として扱わない。
+
+## Phase 2 — Metadata 接続と事前登録
+
+`planning.FileFirstGenerator` は ID 順の file-singleton を固定し、既存 Three-phase の metadata・host evidence・bounded invocation を共有する。最大4 groups の packet ごとに category/text を生成し、最大16 files / 8 calls / 合計 output budget 5,120 tokens / 共通120秒の上限を持つ。新しい stage・model・decoder・fallback は追加しない。各 packet の validator と最後の全 ID を対象とする `planning.Validate()` を通過した完全 plan だけを返す。
+
+metadata の failure・unknown property・join/split 試行・重複 key・不正 type/scope/summary・unresolved breaking・host witness 無視・sensitive output・context 超過・deadline では停止し、先行 packet を含む部分 plan を返さない。入力順の反転でも ID 順の境界を維持する。既存 default の4-file拒否境界と generation profiles は保持する。
+
+1〜16 の metadata 契約、後続 packet 失敗、既存 Three-phase の回帰テストを確認した。repository 全体の Go tests、vet/build、release notes の25テストは成功した。これは実モデル metadata の成功率・費用・意味品質の証明ではない。
+
+実測の条件は `docs/benchmarks/issue-167/phase-2-preregistration.md`、固定 fixture は `phase-2-fixtures.json` に保存する。`tools/benchmark167` は合成 fixture repository を収集し、同じ Prepared を両 planner に入力する。4→5 の最初の4変更は同じ bytes で、追加の対応テストによる増分と方式差を分ける。model 入力はローカル helper の stdin のみで、測定 artifact に prompt・生成内容・stderr を保存しない。
+
+Phase 2 Gate は実測結果を確認するまで未達。Phase 3 の CLI 接続・commit mutation は gated-out のままである。
