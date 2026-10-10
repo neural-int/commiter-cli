@@ -29,6 +29,12 @@ func Collect(root string, options Options) (snapshot Snapshot, err error) {
 			err = closeErr
 		}
 	}()
+	return collectLocked(root, options, ctx)
+}
+
+// collectLocked is shared by collection and read-only file-first replay. The
+// caller holds the repository lock for the entire snapshot/replay operation.
+func collectLocked(root string, options Options, ctx context.Context) (snapshot Snapshot, err error) {
 	state, err := inspect(ctx, root)
 	if err != nil {
 		return Snapshot{}, err

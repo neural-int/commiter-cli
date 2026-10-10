@@ -1,0 +1,246 @@
+{
+  "issue": 167,
+  "phase": 1,
+  "base_commit": "059fb5bd2a2da394f59f5036cc9e7731a2e3163f",
+  "structural_gate": "pass_with_explicit_supported_regular_file_contract",
+  "phase_2": "not_implemented_or_evaluated",
+  "phase_3": "gated_out_pending_gate_2",
+  "issue_complete": false,
+  "acceptance": {
+    "selected_file_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "complete_assignment": "16/16 file-count cases",
+    "byte_reconstruction": "16/16 file-count cases",
+    "temporary_index_replay": "16/16 file-count cases",
+    "original_index_worktree_refs_objects_unchanged": true,
+    "input_order_reversal_at_files": 16,
+    "mixed_git_states": [
+      "staged",
+      "unstaged",
+      "partial_staging",
+      "rename_and_edit",
+      "delete",
+      "untracked",
+      "binary",
+      "non_utf8",
+      "crlf",
+      "no_final_newline",
+      "empty_file",
+      "executable_mode"
+    ],
+    "unsupported_cases_are_stopped_without_partial_result": true,
+    "concurrent_worktree_drift_test": "pass"
+  },
+  "quality_gates": [
+    {
+      "command": "go test ./internal/gitstate -run FileFirst -count=1 -json",
+      "exit_code": 0,
+      "elapsed_seconds": 118.269,
+      "leaf_subtests_passed": 43
+    },
+    {
+      "command": "go test ./internal/gitstate -run ConcurrentWorktree -count=1 -v",
+      "exit_code": 0
+    },
+    {
+      "command": "go test ./... -count=1 -json",
+      "exit_code": 0,
+      "package_results": [
+        {
+          "package": "github.com/natsuki0413/commiter-cli/cmd/commiter",
+          "result": "skip",
+          "elapsed_seconds": 0
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/exitcode",
+          "result": "skip",
+          "elapsed_seconds": 0
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/config",
+          "result": "pass",
+          "elapsed_seconds": 1.3780000000000001
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/contextinput",
+          "result": "pass",
+          "elapsed_seconds": 2.1189999999999998
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/llm",
+          "result": "pass",
+          "elapsed_seconds": 2.722
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/metrics",
+          "result": "pass",
+          "elapsed_seconds": 3.034
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/interaction",
+          "result": "pass",
+          "elapsed_seconds": 3.309
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/mlxmodel",
+          "result": "pass",
+          "elapsed_seconds": 2.204
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/ollama",
+          "result": "pass",
+          "elapsed_seconds": 1.842
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/output",
+          "result": "pass",
+          "elapsed_seconds": 1.7930000000000001
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/relation",
+          "result": "pass",
+          "elapsed_seconds": 1.948
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/pushexec",
+          "result": "pass",
+          "elapsed_seconds": 2.586
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/planning",
+          "result": "pass",
+          "elapsed_seconds": 4.166
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/syntax",
+          "result": "pass",
+          "elapsed_seconds": 1.718
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/trust",
+          "result": "pass",
+          "elapsed_seconds": 1.847
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/tools/benchmark110",
+          "result": "skip",
+          "elapsed_seconds": 0
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/updatecheck",
+          "result": "pass",
+          "elapsed_seconds": 1.873
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/repository",
+          "result": "pass",
+          "elapsed_seconds": 4.823
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/verification",
+          "result": "pass",
+          "elapsed_seconds": 9.834
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/tools/benchmark146",
+          "result": "pass",
+          "elapsed_seconds": 9.732
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/mlx",
+          "result": "pass",
+          "elapsed_seconds": 21.301
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/commitexec",
+          "result": "pass",
+          "elapsed_seconds": 30.463
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/cli",
+          "result": "pass",
+          "elapsed_seconds": 41.321
+        },
+        {
+          "package": "github.com/natsuki0413/commiter-cli/internal/gitstate",
+          "result": "pass",
+          "elapsed_seconds": 131.979
+        }
+      ]
+    },
+    {
+      "command": "go vet ./...",
+      "exit_code": 0
+    },
+    {
+      "command": "go build ./...",
+      "exit_code": 0
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s .github/scripts/release-notes -p 'test_*.py'",
+      "exit_code": 0,
+      "tests_passed": 25
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "evaluation_limits": {
+    "authored_structural_fixtures_only": true,
+    "independent_semantic_holdout": false,
+    "llm_calls": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "semantic_exact": null,
+    "false_merge": null,
+    "false_split": null,
+    "paired_planner_p50_p95": null,
+    "ttft": null,
+    "memory_pressure_swap": null,
+    "default_adoption": "not_evaluated_no_go_claim_not_changed"
+  },
+  "initial_failures_preserved": [
+    {
+      "kind": "compile",
+      "cause": "collectLocked extraction omitted named snapshot result",
+      "resolution": "restored named results"
+    },
+    {
+      "kind": "fixture",
+      "cause": "gitlink index entry had no worktree directory and collector omitted the absent added entry; staged-to-base drift fixture recollected the snapshot",
+      "resolution": "created valid selected gitlink directory and retained original drift snapshot"
+    },
+    {
+      "kind": "fixture_environment",
+      "cause": "global Git LFS clean/process configuration was inherited and explicitly rejected",
+      "resolution": "fixed synthetic test Git configuration; production safety rejection retained"
+    }
+  ],
+  "source_sha256": {
+    "internal/gitstate/collect.go": "a56e5143b2e00b313f27d17316a2158f8622599a8085271629cc668447b65900",
+    "internal/gitstate/file_first.go": "0379367b6ddb3d5f600b0cdc56468e0561aa48027f313aa0210993033cf3ffc2",
+    "internal/gitstate/file_first_test.go": "312fcc39be68b1f4bca8adb81044c05cb224b0e20f43020883f34f15977a4092"
+  },
+  "notes": [
+    "Go checks used GOCACHE=/private/tmp/commiter-167-gocache",
+    "TestFileFirstTemporaryEnvironmentDoesNotRetainCallerIndex was renamed to TestFileFirstPreservesLiteralPathsWithAlternateDirectorySeparator to describe the actual fixture; the renamed focused test passed",
+    "Test wall time includes fixture setup and replay; it is not runtime planner latency"
+  ]
+}
