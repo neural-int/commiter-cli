@@ -134,14 +134,14 @@ func main() {
 			b.Schema = discoverySchema()
 			b.Messages[0].Content = discoverySystem + " The required JSON Schema is: " + string(b.Schema)
 			b.Messages[1].Content = string(user)
-			b.OutputTokens = 1024
+			b.OutputTokens = 768
 			var aa, bb map[string]json.RawMessage
 			json.Unmarshal([]byte(a.Messages[1].Content), &aa)
 			json.Unmarshal(user, &bb)
 			if !bytes.Equal(aa["files"], bb["files"]) {
 				panic("unequal evidence")
 			}
-			if len(b.Messages[0].Content)+len(user)+1024+512 > 16384 {
+			if len(b.Messages[0].Content)+len(user)+768+512 > 16384 {
 				panic("discovery preflight budget")
 			}
 			for arm, request := range map[string]mlx.Request{"baseline": a, "discovery": b} {

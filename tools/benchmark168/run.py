@@ -82,13 +82,13 @@ def main():
     if args.cohort == 'holdout' and not (DATA/'known-evaluation.json').is_file():
         raise ValueError('record known evaluation first; no prompt tuning permitted')
     manifest = json.loads((DATA/'frozen-inputs/manifest.json').read_text())
-    results = DATA / (args.cohort+'-measurements.jsonl')
+    results = DATA / (args.cohort+'-v2-measurements.jsonl')
     # Never replay cells after timeout/failure or on process restart.
     seen = set()
     if results.exists():
         seen = {(r['fixture'], r['order']) for r in map(json.loads, results.read_text().splitlines())}
     for row in manifest:
-        if row['cohort'] != args.cohort or 'admission_failure' in row or (row['fixture'],row['order']) in seen:
+        if row['cohort'] != args.cohort or 'admission_failure' in row or (args.cohort == 'known' and row.get('order') != 'normal') or (row['fixture'],row['order']) in seen:
             continue
         check_pins(pr, local)
         request_path = DATA/'frozen-inputs'/f"{row['fixture']}-{row['order']}-discovery.json"
@@ -113,7 +113,7 @@ def main():
         elapsed = time.monotonic()-started
         after = resources()
         rec = {**row, 'request_sha256': sha(request_path), 'calls': 1, 'wall_seconds': elapsed, 'resource_before': before, 'resource_after': after,
-               'git_unchanged': repo_digest(root)==row['repository_sha256'], 'response': None, 'schema_valid': False, 'status': stop,
+               'git_unchanged': repo_digest(root)==row['repository_sha256'], 'response': None, 'helper_stop_reason': None, 'helper_error_class': None, 'schema_valid': False, 'status': stop,
                'helper_peak_rss_bytes': None, 'input_tokens': None, 'output_tokens': None, 'load_seconds': None, 'ttft_seconds': None, 'mlx_peak_bytes': None}
         rss = re.search(rb'(?m)^\s*(\d+)\s+maximum resident set size\s*$',err)
         if rss:
@@ -121,10 +121,12 @@ def main():
         if stop is None and len(out) <= 4*1024*1024:
             try:
                 response = json.loads(out,object_pairs_hook=decode_unique)
+                rec['helper_stop_reason'] = response['stop_reason']
+                rec['helper_error_class'] = response.get('error_class')
                 rec['status'] = response['stop_reason']
                 for name, source in [('input_tokens','input_tokens'),('output_tokens','output_tokens'),('load_seconds','load_seconds'),('ttft_seconds','ttft_seconds'),('mlx_peak_bytes','peak_bytes')]:
                     rec[name] = response.get('benchmark_'+source)
-                if response.get('generation_profile') != 'bounded-grouping' or response.get('model') != pr['model']+'@'+pr['revision']:
+                if response.get('ok') and (response.get('generation_profile') != 'bounded-grouping' or response.get('model') != pr['model']+'@'+pr['revision']):
                     rec['status'] = 'protocol_mismatch'
                 elif response.get('ok') and rec['status'] == 'completed':
                     rec['response'] = validate_discovery(response['generated_json'])
