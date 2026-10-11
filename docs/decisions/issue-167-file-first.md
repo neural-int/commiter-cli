@@ -109,3 +109,22 @@ scope上限16、summary上限48を緩めない。生成文の切り詰めや架�
 Gate 2 は完成plan・資源・walltime条件を満たさない。明示CLI opt-in、実commit、partial failure、同一ファイルmixed-intent、new API dependency、弱い/ない根拠、実中間state・revert妥当性を含む独立holdoutは実行していない。これは到達不能による未評価であり、成功と記録しない。既存defaultの1〜4 Three-phase、5+拒否、local-only、validatorと確認・Git操作契約を維持する。production GOは出さない。
 
 主計測・診断・構造確認・source/環境の証拠は `docs/benchmarks/issue-167/` に保存する。現行制限を緩めたり、新たなmodel/decoder/stage・意味merge研究へ拡げたりしてGateを通すことは、この検証の成果に含めない。
+
+## 追加回帰診断 — #143成功と#167失敗の比較
+
+[追加の実行契約](https://github.com/neural-int/commiter-cli/issues/167#issuecomment-6104456189)に従い、過去のmetadata成功を現在の共有経路で確認した。#143の1file smokeのsource/入力とconfigを再取得し、LLM 0監査後に事前登録した4 cycle / 12 callだけを実行した。生成設定・モデル・decoder・validatorは変更していない。
+
+| cell | 入力 / 経路 | 有効完全plan | scope / summary最大文字数 | wall秒 |
+|---|---|---|---|---:|
+| A | #143 smoke / 製品CLI・製品helper | 成功、1 group | 9 / 38 | 43.969 |
+| B | 同じsmoke / #167計測・計測helper | 成功、1 group | 9 / 38 | 41.182 |
+| C | #167境界変更 / 製品CLI・製品helper | `invalid_schema` | 18 / 42 | 37.653 |
+| D | 同じ境界変更 / #167計測・計測helper | `invalid_schema` | 18 / 42 | 55.249 |
+
+全12 stageは `completed`、元index/worktree/refs/objectsのdigestは4/4保持。A/Bは最終 `planning.Validate()` を通過、C/Dはmetadata検査で停止して最終plan validatorへ未到達。C/Dはscope上限16文字に違反した。A/BとC/D、それぞれ実推論の全3 requestはbyte/hash一致した。Prepared documentはrelation context等で異なるが、今回の1file requestには影響しなかった。
+
+今回の対照では、既存・計測の両経路で成立する成功入力と、両経路で不成立となる境界入力を再現した。計測helperや新File-firstだけを原因とする根拠はないため、契約の条件分岐に従いPhase Cの追加推論を省略した。`bounded-text`はnative0でgrammarなし、schemaのmaxLengthはpromptと事後検査だけなので、長さ違反が生成されることと過去の制限内生成は両立する。scope超過は今回の拒否に十分な不適合であり、入力のどの個別要素が出力を変えたかという因果効果は未特定。
+
+当時のhelper binary hash/全requestログ/共存負荷は回収できず、歴史的な全環境の完全同一再現とは扱わない。各cell1回の既知合成入力であり、成功率・速度の一般的比較・最終summaryの意味精度・16group成立の証明ではない。主計測33停止すべての原因も遡及確定しない。Aのswap前後差は+3,030 MiB、Cは+571.56 MiBだったが、共存負荷下の差をモデル単独の原因とは断定しない。有効metadataだけでresource gateを通過扱いにしない。
+
+数値/hashの成果物と事前登録は `docs/benchmarks/issue-167/regression/` に保存する。Gate 2未達、Phase 3 gated-out、production NO-GOを維持する。この追加診断では製品の実装や生成条件を変更せず、既存規約に適合する入力と失敗する入力の差を記録した。
