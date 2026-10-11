@@ -1,0 +1,25 @@
+{
+  "fixture": "H4",
+  "original_registered_cohort": "holdout",
+  "corrected_evaluation_cohort": "known-reused",
+  "same_before_after_all_files": true,
+  "prior_fixture": "#167 unused-common-dependency-independent",
+  "prior_calls": 4,
+  "prior_measurement_sha256": "406e65e86bf2dba07eda02201fd7d7faf3a20378b6b07cc5a9451e19cbc6aa92",
+  "reason": "登録時に新規値と記述したが、3fileのbefore/after/pathは#167と完全一致した。初回labelsと結果を改変せず、独立holdoutの根拠から除外し、当初登録集合のGateと未使用入力subsetを両方報告する。新しい推論や置換fixtureは追加しない。",
+  "independent_primary_reached": [
+    "H1",
+    "H2",
+    "H3",
+    "H5"
+  ],
+  "independent_primary_not_reached": [
+    "H6"
+  ],
+  "other_author_fixture_count": 0,
+  "prior_decisions": {
+    "#152": "追加evidenceでFM/FS回帰を繰り返したため、今回はhistory/evidence追加を行わない",
+    "#162": "同symbol/import/callだけをmust-linkとしない。機械的完全性と意味品質を分ける",
+    "#166": "schema-order/方向field変更だけでは分類失敗を救済しなかった。今回はschema調整loopを行わない"
+  }
+}

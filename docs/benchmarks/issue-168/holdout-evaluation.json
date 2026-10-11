@@ -1,0 +1,287 @@
+{
+  "method": "offline agent-authored evidence/gold binding under fixed rubric; no additional generation/verification calls; independent human rating not performed",
+  "cells": [
+    {
+      "fixture": "H1",
+      "order": "normal",
+      "actual_cohort": "independent-holdout",
+      "purposes": [
+        {
+          "description": "Implements the PauseMillis function, which accepts an integer parameter n and executes a pause operation.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            2
+          ],
+          "grounded": false,
+          "hallucination": true,
+          "reason": "PauseMillisを実行停止と説明している場合は、fixtureの純粋な整数計算と不一致。DisplayWidthも変更内容（+2）を述べず、いずれもinteger型の根拠はモデル入力に存在しない。関数名から現行役割を推測した説明で、pause/widthの変更目的を取り出していない。"
+        },
+        {
+          "description": "Implements the DisplayWidth function, which accepts an integer parameter n and calculates/returns a display width value.",
+          "purpose_id": "P002",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": false,
+          "hallucination": true,
+          "reason": "PauseMillisを実行停止と説明している場合は、fixtureの純粋な整数計算と不一致。DisplayWidthも変更内容（+2）を述べず、いずれもinteger型の根拠はモデル入力に存在しない。関数名から現行役割を推測した説明で、pause/widthの変更目的を取り出していない。"
+        }
+      ],
+      "identifiability": "変更対象は見えるが計算差分/値が観測不能"
+    },
+    {
+      "fixture": "H1",
+      "order": "reverse",
+      "actual_cohort": "independent-holdout",
+      "purposes": [
+        {
+          "description": "Defines the DisplayWidth function, which calculates a display width based on an integer input n.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": false,
+          "hallucination": true,
+          "reason": "PauseMillisを実行停止と説明している場合は、fixtureの純粋な整数計算と不一致。DisplayWidthも変更内容（+2）を述べず、いずれもinteger型の根拠はモデル入力に存在しない。関数名から現行役割を推測した説明で、pause/widthの変更目的を取り出していない。"
+        },
+        {
+          "description": "Defines the PauseMillis function, which pauses execution for a duration specified by integer input n milliseconds.",
+          "purpose_id": "P002",
+          "semantic_gold": [],
+          "target_gold": [
+            2
+          ],
+          "grounded": false,
+          "hallucination": true,
+          "reason": "PauseMillisを実行停止と説明している場合は、fixtureの純粋な整数計算と不一致。DisplayWidthも変更内容（+2）を述べず、いずれもinteger型の根拠はモデル入力に存在しない。関数名から現行役割を推測した説明で、pause/widthの変更目的を取り出していない。"
+        }
+      ],
+      "identifiability": "変更対象は見えるが計算差分/値が観測不能"
+    },
+    {
+      "fixture": "H2",
+      "order": "normal",
+      "actual_cohort": "independent-holdout",
+      "purposes": [
+        {
+          "description": "Defines the accepted wire protocol version used by the consumer, specified by the constant AcceptedWireVersion.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "WireVersion/AcceptedWireVersionの宣言対象は入力のkind/name/pathから支持されるが、バージョンを一緒に3→4へ進める変更目的を述べていない。同じgoldのproducer/consumerを別purposeへ分けた。値は入力から観測不能。"
+        },
+        {
+          "description": "Defines the current wire protocol version used by the producer, specified by the constant WireVersion.",
+          "purpose_id": "P002",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "WireVersion/AcceptedWireVersionの宣言対象は入力のkind/name/pathから支持されるが、バージョンを一緒に3→4へ進める変更目的を述べていない。同じgoldのproducer/consumerを別purposeへ分けた。値は入力から観測不能。"
+        }
+      ],
+      "identifiability": "変更対象は見えるが計算差分/値が観測不能"
+    },
+    {
+      "fixture": "H2",
+      "order": "reverse",
+      "actual_cohort": "independent-holdout",
+      "purposes": [
+        {
+          "description": "Defines the `WireVersion` constant in the producer component.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "WireVersion/AcceptedWireVersionの宣言対象は入力のkind/name/pathから支持されるが、バージョンを一緒に3→4へ進める変更目的を述べていない。同じgoldのproducer/consumerを別purposeへ分けた。値は入力から観測不能。"
+        },
+        {
+          "description": "Defines the `AcceptedWireVersion` constant in the consumer component.",
+          "purpose_id": "P002",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "WireVersion/AcceptedWireVersionの宣言対象は入力のkind/name/pathから支持されるが、バージョンを一緒に3→4へ進める変更目的を述べていない。同じgoldのproducer/consumerを別purposeへ分けた。値は入力から観測不能。"
+        }
+      ],
+      "identifiability": "変更対象は見えるが計算差分/値が観測不能"
+    },
+    {
+      "fixture": "H3",
+      "order": "normal",
+      "actual_cohort": "independent-holdout",
+      "purposes": [
+        {
+          "description": "Defines or modifies the `Width` function, which accepts a parameter `n` and returns a value based on its internal logic.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Width/Delayとparameter n、return構文が入力に存在し一般的な説明は支持される。ただしreturns a value based on its internal logicはどのような変更かを示さず、Width+2/Delay×3をcoverageへ数えない。2目的の対象列挙は成功しても具体的な変更目的発見は未達。"
+        },
+        {
+          "description": "Defines or modifies the `Delay` function, which accepts a parameter `n` and returns a value based on its internal logic.",
+          "purpose_id": "P002",
+          "semantic_gold": [],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Width/Delayとparameter n、return構文が入力に存在し一般的な説明は支持される。ただしreturns a value based on its internal logicはどのような変更かを示さず、Width+2/Delay×3をcoverageへ数えない。2目的の対象列挙は成功しても具体的な変更目的発見は未達。"
+        }
+      ],
+      "identifiability": "変更対象は見えるが計算差分/値が観測不能"
+    },
+    {
+      "fixture": "H3",
+      "order": "reverse",
+      "actual_cohort": "independent-holdout",
+      "purposes": [
+        {
+          "description": "Defines or modifies the `Width` function, which accepts a parameter `n` and returns a value based on its internal logic.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Width/Delayとparameter n、return構文が入力に存在し一般的な説明は支持される。ただしreturns a value based on its internal logicはどのような変更かを示さず、Width+2/Delay×3をcoverageへ数えない。2目的の対象列挙は成功しても具体的な変更目的発見は未達。"
+        },
+        {
+          "description": "Defines or modifies the `Delay` function, which accepts a parameter `n` and returns a value based on its internal logic.",
+          "purpose_id": "P002",
+          "semantic_gold": [],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Width/Delayとparameter n、return構文が入力に存在し一般的な説明は支持される。ただしreturns a value based on its internal logicはどのような変更かを示さず、Width+2/Delay×3をcoverageへ数えない。2目的の対象列挙は成功しても具体的な変更目的発見は未達。"
+        }
+      ],
+      "identifiability": "変更対象は見えるが計算差分/値が観測不能"
+    },
+    {
+      "fixture": "H4",
+      "order": "normal",
+      "actual_cohort": "known-reused",
+      "purposes": [
+        {
+          "description": "Defines a constant `BatchLimit` specifying the maximum size for a batch operation.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "H4は既存#167評価済み入力の再利用で独立holdoutから除く。BatchLimitとBackoffの名前/宣言対象は支持されるが具体的な増分変更を記述しない。通常順のcurrent attempt countというnの意味は入力に根拠がない。変更/導入/署名の曖昧な選言もcoverageとして採用しない。"
+        },
+        {
+          "description": "Implements the `Backoff` function to calculate the next retry delay based on the current attempt count.",
+          "purpose_id": "P002",
+          "semantic_gold": [],
+          "target_gold": [
+            2
+          ],
+          "grounded": false,
+          "hallucination": true,
+          "reason": "H4は既存#167評価済み入力の再利用で独立holdoutから除く。BatchLimitとBackoffの名前/宣言対象は支持されるが具体的な増分変更を記述しない。通常順のcurrent attempt countというnの意味は入力に根拠がない。変更/導入/署名の曖昧な選言もcoverageとして採用しない。"
+        }
+      ],
+      "identifiability": "変更対象は見えるが計算差分/値が観測不能"
+    },
+    {
+      "fixture": "H4",
+      "order": "reverse",
+      "actual_cohort": "known-reused",
+      "purposes": [
+        {
+          "description": "Modifies the implementation or signature of the Backoff function.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "H4は既存#167評価済み入力の再利用で独立holdoutから除く。BatchLimitとBackoffの名前/宣言対象は支持されるが具体的な増分変更を記述しない。通常順のcurrent attempt countというnの意味は入力に根拠がない。変更/導入/署名の曖昧な選言もcoverageとして採用しない。"
+        },
+        {
+          "description": "Introduces or changes the constant BatchLimit used for batch operations.",
+          "purpose_id": "P002",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "H4は既存#167評価済み入力の再利用で独立holdoutから除く。BatchLimitとBackoffの名前/宣言対象は支持されるが具体的な増分変更を記述しない。通常順のcurrent attempt countというnの意味は入力に根拠がない。変更/導入/署名の曖昧な選言もcoverageとして採用しない。"
+        }
+      ],
+      "identifiability": "変更対象は見えるが計算差分/値が観測不能"
+    },
+    {
+      "fixture": "H5",
+      "order": "normal",
+      "actual_cohort": "independent-holdout",
+      "purposes": [
+        {
+          "description": "The PR policy body is normalized by replacing CRLF and CR line endings with LF before applying line-anchored markdown checks, ensuring consistent processing across different operating system inputs.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "入力のYAML raw_diffにbody.replace(\"\\r\\n\",\"\\n\").replace(\"\\r\",\"\\n\")とline-anchored markdown checks前の正規化コメントがあり、CRLF/CR→LFと適用時点を説明している。test名のCRLFも同じ目的と整合し、この入力では具体的目的と説明の根拠が支持される。"
+        }
+      ],
+      "identifiability": "raw_diffで主要変更を観測可能"
+    },
+    {
+      "fixture": "H5",
+      "order": "reverse",
+      "actual_cohort": "independent-holdout",
+      "purposes": [
+        {
+          "description": "Normalizes carriage returns and line feeds in the input body variable to ensure correct processing by line-anchored markdown checks.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "入力のYAML raw_diffにbody.replace(\"\\r\\n\",\"\\n\").replace(\"\\r\",\"\\n\")とline-anchored markdown checks前の正規化コメントがあり、CRLF/CR→LFと適用時点を説明している。test名のCRLFも同じ目的と整合し、この入力では具体的目的と説明の根拠が支持される。"
+        }
+      ],
+      "identifiability": "raw_diffで主要変更を観測可能"
+    }
+  ]
+}

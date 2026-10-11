@@ -1,0 +1,63 @@
+{
+  "method": "offline agent-authored evidence/gold binding under fixed rubric; no additional generation/verification calls; independent human rating not performed",
+  "cells": [
+    {
+      "fixture": "K1",
+      "order": "normal",
+      "purposes": [
+        {
+          "description": "Implements the logic for calculating the encoded size using the function EncodeSize.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": false,
+          "hallucination": false,
+          "reason": "対象EncodeSizeは入力にあるが、encoded sizeをどう変更したかを記述しない。元値・n+4・加算幅は入力から観測不能。名称由来の一般的な機能説明であり具体的な変更目的のcoverageに数えない。"
+        },
+        {
+          "description": "Implements the logic for determining the retry delay using the function RetryDelay.",
+          "purpose_id": "P002",
+          "semantic_gold": [],
+          "target_gold": [
+            2
+          ],
+          "grounded": false,
+          "hallucination": false,
+          "reason": "RetryDelayの宣言名は入力にあるが、delayの変更内容（2倍）を記述しない。名称由来の一般的な処理説明であり入力にも変更値が存在しない。"
+        }
+      ],
+      "identifiability": "具体的な計算差分は保持されたモデル入力から観測不能"
+    },
+    {
+      "fixture": "K2",
+      "order": "normal",
+      "purposes": [
+        {
+          "description": "Implements the RoundCents function, which takes an integer input and returns a rounded integer value.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": false,
+          "hallucination": true,
+          "reason": "RoundCentsの名前は入力にあるが、整数型・丸め計算の内容はEvidenceのkind/nameから確定できない。100単位の丸め変更と境界の期待値1→2を記述しない。"
+        },
+        {
+          "description": "Adds a unit test function, TestRoundCents, to verify the correct behavior of the RoundCents function.",
+          "purpose_id": "P002",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": false,
+          "hallucination": true,
+          "reason": "入力からTestRoundCentsの存在は分かるが新規追加とは分からない。fixtureでは既存テストのassertion変更でありadds a unit testは不一致。実装とテストを同じgold目的に対して二つへ分けている。"
+        }
+      ],
+      "identifiability": "具体的な計算差分は保持されたモデル入力から観測不能"
+    }
+  ]
+}
