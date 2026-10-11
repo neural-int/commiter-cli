@@ -55,3 +55,9 @@ Gate 1のcoverage90%・exact80%・grounded95%・oversplit0・hallucination0・�
 - 本結果と8達成条件の照合をIssueに保存し、チェックの意味を「検証/停止判断の記録完了」と明記する。未評価Phaseを実施済みとして扱わないため。
 - Verificationの達成後にrepositoryのtest/vet/build、release notes、研究用回帰テストとdiff整合を実行・記録する。意味NO-GOとソフトウェア品質を別に確認するため。
 - 成果物を専用branchへcommit/pushし、今回の研究を終了する。入力意味を増やす別研究やproduction接続は本Issueのscopeへ追加しないため。
+
+## 最終品質確認
+
+Issueの8条件と未評価Phaseを照合した後に実行。Go全体test（`-p 1 -count=1`）は21package PASS、4packageはテストなし/skip、failure0。`go vet ./...`、`go build ./...`、release notes25tests、研究3回帰tests、`git diff --check`は全てexit0。新規3回帰はJSON所有権/未知ID、元Git状態receipt、実際に失敗したhelper出力予算への適合を対象にしており、意味成功を証明するテストではない。製品機能/既存テストの削除・変更がないため不要テストの整理対象なし。詳細は`final-quality.json`。remote CIは未実施であり、ローカル品質成功と区別する。
+
+研究の8達成条件と品質確認を完了した。Gate 1 NO-GO・Phase 2/3未評価・production未承認を保持して終了する。
