@@ -26,6 +26,7 @@ type callMetric struct {
 	Peak        *int64          `json:"mlx_peak_bytes"`
 	RSS         *int64          `json:"helper_peak_rss_bytes"`
 	Text        *textDiagnostic `json:"text_diagnostic,omitempty"`
+	Request     *requestAudit   `json:"request_audit,omitempty"`
 }
 
 type measuredBackend struct {
@@ -70,6 +71,9 @@ func (b *measuredBackend) ChatWithOptions(ctx context.Context, messages []llm.Me
 		return llm.Response{}, errors.New("measurement request limit")
 	}
 	metric := callMetric{Profile: options.GenerationProfile, Stop: "process_failure"}
+	if b.Diagnose {
+		metric.Request = auditRequest(request, messages, schema)
+	}
 	started := time.Now()
 	defer func() { metric.WallSeconds = time.Since(started).Seconds(); b.Calls = append(b.Calls, metric) }()
 	cmd := exec.CommandContext(ctx, "/usr/bin/time", "-l", b.Helper)

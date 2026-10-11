@@ -354,12 +354,20 @@ func main() {
 	filter := flag.String("fixture", "", "one preregistered fixture, default all")
 	diagnostic := flag.Bool("diagnostic", false, "one repetition with numeric failure diagnostics for one fixed fixture")
 	structures := flag.Bool("structure-only", false, "verify fixed fixture receipts and static singleton references without a model")
+	regression := flag.Bool("regression-control", false, "one Three-phase cycle for a specified #143/#167 regression fixture")
 	flag.Parse()
 	if *diagnostic && *filter == "" {
 		fmt.Fprintln(os.Stderr, "diagnostic requires one explicit preregistered fixture")
 		os.Exit(2)
 	}
 	selected := fixtures()
+	if *regression {
+		if !*diagnostic || *filter == "" {
+			fmt.Fprintln(os.Stderr, "regression requires diagnostic and one explicit fixture")
+			os.Exit(2)
+		}
+		selected = regressionFixtures()
+	}
 	if *structures {
 		if err := runStructures(selected, *filter); err != nil {
 			fmt.Fprintln(os.Stderr, "structural observation failed")
@@ -421,11 +429,17 @@ func main() {
 					routes[0], routes[1] = routes[1], routes[0]
 				}
 			}
+			if *regression {
+				routes = []string{"three-phase"}
+			}
 			for _, route := range routes {
 				m := run(f, root, snapshot, p, route, repeat, bytes, lines, b)
 				m.Diagnostic = *diagnostic
 				if *diagnostic {
 					m.Condition = "diagnostic-after-main-matrix"
+				}
+				if *regression {
+					m.Condition = "regression-control-single-cycle"
 				}
 				if e = encoder.Encode(m); e != nil {
 					panic(e)
