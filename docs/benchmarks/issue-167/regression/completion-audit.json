@@ -1,0 +1,38 @@
+{
+  "objective_comment": "https://github.com/neural-int/commiter-cli/issues/167#issuecomment-6104456189",
+  "checks": {
+    "all_preregistered_sources_unchanged": true,
+    "all_result_artifact_hashes_match": true,
+    "required_4_cells_12_calls_no_extra": true,
+    "actual_positive_control_valid_on_both_routes": true,
+    "negative_control_both_scope_violation": true,
+    "actual_complete_requests_equal": true,
+    "all_git_states_preserved": true,
+    "conditional_phase_c_skip_recorded": true,
+    "no_production_generator_helper_validator_change": true,
+    "original_main_and_diagnostic_results_unchanged": true,
+    "gate_2_and_phase_3_and_production_disposition_preserved": true,
+    "all_17_issue_verification_conditions_checked": true,
+    "final_repository_quality_passed": true,
+    "test_scope_reviewed": true
+  },
+  "mapping": {
+    "step_1_positive_control": "phase-a.json source_blob_checks and A/B receipts; historical binary/load/request absence explicitly retained",
+    "step_2_static_diff": "phase-a.json static entries, LLM 0, all three requests equal for both inputs, Prepared hashes differ",
+    "step_3_minimum_inference": "preregistration.md, A-D calls/receipts, phase-b-summary.json: 4 cycles/12 calls",
+    "step_4_no_unproven_implementation": "production generator/helper/validator unchanged; no truncation/retry/repair/new stages",
+    "step_5_resume_and_termination": "A/B valid full plans + Git state; C/D rejected; Gate 2 / Phase 3 / production unchanged",
+    "phase_c_branch": "phase-b-summary.json phase_c skipped for A/B success, C/D failure; exact requests match",
+    "goal_quality": "final-quality.json: all configured repository checks passed; no obsolete or trivial assertion tests added"
+  },
+  "causal_limitations": [
+    "individual input factor not identified",
+    "n=1 per cell; no success-rate or latency causal effect",
+    "historical complete binary/load environment not recovered",
+    "not all 33 previous failures explained",
+    "successful metadata does not establish swap/resource gate"
+  ],
+  "source_validated_commit": "f0d05436ac028cd12462c3fe0b095119bb17d90b",
+  "final_quality_sha256": "b1bc8a9ccb6b7d19ee28caeaf01e4b977546e3b46304040d9a9e08c44b1e3a46",
+  "diagnostic_goal_disposition": "complete; Gate 2 and production remain NO-GO"
+}

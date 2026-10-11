@@ -1,0 +1,49 @@
+{
+  "recorded_at": "2026-10-11T03:23:11.224481+00:00",
+  "validated_source_commit": "f0d05436ac028cd12462c3fe0b095119bb17d90b",
+  "go_version": "go version go1.27.1 darwin/arm64",
+  "commands": [
+    {
+      "command": "go test ./... -count=1 -json",
+      "exit_code": 0,
+      "packages_passed": 22,
+      "packages_without_tests": 3,
+      "failed_events": 0
+    },
+    {
+      "command": "go vet ./...",
+      "exit_code": 0
+    },
+    {
+      "command": "go build ./...",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 -m unittest discover -s .github/scripts/release-notes -p 'test_*.py'",
+      "exit_code": 0,
+      "tests": 25
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "test_review": {
+    "feature_removed": false,
+    "obsolete_cases_from_feature_removal": 0,
+    "research_entry_requires_explicit_env": true,
+    "real_positive_control_verified_separately": true,
+    "no_mock_pass_used_as_model_positive_control": true,
+    "additional_unnecessary_assertion_tests": 0
+  },
+  "local_quality_only": true,
+  "remote_ci": "not run; no PR created",
+  "production_go": false,
+  "log_sha256": {
+    "commiter-167-regression-final-test.jsonl": "6a0508f03e9b47f808dbe5aa9b1013ddae1763d07c427b261ee4ef5e4b351357",
+    "commiter-167-regression-final-test.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "commiter-167-regression-final-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "commiter-167-regression-final-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "commiter-167-regression-final-release.log": "168461f2a404386f6e7560fbbb21ea61dac019de339fe5a1763f3bb7a42939a6"
+  }
+}
