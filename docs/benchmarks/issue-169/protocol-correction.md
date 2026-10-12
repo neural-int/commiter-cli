@@ -1,0 +1,5 @@
+# 生成前の事前登録自己参照の修正
+
+最初のknown runner起動時、check_pinsがpreregistration.jsonの古いhashを検出して停止した。登録用ローカルscriptの2回目実行が、前回のpreregistration.jsonをpin集合へ含めた後に同ファイルを書き換えたことが原因。attempt journal作成・helper起動・モデル生成は0回。全pinを実ファイルに照合し、差は自己参照の1件だけと確認した。
+
+v1はpreregistration-v1.jsonへ保存した。v2は自己参照pinだけを除き、v1とこの説明を新たにpinする。request/schema、model/helper、fixture/gold、rubric、Gate、最大51生成、retry0、sourceのhashはすべて保持する。登録内容はGit commitと生成前Issueコメントへ保存して監査可能にする。runnerは正しくfail closedしたため変更しない。

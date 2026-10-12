@@ -41,7 +41,6 @@
     "docs/benchmarks/issue-169/input-schema-B.json": "6386d5a5c65c21366ce932727003be02c088fb240e41d13875e67223da6af727",
     "docs/benchmarks/issue-169/source-mapping.json": "c18ee0f7733b315ff822e3d835275112d4f02413ccfe2d05c5633721b624e770",
     "docs/benchmarks/issue-169/tokenization-preflight.jsonl": "9f45a8530d688c05ead6d59bffc70b5fa1a2cc3ae585fb78e358d2396ea268fd",
-    "docs/benchmarks/issue-169/preregistration.json": "eb501debf0551e75f2a789b556f75a6f26f37020e43a5282d960d388e20179dd",
     "docs/benchmarks/issue-169/input-schema-A.json": "4d775b8431db889289684953beb5b881d1311a00a0b8607ab14f09fbd370eab8",
     "docs/benchmarks/issue-169/input-audit.json": "7fea92e1ac2d25ebf869413f8f1a5c28707c32bc831eca48671d84fb6cb25e01",
     "docs/benchmarks/issue-169/frozen-inputs/H01-normal-B-grouping.json": "31db392480d51152c5fd182220ca46a2ca78bbdd915b76464fc7bc478a10bce2",
@@ -130,7 +129,9 @@
     "runtime:tokenizer": "cc8d3a0ce36466ccc1278bf987df5f71db1719b9ca6b4118264f45cb627bfe0f",
     "runtime:tokenizer_config": "080d9e1aff284e2f6043889cd05367966f7c7b80e025fbc0b06745e218158656",
     "runtime:measured_helper_source": "18bc2affba8f687be47ef6a7cecde6b4eb9d85ccf94ea3321527df9a671b35d7",
-    "runtime:preflight_helper_source": "ee4d228a0c1dbcc35a6a0554525ef36a95aab59457d2067957d0d3423d032299"
+    "runtime:preflight_helper_source": "ee4d228a0c1dbcc35a6a0554525ef36a95aab59457d2067957d0d3423d032299",
+    "docs/benchmarks/issue-169/preregistration-v1.json": "7050ad6f677bd0fc9ff0832ffff276de86cebf29cba640637096085d17a1b551",
+    "docs/benchmarks/issue-169/protocol-correction.md": "06ca44b2250857d8faebe16ca14e7e1f6b9664fd44ec1aaddd742621976b3bd7"
   },
   "context_contract": {
     "supported_language": "Go only for this bounded study; other language omits context with reason",
@@ -169,5 +170,8 @@
     "evaluation": "Offline agent annotations only, no extra model inference and no independent-human rating",
     "orders": "two correlated observations, not two independent fixtures"
   },
-  "limit": "four new synthetic holdout fixtures, seven gold purposes, no separate-author real repository holdout; no inference for S16; no 16-file 80% claim"
+  "limit": "four new synthetic holdout fixtures, seven gold purposes, no separate-author real repository holdout; no inference for S16; no 16-file 80% claim",
+  "protocol_revision": 2,
+  "recorded_v2_before_generation_utc": "2026-10-12T13:52:26.654325+00:00",
+  "protocol_correction": "Remove impossible self hash pin only; preserve v1 and every request/model/source/gold/Gate; attempts and generation zero"
 }
