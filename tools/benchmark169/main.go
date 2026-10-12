@@ -158,7 +158,9 @@ func main() {
 			c = append(c, '}')
 			arms["C"] = append(arms["C"], c)
 		}
-		sourceMaps[f.Name] = map[string]any{"files": mapping, "context_extraction": logs, "snapshot": snapshot, "prepared": p.Document}
+		publicSnapshot := snapshot
+		publicSnapshot.Root = "<local-fixture:" + f.Name + ">"
+		sourceMaps[f.Name] = map[string]any{"files": mapping, "context_extraction": logs, "snapshot": publicSnapshot, "prepared": p.Document}
 		for oi, order := range []string{"normal", "reverse"} {
 			for ai := 0; ai < 3; ai++ {
 				arm := []string{"A", "B", "C"}[(ai+fi+oi)%3]
