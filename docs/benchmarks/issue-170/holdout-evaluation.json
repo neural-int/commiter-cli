@@ -1,0 +1,920 @@
+{
+  "evaluation": "offline same-agent frozen-source/gold binding, no additional model calls; four new synthetic fixtures and two paired orders",
+  "cells": [
+    {
+      "fixture": "N01",
+      "arm": "B",
+      "order": "normal",
+      "request_sha256": "958312e21ef2018deabc8a6a29a8d4cf4e7cdf54c9f551e51d21ea5a122f78f4",
+      "purposes": [
+        {
+          "description": "Update the search package limit function to cap the result at a maximum of N, where N is now defined as the new cap.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Limitのcap変更をNというplaceholderで述べるだけで100→64を説明しない。UIと同じpage-size goldを分離"
+        },
+        {
+          "description": "Update the UI package to use a new default page size of N.",
+          "purpose_id": "P002",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "DefaultPageSizeの新値をNとだけ述べ、64を説明しない。同じpage-size goldを重複列挙"
+        }
+      ]
+    },
+    {
+      "fixture": "N01",
+      "arm": "C",
+      "order": "normal",
+      "request_sha256": "159d7e32d8db8bc80fca6996d77357517ce5735533bddb1f114ca425f42a55f5",
+      "purposes": [
+        {
+          "description": "Update the Limit function to cap the input at a maximum of n > n, returning n.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": false,
+          "hallucination": true,
+          "reason": "Limitの条件をn>nと説明するが、実入力はn>64であり同じ変数同士の比較ではない。具体的cap64もない"
+        },
+        {
+          "description": "Update the test case for Limit to expect the new capped value of n.",
+          "purpose_id": "P002",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Limit testの期待値変更をnとだけ述べ、120の期待値100→64を説明しない"
+        },
+        {
+          "description": "Change the DefaultPageSize function to return a value of n.",
+          "purpose_id": "P003",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "DefaultPageSizeの新値をnとだけ述べ、64を説明しない。同じpage-size goldを重複列挙"
+        }
+      ]
+    },
+    {
+      "fixture": "N01",
+      "arm": "A",
+      "order": "normal",
+      "request_sha256": "cc7f89f847e6e5ea51a89d1f8a90ecea76ea12670728681739fabd3510062792",
+      "purposes": [
+        {
+          "description": "The `search.Limit` function now caps the input value at a maximum of N=64, instead of the previous maximum of N=100.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "search.Limitのcap100→64というpage-size契約の具体的変更を単一purposeで説明している"
+        }
+      ]
+    },
+    {
+      "fixture": "N01",
+      "arm": "C",
+      "order": "reverse",
+      "request_sha256": "c468e1abe43a298a9508ca4a2b55ad949f64f5ffe13057979c080901457f9986",
+      "purposes": [
+        {
+          "description": "Update the default page size from returning the value of the old limit (100) to a new value of (64).",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "DefaultPageSizeの100→64というpage-size契約の具体的変更を単一purposeで説明している。normal順の三分割とは異なる"
+        }
+      ]
+    },
+    {
+      "fixture": "N01",
+      "arm": "A",
+      "order": "reverse",
+      "request_sha256": "f6f070f1818f8947232eaca3eafb1d4f4d8203227760392ab768824f2c33d421",
+      "purposes": [
+        {
+          "description": "Updates the default page size returned by ui.DefaultPageSize() from the previous value of pagesize to pagesize of pagesize.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "DefaultPageSizeの旧新値をpagesize placeholderで述べるだけで100→64を説明しない"
+        },
+        {
+          "description": "Modifies search.Limit(n) to cap the input value at the new maximum limit of pagesize.",
+          "purpose_id": "P002",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Limitの新capをpagesizeとだけ述べ、64を説明しない。同じgold1を分離"
+        },
+        {
+          "description": "Updates the test case TestLimit to assert that the search limit caps the input at the new maximum limit.",
+          "purpose_id": "P003",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "TestLimitが新capをassertするとだけ述べ、64を説明しない。同じgold1を重複列挙"
+        }
+      ]
+    },
+    {
+      "fixture": "N01",
+      "arm": "B",
+      "order": "reverse",
+      "request_sha256": "8c98c5db4b3e2909b937e958a3876b43a840089745dff5937d7337ffda192248",
+      "purposes": [
+        {
+          "description": "Update the default page size returned by the UI package from a value of {100} to {64}.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "UI DefaultPageSizeの100→64を具体的に説明。同じpage-size契約を実装から分離"
+        },
+        {
+          "description": "Update the search package's Limit function to cap input values at {64} instead of {100}.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Limit capの100→64を具体的に説明。同じgold1を重複列挙"
+        },
+        {
+          "description": "Update the search package's unit tests to verify the new limit behavior of {64}.",
+          "purpose_id": "P003",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "search testがcap64を検証する具体的変更。同じgold1を重複列挙"
+        }
+      ]
+    },
+    {
+      "fixture": "N02",
+      "arm": "C",
+      "order": "normal",
+      "request_sha256": "b279f8206775a12e8041bd3f1341ea9beade84a6c41e4f32539cf135ea9ae8a9",
+      "purposes": [
+        {
+          "description": "Update the receiver's payload structure to accept 'userId' instead of 'user_id' during JSON decoding.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "receiver.Payload.UserIDのJSON key user_id→userIdを具体的に説明。同じwire契約をproducerから分離"
+        },
+        {
+          "description": "Update the sender's payload structure to encode 'userId' instead of 'user_id'.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "sender.Payload.UserIDのJSON key user_id→userIdを具体的に説明。同じgold1を重複列挙"
+        },
+        {
+          "description": "Update the receiver's test case to use the new expected input format 'userId'.",
+          "purpose_id": "P003",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "receiverのDecode test入力をuserIdへ変える具体的変更。同じgold1を重複列挙"
+        }
+      ]
+    },
+    {
+      "fixture": "N02",
+      "arm": "A",
+      "order": "normal",
+      "request_sha256": "48c82463c5ecf94733da45fada2bfe6940711e196697b1bb136c5ef350ad2cab",
+      "purposes": [
+        {
+          "description": "Updates the JSON tag for the UserID field from 'user_id' to 'userId' in the receiver package's Payload structure (receiver/payload.go).",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "receiver.Payload.UserIDのJSON key user_id→userIdを具体的に説明。同じwire契約をproducerから分離"
+        },
+        {
+          "description": "Updates the JSON tag for the UserID field from 'user_id' to 'userId' in the sender package's Payload structure (sender/payload.go).",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "sender.Payload.UserIDのJSON key user_id→userIdを具体的に説明。同じgold1を重複列挙"
+        },
+        {
+          "description": "Updates the test case input data in receiver/payload_test.go to use the new 'userId' field name, matching the change in receiver/payload.go.",
+          "purpose_id": "P003",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "receiverのDecode test入力をuserIdへ変える具体的変更。同じgold1を重複列挙"
+        }
+      ]
+    },
+    {
+      "fixture": "N02",
+      "arm": "B",
+      "order": "normal",
+      "request_sha256": "14177fa46d3c34dc68b30d778209b2dac90e062997c26a0606898b4bd51c49fb",
+      "purposes": [
+        {
+          "description": "Update the payload structure across sender and receiver to use 'userId' instead of 'user_id' for the UserID field during JSON encoding and decoding.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "sender/receiverのUserID JSON key user_id→userIdを同じencoding/decoding契約として一つに説明している"
+        }
+      ]
+    },
+    {
+      "fixture": "N02",
+      "arm": "A",
+      "order": "reverse",
+      "request_sha256": "85faa2e790a5931e102f0aaa279826431d05233c9a75c4123f588b502e4f1738",
+      "purposes": [
+        {
+          "description": "Updates the JSON serialization tag for the UserID field in the sender package's Payload struct, changing the serialized key from 'user_id' to 'userId'.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "sender.Payload.UserIDのJSON key user_id→userIdを具体的に説明。同じwire契約をconsumerから分離"
+        },
+        {
+          "description": "Updates the JSON serialization tag for the UserID field in the receiver package's Payload struct, changing the deserialized key from 'user_id' to 'userId'.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "receiver.Payload.UserIDのJSON key user_id→userIdを具体的に説明。同じgold1を重複列挙"
+        },
+        {
+          "description": "Updates the test case in receiver/payload_test.go to use the new JSON key 'userId' when testing the Decode function.",
+          "purpose_id": "P003",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "receiverのDecode test入力をuserIdへ変える具体的変更。同じgold1を重複列挙"
+        }
+      ]
+    },
+    {
+      "fixture": "N02",
+      "arm": "B",
+      "order": "reverse",
+      "request_sha256": "60e5c1cc2a4884419f59403dd1bd4c3c2d8d621c47bc45a19e0892e9bef97bee",
+      "purposes": [
+        {
+          "description": "Migrate JSON payload field name from 'user_id' to 'userId' in the sender package.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "sender.Payload.UserIDのJSON key user_id→userIdを具体的に説明。同じwire契約をconsumerから分離"
+        },
+        {
+          "description": "Migrate JSON payload field name from 'user_id' to 'userId' in the receiver package.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "receiver.Payload.UserIDのJSON key user_id→userIdを具体的に説明。同じgold1を重複列挙"
+        },
+        {
+          "description": "Update receiver payload test case to use the new 'userId' field name.",
+          "purpose_id": "P003",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "receiverのDecode test入力をuserIdへ変える具体的変更。同じgold1を重複列挙"
+        }
+      ]
+    },
+    {
+      "fixture": "N02",
+      "arm": "C",
+      "order": "reverse",
+      "request_sha256": "64ff03f213ca7695083871d93405f280d0e1a6f825d2b5e8599d28284d7d8131",
+      "purposes": [
+        {
+          "description": "Update the JSON serialization contract for the sender by changing the field tag from `user_id` to `userId`.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "sender.Payload.UserIDのJSON key user_id→userIdを具体的に説明。同じwire契約をconsumerから分離"
+        },
+        {
+          "description": "Update the JSON deserialization contract for the receiver by changing the field tag from `user_id` to `userId`.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "receiver.Payload.UserIDのJSON key user_id→userIdを具体的に説明。同じgold1を重複列挙"
+        },
+        {
+          "description": "Update the receiver's test case to use the new `userId` field name in the input JSON data.",
+          "purpose_id": "P003",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "receiverのDecode test入力をuserIdへ変える具体的変更。同じgold1を重複列挙"
+        }
+      ]
+    },
+    {
+      "fixture": "N03",
+      "arm": "A",
+      "order": "normal",
+      "request_sha256": "b7aaa8d8c4f59cc26aa7acbfa871df1619fc0bb667277914c46de5c734a68e18",
+      "purposes": [
+        {
+          "description": "The Slug function now replaces spaces with hyphens instead of underscores.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Slugのspace置換先underscore→hyphenを具体的に説明しtestを分離していない"
+        },
+        {
+          "description": "The Visible function now checks against the string 'hidden' to determine visibility instead of 'disabled'.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Visibleの除外文字列disabled→hiddenを具体的に説明しSlugと独立目的として分離している"
+        }
+      ]
+    },
+    {
+      "fixture": "N03",
+      "arm": "B",
+      "order": "normal",
+      "request_sha256": "9393b9f2fd3093e59f5ba892b447e10fa6d9d7130ea9bdc534f4d8e18105fa22",
+      "purposes": [
+        {
+          "description": "Update slug generation to replace spaces with hyphens instead of underscores.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Slugのspace置換先underscore→hyphenを具体的に説明しtestを分離していない"
+        },
+        {
+          "description": "Change the visibility check to consider the string 'hidden' instead of 'disabled'.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Visibleの除外文字列disabled→hiddenを具体的に説明しSlugと独立目的として分離している"
+        }
+      ]
+    },
+    {
+      "fixture": "N03",
+      "arm": "C",
+      "order": "normal",
+      "request_sha256": "c30da0f0e0c21eb3712ed54fdc13aa5f05106f5182f6f4334697df430d2be765",
+      "purposes": [
+        {
+          "description": "Update slug generation to replace spaces with hyphens instead of underscores.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Slugのspace置換先underscore→hyphenを具体的に説明"
+        },
+        {
+          "description": "Update the slug generation test case to expect hyphens instead of underscores.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "slug testの期待文字列underscore→hyphenを具体的に説明。同じgold1を実装から分離して重複列挙"
+        },
+        {
+          "description": "Change the string checked for visibility status from 'disabled' to 'hidden'.",
+          "purpose_id": "P003",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "visibility判定文字列disabled→hiddenを具体的に説明"
+        },
+        {
+          "description": "Update the visibility test case to check against 'hidden' instead of 'disabled'.",
+          "purpose_id": "P004",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "visibility testの入力disabled→hiddenを具体的に説明。同じgold2を実装から分離して重複列挙"
+        }
+      ]
+    },
+    {
+      "fixture": "N03",
+      "arm": "B",
+      "order": "reverse",
+      "request_sha256": "acdb8bd65df6c7b8c9a4d2f8ec293f8fb4c0a42900ca76253140974ec66422a5",
+      "purposes": [
+        {
+          "description": "Update the expected value for visibility from 'disabled' to 'hidden' in the implementation and corresponding test.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "visibilityの判定文字列とtest入力disabled→hiddenを一つの目的にまとめた具体的説明"
+        },
+        {
+          "description": "Update the slug generation logic to replace spaces with hyphens ('-') instead of underscores ('_') and update the test case accordingly.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Slugのspace置換先underscore→hyphenと対応testを一つの目的にまとめた具体的説明"
+        }
+      ]
+    },
+    {
+      "fixture": "N03",
+      "arm": "C",
+      "order": "reverse",
+      "request_sha256": "b1e4a628762b0f94b9d0e414db2f066428cb90eb297ae765e297fb1e3f4fea07",
+      "purposes": [
+        {
+          "description": "Update the Slug function to replace spaces with hyphens instead of underscores.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Slugのspace置換先underscore→hyphenを具体的に説明しtestを分離していない"
+        },
+        {
+          "description": "Update the Visible function and its corresponding test to check against the string value 'hidden' instead of 'disabled'.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Visibleの除外文字列disabled→hiddenを具体的に説明しSlugと独立目的として分離している"
+        }
+      ]
+    },
+    {
+      "fixture": "N03",
+      "arm": "A",
+      "order": "reverse",
+      "request_sha256": "5f2ef348d762d84eac5e6b4648ff4ccbf1316437bb1d4f335895bd77f58f4248",
+      "purposes": [
+        {
+          "description": "The `Visible` function now returns true if the normalized input string is not equal to 'hidden', instead of 'disabled'.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Visibleの判定文字列disabled→hiddenを具体的に説明"
+        },
+        {
+          "description": "The `Slug` function now replaces spaces with hyphens ('-') during slug generation, instead of underscores ('_').",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Slugのspace置換先underscore→hyphenを具体的に説明"
+        },
+        {
+          "description": "Update test case for `Visible` function to check the input ''hidden ''instead of ''disabled ', matching the implementation change.",
+          "purpose_id": "P003",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "visibility test入力disabled→hiddenを具体的に説明。同じgold2を実装から分離して重複列挙"
+        },
+        {
+          "description": "Update test case for `Slug` function to expect hyphenated output (e.g., 'two-words') instead of underscored output (e.g., 'two_words').",
+          "purpose_id": "P004",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Slug testの期待値two_words→two-wordsを具体的に説明。同じgold1を実装から分離して重複列挙"
+        }
+      ]
+    },
+    {
+      "fixture": "N04",
+      "arm": "B",
+      "order": "normal",
+      "request_sha256": "245241cc8c5a9731a057d8715478eb9cadddadfab4e58442c4fefc8f16abbd7b",
+      "purposes": [
+        {
+          "description": "Update the timeout setting from the old value of five to nine seconds.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "TimeoutSecondsの5→9秒を具体的に説明しtestを別purposeにしない"
+        },
+        {
+          "description": "Update the batch limit setting from the old value of twenty to twelve.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "BatchLimitの20→12を具体的に説明しtestを別purposeにしない"
+        }
+      ]
+    },
+    {
+      "fixture": "N04",
+      "arm": "C",
+      "order": "normal",
+      "request_sha256": "d0a760f24c4fc13fce46d260faa56607f31872c4b3326455a586e88407ef0278",
+      "purposes": [
+        {
+          "description": "Update the timeout duration from five to nine seconds and update the corresponding test case.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "TimeoutSecondsの5→9 secondsと対応testの変更を一つの独立目的として具体的に説明"
+        },
+        {
+          "description": "Update the batch limit from twenty to twelve and update the corresponding test case.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "BatchLimitの20→12と対応testの変更を一つの独立目的として具体的に説明"
+        }
+      ]
+    },
+    {
+      "fixture": "N04",
+      "arm": "A",
+      "order": "normal",
+      "request_sha256": "8aeb76f1fb252f40b83fa0876763381e5fe29dc644a0f4830f29ecc403c0a684",
+      "purposes": [
+        {
+          "description": "The timeout duration is changed from a default of five seconds to nine seconds. (Affects TimeoutSeconds())",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "TimeoutSecondsの5→9秒を具体的に説明しtestを別purposeにしない"
+        },
+        {
+          "description": "The batch processing limit is changed from a default of twenty items to twelve items. (Affects BatchLimit())",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "BatchLimitの20→12を具体的に説明しtestを別purposeにしない"
+        }
+      ]
+    },
+    {
+      "fixture": "N04",
+      "arm": "C",
+      "order": "reverse",
+      "request_sha256": "70fc35f1c73ede2dafb7dcd161ea0e9345babafbb3d7724b8a3d161c85fe6997",
+      "purposes": [
+        {
+          "description": "Update the timeout duration from seconds=5 to seconds=9 in `TimeoutSeconds()` and corresponding test case.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "TimeoutSecondsの5→9秒と対応testを同じ目的として具体的に説明"
+        },
+        {
+          "description": "Update the batch limit from pages=20 to pages=12 in `BatchLimit()` and corresponding test case.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": false,
+          "hallucination": true,
+          "reason": "BatchLimitの20→12という値の変更は正しいが、単位をpagesとする根拠は入力にない"
+        }
+      ]
+    },
+    {
+      "fixture": "N04",
+      "arm": "A",
+      "order": "reverse",
+      "request_sha256": "f92dc4475129a1b13bf9d1d9ab460139a52da2e80290b043a65272b411c92c34",
+      "purposes": [
+        {
+          "description": "The `TimeoutSeconds()` function now returns a value of nine, changing from the previous return value of five.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "TimeoutSecondsの戻り値5→9を具体的に説明しtestを別purposeにしない"
+        },
+        {
+          "description": "The `BatchLimit()` function now returns a value of twelve, changing from the previous return value of twenty.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "BatchLimitの戻り値20→12を具体的に説明しtestを別purposeにしない"
+        }
+      ]
+    },
+    {
+      "fixture": "N04",
+      "arm": "B",
+      "order": "reverse",
+      "request_sha256": "2fc331f1d7366aa30fd65280919010030d51174eddaff272d46ca6aa24ee34d9",
+      "purposes": [
+        {
+          "description": "Update the timeout duration from seconds to match the new implementation value.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "TimeoutSecondsの新値をnew implementation valueとだけ説明し、5→9秒の具体的変更を述べない"
+        },
+        {
+          "description": "Update the batch limit value from twenty to twelve.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "BatchLimitの20→12という具体的変更を説明しtestを別purposeにしない"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,455 @@
+{
+  "evaluation": "offline same-agent frozen-source/gold binding, no additional model calls; regression only",
+  "cells": [
+    {
+      "fixture": "H01",
+      "arm": "A",
+      "order": "normal",
+      "request_sha256": "d2e333ee9a7d6119449a557a49dfdb07d85a19bec0a2f58843b4ef509fa51fe5",
+      "purposes": [
+        {
+          "description": "The Interval function now clamps negative inputs to zero, returning zero instead of the absolute value of the input.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Intervalの負値について旧絶対値→0を具体的に説明している"
+        }
+      ]
+    },
+    {
+      "fixture": "H01",
+      "arm": "B",
+      "order": "normal",
+      "request_sha256": "a89cb114adff771a6cbf9b89ec23b75ad29d1a2f5241f1f44eade8037633d39b",
+      "purposes": [
+        {
+          "description": "Modify Interval function to return zero when given a negative input, instead of the absolute value.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Intervalの負値について旧絶対値→0を具体的に説明している"
+        }
+      ]
+    },
+    {
+      "fixture": "H01",
+      "arm": "C",
+      "order": "normal",
+      "request_sha256": "b041cf1d275b815df8cbc23578bcea389fbaf5004e742a1c47a8897f54c83b03",
+      "purposes": [
+        {
+          "description": "Modifies Interval function to return zero if the input is negative, instead of the absolute value of the input.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Intervalの負値について旧絶対値→0を具体的に説明している"
+        }
+      ]
+    },
+    {
+      "fixture": "H02",
+      "arm": "B",
+      "order": "normal",
+      "request_sha256": "79111377196ea727f8fd4d30696db753d2046da33ccb9ceac11b940aa518904c",
+      "purposes": [
+        {
+          "description": "Update the byte count calculation logic in `ByteCount` function.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "ByteCountのtargetはあるがuint64への変換を乗算前に移す具体的変更がない"
+        },
+        {
+          "description": "Change the default separator used by the `Join` function from '|' to ':' when concatenating parts.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Joinのseparator |→: を具体的に説明している"
+        }
+      ]
+    },
+    {
+      "fixture": "H02",
+      "arm": "C",
+      "order": "normal",
+      "request_sha256": "827dd5674712b98f6ed546183492502ebc5eb5d2e5312f60ec634f62f7b13d1e",
+      "purposes": [
+        {
+          "description": "Refactors the calculation expression in ByteCount(n uint32) to use multiplication after casting to uint64.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "ByteCountのuint64 cast後に乗算する具体的変更を説明している"
+        },
+        {
+          "description": "Changes the delimiter used by the Join function from '|' to ':' when joining parts.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Joinのseparator |→: を具体的に説明している"
+        }
+      ]
+    },
+    {
+      "fixture": "H02",
+      "arm": "A",
+      "order": "normal",
+      "request_sha256": "1ef4e757664e2b4abca4fe2fc350ab293626e354ead71ba1c147aeccbc25a760",
+      "purposes": [
+        {
+          "description": "The ByteCount function now calculates the total bytes by casting the input count `n` to `uint64` before multiplication by the factor of $4096$ (the size of a record/block).",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": false,
+          "hallucination": true,
+          "reason": "uint64 castを乗算前に移す事実は正しいが、4096をrecord/blockのsizeとする説明は入力に根拠がない。Joinの変更は列挙されていない"
+        }
+      ]
+    },
+    {
+      "fixture": "H03",
+      "arm": "C",
+      "order": "normal",
+      "request_sha256": "4c75e2d5e5cf615c026953623aeb2d711516e6f73df524c99b6f7de3a3d173e5",
+      "purposes": [
+        {
+          "description": "Update publisher.EventTime to return Unix timestamp in milliseconds instead of seconds.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "publisherのUnix秒→msというwire契約変更を具体的に説明している。同じ契約のconsumerを別purposeにしている"
+        },
+        {
+          "description": "Increase the retry exhaustion threshold from attempt count of >=2 to >=4.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Exhaustedの閾値>=2→>=4を具体的に説明している"
+        },
+        {
+          "description": "Update subscriber.EventTime to interpret the int64 input as milliseconds when creating a time.Time object.",
+          "purpose_id": "P003",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "subscriberのinputをmillisecondsとして解釈する具体的変更。同じwire契約をpublisherから分離して重複列挙している"
+        }
+      ]
+    },
+    {
+      "fixture": "H03",
+      "arm": "A",
+      "order": "normal",
+      "request_sha256": "87cd63ca6c92811489364ddc39ed7026902c88782c127093d45ddb004d15d670",
+      "purposes": [
+        {
+          "description": "The publisher package's EventTime function now returns the Unix timestamp in milliseconds instead of seconds.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "publisherのUnix秒→msというwire契約変更を具体的に説明している。同じ契約のconsumerを別purposeにしている"
+        },
+        {
+          "description": "The subscriber package's Exhausted function now checks if the attempt count is greater than or equal to four, instead of two.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Exhaustedの閾値>=2→>=4を具体的に説明している"
+        },
+        {
+          "description": "The subscriber package's EventTime function now converts an integer input (milliseconds) into a time.Time object using UnixMilli.",
+          "purpose_id": "P003",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "subscriberのinputをmillisecondsとして解釈する具体的変更。同じwire契約をpublisherから分離して重複列挙している"
+        }
+      ]
+    },
+    {
+      "fixture": "H03",
+      "arm": "B",
+      "order": "normal",
+      "request_sha256": "2d1994f6f0d8b8e24ce51378b0f46f56588fb1603dec3df70e114c4a7460a8c4",
+      "purposes": [
+        {
+          "description": "Migrate time representation from Unix seconds to Unix milliseconds in the publisher.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "publisherのUnix秒→ms wire契約変更を具体的に説明し、同契約のconsumerを別purposeに列挙していない"
+        },
+        {
+          "description": "Update the retry mechanism to consider an attempt count of four as exhausted.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "retryがattempt4でexhaustedとなる変更後の具体的閾値を説明している。前後の>=比較と一致する"
+        }
+      ]
+    },
+    {
+      "fixture": "H04",
+      "arm": "A",
+      "order": "normal",
+      "request_sha256": "69cbd0039f1aaa9f4c21a2c2016b5d141b0b4301ce32e90a3e86c685053daa27",
+      "purposes": [
+        {
+          "description": "The `Select` function now returns the first argument `a` if it is strictly less than the second argument `b`, otherwise it returns `b`.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "a<bならa、それ以外bという最小値の具体的変更を説明している"
+        },
+        {
+          "description": "The `PageStart` function now calculates the starting index by multiplying the page number by the size, instead of using a zero-based offset calculation.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "page*sizeへのformula変更を説明。旧式は(page-1)*sizeというoffset計算である"
+        },
+        {
+          "description": "The test case for `PageStart` is updated to expect the result of `PageStart(1, size)` to be `size` (assuming the new implementation is correct for the test scenario).",
+          "purpose_id": "P003",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "PageStart(1,size)の期待値をsizeに変える具体的test更新だが同じgold2を重複列挙"
+        },
+        {
+          "description": "The test case for `Select` is updated to match the new behavior of the `Select` function.",
+          "purpose_id": "P004",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Select testの更新という一般説明だけで期待値8→3がない。同じgold1を重複列挙"
+        }
+      ]
+    },
+    {
+      "fixture": "H04",
+      "arm": "B",
+      "order": "normal",
+      "request_sha256": "0ab39d108de230e43b3ab8003a63c6beedab60f5de33239d02794f06f7c47fb8",
+      "purposes": [
+        {
+          "description": "Update test case for PageStart to expect a return value of page * size instead of the previous calculation.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "PageStartのpage*sizeに対応するtest更新を具体的に説明。同じformula目的を別purposeでも列挙"
+        },
+        {
+          "description": "Modify Select function to return the smaller of two inputs (a or b) instead of the larger.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Selectを大きい値から小さい値へ変える具体的変更"
+        },
+        {
+          "description": "Update test case for Select to match the new behavior where the function returns the smaller of the two inputs.",
+          "purpose_id": "P003",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "最小値動作に対応するtest更新で同じgold1を重複列挙"
+        },
+        {
+          "description": "Change PageStart implementation to calculate the result as page * size instead of (page - one) * size.",
+          "purpose_id": "P004",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "PageStartの(page-1)*size→page*sizeを具体的に説明。同じgold2を重複列挙"
+        }
+      ]
+    },
+    {
+      "fixture": "H04",
+      "arm": "C",
+      "order": "normal",
+      "request_sha256": "f77f39fa8b1ad4dee354666ad7568c5a8749f626b0875b0e3ee99753b18a735d",
+      "purposes": [
+        {
+          "description": "Update test case for Select function, expecting a different return value when inputs are (3,8).",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "Select(3,8)の期待値を変えるとだけ述べ、変更後の3を説明しない"
+        },
+        {
+          "description": "Update test case for PageStart function, expecting a different return value when inputs are (1,5).",
+          "purpose_id": "P002",
+          "semantic_gold": [],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "PageStart(1,5)の期待値を変えるとだけ述べ、変更後の5を説明しない"
+        },
+        {
+          "description": "Implement new logic for Select function, changing the condition for returning 'a' and the default return value.",
+          "purpose_id": "P003",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": false,
+          "hallucination": true,
+          "reason": "Selectの条件変更は一般説明だけで最小値を説明しない。default return valueも変更すると述べるがreturn bは旧新とも同じ"
+        },
+        {
+          "description": "Implement new calculation for PageStart function, changing the formula from (page -1) * size to page * size.",
+          "purpose_id": "P004",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "PageStartの(page-1)*size→page*sizeを具体的に説明。同じgold2をtest更新から分離して列挙"
+        }
+      ]
+    }
+  ]
+}
