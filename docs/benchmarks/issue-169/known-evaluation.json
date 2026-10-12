@@ -1,0 +1,103 @@
+{
+  "evaluation": "offline agent annotation, not independent human rating",
+  "cells": [
+    {
+      "fixture": "K01",
+      "order": "normal",
+      "arm": "A",
+      "request_sha256": "6a54a6ef202f26582188789b07035293d67a8c3cc34f9de074c6de6cb1a6f5e5",
+      "purposes": [
+        {
+          "description": "Modifies the implementation of EncodeSize, which calculates a specific size based on input parameter n.",
+          "purpose_id": "P001",
+          "semantic_gold": [],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "宣言名・parameter n・return/binary expression は対象の一般説明を支持するが、演算子/定数の前後がなく具体的変更は説明されていない"
+        },
+        {
+          "description": "Modifies the implementation of RetryDelay, which calculates a specific delay based on input parameter n.",
+          "purpose_id": "P002",
+          "semantic_gold": [],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "宣言名・parameter n・return/binary expression は対象の一般説明を支持するが、演算子/定数の前後がなく具体的変更は説明されていない"
+        }
+      ]
+    },
+    {
+      "fixture": "K01",
+      "order": "normal",
+      "arm": "B",
+      "request_sha256": "6456a8ae61ea507dd2798197303d660f4bcc11763541cb3169d18943d9e041b4",
+      "purposes": [
+        {
+          "description": "The EncodeSize function now returns the input size plus an offset of four.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "raw diff の return n→n+4 / n*2 と一致し具体的変更を説明している"
+        },
+        {
+          "description": "The RetryDelay function now returns double the input value.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "raw diff の return n→n+4 / n*2 と一致し具体的変更を説明している"
+        }
+      ]
+    },
+    {
+      "fixture": "K01",
+      "order": "normal",
+      "arm": "C",
+      "request_sha256": "d89863965b7cb1bdefb89e42af7e84b9898e89418986267ac1fe36fa08bf6145",
+      "purposes": [
+        {
+          "description": "The EncodeSize function now returns the input value incremented by four.",
+          "purpose_id": "P001",
+          "semantic_gold": [
+            1
+          ],
+          "target_gold": [
+            1
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "raw diff の return n→n+4 / n*2 と一致し具体的変更を説明している"
+        },
+        {
+          "description": "The RetryDelay function now returns the input value multiplied by two.",
+          "purpose_id": "P002",
+          "semantic_gold": [
+            2
+          ],
+          "target_gold": [
+            2
+          ],
+          "grounded": true,
+          "hallucination": false,
+          "reason": "raw diff の return n→n+4 / n*2 と一致し具体的変更を説明している"
+        }
+      ]
+    }
+  ]
+}
