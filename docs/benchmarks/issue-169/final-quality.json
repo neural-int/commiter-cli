@@ -1,0 +1,65 @@
+{
+  "recorded_utc": "2026-10-12T14:29:43.199083+00:00",
+  "verification_before_quality_gate": {
+    "issue_conditions_checked": 10,
+    "total": 10,
+    "phase2_conditional_no_go_unevaluated": true
+  },
+  "checks": {
+    "go_test": {
+      "command": "go test -p 1 ./... -count=1 -json",
+      "exit_code": 0,
+      "packages_pass": 22,
+      "packages_no_tests": 3,
+      "failures": 0
+    },
+    "go_vet": {
+      "command": "go vet ./...",
+      "exit_code": 0
+    },
+    "go_build": {
+      "command": "go build ./...",
+      "exit_code": 0
+    },
+    "release_notes": {
+      "command": "python3 -m unittest discover -s .github/scripts/release-notes -p 'test_*.py'",
+      "exit_code": 0,
+      "tests": 25
+    },
+    "research_contract": {
+      "command": "python3 -m unittest discover -s tools/benchmark169 -p 'test_*.py'",
+      "exit_code": 0,
+      "tests": 4
+    },
+    "branch_diff": {
+      "command": "git diff --check origin/main...HEAD",
+      "exit_code": 0
+    },
+    "gofmt": {
+      "command": "gofmt -l tools/benchmark169/*.go",
+      "unformatted_files": 0
+    }
+  },
+  "local_log_sha256": {
+    "go_test": "a3d38bb3a0556c61f63b49067c47f5f6833960c5eb9a6ac42d183ada380ffc5f",
+    "go_vet": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "go_build": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "release_notes": "4c2de99f46bcce57129a20f1bb8ebe58c9cdee39baa3db358254d7fb6b6e8ccf",
+    "research_contract": "5c5059ffe660259db32dc1b4a02e8b2a73514e80d187184d21997dcd28f35254",
+    "branch_diff": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gofmt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "main_preserved_after_quality": true,
+  "changed_scope": [
+    "tools/benchmark169/",
+    "docs/benchmarks/issue-169/"
+  ],
+  "old_functionality_and_tests_removed": false,
+  "unnecessary_test_cleanup": "not applicable; existing functionality/tests unchanged",
+  "additional_model_generation_after_gate1": 0,
+  "remote_ci": "not used as evidence; local quality gate only",
+  "goal_success_is_research_record_completion": true,
+  "gate1": "NO-GO",
+  "phase2": "unevaluated",
+  "production_go": false
+}
