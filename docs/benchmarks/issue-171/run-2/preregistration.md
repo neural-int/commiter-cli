@@ -1,0 +1,9 @@
+# Iteration 2: 新しい有限runの事前登録
+
+ユーザーの「すべてフルアクセスで承認」を受け、run1停止証跡を保持したまま別runを実施する。run1を再開・上書きしない。現在pressure1を確認し、無関係なユーザープロセスは停止していない。原入力96件、Gold、モデルcheckpoint/helper、seed144/temperature0/context16384/output768/native thought512/timeout120秒、call上限96、retry0、品質Gate、RSS8GiB・swap増分1024MiB/callをすべて維持する。新モデル・新Planner・追加LLM段階・prompt調整・事後上限緩和は行わない。
+
+既存run.py/evaluate.pyをDATA出力先だけ切り替えるwrapperで再利用する。処理開始済み・terminal runの再開をwrapperで拒否する。新runも上限超過すれば停止してraw結果を保存する。完全実行後もGO/NO-GOを区別し、GOを要件にして結果を選別しない。
+
+F01は前runでA通常順の成功を観測した既知診断ケース。全confirmed11件の固定分母22cell/armと固定Gateは再定義しないが、未生成confirmed F02〜F11の20cell/armを別表で報告する。F12は同じundetermined扱いを維持する。未使用holdout12件や独立作者への一般化は主張しない。再実験であること、既知F01、初回停止を明示して4条件の単純効果・交互作用を比較する。
+
+初回生成前に新manifest/payload、旧契約hash、新wrapper、resource観測を固定しcommit/pushし、Issueへ事前報告する。Gold作成規則v1.0による元fixtureの根拠監査は維持する。現resource1は呼出し中swapが上限を超えない保証ではない。環境由来swapの寄与をモデルだけの因果と断定しない。
