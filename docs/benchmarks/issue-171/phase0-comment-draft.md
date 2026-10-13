@@ -25,4 +25,3 @@ R6/R7によるsingletonはGold上の正解ですが目的分断を含むため�
 - 凍結した作業履歴をcommit/pushし、remote headを照合する。初回生成前のGold・Gate・入力固定を第三者が確認できる状態にするため。
 - A/B/C/Dの96cellを各1回実行し、A→B、A→C、B→D、C→DとD−B−C+Aを評価する。入力要因とprompt要因を分離するため。
 - Exact/FM/FS、順序一致、完全割当、Fallback/偏り、tokens/wall/RSS/pressure/swapを固定Gateで判定し、GO/NO-GOで有限研究を終了する。結果に追従した再試行・Gold/prompt/threshold変更はしない。
-

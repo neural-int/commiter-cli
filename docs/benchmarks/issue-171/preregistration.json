@@ -181,7 +181,7 @@
     "docs/benchmarks/issue-171/prompt-adaptation.json": "cf455e6247fe321023634ecc00ad0df55e513003b1bb1e0a9ba5a65cc78a3d66",
     "docs/benchmarks/issue-171/source-mapping.json": "e735197e798e3c4307fb749f35a7e9bc2a7d737c25a0220a048c426f9ba28fa1",
     "docs/benchmarks/issue-171/tokenization-preflight.jsonl": "bf6079c9d7e549f74071fe91df4338673377b369bd0bde976f8d02cc079e2ab7",
-    "docs/benchmarks/issue-171/workflow-source.md": "ec53af0208fbab7c1c6f3f3e5b036a77447f620771cf9101a7fc0b15dc6d2d98",
+    "docs/benchmarks/issue-171/workflow-source.md": "06504a3ebf999fbe87debd06928c2677f4a0b4a69a2a00831c858d889036e892",
     "tools/benchmark169/run.py": "072b7675c959d02861aab5740ef62c12cb71931bedcfff8f82726aca58ff6b2c",
     "tools/benchmark169/preflight.py": "02735d431c84659c9ba9199fb9285545ed903c1f043057375c8e8b8cd49419a1",
     "tools/benchmark169/prepare.go": "2b8718b73998235494bb0c5ab8207f5bdb2deafb5122d120802cbaa40853a2c0",
@@ -199,7 +199,9 @@
     "runtime:tokenizer": "cc8d3a0ce36466ccc1278bf987df5f71db1719b9ca6b4118264f45cb627bfe0f",
     "runtime:tokenizer_config": "080d9e1aff284e2f6043889cd05367966f7c7b80e025fbc0b06745e218158656",
     "runtime:measured_helper_source": "18bc2affba8f687be47ef6a7cecde6b4eb9d85ccf94ea3321527df9a671b35d7",
-    "runtime:preflight_helper_source": "ee4d228a0c1dbcc35a6a0554525ef36a95aab59457d2067957d0d3423d032299"
+    "runtime:preflight_helper_source": "ee4d228a0c1dbcc35a6a0554525ef36a95aab59457d2067957d0d3423d032299",
+    "docs/benchmarks/issue-171/workflow-source.json": "9d73ba1e5f70282db38b004344781097713921dd5f6fc884ad590b1634b23762",
+    "docs/benchmarks/issue-171/preregistration-v1.json": "7794f547a9732d7eef9d8cc73d8bbfeb66694159ec4429547fd4fb8c225862c5"
   },
   "model_artifacts": [
     {
@@ -267,5 +269,11 @@
     }
   ],
   "model_generations_before_registration": 0,
-  "production_go": false
+  "production_go": false,
+  "correction_before_generation": {
+    "utc": "2026-10-13T02:51:58.280881+00:00",
+    "reason": "Initial git diff --check found original remote goal trailing whitespace. Preserve exact raw content in JSON, format Markdown whitespace only; no fixture, Gold, prompt, evaluator, Gate or model changes; generation count remains 0",
+    "first_frozen_commit": "f94ec345",
+    "version": 2
+  }
 }
