@@ -45,7 +45,7 @@ func (c *groupingFlowClient) ChatWithOptions(_ context.Context, m []llm.Message,
 }
 
 func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
-	for _, kind := range []string{"modified", "added", "deleted", "renamed", "unsupported"} {
+	for _, kind := range []string{"modified", "added", "deleted", "renamed", "split rename", "unsupported"} {
 		t.Run(kind, func(t *testing.T) {
 			before := "package sample\nfunc Value() int {\n return 1\n}\n"
 			after := strings.Replace(before, "return 1", "return 2", 1)
@@ -65,9 +65,12 @@ func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
 			case "added":
 				path = "added.go"
 				cliWrite(t, root, path, after, 0o644)
-			case "renamed":
+			case "renamed", "split rename":
 				cliGit(t, root, "mv", path, "renamed.go")
 				path = "renamed.go"
+				if kind == "split rename" {
+					after = "package replacement\nfunc Other() string { return \"changed\" }\n"
+				}
 				cliWrite(t, root, path, after, 0o644)
 			default:
 				cliWrite(t, root, path, after, 0o644)
@@ -83,6 +86,9 @@ func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
 			document, err := contextinput.Build(snapshot, results)
 			if err != nil {
 				t.Fatal(err)
+			}
+			if kind == "split rename" && strings.Count(document.Files[0].GroupingRawDiff, "diff --git ") != 2 {
+				t.Fatalf("split rename not reproduced: %s", document.Files[0].GroupingRawDiff)
 			}
 			if err := attachGroupingSyntaxContext(context.Background(), root, &document, sources); err != nil {
 				t.Fatal(err)
@@ -114,10 +120,13 @@ func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
 			if err := json.Unmarshal([]byte(client.messages[0][1].Content), &input); err != nil {
 				t.Fatal(err)
 			}
+			if input.Files[0].RawDiff != document.Files[0].GroupingRawDiff {
+				t.Fatal("grouping changed the complete raw diff")
+			}
 			if input.Files[0].RawDiff == "" || input.Files[0].Mode != "raw_diff" || input.Files[0].ID != "path:"+path {
 				t.Fatalf("bad grouping input: %s", client.messages[0][1].Content)
 			}
-			if kind == "unsupported" {
+			if kind == "unsupported" || kind == "split rename" {
 				if len(input.Files[0].SyntaxContext) != 0 {
 					t.Fatal("unsupported context guessed")
 				}
@@ -132,5 +141,35 @@ func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
 				t.Fatal("planning changed HEAD/index/worktree")
 			}
 		})
+	}
+}
+
+func TestGroupingContextKeepsGitSourceErrors(t *testing.T) {
+	root := cliRepository(t)
+	before := "package sample\nfunc Value() int { return 1 }\n"
+	cliWrite(t, root, "sample.go", before, 0o644)
+	cliGit(t, root, "add", "sample.go")
+	cliGit(t, root, "commit", "-m", "base")
+	cliGit(t, root, "mv", "sample.go", "renamed.go")
+	cliWrite(t, root, "renamed.go", "package replacement\nfunc Other() string { return \"changed\" }\n", 0o644)
+	snapshot, err := gitstate.Collect(root, gitstate.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	results, _, _, sources, err := analyzeForPlanningWithStatsAndRelationsContext(context.Background(), root, snapshot)
+	if err != nil {
+		t.Fatal(err)
+	}
+	document, err := contextinput.Build(snapshot, results)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Count(document.Files[0].GroupingRawDiff, "diff --git ") != 2 {
+		t.Fatal("multiple diff sections not reproduced")
+	}
+	missingBlob := strings.Repeat("0", 40)
+	sources[0].Change.HeadIdentity = &missingBlob
+	if err := attachGroupingSyntaxContext(context.Background(), root, &document, sources); err == nil {
+		t.Fatal("Git blob failure was ignored")
 	}
 }

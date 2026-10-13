@@ -30,6 +30,8 @@ type contextChangeBlock struct {
 	old, new []int
 }
 
+var contextDiffHeader = regexp.MustCompile(`(?m)^diff --git `)
+
 var contextHunkHeader = regexp.MustCompile(`(?m)^@@ -([0-9]+)(?:,([0-9]+))? \+([0-9]+)(?:,([0-9]+))? @@`)
 
 // Changed runs are bounded by context lines; counts must match every hunk header.
@@ -145,23 +147,27 @@ func contextDeclarationName(n *treesitter.Node, source string) string {
 		if r == nil {
 			return ""
 		}
-		var typ string
-		var walk func(*treesitter.Node)
-		walk = func(x *treesitter.Node) {
-			if x == nil {
-				return
-			}
-			if x.Kind() == "type_identifier" {
-				typ = x.Utf8Text([]byte(source))
-			}
-			for i := uint(0); i < x.NamedChildCount(); i++ {
-				walk(x.NamedChild(i))
-			}
-		}
-		walk(r)
-		if typ == "" {
+		if r.NamedChildCount() != 1 {
 			return ""
 		}
+		parameter := r.NamedChild(0)
+		if parameter.Kind() != "parameter_declaration" {
+			return ""
+		}
+		receiverType := parameter.ChildByFieldName("type")
+		if receiverType != nil && receiverType.Kind() == "pointer_type" {
+			if receiverType.NamedChildCount() != 1 {
+				return ""
+			}
+			receiverType = receiverType.NamedChild(0)
+		}
+		if receiverType != nil && receiverType.Kind() == "generic_type" {
+			receiverType = receiverType.ChildByFieldName("type")
+		}
+		if receiverType == nil || receiverType.Kind() != "type_identifier" {
+			return ""
+		}
+		typ := receiverType.Utf8Text([]byte(source))
 		result = typ + "." + result
 	}
 	return result
@@ -212,6 +218,13 @@ func contextOwner(ctx context.Context, t *treesitter.Tree, source string, line i
 func extractMinimalContext(ctx context.Context, before, after, raw, language string) ([]MinimalContext, contextAudit, error) {
 	a := contextAudit{Reasons: map[string]int{}}
 	out := []MinimalContext{}
+	// A rename can be rendered as separate add/delete sections. This API has
+	// one Before/After pair, so attributing section-local line numbers would be
+	// ambiguous. Omit only the optional context and preserve the complete diff.
+	if len(contextDiffHeader.FindAllStringIndex(raw, 2)) > 1 {
+		a.Reasons["multiple_diff_sections"] = 1
+		return out, a, ctx.Err()
+	}
 	bs, e := contextBlocks(raw)
 	if e != nil {
 		return nil, a, e
@@ -294,7 +307,8 @@ func extractMinimalContext(ctx context.Context, before, after, raw, language str
 
 // ExtractMinimalContext returns only hunk indices and unambiguous Go function
 // or receiver-qualified method names. The 32-entry and 128-byte name caps match
-// #169; malformed diffs are rejected and unsupported languages add no context.
+// #169; malformed single-section diffs are rejected. Multiple sections and
+// unsupported languages add no context, while cancellation remains an error.
 func ExtractMinimalContext(ctx context.Context, before, after []byte, raw, language string) ([]MinimalContext, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err

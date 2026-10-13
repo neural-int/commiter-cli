@@ -2,6 +2,7 @@ package syntax
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -69,5 +70,45 @@ func TestContextCapIsSortedAndAudited(t *testing.T) {
 	got, a, e := extractMinimalContext(context.Background(), "", source, raw, "Go")
 	if e != nil || len(got) != 32 || a.Reasons["entry_cap"] != 3 || got[0].EnclosingDeclaration != "F00" || got[31].EnclosingDeclaration != "F31" {
 		t.Fatalf("cap order/audit = %v %v %v", got, a, e)
+	}
+}
+
+func TestMinimalContextOmitsMultipleDiffSections(t *testing.T) {
+	before := "package x\nfunc A() int { return 1 }\n"
+	after := "package y\nfunc B() int { return 2 }\n"
+	raw := "diff --git a/new.go b/new.go\nnew file mode 100644\n--- /dev/null\n+++ b/new.go\n@@ -0,0 +1,2 @@\n+package y\n+func B() int { return 2 }\ndiff --git a/old.go b/old.go\ndeleted file mode 100644\n--- a/old.go\n+++ /dev/null\n@@ -1,2 +0,0 @@\n-package x\n-func A() int { return 1 }\n"
+	got, err := ExtractMinimalContext(context.Background(), []byte(before), []byte(after), raw, "Go")
+	if err != nil || len(got) != 0 {
+		t.Fatalf("multi-section context should be omitted without stopping raw grouping: context=%v error=%v", got, err)
+	}
+}
+func TestMinimalContextUsesReceiverBaseTypes(t *testing.T) {
+	for _, receiver := range []string{"T", "*T", "Box[T]", "*Box[T]"} {
+		t.Run(receiver, func(t *testing.T) {
+			prefix := "package p\ntype T int\ntype Box[T any] struct{}\n"
+			before := prefix + "func (b " + receiver + ") Get() int { return 1 }\n"
+			after := prefix + "func (b " + receiver + ") Get() int { return 2 }\n"
+			raw := "@@ -4 +4 @@\n-func (b " + receiver + ") Get() int { return 1 }\n+func (b " + receiver + ") Get() int { return 2 }\n"
+			want := "T.Get"
+			if strings.Contains(receiver, "Box") {
+				want = "Box.Get"
+			}
+			got, err := ExtractMinimalContext(context.Background(), []byte(before), []byte(after), raw, "Go")
+			if err != nil || len(got) != 1 || got[0].EnclosingDeclaration != want {
+				t.Fatalf("got=%v error=%v want=%s", got, err, want)
+			}
+		})
+	}
+}
+
+func TestMinimalContextKeepsCancellationAndMalformedDiffErrors(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	raw := "diff --git a/new.go b/new.go\ndiff --git a/old.go b/old.go\n"
+	if _, err := ExtractMinimalContext(ctx, nil, nil, raw, "Go"); !errors.Is(err, context.Canceled) {
+		t.Fatalf("cancellation lost: %v", err)
+	}
+	if _, err := ExtractMinimalContext(context.Background(), nil, nil, "@@ -1,2 +1 @@\n-a\n+b\n", "Go"); err == nil {
+		t.Fatal("malformed single-section diff was ignored")
 	}
 }
