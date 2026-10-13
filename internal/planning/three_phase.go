@@ -85,8 +85,8 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 	if !ok {
 		return result, errors.New("three-phase planner requires explicit generation-profile support")
 	}
-	if prepared.Budget.ContextTokens != contextinput.Context16K {
-		return result, errors.New("three-phase planner requires a fixed 16k context")
+	if prepared.Budget.ContextTokens != contextinput.Context16K && prepared.Budget.ContextTokens != contextinput.Context32K && prepared.Budget.ContextTokens != contextinput.Context64K {
+		return result, errors.New("three-phase planner requires a supported context ceiling (16k, 32k, or 64k)")
 	}
 	if prepared.SummaryCount != 0 || prepared.EvidenceReductionCount != 0 || prepared.CompressionProfile != contextinput.CompressionNone {
 		return result, exitcode.New(exitcode.LLM, "provisional three-phase planner does not support compressed input")
@@ -152,11 +152,19 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 		system += schemaInstructionPrefix + string(shape)
 		// Bound every actual phase prompt independently, including dynamic schemas.
 		// The helper also checks exact tokenized prompt+output before generation.
-		if len(system)+len(encoded)+contextinput.TemplateReserve+budget > prepared.Budget.ContextTokens {
+		requiredTokens := len(system) + len(encoded) + contextinput.TemplateReserve + budget
+		contextTokens := 0
+		for _, tier := range []int{contextinput.Context16K, contextinput.Context32K, contextinput.Context64K} {
+			if tier <= prepared.Budget.ContextTokens && requiredTokens <= tier {
+				contextTokens = tier
+				break
+			}
+		}
+		if contextTokens == 0 {
 			return contextinput.ErrTooLarge
 		}
 		result.Calls++
-		response, e := client.ChatWithOptions(ctx, []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: string(encoded)}}, shape, llm.Options{ContextTokens: prepared.Budget.ContextTokens, OutputTokens: budget, GenerationProfile: profile})
+		response, e := client.ChatWithOptions(ctx, []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: string(encoded)}}, shape, llm.Options{ContextTokens: contextTokens, OutputTokens: budget, GenerationProfile: profile})
 		if e != nil {
 			return generationError(nil)
 		}
