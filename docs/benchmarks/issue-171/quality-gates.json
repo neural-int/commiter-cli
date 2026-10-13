@@ -1,0 +1,32 @@
+{
+  "research_contract_tests": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tools/benchmark171 -p 'test_*.py'",
+    "tests": 6,
+    "result": "PASS",
+    "prior_failures_preserved": "pre-freeze-errors.json"
+  },
+  "harness_build": {
+    "command": "GOCACHE=/private/tmp/commiter-171-gocache go build -o /private/tmp/commiter-171-prepare ./tools/benchmark171",
+    "result": "PASS"
+  },
+  "frozen_and_model_hashes": "PASS",
+  "real_baseline_capture": "PASS 12/12",
+  "tokenize_only": "PASS 96/96",
+  "gold_allocation_rules": "PASS",
+  "temporary_index_bytes_tree": "PASS 12/12",
+  "main_head_index_original_diff": "PASS unchanged",
+  "diff_check": {
+    "command": "git diff --check 97a98633 -- tools/benchmark171 docs/benchmarks/issue-171",
+    "result": "PASS",
+    "initial_failure": "Imported goal whitespace retained exactly in JSON; Markdown whitespace-only correction frozen before inference"
+  },
+  "final_repository_quality_gate": {
+    "result": "NOT_RUN",
+    "commands": [
+      "go test ./...",
+      "go vet ./...",
+      "go build ./..."
+    ],
+    "reason": "User-specified goal.md permits final quality gate only after all Issue Verification is met. Phase 1 paired comparison is unmet, external checkbox updates unapproved."
+  }
+}
