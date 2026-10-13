@@ -33,7 +33,7 @@ R6/R7 Fallbackは4ファイル、Fallback由来の目的分断は7件。これ�
 
 一時index/object directoryだけで全12fixtureの選択byte・全tree一致を確認した。元fixture HEAD/index/worktree、main HEAD/index/既存diffは事後監査でも維持された。初期観測処理のindex cache更新による監査失敗は保存し、no-optional-locks修正と同source再作成後の実request一致を確認した。F07のbyte-bound拒否と、Python module読み込み、捕捉引数、原文Goalの空白チェック失敗も事前エラーとして保存した。
 
-最初の凍結commitは `f94ec345`。原文GoalをJSONで完全保持しMarkdown空白のみを整形した、生成前の訂正commitは `e94e0f3f`。訂正前事前登録を `preregistration-v1.json` に残し、比較変数は変更していない。最終事前登録は153ファイルhashとモデル関連9ファイルhashを固定した。GitHubへの事前投稿は自動承認レビューで拒否され、pushも保留した。公開が生成前に済んだとは主張しない。
+最初の凍結commitは `f94ec345`。原文GoalをJSONで保存しMarkdown空白のみを整形した、生成前の訂正commitは `e94e0f3f`。訂正前事前登録を `preregistration-v1.json` に残し、比較変数は変更していない。最終事前登録は153ファイルhashとモデル関連9ファイルhashを固定した。後の原文byte監査で、凍結済みworkflow-source.jsonに取得原文より末尾LFが1つ多いことを確認した。凍結物を変更せず、取得した原文をworkflow-exact-source.jsonに保存し、Git blob SHAがad92785ee8b4f4d04ded9c5755c4450cf02281caと一致することを検証した。比較入力・Gold・Gateへの影響はない。GitHubへの事前投稿は自動承認レビューで拒否され、pushも保留した。公開が生成前に済んだとは主張しない。
 
 ## Phase 1 の観測結果
 
