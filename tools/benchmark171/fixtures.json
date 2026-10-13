@@ -1,0 +1,1722 @@
+[
+  {
+    "name": "F01",
+    "cohort": "holdout",
+    "source": "New synthetic fixture authored before Issue 171 inference; not independent-author/real-repository evidence",
+    "files": [
+      {
+        "path": "bounds/clamp.go",
+        "before": "package bounds\n\nfunc Clamp(n int) int { return n }\n",
+        "after": "package bounds\n\nfunc Clamp(n int) int { if n > 90 { return 90 }; return n }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package bounds",
+            "",
+            "func Clamp(n int) int { return n }"
+          ],
+          "after": [
+            "package bounds",
+            "",
+            "func Clamp(n int) int { if n > 90 { return 90 }; return n }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      },
+      {
+        "path": "bounds/clamp_test.go",
+        "before": "package bounds\nimport \"testing\"\nfunc TestClampHigh(t *testing.T) { if Clamp(120)!=120 { t.Fatal(\"clamp\") } }\n",
+        "after": "package bounds\nimport \"testing\"\nfunc TestClampHigh(t *testing.T) { if Clamp(120)!=90 { t.Fatal(\"clamp\") } }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package bounds",
+            "import \"testing\"",
+            "func TestClampHigh(t *testing.T) { if Clamp(120)!=120 { t.Fatal(\"clamp\") } }"
+          ],
+          "after": [
+            "package bounds",
+            "import \"testing\"",
+            "func TestClampHigh(t *testing.T) { if Clamp(120)!=90 { t.Fatal(\"clamp\") } }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      },
+      {
+        "path": "labels/prefix.go",
+        "before": "package labels\n\nfunc Prefix() string { return \"item:\" }\n",
+        "after": "package labels\n\nfunc Prefix() string { return \"entry:\" }\n",
+        "purpose_ids": [
+          "P2"
+        ],
+        "source_evidence": {
+          "before": [
+            "package labels",
+            "",
+            "func Prefix() string { return \"item:\" }"
+          ],
+          "after": [
+            "package labels",
+            "",
+            "func Prefix() string { return \"entry:\" }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      }
+    ],
+    "purpose_descriptions": {
+      "P1": "Clamp high values at 90 and change high-input expectation",
+      "P2": "Change display label prefix item: to entry:"
+    },
+    "purpose_relations": [
+      {
+        "purposes": [
+          "P1",
+          "P2"
+        ],
+        "relation": "independent",
+        "source_basis": "Clamp bound and display prefix have different observable targets; either change survives reverting the other"
+      }
+    ],
+    "gold_groups": [
+      [
+        "bounds/clamp.go",
+        "bounds/clamp_test.go"
+      ],
+      [
+        "labels/prefix.go"
+      ]
+    ],
+    "allowed_partitions": [
+      [
+        [
+          "bounds/clamp.go",
+          "bounds/clamp_test.go"
+        ],
+        [
+          "labels/prefix.go"
+        ]
+      ]
+    ],
+    "fallback_files": [],
+    "fallback_purpose_fragmentation": {},
+    "gold_status": "confirmed",
+    "rules": [
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R8",
+      "R10"
+    ],
+    "rationale": "Clamp implementation and matching high-value assertion form one behavior; prefix text is an independent goal",
+    "revert_independence": "Independent goals are separate except R6 file indivisibility; arbitrary-order build/test safety is not guaranteed (R8-R10)",
+    "input_identifiability": {
+      "A": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "B": {
+        "status": "identifiable",
+        "reason": "Clamp implementation and matching high-value assertion form one behavior; prefix text is an independent goal"
+      },
+      "C": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "D": {
+        "status": "identifiable",
+        "reason": "Clamp implementation and matching high-value assertion form one behavior; prefix text is an independent goal"
+      }
+    },
+    "host_only_specification": null
+  },
+  {
+    "name": "F02",
+    "cohort": "holdout",
+    "source": "New synthetic fixture authored before Issue 171 inference; not independent-author/real-repository evidence",
+    "files": [
+      {
+        "path": "encoder/rate.go",
+        "before": "package encoder\n\nfunc EncodeRate(n int) int { return n }\n",
+        "after": "package encoder\n\nfunc EncodeRate(n int) int { return n * 100 }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package encoder",
+            "",
+            "func EncodeRate(n int) int { return n }"
+          ],
+          "after": [
+            "package encoder",
+            "",
+            "func EncodeRate(n int) int { return n * 100 }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      },
+      {
+        "path": "decoder/rate.go",
+        "before": "package decoder\n\nfunc DecodeRate(n int) int { return n }\n",
+        "after": "package decoder\n\nfunc DecodeRate(n int) int { return n / 100 }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package decoder",
+            "",
+            "func DecodeRate(n int) int { return n }"
+          ],
+          "after": [
+            "package decoder",
+            "",
+            "func DecodeRate(n int) int { return n / 100 }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      },
+      {
+        "path": "decoder/backoff.go",
+        "before": "package decoder\n\nfunc Delay() int { return 8 }\n",
+        "after": "package decoder\n\nfunc Delay() int { return 13 }\n",
+        "purpose_ids": [
+          "P2"
+        ],
+        "source_evidence": {
+          "before": [
+            "package decoder",
+            "",
+            "func Delay() int { return 8 }"
+          ],
+          "after": [
+            "package decoder",
+            "",
+            "func Delay() int { return 13 }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      }
+    ],
+    "purpose_descriptions": {
+      "P1": "Encode and decode rates in centi-units rather than whole units",
+      "P2": "Change retry delay from 8 to 13"
+    },
+    "purpose_relations": [
+      {
+        "purposes": [
+          "P1",
+          "P2"
+        ],
+        "relation": "independent",
+        "source_basis": "Retry delay does not consume rate wire units"
+      }
+    ],
+    "gold_groups": [
+      [
+        "encoder/rate.go",
+        "decoder/rate.go"
+      ],
+      [
+        "decoder/backoff.go"
+      ]
+    ],
+    "allowed_partitions": [
+      [
+        [
+          "encoder/rate.go",
+          "decoder/rate.go"
+        ],
+        [
+          "decoder/backoff.go"
+        ]
+      ]
+    ],
+    "fallback_files": [],
+    "fallback_purpose_fragmentation": {},
+    "gold_status": "confirmed",
+    "rules": [
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R8",
+      "R10"
+    ],
+    "rationale": "Producer and consumer implement opposite sides of the same unit contract across directories; retry policy is independent",
+    "revert_independence": "Independent goals are separate except R6 file indivisibility; arbitrary-order build/test safety is not guaranteed (R8-R10)",
+    "input_identifiability": {
+      "A": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "B": {
+        "status": "identifiable",
+        "reason": "Producer and consumer implement opposite sides of the same unit contract across directories; retry policy is independent"
+      },
+      "C": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "D": {
+        "status": "identifiable",
+        "reason": "Producer and consumer implement opposite sides of the same unit contract across directories; retry policy is independent"
+      }
+    },
+    "host_only_specification": null
+  },
+  {
+    "name": "F03",
+    "cohort": "holdout",
+    "source": "New synthetic fixture authored before Issue 171 inference; not independent-author/real-repository evidence",
+    "files": [
+      {
+        "path": "report/width.go",
+        "before": "package report\n\nfunc Width(n int) int { return n * 10 }\n",
+        "after": "package report\n\nfunc Width(n int) int { return n * 12 }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package report",
+            "",
+            "func Width(n int) int { return n * 10 }"
+          ],
+          "after": [
+            "package report",
+            "",
+            "func Width(n int) int { return n * 12 }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      },
+      {
+        "path": "report/width_test.go",
+        "before": "package report\nimport \"testing\"\nfunc TestWidth(t *testing.T) { if Width(2)!=20 { t.Fatal(\"width\") } }\n",
+        "after": "package report\nimport \"testing\"\nfunc TestWidth(t *testing.T) { if Width(2)!=24 { t.Fatal(\"width\") } }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package report",
+            "import \"testing\"",
+            "func TestWidth(t *testing.T) { if Width(2)!=20 { t.Fatal(\"width\") } }"
+          ],
+          "after": [
+            "package report",
+            "import \"testing\"",
+            "func TestWidth(t *testing.T) { if Width(2)!=24 { t.Fatal(\"width\") } }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      },
+      {
+        "path": "report/badge.go",
+        "before": "package report\n\nfunc Badge() string { return \"open\" }\n",
+        "after": "package report\n\nfunc Badge() string { return \"active\" }\n",
+        "purpose_ids": [
+          "P2"
+        ],
+        "source_evidence": {
+          "before": [
+            "package report",
+            "",
+            "func Badge() string { return \"open\" }"
+          ],
+          "after": [
+            "package report",
+            "",
+            "func Badge() string { return \"active\" }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      },
+      {
+        "path": "report/badge_test.go",
+        "before": "package report\nimport \"testing\"\nfunc TestBadge(t *testing.T) { if Badge()!=\"open\" { t.Fatal(\"badge\") } }\n",
+        "after": "package report\nimport \"testing\"\nfunc TestBadge(t *testing.T) { if Badge()!=\"active\" { t.Fatal(\"badge\") } }\n",
+        "purpose_ids": [
+          "P2"
+        ],
+        "source_evidence": {
+          "before": [
+            "package report",
+            "import \"testing\"",
+            "func TestBadge(t *testing.T) { if Badge()!=\"open\" { t.Fatal(\"badge\") } }"
+          ],
+          "after": [
+            "package report",
+            "import \"testing\"",
+            "func TestBadge(t *testing.T) { if Badge()!=\"active\" { t.Fatal(\"badge\") } }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      }
+    ],
+    "purpose_descriptions": {
+      "P1": "Change width multiplier 10 to 12",
+      "P2": "Change badge label open to active"
+    },
+    "purpose_relations": [
+      {
+        "purposes": [
+          "P1",
+          "P2"
+        ],
+        "relation": "independent",
+        "source_basis": "Width numeric output and badge text are distinct contracts despite same package"
+      }
+    ],
+    "gold_groups": [
+      [
+        "report/width.go",
+        "report/width_test.go"
+      ],
+      [
+        "report/badge.go",
+        "report/badge_test.go"
+      ]
+    ],
+    "allowed_partitions": [
+      [
+        [
+          "report/width.go",
+          "report/width_test.go"
+        ],
+        [
+          "report/badge.go",
+          "report/badge_test.go"
+        ]
+      ]
+    ],
+    "fallback_files": [],
+    "fallback_purpose_fragmentation": {},
+    "gold_status": "confirmed",
+    "rules": [
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R8",
+      "R10"
+    ],
+    "rationale": "Each implementation has its direct test; shared package does not justify merging the two goals",
+    "revert_independence": "Independent goals are separate except R6 file indivisibility; arbitrary-order build/test safety is not guaranteed (R8-R10)",
+    "input_identifiability": {
+      "A": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "B": {
+        "status": "identifiable",
+        "reason": "Each implementation has its direct test; shared package does not justify merging the two goals"
+      },
+      "C": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "D": {
+        "status": "identifiable",
+        "reason": "Each implementation has its direct test; shared package does not justify merging the two goals"
+      }
+    },
+    "host_only_specification": null
+  },
+  {
+    "name": "F04",
+    "cohort": "holdout",
+    "source": "New synthetic fixture authored before Issue 171 inference; not independent-author/real-repository evidence",
+    "files": [
+      {
+        "path": "packet/codec.go",
+        "before": "package packet\n\nfunc Encode(n int) int { return n + 1 }\nfunc Decode(n int) int { return n - 1 }\n",
+        "after": "package packet\n\nfunc Encode(n int) int { return n + 3 }\nfunc Decode(n int) int { return n - 3 }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package packet",
+            "",
+            "func Encode(n int) int { return n + 1 }",
+            "func Decode(n int) int { return n - 1 }"
+          ],
+          "after": [
+            "package packet",
+            "",
+            "func Encode(n int) int { return n + 3 }",
+            "func Decode(n int) int { return n - 3 }"
+          ],
+          "after_lines": [
+            1,
+            4
+          ]
+        }
+      },
+      {
+        "path": "packet/codec_test.go",
+        "before": "package packet\nimport \"testing\"\nfunc TestWire(t *testing.T) { if Encode(5)!=6 || Decode(6)!=5 { t.Fatal(\"wire\") } }\n",
+        "after": "package packet\nimport \"testing\"\nfunc TestWire(t *testing.T) { if Encode(5)!=8 || Decode(8)!=5 { t.Fatal(\"wire\") } }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package packet",
+            "import \"testing\"",
+            "func TestWire(t *testing.T) { if Encode(5)!=6 || Decode(6)!=5 { t.Fatal(\"wire\") } }"
+          ],
+          "after": [
+            "package packet",
+            "import \"testing\"",
+            "func TestWire(t *testing.T) { if Encode(5)!=8 || Decode(8)!=5 { t.Fatal(\"wire\") } }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      }
+    ],
+    "purpose_descriptions": {
+      "P1": "Move paired encoding/decoding offset from 1 to 3"
+    },
+    "purpose_relations": [],
+    "gold_groups": [
+      [
+        "packet/codec.go",
+        "packet/codec_test.go"
+      ]
+    ],
+    "allowed_partitions": [
+      [
+        [
+          "packet/codec.go",
+          "packet/codec_test.go"
+        ]
+      ]
+    ],
+    "fallback_files": [],
+    "fallback_purpose_fragmentation": {},
+    "gold_status": "confirmed",
+    "rules": [
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R8",
+      "R10",
+      "R5"
+    ],
+    "rationale": "Two changed functions are inverse sides of one concrete wire contract (R5), so the file is not an R6 fallback",
+    "revert_independence": "Independent goals are separate except R6 file indivisibility; arbitrary-order build/test safety is not guaranteed (R8-R10)",
+    "input_identifiability": {
+      "A": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "B": {
+        "status": "identifiable",
+        "reason": "Two changed functions are inverse sides of one concrete wire contract (R5), so the file is not an R6 fallback"
+      },
+      "C": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "D": {
+        "status": "identifiable",
+        "reason": "Two changed functions are inverse sides of one concrete wire contract (R5), so the file is not an R6 fallback"
+      }
+    },
+    "host_only_specification": null
+  },
+  {
+    "name": "F05",
+    "cohort": "holdout",
+    "source": "New synthetic fixture authored before Issue 171 inference; not independent-author/real-repository evidence",
+    "files": [
+      {
+        "path": "display/settings.go",
+        "before": "package display\n\nfunc Columns() int { return 70 }\nfunc Accent() string { return \"green\" }\n",
+        "after": "package display\n\nfunc Columns() int { return 84 }\nfunc Accent() string { return \"amber\" }\n",
+        "purpose_ids": [
+          "P1",
+          "P2"
+        ],
+        "source_evidence": {
+          "before": [
+            "package display",
+            "",
+            "func Columns() int { return 70 }",
+            "func Accent() string { return \"green\" }"
+          ],
+          "after": [
+            "package display",
+            "",
+            "func Columns() int { return 84 }",
+            "func Accent() string { return \"amber\" }"
+          ],
+          "after_lines": [
+            1,
+            4
+          ]
+        }
+      },
+      {
+        "path": "display/columns_test.go",
+        "before": "package display\nimport \"testing\"\nfunc TestColumns(t *testing.T) { if Columns()!=70 { t.Fatal(\"columns\") } }\n",
+        "after": "package display\nimport \"testing\"\nfunc TestColumns(t *testing.T) { if Columns()!=84 { t.Fatal(\"columns\") } }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package display",
+            "import \"testing\"",
+            "func TestColumns(t *testing.T) { if Columns()!=70 { t.Fatal(\"columns\") } }"
+          ],
+          "after": [
+            "package display",
+            "import \"testing\"",
+            "func TestColumns(t *testing.T) { if Columns()!=84 { t.Fatal(\"columns\") } }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      },
+      {
+        "path": "display/accent_test.go",
+        "before": "package display\nimport \"testing\"\nfunc TestAccent(t *testing.T) { if Accent()!=\"green\" { t.Fatal(\"accent\") } }\n",
+        "after": "package display\nimport \"testing\"\nfunc TestAccent(t *testing.T) { if Accent()!=\"amber\" { t.Fatal(\"accent\") } }\n",
+        "purpose_ids": [
+          "P2"
+        ],
+        "source_evidence": {
+          "before": [
+            "package display",
+            "import \"testing\"",
+            "func TestAccent(t *testing.T) { if Accent()!=\"green\" { t.Fatal(\"accent\") } }"
+          ],
+          "after": [
+            "package display",
+            "import \"testing\"",
+            "func TestAccent(t *testing.T) { if Accent()!=\"amber\" { t.Fatal(\"accent\") } }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      }
+    ],
+    "purpose_descriptions": {
+      "P1": "Change column count 70 to 84",
+      "P2": "Change accent green to amber"
+    },
+    "purpose_relations": [
+      {
+        "purposes": [
+          "P1",
+          "P2"
+        ],
+        "relation": "independent",
+        "source_basis": "Columns and color can be reverted separately at the behavior level"
+      }
+    ],
+    "gold_groups": [
+      [
+        "display/settings.go"
+      ],
+      [
+        "display/columns_test.go"
+      ],
+      [
+        "display/accent_test.go"
+      ]
+    ],
+    "allowed_partitions": [
+      [
+        [
+          "display/settings.go"
+        ],
+        [
+          "display/columns_test.go"
+        ],
+        [
+          "display/accent_test.go"
+        ]
+      ]
+    ],
+    "fallback_files": [
+      "display/settings.go"
+    ],
+    "fallback_purpose_fragmentation": {
+      "P1": [
+        0,
+        1
+      ],
+      "P2": [
+        0,
+        2
+      ]
+    },
+    "gold_status": "confirmed",
+    "rules": [
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R8",
+      "R10",
+      "R5",
+      "R6",
+      "R7",
+      "R9"
+    ],
+    "rationale": "Settings has two independent goals; R6/R7 override implementation/test merging and require singleton",
+    "revert_independence": "Independent goals are separate except R6 file indivisibility; arbitrary-order build/test safety is not guaranteed (R8-R10)",
+    "input_identifiability": {
+      "A": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "B": {
+        "status": "identifiable",
+        "reason": "Settings has two independent goals; R6/R7 override implementation/test merging and require singleton"
+      },
+      "C": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "D": {
+        "status": "identifiable",
+        "reason": "Settings has two independent goals; R6/R7 override implementation/test merging and require singleton"
+      }
+    },
+    "host_only_specification": null
+  },
+  {
+    "name": "F06",
+    "cohort": "holdout",
+    "source": "New synthetic fixture authored before Issue 171 inference; not independent-author/real-repository evidence",
+    "files": [
+      {
+        "path": "service/pool.go",
+        "before": "package service\n\nfunc PoolSize() int { return 6 }\n",
+        "after": "package service\n\nfunc PoolSize() int { return 9 }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package service",
+            "",
+            "func PoolSize() int { return 6 }"
+          ],
+          "after": [
+            "package service",
+            "",
+            "func PoolSize() int { return 9 }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      },
+      {
+        "path": "service/expiry.go",
+        "before": "package service\n\nfunc ExpiryDays() int { return 14 }\n",
+        "after": "package service\n\nfunc ExpiryDays() int { return 21 }\n",
+        "purpose_ids": [
+          "P2"
+        ],
+        "source_evidence": {
+          "before": [
+            "package service",
+            "",
+            "func ExpiryDays() int { return 14 }"
+          ],
+          "after": [
+            "package service",
+            "",
+            "func ExpiryDays() int { return 21 }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      },
+      {
+        "path": "service/policies_test.go",
+        "before": "package service\nimport \"testing\"\nfunc TestPool(t *testing.T) { if PoolSize()!=6 { t.Fatal(\"pool\") } }\nfunc TestExpiry(t *testing.T) { if ExpiryDays()!=14 { t.Fatal(\"expiry\") } }\n",
+        "after": "package service\nimport \"testing\"\nfunc TestPool(t *testing.T) { if PoolSize()!=9 { t.Fatal(\"pool\") } }\nfunc TestExpiry(t *testing.T) { if ExpiryDays()!=21 { t.Fatal(\"expiry\") } }\n",
+        "purpose_ids": [
+          "P1",
+          "P2"
+        ],
+        "source_evidence": {
+          "before": [
+            "package service",
+            "import \"testing\"",
+            "func TestPool(t *testing.T) { if PoolSize()!=6 { t.Fatal(\"pool\") } }",
+            "func TestExpiry(t *testing.T) { if ExpiryDays()!=14 { t.Fatal(\"expiry\") } }"
+          ],
+          "after": [
+            "package service",
+            "import \"testing\"",
+            "func TestPool(t *testing.T) { if PoolSize()!=9 { t.Fatal(\"pool\") } }",
+            "func TestExpiry(t *testing.T) { if ExpiryDays()!=21 { t.Fatal(\"expiry\") } }"
+          ],
+          "after_lines": [
+            1,
+            4
+          ]
+        }
+      }
+    ],
+    "purpose_descriptions": {
+      "P1": "Increase pool capacity 6 to 9",
+      "P2": "Extend expiry 14 to 21 days"
+    },
+    "purpose_relations": [
+      {
+        "purposes": [
+          "P1",
+          "P2"
+        ],
+        "relation": "independent",
+        "source_basis": "Pool capacity and retention duration have separate observable targets"
+      }
+    ],
+    "gold_groups": [
+      [
+        "service/pool.go"
+      ],
+      [
+        "service/expiry.go"
+      ],
+      [
+        "service/policies_test.go"
+      ]
+    ],
+    "allowed_partitions": [
+      [
+        [
+          "service/pool.go"
+        ],
+        [
+          "service/expiry.go"
+        ],
+        [
+          "service/policies_test.go"
+        ]
+      ]
+    ],
+    "fallback_files": [
+      "service/policies_test.go"
+    ],
+    "fallback_purpose_fragmentation": {
+      "P1": [
+        0,
+        2
+      ],
+      "P2": [
+        1,
+        2
+      ]
+    },
+    "gold_status": "confirmed",
+    "rules": [
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R8",
+      "R10",
+      "R5",
+      "R6",
+      "R7",
+      "R9"
+    ],
+    "rationale": "Shared test file is indivisible and multi-purpose; keep it alone and do not merge unrelated implementations via shared tests",
+    "revert_independence": "Independent goals are separate except R6 file indivisibility; arbitrary-order build/test safety is not guaranteed (R8-R10)",
+    "input_identifiability": {
+      "A": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "B": {
+        "status": "identifiable",
+        "reason": "Shared test file is indivisible and multi-purpose; keep it alone and do not merge unrelated implementations via shared tests"
+      },
+      "C": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "D": {
+        "status": "identifiable",
+        "reason": "Shared test file is indivisible and multi-purpose; keep it alone and do not merge unrelated implementations via shared tests"
+      }
+    },
+    "host_only_specification": null
+  },
+  {
+    "name": "F07",
+    "cohort": "holdout",
+    "source": "New synthetic fixture authored before Issue 171 inference; not independent-author/real-repository evidence",
+    "files": [
+      {
+        "path": "bundle/values.go",
+        "before": "package bundle\nfunc Values(n int) (int,int,string,int) { return n*4,n/4,\"queue\",2 }\n",
+        "after": "package bundle\nfunc Values(n int) (int,int,string,int) { return n*5,n/5,\"jobs\",6 }\n",
+        "purpose_ids": [
+          "P1",
+          "P2",
+          "P3"
+        ],
+        "source_evidence": {
+          "before": [
+            "package bundle",
+            "func Values(n int) (int,int,string,int) { return n*4,n/4,\"queue\",2 }"
+          ],
+          "after": [
+            "package bundle",
+            "func Values(n int) (int,int,string,int) { return n*5,n/5,\"jobs\",6 }"
+          ],
+          "after_lines": [
+            1,
+            2
+          ]
+        }
+      },
+      {
+        "path": "bundle/units_test.go",
+        "before": "package bundle\n\nimport \"testing\"\n\nfunc TestUnits(t *testing.T) {\n\ta, b, _, _ := Values(20)\n\tif a != 80 || b != 5 {\n\t\tt.Fatal(\"units\")\n\t}\n}\n",
+        "after": "package bundle\n\nimport \"testing\"\n\nfunc TestUnits(t *testing.T) {\n\ta, b, _, _ := Values(20)\n\tif a != 100 || b != 4 {\n\t\tt.Fatal(\"units\")\n\t}\n}\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package bundle",
+            "",
+            "import \"testing\"",
+            "",
+            "func TestUnits(t *testing.T) {",
+            "\ta, b, _, _ := Values(20)",
+            "\tif a != 80 || b != 5 {",
+            "\t\tt.Fatal(\"units\")",
+            "\t}",
+            "}"
+          ],
+          "after": [
+            "package bundle",
+            "",
+            "import \"testing\"",
+            "",
+            "func TestUnits(t *testing.T) {",
+            "\ta, b, _, _ := Values(20)",
+            "\tif a != 100 || b != 4 {",
+            "\t\tt.Fatal(\"units\")",
+            "\t}",
+            "}"
+          ],
+          "after_lines": [
+            1,
+            10
+          ]
+        }
+      },
+      {
+        "path": "bundle/policies_test.go",
+        "before": "package bundle\n\nimport \"testing\"\n\nfunc TestPolicies(t *testing.T) {\n\t_, _, label, retry := Values(20)\n\tif label != \"queue\" || retry != 2 {\n\t\tt.Fatal(\"policy\")\n\t}\n}\n",
+        "after": "package bundle\n\nimport \"testing\"\n\nfunc TestPolicies(t *testing.T) {\n\t_, _, label, retry := Values(20)\n\tif label != \"jobs\" || retry != 6 {\n\t\tt.Fatal(\"policy\")\n\t}\n}\n",
+        "purpose_ids": [
+          "P2",
+          "P3"
+        ],
+        "source_evidence": {
+          "before": [
+            "package bundle",
+            "",
+            "import \"testing\"",
+            "",
+            "func TestPolicies(t *testing.T) {",
+            "\t_, _, label, retry := Values(20)",
+            "\tif label != \"queue\" || retry != 2 {",
+            "\t\tt.Fatal(\"policy\")",
+            "\t}",
+            "}"
+          ],
+          "after": [
+            "package bundle",
+            "",
+            "import \"testing\"",
+            "",
+            "func TestPolicies(t *testing.T) {",
+            "\t_, _, label, retry := Values(20)",
+            "\tif label != \"jobs\" || retry != 6 {",
+            "\t\tt.Fatal(\"policy\")",
+            "\t}",
+            "}"
+          ],
+          "after_lines": [
+            1,
+            10
+          ]
+        }
+      }
+    ],
+    "purpose_descriptions": {
+      "P1": "Change dependent encode/decode multiplier 4 to 5",
+      "P2": "Change independent title queue to jobs",
+      "P3": "Increase retry count 2 to 6"
+    },
+    "purpose_relations": [
+      {
+        "purposes": [
+          "P1",
+          "P2"
+        ],
+        "relation": "independent",
+        "source_basis": "Encode and Decode depend on the same unit change; Title is independent"
+      },
+      {
+        "purposes": [
+          "P1",
+          "P3"
+        ],
+        "relation": "independent",
+        "source_basis": "Retry count does not affect encoding units"
+      },
+      {
+        "purposes": [
+          "P2",
+          "P3"
+        ],
+        "relation": "independent",
+        "source_basis": "Retry count does not affect title text"
+      }
+    ],
+    "gold_groups": [
+      [
+        "bundle/values.go"
+      ],
+      [
+        "bundle/units_test.go"
+      ],
+      [
+        "bundle/policies_test.go"
+      ]
+    ],
+    "allowed_partitions": [
+      [
+        [
+          "bundle/values.go"
+        ],
+        [
+          "bundle/units_test.go"
+        ],
+        [
+          "bundle/policies_test.go"
+        ]
+      ]
+    ],
+    "fallback_files": [
+      "bundle/values.go",
+      "bundle/policies_test.go"
+    ],
+    "fallback_purpose_fragmentation": {
+      "P1": [
+        0,
+        1
+      ],
+      "P2": [
+        0,
+        2
+      ],
+      "P3": [
+        0,
+        2
+      ]
+    },
+    "gold_status": "confirmed",
+    "rules": [
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R8",
+      "R10",
+      "R5",
+      "R6",
+      "R7",
+      "R9"
+    ],
+    "rationale": "One line contains paired inverse unit calculations plus independent title and retry changes. R5 fails for three purposes, so Values and the two-purpose policy test are R6/R7 singletons.",
+    "revert_independence": "Independent goals are separate except R6 file indivisibility; arbitrary-order build/test safety is not guaranteed (R8-R10)",
+    "input_identifiability": {
+      "A": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "B": {
+        "status": "identifiable",
+        "reason": "Three changed symbols contain a dependent pair plus an independent goal; partial dependence does not meet R5 and file is R6 singleton"
+      },
+      "C": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "D": {
+        "status": "identifiable",
+        "reason": "Three changed symbols contain a dependent pair plus an independent goal; partial dependence does not meet R5 and file is R6 singleton"
+      }
+    },
+    "host_only_specification": null
+  },
+  {
+    "name": "F08",
+    "cohort": "holdout",
+    "source": "New synthetic fixture authored before Issue 171 inference; not independent-author/real-repository evidence",
+    "files": [
+      {
+        "path": "format/number.go",
+        "before": "package format\nimport \"strconv\"\nfunc Number(n int) string { return strconv.Itoa(n) }\n",
+        "after": "package format\nimport (\"strconv\"; \"fmt\")\nfunc Number(n int) string { return strconv.Itoa(n) }\nfunc Padded(n int) string { return fmt.Sprintf(\"%03d\", n) }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package format",
+            "import \"strconv\"",
+            "func Number(n int) string { return strconv.Itoa(n) }"
+          ],
+          "after": [
+            "package format",
+            "import (\"strconv\"; \"fmt\")",
+            "func Number(n int) string { return strconv.Itoa(n) }",
+            "func Padded(n int) string { return fmt.Sprintf(\"%03d\", n) }"
+          ],
+          "after_lines": [
+            1,
+            4
+          ]
+        }
+      },
+      {
+        "path": "format/status.go",
+        "before": "package format\n\nfunc Status(n int) string { return \"pending\" }\n",
+        "after": "package format\n\nfunc Status(n int) string { return Padded(n) + \" pending\" }\n",
+        "purpose_ids": [
+          "P2"
+        ],
+        "source_evidence": {
+          "before": [
+            "package format",
+            "",
+            "func Status(n int) string { return \"pending\" }"
+          ],
+          "after": [
+            "package format",
+            "",
+            "func Status(n int) string { return Padded(n) + \" pending\" }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      }
+    ],
+    "purpose_descriptions": {
+      "P1": "Expose a three-digit padded number formatting capability",
+      "P2": "Display padded pending job counts in Status"
+    },
+    "purpose_relations": [
+      {
+        "purposes": [
+          "P1",
+          "P2"
+        ],
+        "relation": "dependent_independent_goals",
+        "source_basis": "Status depends on new Padded, but generic formatting capability and displaying pending counts are distinct feature goals. Reverting Status preserves the formatting feature."
+      }
+    ],
+    "gold_groups": [
+      [
+        "format/number.go"
+      ],
+      [
+        "format/status.go"
+      ]
+    ],
+    "allowed_partitions": [
+      [
+        [
+          "format/number.go"
+        ],
+        [
+          "format/status.go"
+        ]
+      ]
+    ],
+    "fallback_files": [],
+    "fallback_purpose_fragmentation": {},
+    "gold_status": "confirmed",
+    "rules": [
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R8",
+      "R10"
+    ],
+    "rationale": "R3 dependency is not sufficient for same purpose; consumers can rely on a prerequisite while having a different feature goal",
+    "revert_independence": "Independent goals are separate except R6 file indivisibility; arbitrary-order build/test safety is not guaranteed (R8-R10)",
+    "input_identifiability": {
+      "A": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "B": {
+        "status": "identifiable",
+        "reason": "R3 dependency is not sufficient for same purpose; consumers can rely on a prerequisite while having a different feature goal"
+      },
+      "C": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "D": {
+        "status": "identifiable",
+        "reason": "R3 dependency is not sufficient for same purpose; consumers can rely on a prerequisite while having a different feature goal"
+      }
+    },
+    "host_only_specification": null
+  },
+  {
+    "name": "F09",
+    "cohort": "holdout",
+    "source": "New synthetic fixture authored before Issue 171 inference; not independent-author/real-repository evidence",
+    "files": [
+      {
+        "path": "config/transport.json",
+        "before": "{\"separator\":\";\"}\n",
+        "after": "{\"separator\":\"~\"}\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "{\"separator\":\";\"}"
+          ],
+          "after": [
+            "{\"separator\":\"~\"}"
+          ],
+          "after_lines": [
+            1,
+            1
+          ]
+        }
+      },
+      {
+        "path": "wire/serialize.go",
+        "before": "package wire\n\nimport \"strings\"\nfunc Serialize(xs []string) string { return strings.Join(xs,\";\") }\n",
+        "after": "package wire\n\nimport \"strings\"\nfunc Serialize(xs []string) string { return strings.Join(xs,\"~\") }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package wire",
+            "",
+            "import \"strings\"",
+            "func Serialize(xs []string) string { return strings.Join(xs,\";\") }"
+          ],
+          "after": [
+            "package wire",
+            "",
+            "import \"strings\"",
+            "func Serialize(xs []string) string { return strings.Join(xs,\"~\") }"
+          ],
+          "after_lines": [
+            1,
+            4
+          ]
+        }
+      },
+      {
+        "path": "reader/parse.go",
+        "before": "package reader\n\nimport \"strings\"\nfunc Parse(s string) []string { return strings.Split(s,\";\") }\n",
+        "after": "package reader\n\nimport \"strings\"\nfunc Parse(s string) []string { return strings.Split(s,\"~\") }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package reader",
+            "",
+            "import \"strings\"",
+            "func Parse(s string) []string { return strings.Split(s,\";\") }"
+          ],
+          "after": [
+            "package reader",
+            "",
+            "import \"strings\"",
+            "func Parse(s string) []string { return strings.Split(s,\"~\") }"
+          ],
+          "after_lines": [
+            1,
+            4
+          ]
+        }
+      },
+      {
+        "path": "docs/transport.md",
+        "before": "Records separate fields with `;`.\n",
+        "after": "Records separate fields with `~`.\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "Records separate fields with `;`."
+          ],
+          "after": [
+            "Records separate fields with `~`."
+          ],
+          "after_lines": [
+            1,
+            1
+          ]
+        }
+      }
+    ],
+    "purpose_descriptions": {
+      "P1": "Switch shared field separator contract from ; to ~ in configuration, producer, consumer and documentation"
+    },
+    "purpose_relations": [],
+    "gold_groups": [
+      [
+        "config/transport.json",
+        "wire/serialize.go",
+        "reader/parse.go",
+        "docs/transport.md"
+      ]
+    ],
+    "allowed_partitions": [
+      [
+        [
+          "config/transport.json",
+          "wire/serialize.go",
+          "reader/parse.go",
+          "docs/transport.md"
+        ]
+      ]
+    ],
+    "fallback_files": [],
+    "fallback_purpose_fragmentation": {},
+    "gold_status": "confirmed",
+    "rules": [
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R8",
+      "R10"
+    ],
+    "rationale": "Different file types and directories all implement or document one separator contract",
+    "revert_independence": "Independent goals are separate except R6 file indivisibility; arbitrary-order build/test safety is not guaranteed (R8-R10)",
+    "input_identifiability": {
+      "A": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "B": {
+        "status": "identifiable",
+        "reason": "Different file types and directories all implement or document one separator contract"
+      },
+      "C": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "D": {
+        "status": "identifiable",
+        "reason": "Different file types and directories all implement or document one separator contract"
+      }
+    },
+    "host_only_specification": null
+  },
+  {
+    "name": "F10",
+    "cohort": "holdout",
+    "source": "New synthetic fixture authored before Issue 171 inference; not independent-author/real-repository evidence",
+    "files": [
+      {
+        "path": "numbers/zero_test.go",
+        "before": "package numbers\nimport \"testing\"\nfunc TestZero(t *testing.T) { if Double(1)!=2 { t.Fatal(\"double\") } }\n",
+        "after": "package numbers\nimport \"testing\"\nfunc TestZero(t *testing.T) { if Double(1)!=2 || Double(0)!=0 { t.Fatal(\"double\") } }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package numbers",
+            "import \"testing\"",
+            "func TestZero(t *testing.T) { if Double(1)!=2 { t.Fatal(\"double\") } }"
+          ],
+          "after": [
+            "package numbers",
+            "import \"testing\"",
+            "func TestZero(t *testing.T) { if Double(1)!=2 || Double(0)!=0 { t.Fatal(\"double\") } }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      },
+      {
+        "path": "numbers/negative_test.go",
+        "before": "package numbers\nimport \"testing\"\nfunc TestNegative(t *testing.T) { if Double(2)!=4 { t.Fatal(\"double\") } }\n",
+        "after": "package numbers\nimport \"testing\"\nfunc TestNegative(t *testing.T) { if Double(2)!=4 || Double(-3)!=-6 { t.Fatal(\"double\") } }\n",
+        "purpose_ids": [
+          "P2"
+        ],
+        "source_evidence": {
+          "before": [
+            "package numbers",
+            "import \"testing\"",
+            "func TestNegative(t *testing.T) { if Double(2)!=4 { t.Fatal(\"double\") } }"
+          ],
+          "after": [
+            "package numbers",
+            "import \"testing\"",
+            "func TestNegative(t *testing.T) { if Double(2)!=4 || Double(-3)!=-6 { t.Fatal(\"double\") } }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      },
+      {
+        "path": "numbers/double.go",
+        "before": "package numbers\n\nfunc Double(n int) int { return n*2 }\n",
+        "after": "package numbers\n\nfunc Double(n int) int { return n*2 }\n",
+        "purpose_ids": [],
+        "source_evidence": {
+          "before": [
+            "package numbers",
+            "",
+            "func Double(n int) int { return n*2 }"
+          ],
+          "after": [
+            "package numbers",
+            "",
+            "func Double(n int) int { return n*2 }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      }
+    ],
+    "purpose_descriptions": {
+      "P1": "Add zero-input coverage for Double",
+      "P2": "Add negative-input coverage for Double"
+    },
+    "purpose_relations": [
+      {
+        "purposes": [
+          "P1",
+          "P2"
+        ],
+        "relation": "independent",
+        "source_basis": "Zero and negative boundary checks are independently meaningful; unchanged helper reference alone does not prove same goal"
+      }
+    ],
+    "gold_groups": [
+      [
+        "numbers/zero_test.go"
+      ],
+      [
+        "numbers/negative_test.go"
+      ]
+    ],
+    "allowed_partitions": [
+      [
+        [
+          "numbers/zero_test.go"
+        ],
+        [
+          "numbers/negative_test.go"
+        ]
+      ]
+    ],
+    "fallback_files": [],
+    "fallback_purpose_fragmentation": {},
+    "gold_status": "confirmed",
+    "rules": [
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R8",
+      "R10"
+    ],
+    "rationale": "Test-only changes cover independent input domains while sharing an unchanged helper; R2 forbids automatic merge",
+    "revert_independence": "Independent goals are separate except R6 file indivisibility; arbitrary-order build/test safety is not guaranteed (R8-R10)",
+    "input_identifiability": {
+      "A": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "B": {
+        "status": "identifiable",
+        "reason": "Test-only changes cover independent input domains while sharing an unchanged helper; R2 forbids automatic merge"
+      },
+      "C": {
+        "status": "insufficient",
+        "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+      },
+      "D": {
+        "status": "identifiable",
+        "reason": "Test-only changes cover independent input domains while sharing an unchanged helper; R2 forbids automatic merge"
+      }
+    },
+    "host_only_specification": null
+  },
+  {
+    "name": "F11",
+    "cohort": "holdout",
+    "source": "New synthetic fixture authored before Issue 171 inference; not independent-author/real-repository evidence",
+    "files": [
+      {
+        "path": "sender/limits.go",
+        "before": "package sender\n\nfunc Limit() int { return 11 }\n",
+        "after": "package sender\n\nfunc Limit() int { return 17 }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package sender",
+            "",
+            "func Limit() int { return 11 }"
+          ],
+          "after": [
+            "package sender",
+            "",
+            "func Limit() int { return 17 }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      },
+      {
+        "path": "receiver/limits.go",
+        "before": "package receiver\n\nfunc Limit() int { return 11 }\n",
+        "after": "package receiver\n\nfunc Limit() int { return 17 }\n",
+        "purpose_ids": [
+          "P1"
+        ],
+        "source_evidence": {
+          "before": [
+            "package receiver",
+            "",
+            "func Limit() int { return 11 }"
+          ],
+          "after": [
+            "package receiver",
+            "",
+            "func Limit() int { return 17 }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      }
+    ],
+    "purpose_descriptions": {
+      "P1": "Update both sides of the mandated shared batch limit 11 to 17"
+    },
+    "purpose_relations": [],
+    "gold_groups": [
+      [
+        "sender/limits.go",
+        "receiver/limits.go"
+      ]
+    ],
+    "allowed_partitions": [
+      [
+        [
+          "sender/limits.go",
+          "receiver/limits.go"
+        ]
+      ]
+    ],
+    "fallback_files": [],
+    "fallback_purpose_fragmentation": {},
+    "gold_status": "confirmed",
+    "rules": [
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R8",
+      "R10"
+    ],
+    "rationale": "Host-only explicit specification defines one shared batch limit; same literal alone would not establish purpose identity",
+    "revert_independence": "Independent goals are separate except R6 file indivisibility; arbitrary-order build/test safety is not guaranteed (R8-R10)",
+    "input_identifiability": {
+      "A": {
+        "status": "insufficient",
+        "reason": "Both inputs expose only Limit and literal 11->17, without the shared-batch specification; required relation cannot be established solely from raw/structural evidence"
+      },
+      "B": {
+        "status": "insufficient",
+        "reason": "Both inputs expose only Limit and literal 11->17, without the shared-batch specification; required relation cannot be established solely from raw/structural evidence"
+      },
+      "C": {
+        "status": "insufficient",
+        "reason": "Both inputs expose only Limit and literal 11->17, without the shared-batch specification; required relation cannot be established solely from raw/structural evidence"
+      },
+      "D": {
+        "status": "insufficient",
+        "reason": "Both inputs expose only Limit and literal 11->17, without the shared-batch specification; required relation cannot be established solely from raw/structural evidence"
+      }
+    },
+    "host_only_specification": "Evaluation specification: sender.Limit and receiver.Limit are both values of a single batch framing contract, whose new maximum is 17. Both changes are required for this contract."
+  },
+  {
+    "name": "F12",
+    "cohort": "holdout",
+    "source": "New synthetic fixture authored before Issue 171 inference; not independent-author/real-repository evidence",
+    "files": [
+      {
+        "path": "north/options.go",
+        "before": "package north\n\nfunc Option() int { return 19 }\n",
+        "after": "package north\n\nfunc Option() int { return 23 }\n",
+        "purpose_ids": [],
+        "source_evidence": {
+          "before": [
+            "package north",
+            "",
+            "func Option() int { return 19 }"
+          ],
+          "after": [
+            "package north",
+            "",
+            "func Option() int { return 23 }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      },
+      {
+        "path": "south/options.go",
+        "before": "package south\n\nfunc Option() int { return 19 }\n",
+        "after": "package south\n\nfunc Option() int { return 23 }\n",
+        "purpose_ids": [],
+        "source_evidence": {
+          "before": [
+            "package south",
+            "",
+            "func Option() int { return 19 }"
+          ],
+          "after": [
+            "package south",
+            "",
+            "func Option() int { return 23 }"
+          ],
+          "after_lines": [
+            1,
+            3
+          ]
+        }
+      }
+    ],
+    "purpose_descriptions": {},
+    "purpose_relations": [],
+    "gold_groups": [],
+    "allowed_partitions": [],
+    "fallback_files": [],
+    "fallback_purpose_fragmentation": {},
+    "gold_status": "undetermined",
+    "rules": [
+      "6.1",
+      "6.2"
+    ],
+    "rationale": "No specification or observable caller establishes whether these opaque options share a contract. Neither a unique partition nor supported finite alternatives can be justified; undetermined, excluded before generation",
+    "revert_independence": "Independent goals are separate except R6 file indivisibility; arbitrary-order build/test safety is not guaranteed (R8-R10)",
+    "input_identifiability": {
+      "A": {
+        "status": "undetermined",
+        "reason": "No specification or observable caller establishes whether these opaque options share a contract. Neither a unique partition nor supported finite alternatives can be justified; undetermined, excluded before generation"
+      },
+      "B": {
+        "status": "undetermined",
+        "reason": "No specification or observable caller establishes whether these opaque options share a contract. Neither a unique partition nor supported finite alternatives can be justified; undetermined, excluded before generation"
+      },
+      "C": {
+        "status": "undetermined",
+        "reason": "No specification or observable caller establishes whether these opaque options share a contract. Neither a unique partition nor supported finite alternatives can be justified; undetermined, excluded before generation"
+      },
+      "D": {
+        "status": "undetermined",
+        "reason": "No specification or observable caller establishes whether these opaque options share a contract. Neither a unique partition nor supported finite alternatives can be justified; undetermined, excluded before generation"
+      }
+    },
+    "host_only_specification": null
+  }
+]

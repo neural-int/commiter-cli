@@ -1,0 +1,572 @@
+{
+  "gold_rules_version": "1.0",
+  "fixtures": 12,
+  "confirmed": 11,
+  "undetermined": 1,
+  "multiple_valid": 0,
+  "fallback_files": 4,
+  "rows": [
+    {
+      "fixture": "F01",
+      "status": "confirmed",
+      "file_ids": [
+        "path:bounds/clamp.go",
+        "path:bounds/clamp_test.go",
+        "path:labels/prefix.go"
+      ],
+      "rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R8",
+        "R10"
+      ],
+      "derived_partition": [
+        [
+          "bounds/clamp.go",
+          "bounds/clamp_test.go"
+        ],
+        [
+          "labels/prefix.go"
+        ]
+      ],
+      "fallback": [],
+      "fallback_fragmented_purposes": [],
+      "source_overlap_168_169_170": 0,
+      "semantic_source_review": "Clamp implementation and matching high-value assertion form one behavior; prefix text is an independent goal",
+      "input_identifiability": {
+        "A": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "B": {
+          "status": "identifiable",
+          "reason": "Clamp implementation and matching high-value assertion form one behavior; prefix text is an independent goal"
+        },
+        "C": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "D": {
+          "status": "identifiable",
+          "reason": "Clamp implementation and matching high-value assertion form one behavior; prefix text is an independent goal"
+        }
+      }
+    },
+    {
+      "fixture": "F02",
+      "status": "confirmed",
+      "file_ids": [
+        "path:encoder/rate.go",
+        "path:decoder/rate.go",
+        "path:decoder/backoff.go"
+      ],
+      "rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R8",
+        "R10"
+      ],
+      "derived_partition": [
+        [
+          "encoder/rate.go",
+          "decoder/rate.go"
+        ],
+        [
+          "decoder/backoff.go"
+        ]
+      ],
+      "fallback": [],
+      "fallback_fragmented_purposes": [],
+      "source_overlap_168_169_170": 0,
+      "semantic_source_review": "Producer and consumer implement opposite sides of the same unit contract across directories; retry policy is independent",
+      "input_identifiability": {
+        "A": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "B": {
+          "status": "identifiable",
+          "reason": "Producer and consumer implement opposite sides of the same unit contract across directories; retry policy is independent"
+        },
+        "C": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "D": {
+          "status": "identifiable",
+          "reason": "Producer and consumer implement opposite sides of the same unit contract across directories; retry policy is independent"
+        }
+      }
+    },
+    {
+      "fixture": "F03",
+      "status": "confirmed",
+      "file_ids": [
+        "path:report/width.go",
+        "path:report/width_test.go",
+        "path:report/badge.go",
+        "path:report/badge_test.go"
+      ],
+      "rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R8",
+        "R10"
+      ],
+      "derived_partition": [
+        [
+          "report/width.go",
+          "report/width_test.go"
+        ],
+        [
+          "report/badge.go",
+          "report/badge_test.go"
+        ]
+      ],
+      "fallback": [],
+      "fallback_fragmented_purposes": [],
+      "source_overlap_168_169_170": 0,
+      "semantic_source_review": "Each implementation has its direct test; shared package does not justify merging the two goals",
+      "input_identifiability": {
+        "A": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "B": {
+          "status": "identifiable",
+          "reason": "Each implementation has its direct test; shared package does not justify merging the two goals"
+        },
+        "C": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "D": {
+          "status": "identifiable",
+          "reason": "Each implementation has its direct test; shared package does not justify merging the two goals"
+        }
+      }
+    },
+    {
+      "fixture": "F04",
+      "status": "confirmed",
+      "file_ids": [
+        "path:packet/codec.go",
+        "path:packet/codec_test.go"
+      ],
+      "rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R8",
+        "R10",
+        "R5"
+      ],
+      "derived_partition": [
+        [
+          "packet/codec.go",
+          "packet/codec_test.go"
+        ]
+      ],
+      "fallback": [],
+      "fallback_fragmented_purposes": [],
+      "source_overlap_168_169_170": 0,
+      "semantic_source_review": "Two changed functions are inverse sides of one concrete wire contract (R5), so the file is not an R6 fallback",
+      "input_identifiability": {
+        "A": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "B": {
+          "status": "identifiable",
+          "reason": "Two changed functions are inverse sides of one concrete wire contract (R5), so the file is not an R6 fallback"
+        },
+        "C": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "D": {
+          "status": "identifiable",
+          "reason": "Two changed functions are inverse sides of one concrete wire contract (R5), so the file is not an R6 fallback"
+        }
+      }
+    },
+    {
+      "fixture": "F05",
+      "status": "confirmed",
+      "file_ids": [
+        "path:display/settings.go",
+        "path:display/columns_test.go",
+        "path:display/accent_test.go"
+      ],
+      "rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R8",
+        "R10",
+        "R5",
+        "R6",
+        "R7",
+        "R9"
+      ],
+      "derived_partition": [
+        [
+          "display/settings.go"
+        ],
+        [
+          "display/columns_test.go"
+        ],
+        [
+          "display/accent_test.go"
+        ]
+      ],
+      "fallback": [
+        "display/settings.go"
+      ],
+      "fallback_fragmented_purposes": [
+        "P1",
+        "P2"
+      ],
+      "source_overlap_168_169_170": 0,
+      "semantic_source_review": "Settings has two independent goals; R6/R7 override implementation/test merging and require singleton",
+      "input_identifiability": {
+        "A": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "B": {
+          "status": "identifiable",
+          "reason": "Settings has two independent goals; R6/R7 override implementation/test merging and require singleton"
+        },
+        "C": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "D": {
+          "status": "identifiable",
+          "reason": "Settings has two independent goals; R6/R7 override implementation/test merging and require singleton"
+        }
+      }
+    },
+    {
+      "fixture": "F06",
+      "status": "confirmed",
+      "file_ids": [
+        "path:service/pool.go",
+        "path:service/expiry.go",
+        "path:service/policies_test.go"
+      ],
+      "rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R8",
+        "R10",
+        "R5",
+        "R6",
+        "R7",
+        "R9"
+      ],
+      "derived_partition": [
+        [
+          "service/policies_test.go"
+        ],
+        [
+          "service/pool.go"
+        ],
+        [
+          "service/expiry.go"
+        ]
+      ],
+      "fallback": [
+        "service/policies_test.go"
+      ],
+      "fallback_fragmented_purposes": [
+        "P1",
+        "P2"
+      ],
+      "source_overlap_168_169_170": 0,
+      "semantic_source_review": "Shared test file is indivisible and multi-purpose; keep it alone and do not merge unrelated implementations via shared tests",
+      "input_identifiability": {
+        "A": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "B": {
+          "status": "identifiable",
+          "reason": "Shared test file is indivisible and multi-purpose; keep it alone and do not merge unrelated implementations via shared tests"
+        },
+        "C": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "D": {
+          "status": "identifiable",
+          "reason": "Shared test file is indivisible and multi-purpose; keep it alone and do not merge unrelated implementations via shared tests"
+        }
+      }
+    },
+    {
+      "fixture": "F07",
+      "status": "confirmed",
+      "file_ids": [
+        "path:bundle/values.go",
+        "path:bundle/units_test.go",
+        "path:bundle/policies_test.go"
+      ],
+      "rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R8",
+        "R10",
+        "R5",
+        "R6",
+        "R7",
+        "R9"
+      ],
+      "derived_partition": [
+        [
+          "bundle/values.go"
+        ],
+        [
+          "bundle/policies_test.go"
+        ],
+        [
+          "bundle/units_test.go"
+        ]
+      ],
+      "fallback": [
+        "bundle/values.go",
+        "bundle/policies_test.go"
+      ],
+      "fallback_fragmented_purposes": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "source_overlap_168_169_170": 0,
+      "semantic_source_review": "One line contains paired inverse unit calculations plus independent title and retry changes. R5 fails for three purposes, so Values and the two-purpose policy test are R6/R7 singletons.",
+      "input_identifiability": {
+        "A": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "B": {
+          "status": "identifiable",
+          "reason": "Three changed symbols contain a dependent pair plus an independent goal; partial dependence does not meet R5 and file is R6 singleton"
+        },
+        "C": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "D": {
+          "status": "identifiable",
+          "reason": "Three changed symbols contain a dependent pair plus an independent goal; partial dependence does not meet R5 and file is R6 singleton"
+        }
+      }
+    },
+    {
+      "fixture": "F08",
+      "status": "confirmed",
+      "file_ids": [
+        "path:format/number.go",
+        "path:format/status.go"
+      ],
+      "rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R8",
+        "R10"
+      ],
+      "derived_partition": [
+        [
+          "format/number.go"
+        ],
+        [
+          "format/status.go"
+        ]
+      ],
+      "fallback": [],
+      "fallback_fragmented_purposes": [],
+      "source_overlap_168_169_170": 0,
+      "semantic_source_review": "R3 dependency is not sufficient for same purpose; consumers can rely on a prerequisite while having a different feature goal",
+      "input_identifiability": {
+        "A": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "B": {
+          "status": "identifiable",
+          "reason": "R3 dependency is not sufficient for same purpose; consumers can rely on a prerequisite while having a different feature goal"
+        },
+        "C": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "D": {
+          "status": "identifiable",
+          "reason": "R3 dependency is not sufficient for same purpose; consumers can rely on a prerequisite while having a different feature goal"
+        }
+      }
+    },
+    {
+      "fixture": "F09",
+      "status": "confirmed",
+      "file_ids": [
+        "path:config/transport.json",
+        "path:wire/serialize.go",
+        "path:reader/parse.go",
+        "path:docs/transport.md"
+      ],
+      "rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R8",
+        "R10"
+      ],
+      "derived_partition": [
+        [
+          "config/transport.json",
+          "wire/serialize.go",
+          "reader/parse.go",
+          "docs/transport.md"
+        ]
+      ],
+      "fallback": [],
+      "fallback_fragmented_purposes": [],
+      "source_overlap_168_169_170": 0,
+      "semantic_source_review": "Different file types and directories all implement or document one separator contract",
+      "input_identifiability": {
+        "A": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "B": {
+          "status": "identifiable",
+          "reason": "Different file types and directories all implement or document one separator contract"
+        },
+        "C": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "D": {
+          "status": "identifiable",
+          "reason": "Different file types and directories all implement or document one separator contract"
+        }
+      }
+    },
+    {
+      "fixture": "F10",
+      "status": "confirmed",
+      "file_ids": [
+        "path:numbers/zero_test.go",
+        "path:numbers/negative_test.go"
+      ],
+      "rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R8",
+        "R10"
+      ],
+      "derived_partition": [
+        [
+          "numbers/zero_test.go"
+        ],
+        [
+          "numbers/negative_test.go"
+        ]
+      ],
+      "fallback": [],
+      "fallback_fragmented_purposes": [],
+      "source_overlap_168_169_170": 0,
+      "semantic_source_review": "Test-only changes cover independent input domains while sharing an unchanged helper; R2 forbids automatic merge",
+      "input_identifiability": {
+        "A": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "B": {
+          "status": "identifiable",
+          "reason": "Test-only changes cover independent input domains while sharing an unchanged helper; R2 forbids automatic merge"
+        },
+        "C": {
+          "status": "insufficient",
+          "reason": "Actual baseline supplies AST kinds, symbol names and coordinates without source body/literal changes or call targets. Names may suggest grouping, but do not establish the full changed-behavior/contract and independence evidence recorded in host Gold."
+        },
+        "D": {
+          "status": "identifiable",
+          "reason": "Test-only changes cover independent input domains while sharing an unchanged helper; R2 forbids automatic merge"
+        }
+      }
+    },
+    {
+      "fixture": "F11",
+      "status": "confirmed",
+      "file_ids": [
+        "path:sender/limits.go",
+        "path:receiver/limits.go"
+      ],
+      "rules": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R8",
+        "R10"
+      ],
+      "derived_partition": [
+        [
+          "sender/limits.go",
+          "receiver/limits.go"
+        ]
+      ],
+      "fallback": [],
+      "fallback_fragmented_purposes": [],
+      "source_overlap_168_169_170": 0,
+      "semantic_source_review": "Host-only explicit specification defines one shared batch limit; same literal alone would not establish purpose identity",
+      "input_identifiability": {
+        "A": {
+          "status": "insufficient",
+          "reason": "Both inputs expose only Limit and literal 11->17, without the shared-batch specification; required relation cannot be established solely from raw/structural evidence"
+        },
+        "B": {
+          "status": "insufficient",
+          "reason": "Both inputs expose only Limit and literal 11->17, without the shared-batch specification; required relation cannot be established solely from raw/structural evidence"
+        },
+        "C": {
+          "status": "insufficient",
+          "reason": "Both inputs expose only Limit and literal 11->17, without the shared-batch specification; required relation cannot be established solely from raw/structural evidence"
+        },
+        "D": {
+          "status": "insufficient",
+          "reason": "Both inputs expose only Limit and literal 11->17, without the shared-batch specification; required relation cannot be established solely from raw/structural evidence"
+        }
+      }
+    },
+    {
+      "fixture": "F12",
+      "status": "undetermined",
+      "main_excluded": true,
+      "reason": "No specification or observable caller establishes whether these opaque options share a contract. Neither a unique partition nor supported finite alternatives can be justified; undetermined, excluded before generation"
+    }
+  ],
+  "automated_checks": "Allocation, purposes, evidence bytes, R4-R7 derivation, fragmentation and prior-source overlap; semantic judgments are documented source reviews, not automated proof",
+  "model_generations": 0
+}
