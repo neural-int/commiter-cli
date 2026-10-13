@@ -1,0 +1,43 @@
+{
+  "checked_utc": "2026-10-13T06:34:27.530937+00:00",
+  "commands": [
+    {
+      "command": "go test ./...",
+      "exit_code": 0,
+      "status": "PASS",
+      "wall_seconds": 0.8906050419900566,
+      "log": "quality-0.log"
+    },
+    {
+      "command": "go vet ./...",
+      "exit_code": 0,
+      "status": "PASS",
+      "wall_seconds": 0.1645238329656422,
+      "log": "quality-1.log"
+    },
+    {
+      "command": "go build ./...",
+      "exit_code": 0,
+      "status": "PASS",
+      "wall_seconds": 2.4895148330833763,
+      "log": "quality-2.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/benchmark171 -p test_*.py",
+      "exit_code": 0,
+      "status": "PASS",
+      "wall_seconds": 0.06618608301505446,
+      "log": "quality-3.log"
+    },
+    {
+      "command": "git diff --check 8c873cfd -- tools/benchmark171 docs/benchmarks/issue-171/r67-diagnostic",
+      "exit_code": 0,
+      "status": "PASS",
+      "wall_seconds": 0.01737054088152945,
+      "log": "quality-4.log"
+    }
+  ],
+  "all_passed": true,
+  "model_generations_in_quality_gate": 0,
+  "test_review": "Two new tests assert sole paragraph mutation and ambiguous-anchor rejection; previous nine retained; no production test removal or disabling"
+}
