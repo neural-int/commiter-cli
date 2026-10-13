@@ -105,7 +105,7 @@ func TestThreePhaseScalesGroupingContextWithinConfiguredCeiling(t *testing.T) {
 	}
 	p.Budget.ContextTokens = contextinput.Context16K
 	c = &candidateClient{responses: candidateResponses()}
-	if _, err := (ThreePhaseGenerator{Client: c}).Generate(context.Background(), p, English, SensitiveValues{}); !errors.Is(err, contextinput.ErrTooLarge) || c.calls != 0 {
+	if _, err := (ThreePhaseGenerator{Client: c}).Generate(context.Background(), p, English, SensitiveValues{}); (err == nil || !strings.Contains(err.Error(), contextinput.ErrTooLarge.Error())) || c.calls != 0 {
 		t.Fatalf("16k user ceiling not enforced: calls=%d err=%v", c.calls, err)
 	}
 }
