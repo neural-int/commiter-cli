@@ -54,6 +54,7 @@ func candidatePrepared(t *testing.T) contextinput.Prepared {
 	t.Helper()
 	p := preparedInput(t, English)
 	p.Budget.ContextTokens = contextinput.Context16K
+	p.Document.Files[0].GroupingRawDiff = "@@ -1 +1 @@\n-func changed() { return 1 }\n+func changed() { return 2 }\n"
 	return p
 }
 func candidateResponses() []string {
@@ -154,7 +155,7 @@ func TestThreePhaseRejectsUnsupportedInputBeforeGeneration(t *testing.T) {
 			case "compression":
 				p.SummaryCount = 1
 			case "prompt":
-				p.Document.Files[0].RawDiff = strings.Repeat("x", 16384)
+				p.Document.Files[0].GroupingRawDiff = strings.Repeat("x", 16384)
 				p.Prompt, _ = Renderer(English)(p.Document)
 			case "cancelled":
 				var cancel context.CancelFunc

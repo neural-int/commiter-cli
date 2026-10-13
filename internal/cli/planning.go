@@ -61,6 +61,11 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 		return planning.Plan{}, err
 	}
 	attachRelationContext(&document, snapshot.Changes, relationFiles)
+	if values.Planner == config.CandidatePlanner {
+		if err := attachGroupingSyntaxContext(ctx, root, &document, relationFiles); err != nil {
+			return planning.Plan{}, err
+		}
+	}
 	fileIDs := make([]string, len(document.Files))
 	for index, file := range document.Files {
 		fileIDs[index] = file.ID

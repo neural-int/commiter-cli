@@ -312,6 +312,7 @@ func cloneDocument(document Document) Document {
 		clone.Files[i].HeadIdentity = cloneString(file.HeadIdentity)
 		clone.Files[i].WorktreeIdentity = cloneString(file.WorktreeIdentity)
 		clone.Files[i].Evidence = append([]syntax.Evidence(nil), file.Evidence...)
+		clone.Files[i].GroupingSyntaxContext = append([]syntax.MinimalContext(nil), file.GroupingSyntaxContext...)
 		clone.Files[i].summaryLines = append([]summaryLine(nil), file.summaryLines...)
 		if file.EvidenceReduction != nil {
 			reduction := *file.EvidenceReduction

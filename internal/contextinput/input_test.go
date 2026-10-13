@@ -1,6 +1,7 @@
 package contextinput
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/natsuki0413/commiter-cli/internal/gitstate"
@@ -89,4 +90,28 @@ func TestBuildRejectsContentThatContradictsMode(t *testing.T) {
 func withStatus(change gitstate.Change, status string) gitstate.Change {
 	change.Status = status
 	return change
+}
+
+func TestGroupingSidecarIsClonedAndPreservedWithoutSerialization(t *testing.T) {
+	original := Document{Files: []File{{ID: "F001", GroupingRawDiff: "private host source", GroupingSyntaxContext: []syntax.MinimalContext{{HunkIndex: 0, EnclosingDeclaration: "Value"}}}}}
+	cloned := cloneDocument(original)
+	cloned.Files[0].GroupingSyntaxContext[0].EnclosingDeclaration = "Changed"
+	if original.Files[0].GroupingSyntaxContext[0].EnclosingDeclaration != "Value" {
+		t.Fatal("context clone aliases source")
+	}
+	if err := ValidatePreserved(original, cloned); err == nil {
+		t.Fatal("grouping provenance rewrite accepted")
+	}
+	cloned = cloneDocument(original)
+	cloned.Files[0].GroupingRawDiff = "rewritten"
+	if err := ValidatePreserved(original, cloned); err == nil {
+		t.Fatal("raw grouping source rewrite accepted")
+	}
+	data, err := JSONRenderer(original)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(data), "private host source") || strings.Contains(string(data), "enclosing_declaration") {
+		t.Fatal("host-only input was serialized")
+	}
 }
