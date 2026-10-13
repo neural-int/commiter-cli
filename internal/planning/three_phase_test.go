@@ -89,6 +89,27 @@ func TestThreePhaseRestoresIDsAndUsesSharedBoundedProfiles(t *testing.T) {
 		t.Fatal("generated category fed back into text phase")
 	}
 }
+func TestThreePhaseScalesGroupingContextWithinConfiguredCeiling(t *testing.T) {
+	p := candidatePrepared(t)
+	p.Budget.ContextTokens = contextinput.Context32K
+	p.Document.Files[0].GroupingRawDiff = strings.Repeat("+ some changed code\n", 1000)
+	c := &candidateClient{responses: candidateResponses()}
+	result, err := (ThreePhaseGenerator{Client: c}).Generate(context.Background(), p, English, SensitiveValues{})
+	if err != nil || result.Calls != 3 {
+		t.Fatalf("adaptive grouping: result=%+v err=%v", result, err)
+	}
+	for i, expected := range []int{contextinput.Context32K, contextinput.Context16K, contextinput.Context16K} {
+		if c.options[i].ContextTokens != expected {
+			t.Fatalf("phase %d context=%d, want %d", i, c.options[i].ContextTokens, expected)
+		}
+	}
+	p.Budget.ContextTokens = contextinput.Context16K
+	c = &candidateClient{responses: candidateResponses()}
+	if _, err := (ThreePhaseGenerator{Client: c}).Generate(context.Background(), p, English, SensitiveValues{}); !errors.Is(err, contextinput.ErrTooLarge) || c.calls != 0 {
+		t.Fatalf("16k user ceiling not enforced: calls=%d err=%v", c.calls, err)
+	}
+}
+
 func TestThreePhaseStopsWithoutRepairOrPartialPlan(t *testing.T) {
 	tests := []struct {
 		name           string
