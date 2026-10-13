@@ -105,7 +105,7 @@ DはExact11/22（18以上必要）、A比+1（+4以上必要）、FS1（A0以下
 - [x] 意味品質・安全・費用を区別してNO-GO/限界/次の条件を記録
 - [x] Production/元Git状態を維持し有限研究として終了
 
-Issue本文へ全完了条件と報告目次を反映した後、指定goal.mdに従って最終repository test/vet/buildを実行する。実行結果はfinal-quality.jsonで確定し、検証前にPASSと扱わない。
+Issue本文の6完了条件と報告目次を反映した後、指定goal.mdに従って最終品質ゲートを実施した。go test ./...、go vet ./...、go build ./...、研究用契約テスト9件、対象diff checkはすべてPASS。final-quality.jsonにexit codeと実行時間を保存した。Productionの機能削除/更新やテスト削除はなく、実回帰・採点契約以外の自明なテストを追加していない。
 
 ## Next Steps
 

@@ -1,0 +1,103 @@
+{
+  "checked_utc": "2026-10-13T05:12:50.468628+00:00",
+  "requirements": [
+    {
+      "requirement": "Remote goal.md retrieved exactly",
+      "state": "achieved",
+      "evidence": [
+        "workflow-exact-source.json",
+        "source-provenance-audit.json"
+      ],
+      "verified_blob": "ad92785ee8b4f4d04ded9c5755c4450cf02281ca"
+    },
+    {
+      "requirement": "Remote Issue 171 branch fetched and isolated worktree used",
+      "state": "achieved",
+      "evidence": [
+        "preregistration.json",
+        "main-before.json",
+        "run-3/final-audit.json"
+      ]
+    },
+    {
+      "requirement": "Gold rules v1 R1-R10 and uncertainty/scoring applied to fixtures",
+      "state": "achieved",
+      "evidence": [
+        "commit-grouping-gold-rules.md",
+        "tools/benchmark171/fixtures.json",
+        "gold-audit.json",
+        "input-audit.json",
+        "integrity-audit.json"
+      ]
+    },
+    {
+      "requirement": "Actual first-phase baseline; 4 arms and finite contracts frozen before generation",
+      "state": "achieved",
+      "evidence": [
+        "F01-captured-baseline.json",
+        "frozen-inputs/manifest.json",
+        "prompt-adaptation.json",
+        "preregistration.json",
+        "run-3/preregistration.json"
+      ]
+    },
+    {
+      "requirement": "Case evidence for FM/FS/uncertainty and input identifiability",
+      "state": "achieved",
+      "evidence": [
+        "gold-audit.json",
+        "tools/benchmark171/fixtures.json",
+        "run-3/cohort-and-case-metrics.json"
+      ]
+    },
+    {
+      "requirement": "All paired model calls and Exact/FM/FS/order/assignment/resources measured",
+      "state": "achieved",
+      "evidence": [
+        "run-3/attempts.jsonl",
+        "run-3/measurements.jsonl",
+        "run-3/evaluation.json",
+        "run-3/cohort-and-case-metrics.json"
+      ],
+      "calls": 96
+    },
+    {
+      "requirement": "Meaning/safety/cost decision and limits, next implementation conditions recorded",
+      "state": "achieved",
+      "evidence": [
+        "run-3/report.md",
+        "run-3/issue-comment.md"
+      ],
+      "candidate_decision": "NO-GO",
+      "production_go": false
+    },
+    {
+      "requirement": "Finite run ended; original Git/bytes/tree, production, default max files preserved",
+      "state": "achieved",
+      "evidence": [
+        "run-3/termination.json",
+        "run-3/final-audit.json",
+        "integrity-audit.json"
+      ],
+      "total_calls": 98,
+      "retry": 0
+    },
+    {
+      "requirement": "Final repository quality gates and nontrivial tests",
+      "state": "achieved",
+      "evidence": [
+        "run-3/final-quality.json"
+      ],
+      "all_checks": "PASS"
+    }
+  ],
+  "local_requirements_all_achieved": true,
+  "remote_verification": "Finalize after push: remote head equality, 6 checked Issue criteria, posted report/quality comments",
+  "preserved_limits": [
+    "First-stage grouping only",
+    "Synthetic self-authored cohort; known F01",
+    "No real-repository/independent-author/16-file accuracy claim",
+    "No Production adoption or new stage/dependencies"
+  ],
+  "model_calls_after_fixed_matrix": 0
+}

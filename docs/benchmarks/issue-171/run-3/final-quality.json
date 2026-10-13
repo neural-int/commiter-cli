@@ -1,0 +1,40 @@
+{
+  "checked_utc": "2026-10-13T05:10:52.108183+00:00",
+  "issue_verification_complete_before_quality_gate": true,
+  "commands": [
+    {
+      "command": "go test ./...",
+      "exit_code": 0,
+      "status": "PASS",
+      "wall_seconds": 41.42423770809546
+    },
+    {
+      "command": "go vet ./...",
+      "exit_code": 0,
+      "status": "PASS",
+      "wall_seconds": 1.687382958130911
+    },
+    {
+      "command": "go build ./...",
+      "exit_code": 0,
+      "status": "PASS",
+      "wall_seconds": 1.7658649170771241
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/benchmark171 -p test_*.py",
+      "exit_code": 0,
+      "status": "PASS",
+      "wall_seconds": 0.08081825007684529
+    },
+    {
+      "command": "git diff --check 97a98633 -- tools/benchmark171 docs/benchmarks/issue-171",
+      "exit_code": 0,
+      "status": "PASS",
+      "wall_seconds": 0.03558537503704429
+    }
+  ],
+  "all_passed": true,
+  "unnecessary_removed_tests": "No production feature/test removals; no obsolete cases introduced",
+  "test_scope": "9 research regression/contracts plus full Go suite; no tests disabled",
+  "model_generation_calls_during_quality_gate": 0
+}
