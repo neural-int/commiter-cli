@@ -47,7 +47,7 @@ Separate changes only when they represent independent
 behavioral goals. Sharing a file, package, import, or helper
 is not sufficient evidence of a shared purpose.
 
-Describe each purpose using only concrete changes
+Base each grouping decision only on concrete changes
 supported by the input. Do not infer unseen requirements
 or behavior.
 
