@@ -55,6 +55,7 @@ type Record struct {
 	Counts             Counts    `json:"counts"`
 	Model              string    `json:"model,omitempty"`
 	Context            string    `json:"context,omitempty"`
+	ContextCeiling     string    `json:"context_ceiling,omitempty"`
 	CompressionProfile string    `json:"compression_profile,omitempty"`
 	Exit               string    `json:"exit"`
 }
@@ -123,6 +124,17 @@ func (r *Recorder) SetContext(model, contextStage string) {
 		r.record.Model = model
 	}
 	r.record.Context = contextStage
+}
+
+// SetContextCeiling records the configured three-phase limit separately from
+// Context, which records the largest window actually requested from a backend.
+func (r *Recorder) SetContextCeiling(ceiling string) {
+	if r == nil {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.record.ContextCeiling = ceiling
 }
 
 func (r *Recorder) SetCompressionProfile(profile string) {

@@ -103,6 +103,9 @@ func TestThreePhaseScalesGroupingContextWithinConfiguredCeiling(t *testing.T) {
 			t.Fatalf("phase %d context=%d, want %d", i, c.options[i].ContextTokens, expected)
 		}
 	}
+	if result.Telemetry.ContextTokens != contextinput.Context32K {
+		t.Fatalf("maximum selected context=%d", result.Telemetry.ContextTokens)
+	}
 	p.Budget.ContextTokens = contextinput.Context16K
 	c = &candidateClient{responses: candidateResponses()}
 	if _, err := (ThreePhaseGenerator{Client: c}).Generate(context.Background(), p, English, SensitiveValues{}); (err == nil || !strings.Contains(err.Error(), contextinput.ErrTooLarge.Error())) || c.calls != 0 {

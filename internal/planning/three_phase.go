@@ -164,6 +164,9 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 			return contextinput.ErrTooLarge
 		}
 		result.Calls++
+		if contextTokens > result.Telemetry.ContextTokens {
+			result.Telemetry.ContextTokens = contextTokens
+		}
 		response, e := client.ChatWithOptions(ctx, []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: string(encoded)}}, shape, llm.Options{ContextTokens: contextTokens, OutputTokens: budget, GenerationProfile: profile})
 		if e != nil {
 			return generationError(nil)

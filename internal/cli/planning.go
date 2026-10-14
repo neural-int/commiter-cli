@@ -101,6 +101,10 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 		}
 	}
 	contextStage := fmt.Sprintf("%dk", prepared.Budget.ContextTokens/1024)
+	if values.Planner == config.CandidatePlanner {
+		recorder.SetContextCeiling(contextStage)
+		contextStage = "" // No phase window has been requested yet.
+	}
 	recorder.SetContext(values.Model, contextStage)
 	if client == nil {
 		runtime, err := ollama.Open(ctx, values)
@@ -117,6 +121,9 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 		generated, err = (planning.Generator{Client: client}).Generate(ctx, prepared, language, sensitive)
 	}
 	recordGeneratedTelemetry(recorder, generated)
+	if generated.Telemetry.ContextTokens > 0 {
+		contextStage = fmt.Sprintf("%dk", generated.Telemetry.ContextTokens/1024)
+	}
 	if err != nil {
 		return planning.Plan{}, err
 	}
@@ -172,6 +179,9 @@ func recordSummarization(recorder *runmetrics.Recorder, prepared contextinput.Pr
 }
 
 func recordGeneratedTelemetry(recorder *runmetrics.Recorder, generated planning.Result) {
+	if generated.Telemetry.ContextTokens > 0 {
+		recorder.SetContext("", fmt.Sprintf("%dk", generated.Telemetry.ContextTokens/1024))
+	}
 	availability := generated.Telemetry.Availability
 	if !availability.Any() {
 		return

@@ -49,6 +49,9 @@ type Result struct {
 // Duration fields are elapsed nanoseconds.
 // It deliberately excludes prompts, generated content, and validation reasons.
 type Telemetry struct {
+	// ContextTokens is the largest context window requested across phases,
+	// not the configured ceiling or the number of prompt tokens.
+	ContextTokens      int
 	Backend            string
 	Model              string
 	TotalDuration      int64
