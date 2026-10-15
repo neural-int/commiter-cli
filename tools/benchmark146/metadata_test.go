@@ -56,6 +56,35 @@ func (b *fixtureBackend) ChatWithOptions(ctx context.Context, m []llm.Message, s
 	if b.Invalid != "" {
 		return llm.Response{Content: b.Invalid, StopReason: "completed"}, nil
 	}
+	if o.GenerationProfile == "bounded-category" {
+		var payload struct {
+			Groups []benchmarkCategoryGroup `json:"groups"`
+		}
+		if err := json.Unmarshal([]byte(m[1].Content), &payload); err != nil {
+			return llm.Response{}, err
+		}
+		answers := map[string]any{}
+		for _, group := range payload.Groups {
+			ids := []string{}
+			testOnly := true
+			for p := range group.Metadata {
+				testOnly = testOnly && strings.HasSuffix(p, "_test.go")
+				for _, file := range b.Fixture.Files {
+					if *file.NewPath == p {
+						ids = append(ids, file.ID)
+					}
+				}
+			}
+			b.MetadataGroups = append(b.MetadataGroups, ids)
+			kind := "fix"
+			if testOnly {
+				kind = "test"
+			}
+			answers[group.ID] = category{kind, "none"}
+		}
+		data, _ := json.Marshal(answers)
+		return llm.Response{Content: string(data), StopReason: "completed"}, nil
+	}
 	var payload struct {
 		Groups []finalizedGroup `json:"groups"`
 	}

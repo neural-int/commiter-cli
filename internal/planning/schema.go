@@ -6,7 +6,7 @@ import (
 )
 
 var allowedTypes = []string{
-	"feat", "fix", "docs", "style", "refactor", "perf", "test", "build", "ci", "chore", "revert",
+	"feat", "fix", "docs", "style", "refactor", "perf", "test", "build", "ci", "chore", "revert", "update", "change",
 }
 
 type Constraints struct {
@@ -39,7 +39,7 @@ func NewConstraints(language Language, fileIDs []string) (Constraints, error) {
 		OpaqueGrouping: "only opaque files may use path, status, size, type, and other metadata as supporting grouping evidence",
 		Scope:          "name the affected component; never use Conventional Commit type names as scope",
 		Breaking:       "set breaking=true only when the diff explains an incompatible public API, CLI, configuration format, or stored format change; ordinary UI changes and internal refactors are not breaking",
-		Performance:    "use perf only when performance improvement is the purpose and performance evidence is present in the change; use refactor for JSX cleanup or responsibility moves without performance evidence",
+		Performance:    "use perf only when performance improvement is the purpose and performance evidence is present in the change; use refactor for JSX cleanup or responsibility moves without performance evidence; use update only for a behavior change where only feat versus fix is ambiguous, and change only when no specific type is supported",
 		Summary:        summaryConstraint(language),
 	}, nil
 }

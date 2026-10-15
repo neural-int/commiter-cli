@@ -98,7 +98,7 @@ func TestThreePhaseScalesGroupingContextWithinConfiguredCeiling(t *testing.T) {
 	if err != nil || result.Calls != 3 {
 		t.Fatalf("adaptive grouping: result=%+v err=%v", result, err)
 	}
-	for i, expected := range []int{contextinput.Context32K, contextinput.Context16K, contextinput.Context16K} {
+	for i, expected := range []int{contextinput.Context32K, contextinput.Context32K, contextinput.Context16K} {
 		if c.options[i].ContextTokens != expected {
 			t.Fatalf("phase %d context=%d, want %d", i, c.options[i].ContextTokens, expected)
 		}

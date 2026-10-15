@@ -63,6 +63,7 @@ type capture struct {
 	Metrics []callMetric
 	Groups  [][]string
 	Window  []string
+	PathIDs map[string]string
 	Reached bool
 }
 
@@ -72,15 +73,21 @@ func (c *capture) Chat(context.Context, []llm.Message, json.RawMessage) (llm.Res
 func (c *capture) ChatWithOptions(ctx context.Context, m []llm.Message, s json.RawMessage, o llm.Options) (llm.Response, error) {
 	if o.GenerationProfile == "bounded-category" {
 		var payload struct {
-			Groups []struct {
-				FileIDs []string `json:"file_ids"`
-			} `json:"groups"`
+			Groups []benchmarkCategoryGroup `json:"groups"`
 		}
 		if err := json.Unmarshal([]byte(m[1].Content), &payload); err != nil {
 			return llm.Response{}, err
 		}
 		for _, g := range payload.Groups {
-			c.Groups = append(c.Groups, g.FileIDs)
+			ids := []string{}
+			for p := range g.Metadata {
+				id := c.PathIDs[p]
+				if id == "" {
+					return llm.Response{}, errors.New("category path missing from selected host files")
+				}
+				ids = append(ids, id)
+			}
+			c.Groups = append(c.Groups, ids)
 		}
 		c.Reached = true
 		return llm.Response{}, errors.New("experiment stops before local metadata")
@@ -152,7 +159,11 @@ func local(ctx context.Context, f fixture, w []string, backend llm.OptionsBacken
 			}
 		}
 	}
-	c := &capture{Backend: backend, Truth: truth, Window: w}
+	pathIDs := map[string]string{}
+	for _, file := range d.Files {
+		pathIDs[*file.NewPath] = file.ID
+	}
+	c := &capture{Backend: backend, Truth: truth, Window: w, PathIDs: pathIDs}
 	_, err = (planning.ThreePhaseGenerator{Client: c}).Generate(ctx, p, planning.English, planning.SensitiveValues{})
 	if !c.Reached {
 		return windowResult{}, c.Metrics, err
