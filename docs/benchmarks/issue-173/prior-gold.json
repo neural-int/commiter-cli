@@ -1,0 +1,196 @@
+{
+  "A": {
+    "groups": [
+      {
+        "paths": [
+          "checkout/shipping.go"
+        ],
+        "expected_type": "fix",
+        "component": "shipping / checkout",
+        "summary_fact": "Equality at the 5000-cent free-shipping threshold must qualify; accept a concrete boundary/inclusive-threshold paraphrase.",
+        "source_binding": {
+          "checkout/shipping.go": {
+            "before_sha256": "2aa7e62a6fb7e8da6bd2a6c6b247ae94b9e6d36a373256886f12dcfbed415db3",
+            "after_sha256": "d044e8b39f77c0edacd6b791ef85ed5705737441efe872bc78542f053d284bfc"
+          }
+        }
+      }
+    ],
+    "breaking": false,
+    "language": "en",
+    "group_order_matters": false,
+    "summary_exact_string_required": false,
+    "rules": [
+      "FR-010: purpose-based file partition, directly corresponding implementation and tests together, no duplicated/split files",
+      "Current membershipSystem: group inseparable elements of one behavior/contract; unrelated goals remain separate",
+      "Current categorySystem: bug correction is fix; changing internal values is not supported public incompatibility",
+      "Current textSystem and schema: affected component scope, one concrete English line, scope 1..16 and summary 1..48 characters"
+    ],
+    "evaluation": "agent-authored source-bound synthetic gold, not independent human validation; summary meaning and scope grounding judged against these fixed facts after the finite suite"
+  },
+  "B": {
+    "groups": [
+      {
+        "paths": [
+          "transport/client.go",
+          "transport/client_test.go",
+          "transport/settings.go",
+          "transport/settings_test.go"
+        ],
+        "expected_type": "fix",
+        "component": "transport / timeout / client / settings",
+        "summary_fact": "Correct the documented default request timeout from 30 to 45 seconds and make its consumer use that default. A concrete default-timeout correction is sufficient within 48 characters.",
+        "source_binding": {
+          "transport/client.go": {
+            "before_sha256": "ad4be4d4ddf7e9dadafa0cb59c6e554006f73fc247f77ad29bef6e7d0cc3d7a7",
+            "after_sha256": "f1f9df73bc3a86200bb7f277dd79cd5e36bea033615301316fee95cbc14fc0d8"
+          },
+          "transport/client_test.go": {
+            "before_sha256": "9956d77d3e0a55e37fcc43c72e5ad0ba65ef7529bef6714fa7fec1d32547ca6a",
+            "after_sha256": "fb61d7f62338984fb5258a8d3673eb792ca1369d9ab95974c103ef6f625163ee"
+          },
+          "transport/settings.go": {
+            "before_sha256": "02157157da594aee17ed410165ff4226b2ab082570a7887412eb7eb269c8799e",
+            "after_sha256": "fea594555ee0c5802e966c34a5001fb367f92228245368d92a11d55dc61aeda4"
+          },
+          "transport/settings_test.go": {
+            "before_sha256": "0f18d872af11399e36031864e4227db5063c198c1e45b4875d9e560e01af3ffe",
+            "after_sha256": "c23648324dfed9eed3fa14036349c7d8083033728d3574207ec6d90f40f495a0"
+          }
+        }
+      }
+    ],
+    "breaking": false,
+    "language": "en",
+    "group_order_matters": false,
+    "summary_exact_string_required": false,
+    "rules": [
+      "FR-010: purpose-based file partition, directly corresponding implementation and tests together, no duplicated/split files",
+      "Current membershipSystem: group inseparable elements of one behavior/contract; unrelated goals remain separate",
+      "Current categorySystem: bug correction is fix; changing internal values is not supported public incompatibility",
+      "Current textSystem and schema: affected component scope, one concrete English line, scope 1..16 and summary 1..48 characters"
+    ],
+    "evaluation": "agent-authored source-bound synthetic gold, not independent human validation; summary meaning and scope grounding judged against these fixed facts after the finite suite"
+  },
+  "C": {
+    "groups": [
+      {
+        "paths": [
+          "checkout/shipping.go",
+          "checkout/shipping_test.go"
+        ],
+        "expected_type": "fix",
+        "component": "shipping / checkout",
+        "summary_fact": "Make free shipping inclusive at the threshold, with its boundary regression test.",
+        "source_binding": {
+          "checkout/shipping.go": {
+            "before_sha256": "2aa7e62a6fb7e8da6bd2a6c6b247ae94b9e6d36a373256886f12dcfbed415db3",
+            "after_sha256": "d044e8b39f77c0edacd6b791ef85ed5705737441efe872bc78542f053d284bfc"
+          },
+          "checkout/shipping_test.go": {
+            "before_sha256": "b4c4d9c3e6d6dd2153fba3da056758e498244cc2fca2bdf38ba9f5414a376644",
+            "after_sha256": "05986feb495fe62162209d51b29cacb813f06425bd0918cf035ba4ab28cfcf8c"
+          }
+        }
+      },
+      {
+        "paths": [
+          "checkout/retry.go",
+          "checkout/retry_test.go"
+        ],
+        "expected_type": "fix",
+        "component": "retry / checkout",
+        "summary_fact": "Treat HTTP 503 service-unavailable as transient alongside 500, with its regression test.",
+        "source_binding": {
+          "checkout/retry.go": {
+            "before_sha256": "ab30cf3f44cf60eefc590a7aad9a60aefc323e352f5826730bd2d59f922ec84b",
+            "after_sha256": "e22ccb2897b2accce8e9ef14408cdc135afba8f6859d9fdbf611b995bb85ec7d"
+          },
+          "checkout/retry_test.go": {
+            "before_sha256": "f2f0f58cd6edaaab650fb9868514bdbfc21b275d8e48c83e99068ae6a465e04d",
+            "after_sha256": "d1279ff1b9a297a115a6e9324870753512f6591e61cc21f67fb1acb45ef752d4"
+          }
+        }
+      }
+    ],
+    "breaking": false,
+    "language": "en",
+    "group_order_matters": false,
+    "summary_exact_string_required": false,
+    "rules": [
+      "FR-010: purpose-based file partition, directly corresponding implementation and tests together, no duplicated/split files",
+      "Current membershipSystem: group inseparable elements of one behavior/contract; unrelated goals remain separate",
+      "Current categorySystem: bug correction is fix; changing internal values is not supported public incompatibility",
+      "Current textSystem and schema: affected component scope, one concrete English line, scope 1..16 and summary 1..48 characters"
+    ],
+    "evaluation": "agent-authored source-bound synthetic gold, not independent human validation; summary meaning and scope grounding judged against these fixed facts after the finite suite"
+  },
+  "D": {
+    "groups": [
+      {
+        "paths": [
+          "catalog/rates.go",
+          "catalog/rates_test.go"
+        ],
+        "expected_type": "fix",
+        "component": "catalog / rates / tariffs",
+        "summary_fact": "Include the mandatory 200-cent surcharge above base in each regional tariff total; tests must check the same contract.",
+        "source_binding": {
+          "catalog/rates.go": {
+            "before_sha256": "85d5f86be0f0d7861ccf3743df5cb9f58c464c38dcbe04fa2b7c36a176baa56b",
+            "after_sha256": "57515729f55705bfdde5972d8f4fc322f62357f3c7a0b40fd306f874578a818f"
+          },
+          "catalog/rates_test.go": {
+            "before_sha256": "d922499dcfe8ecd89e254cbffa3b879d5df7578b2fed1b02fb059793ac1a2008",
+            "after_sha256": "221f725cee80e3451476d98124a4f2b4dc94fa5b6935574f90ee30afc98f681d"
+          }
+        }
+      }
+    ],
+    "breaking": false,
+    "language": "en",
+    "group_order_matters": false,
+    "summary_exact_string_required": false,
+    "rules": [
+      "FR-010: purpose-based file partition, directly corresponding implementation and tests together, no duplicated/split files",
+      "Current membershipSystem: group inseparable elements of one behavior/contract; unrelated goals remain separate",
+      "Current categorySystem: bug correction is fix; changing internal values is not supported public incompatibility",
+      "Current textSystem and schema: affected component scope, one concrete English line, scope 1..16 and summary 1..48 characters"
+    ],
+    "evaluation": "agent-authored source-bound synthetic gold, not independent human validation; summary meaning and scope grounding judged against these fixed facts after the finite suite"
+  },
+  "E": {
+    "groups": [
+      {
+        "paths": [
+          "catalog/rates.go",
+          "catalog/rates_test.go"
+        ],
+        "expected_type": "fix",
+        "component": "catalog / rates / tariffs",
+        "summary_fact": "Include the mandatory 200-cent surcharge above base in each regional tariff total; tests must check the same contract.",
+        "source_binding": {
+          "catalog/rates.go": {
+            "before_sha256": "6dd2de679b979018ded67de2b4322c8c79be9696318848f9b81873452273ac2d",
+            "after_sha256": "dbf0a732eac2259bf5cc7ebd78f8e3ea73362d6bb51cc2b712d1ee24c8c3c03f"
+          },
+          "catalog/rates_test.go": {
+            "before_sha256": "d922499dcfe8ecd89e254cbffa3b879d5df7578b2fed1b02fb059793ac1a2008",
+            "after_sha256": "221f725cee80e3451476d98124a4f2b4dc94fa5b6935574f90ee30afc98f681d"
+          }
+        }
+      }
+    ],
+    "breaking": false,
+    "language": "en",
+    "group_order_matters": false,
+    "summary_exact_string_required": false,
+    "rules": [
+      "FR-010: purpose-based file partition, directly corresponding implementation and tests together, no duplicated/split files",
+      "Current membershipSystem: group inseparable elements of one behavior/contract; unrelated goals remain separate",
+      "Current categorySystem: bug correction is fix; changing internal values is not supported public incompatibility",
+      "Current textSystem and schema: affected component scope, one concrete English line, scope 1..16 and summary 1..48 characters"
+    ],
+    "evaluation": "agent-authored source-bound synthetic gold, not independent human validation; summary meaning and scope grounding judged against these fixed facts after the finite suite"
+  }
+}

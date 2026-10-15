@@ -1,0 +1,15 @@
+# Issue #173 finite Category evaluation
+
+`docs/benchmarks/issue-173/` contains the frozen inputs, source/model hashes, Gold, original result rows and derived report. The original PR #172 failure fixtures remain unchanged and are labeled reused. Twenty source-bound boundary fixtures have separate Gold. This is agent-authored synthetic evaluation, not independent human evaluation.
+
+- `prepare.py` builds an isolated CLI, copies the prior fixtures, creates boundary fixture repositories, captures actual Three-phase requests with zero generation, verifies unchanged Grouping/Text requests, and freezes the contract. Its public version requires `--root`, `--prior`, `--helper`, and `--preflight-helper`; no dependency is installed. The prior artifact directory must contain the PR #172 capture, fixture and model-cache records. Existing preregistration is never overwritten.
+- `trace_helper.py` records sanitized requests and forwards local inference. Capture mode returns fixture-bound JSON without loading or generating with a model.
+- `run.py --root <local-artifact-directory> --phase category|integrated` executes each preregistered suite once. Existing attempt journals block replay. Category arms alternate for the five prior cases; twenty boundary cases use the candidate. Integrated cycles run serially. Max 45 generation calls, retries and repairs zero.
+- `diagnose_integrated.py --root <local-artifact-directory>` reads final response JSON, compares requests with the freeze, checks partitions, and records Text lengths without another model call.
+- `analyze.py` and `report.py` derive aggregate metrics and the Japanese report without altering Gold or original result rows.
+
+The measured production helper exposes no token counts. Three attempts to use an existing tokenize-only helper failed before generation; they are retained as failures, not successful tokenization. No byte count is labeled a measured token count. Resources distinguish Category helper peak RSS from the integrated run's sampled largest descendant RSS; neither is Metal/GPU peak or total model memory.
+
+`measurement-integrity.json` records the final full verification against 198 frozen artifacts plus model files, helper, CLI and fixture Git digests. After all generation stopped, only the preparation script's environment-specific helper locations were replaced with required arguments for publication. `publication.json` retains its measured and published hashes. The original measured script remains in the local artifact directory. Historical hash checking intentionally detects this documented preparer difference; no historical experiment may be silently resumed or rerun. A new run requires a new isolated output/contract rather than overwriting these results.
+
+The initial full Go test failure came from benchmark146 reading the previous Category packet shape. Its adapter was updated to map projected paths to existing host IDs; the request-equality regression test and the full package suite pass. This compatibility repair changed neither the frozen measurement CLI nor historical benchmark data.

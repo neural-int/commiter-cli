@@ -1,0 +1,366 @@
+{
+  "source_base": "0f9278c33c2f477372bc7dd07c7616a738dd6268",
+  "goal_blob": "ad92785ee8b4f4d04ded9c5755c4450cf02281ca",
+  "model": "mlx-community/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2",
+  "helper_sha256": "29e9aac1b2782c0fe255b7c01f50fed1c7e1cba364062c0a9b8757cf05c3cf83",
+  "preflight_helper_sha256": "44c016b46bb73b96753798c1cda1908f20685e59b21124555d1fcb3f904bd09a",
+  "cli_sha256": "00c272c61d7965088fd0143c01ec413e5d472670d4e0c029f66372d9be73f843",
+  "source_fixture_request_sha256": {
+    "internal/cli/cli.go": "6402563a85d21d29cb2f765f396eabccc6cd3c83a0ef0bd9f711bb31ddbcc553",
+    "internal/cli/cli_test.go": "42c24e1051f8499cddbf851f33720cf61c3ec60b8bd36db17206f87d885ce3ea",
+    "internal/cli/collection.go": "4502d29943d46ee12fea275b9763af96f1f932f31a5d48411fa7803a65789126",
+    "internal/cli/collection_test.go": "5e63332adba93c3e62d73e4af9b53a9dd2d826eb88e9e2b78da7fc2dc544ceae",
+    "internal/cli/doctor_mlx.go": "ec3befaacaf4f9ee224c4706ae395d7af34e6a2c03e5f924b740da973f6ef79f",
+    "internal/cli/doctor_mlx_test.go": "c6c0135c11275a2d7e97eb8bc8494873b019b18329d7b91bdb1d9930d36b57c9",
+    "internal/cli/grouping_context.go": "c246578cf973c182f6a91dc0ec964ba7d7ecd609710f64afcfbd8d5a656bb297",
+    "internal/cli/grouping_context_test.go": "02f2ae1b0a5196f23bb339d62b83525ab0f9d5defbfc6bbc886f27d20c150d1c",
+    "internal/cli/metrics_test.go": "61be87e3cfaa7ef8441a97fd5966c2282b50a891a166b3140bdddc1002605f5f",
+    "internal/cli/planning.go": "08d76850e46a0867a715c3b090f11288d80b7a6ba05b1f086ce2ac9a0438bfa1",
+    "internal/cli/planning_test.go": "e5a4ff11797645cc83fb6842d4d246c121474334fddf2d19248f719ffc1fe362",
+    "internal/cli/verification.go": "373a9dc085ac38b1dc85ac8b4007f6952f491af58014ee2db4dfc2a6b1ce240c",
+    "internal/cli/verification_test.go": "ff79607e82ef317d0bdbf9e11411d14c3cd0f484dd1140aee5037307aa25a263",
+    "internal/commitexec/executor.go": "d999923a36a3c32e732450ff5bb2c1a8d323913092ee14714ea047b4b942d23a",
+    "internal/commitexec/executor_regression_test.go": "399167d2fb5a8096a73f6faadf25e8518cf252c4b3e54ac256c5ba9174a2eb54",
+    "internal/commitexec/executor_test.go": "8d53141ff2d1a98266c8947319ddd4452c11de5ba7069fe9421a6e54f409cca9",
+    "internal/config/config.go": "4990515bd29a7854d1eb458769699443849596ad799ead686669b84352f7fc0e",
+    "internal/config/config_test.go": "58314cf01466f2ea13cae439c0c34462faa0ece2980017a0a84aa53168f73acb",
+    "internal/config/init.go": "15ad135e6ccacda9cbeb2a71162ab642b43789ce6ecac899972cf9d42eda96fb",
+    "internal/config/paths.go": "1df2faba6fa94052f69a809a592696dc1e69102e5b60b8a169370458b72f9082",
+    "internal/contextinput/budget.go": "f0567233de4f9552b86cd888d81792950f96ac3ca7a15dab6be15f62403181ae",
+    "internal/contextinput/budget_test.go": "0da16ef88ac117f01cf17fc3bc465bed0e59b134637e7583b27ab816e4ccbb58",
+    "internal/contextinput/chunk.go": "00053584a27632905f4425e137f576c8340e92e139eba4e02130884fd02689e2",
+    "internal/contextinput/chunk_comparison_test.go": "c8b8677e11a4b097d3281d012d5410367e251f30660c7369e13181fb9e9a468f",
+    "internal/contextinput/controller.go": "141b3eb78aa29dd955f540ac48dd5b0be9ddfb5aa1e76518b8e43d099460b3aa",
+    "internal/contextinput/controller_test.go": "18d8dfa3f0e49d0f3d797f84eda212debf05425edf8439e4a6775d75f32d5584",
+    "internal/contextinput/cross_language_evidence_test.go": "19095c5a52cc24305eabe5ec82430ddb41889f6f70e3e27dbb0c2b3ec600de5e",
+    "internal/contextinput/evidence.go": "a6b9e609f75a5d1fa42eb33c304d183a9416dbfffe213c6219a9ef837e118f2e",
+    "internal/contextinput/evidence_test.go": "987cb10ede4bbe3a1fee262191a1f692279005cea4541db9e6bac1b09612d344",
+    "internal/contextinput/input.go": "35a969c28e191d255dfc2591370c52b33a4aba9804fc8cb49d1b6570b04ce471",
+    "internal/contextinput/input_test.go": "ab0a6c53d130e680939b38738a1ff084335e74a0ba48311bc1b37a79daf802f6",
+    "internal/contextinput/relations.go": "f9c40a5326468aa0aff3c24ec32aa2b41495d90ac2779c36fdd30b157d00ba15",
+    "internal/contextinput/summarizer.go": "c8d3d7080bb1746fc08f29b5721fce2eeb0d3dbfde8cf0e59c1547b8ebf53a42",
+    "internal/contextinput/summarizer_test.go": "90f5a939245f3c6e88f7b6b3ae768d31e387026a99a22fb032ce9bc6e77c77ce",
+    "internal/exitcode/exitcode.go": "91845fe70b5e958acf1543f7a28f9a35b62a37885c2ad76c7200a0eb100cecf7",
+    "internal/gitstate/collect.go": "4ff367b80de07ecb5a09a9a6fc1c7258449d67ad11808ce573da6af57751f666",
+    "internal/gitstate/files.go": "de69bc424cc7baea22bcde8c725c215cf087362cde1574b47831d2e092036345",
+    "internal/gitstate/git.go": "fd60a34c1f9cbd8727801a223f186511610e20bf97b610f251f776bf43067ac6",
+    "internal/gitstate/gitstate_test.go": "26e7628a9bbbf296599d87ced41a485463b887ab4bb04cae1ef74af42f9c618b",
+    "internal/gitstate/lock.go": "9690548ed70b086734ba2474c9d9c8bc4e9ac465fc011444e2a60afad9e5e21b",
+    "internal/gitstate/sensitive.go": "c8d6df79555fa0dbecfe1a9a4a3e75fe215b20ce650f0ee9b74268738f3d462b",
+    "internal/gitstate/snapshot.go": "c3657f729428e7cdec9dd95e9c1e0b8eeac0fae5259bc4ae3ebb2828e4e1adbe",
+    "internal/gitstate/status.go": "f9edc2341c64efb6d726bf175e062f35e5d52a38f9afa4e721f5fb9573e2db7a",
+    "internal/gitstate/types.go": "146c281a3ab7736fa06f00bad9dd1d3a7654ffc6211ddf70d10a12872acc51af",
+    "internal/interaction/interaction.go": "e608d2b7f497a3a9446b7654c028d9bb52d5d1f6064400758b0e4599719ed69c",
+    "internal/interaction/interaction_test.go": "21a2941b7131881afb1da40be66773db920511c04e097d430468b884936037d6",
+    "internal/llm/types.go": "1d43af410ebcd0b336c9f1942382ce8f4cd091cb441f75560383fdcce0bb31ce",
+    "internal/llm/types_test.go": "04cded1e1db99fde2c4647158979506d3e3a0dad96dea012ecfeb1d60b4084ca",
+    "internal/metrics/metrics.go": "d3b14e671ee79981a9e4e57467891c197227f2c61a4c1d40c50e428199ebc506",
+    "internal/metrics/metrics_test.go": "6b97a74c4309c0e497b33e62b60f17da7295cc84c28749118cb9686b48c37fea",
+    "internal/mlx/backend.go": "d6439612582ab2e2724ff0bcbc2b47f98a29eee3ecbcb829ff3f4fcc3460c10f",
+    "internal/mlx/backend_test.go": "7251e47a30e1638b13084e1b1adc3bc4c8da48c52c43b80cb025fce5ee740155",
+    "internal/mlx/client.go": "8693a566c0c6acf6cae4fae3b011ad6e952264fa3dcfd6d32bacbf0d277acaa8",
+    "internal/mlx/client_test.go": "d2171a402ca211a12e35aab1c6829f19fbe9d09ee31c7d527876fa7aed0ee260",
+    "internal/mlx/context_smoke_test.go": "7cd6b9f02ed04980330b8c65a01e67a3e7c90a6ca6f54163ab3e8b0d0c7df59f",
+    "internal/mlx/helper.go": "ed57c4beb4656a1c9e32a057333989b2327a9fa4ae6c78976dda18398f6b097a",
+    "internal/mlx/helper_test.go": "a0e5b694333e5ddc81b4751733884c3d35fc178adf21e5aae17d9135ca6632b3",
+    "internal/mlx/process_other.go": "526ee5d62df437188aec8b2695975023f72b232fa7d0cddc0c23cddf252fb20b",
+    "internal/mlx/process_unix.go": "a09afa7fcfd7fc21b0eb5c95a76b719b4608cbbae1a16fe37c789119f02631e5",
+    "internal/mlxmodel/store.go": "cac559ba7bf4e06915f7c99cb7402fdd7d89daf6aa420eba71492d4477980413",
+    "internal/mlxmodel/store_test.go": "2460958dcc8ec05937a860c8913d07d439e2b8ea3997f0e2a3f69aadd824fdee",
+    "internal/ollama/client.go": "86a87528cbe0d05be3b24f27d17e6a689dbc909c81c9b21e7f8d3120e3761560",
+    "internal/ollama/client_test.go": "95957e3e57b10f38628a3260931b4fd70f6ea8350f1c1caa3e7a215c87cdb02a",
+    "internal/ollama/retry_test.go": "dcbcabbef1df9e96ef0e92e70726cf1eb79e6ea9fbe114c5b81527f3c7bb55aa",
+    "internal/ollama/runtime.go": "ea8aee08b7b3449b973002ff81e7a5d22d367bccd6a047f696ecaf98af4f2361",
+    "internal/ollama/runtime_test.go": "487c6ea6dfcb60c194e48eb849d73beac5befb2403226f1ea31fb706aa4627c7",
+    "internal/output/output.go": "94fc019bb5904587b34dc9f609fa20878002f5f27425b150126823afb30e7f35",
+    "internal/output/output_test.go": "5421fa9042b7c658c14d6e38a79d40df1ebfe106c3ddee14d24ac81ffa5ce9ba",
+    "internal/planning/abnormal_fixture_test.go": "eddc4c9e80061899f19abaa84ae7f799a8ea386189aa53a4bc45a7dcde86d6fe",
+    "internal/planning/category_input.go": "eaabd371d915637892e510d97c99d5cbb54680c7a5bad507ba0db329b317f326",
+    "internal/planning/category_input_test.go": "9c3a26a9af07ac1f052e733fd13d57d489b236f2825ee6eea2d778c154ea2d33",
+    "internal/planning/evidence_budget_test.go": "87eedc17676a859865b708eb7eb7660537c7ad392739cef0044cea86fae1df72",
+    "internal/planning/generator.go": "a7ccbe3d6774e624a90184692fbdc9a80b56f526bb34bcefe946c73e1f442d35",
+    "internal/planning/grouping_input.go": "4fe4b5d5fef8cd7947499057bb775835b41e27f7b05e26a5dfe219ed4c96dcc1",
+    "internal/planning/grouping_input_test.go": "a71cf4a1810f3d8de4346acce769a57ae9649ee84e9f6b685defabdf1caa10a9",
+    "internal/planning/planning_test.go": "e7dce320f73c764611e2987bd998b0660852c74105dffca22d08740b9b7feba8",
+    "internal/planning/prompt.go": "00e218324e3c65234148e31d0dfdcac87a625e55853a6e856736473afee73cf8",
+    "internal/planning/relation_context_test.go": "7331716922f7fa982b209ceecfdf4a488f5ebc017068c84578a046014659189e",
+    "internal/planning/schema.go": "7ce33e1066d5d3f96e33846ffcc642d23759209de354dcf91029e266ba9db676",
+    "internal/planning/sensitive.go": "899c8d821ddda86b818247fadd0e79acd7a4a4a6c86cb065163662639c8dee0c",
+    "internal/planning/three_phase.go": "4743cddb59ca61e70651dff80705ebd1956e7055355321af2770bc4d1ceb446b",
+    "internal/planning/three_phase_test.go": "b80f81f377f862c9bcd12e16ae4b0d48ffecc228d338bb1e3accbc84429ab688",
+    "internal/planning/types.go": "59510220c10d13958f049cfea78bec0e95bfa2ca4dac754d3c6f3dc2d1163d4c",
+    "internal/planning/validate.go": "ff7565e7202718fdc685b6fda89471fdbaa612759fae6e9180268b106b54d27f",
+    "internal/pushexec/executor.go": "d676c68967c267e1616fc6366052e6d52388c6799bf41e2c0a27d4b35c559f57",
+    "internal/pushexec/executor_test.go": "30aded30dd23c5f187c9dba093a0b9d9b160b9443bcd72efa13c28c7a060f21a",
+    "internal/relation/extract.go": "68db6cbe9f2e7e7af9eddd5399eecc055bbdac6e90b5a285b34e7207b7b670eb",
+    "internal/relation/extract_test.go": "f533f743e36fb377f6f5736eb02371fa061a9d56f0135454ee87bd4522eea3d9",
+    "internal/relation/graph.go": "c4f4ffeffcf930d7579a79ba427eb2db9f93fc4929c0949165535e1b14addc95",
+    "internal/relation/graph_test.go": "7b488f25a459477cadf3aa93841ee5c3aa30206a4fc3b3af2daf429040429b41",
+    "internal/repository/init.go": "5333f9ab19679131251860805b4a792afcd5ae044e4fdd140f7b50385be326ef",
+    "internal/repository/init_test.go": "2688fbb482b9208e4c6a70fe5f2c01ad479071961a63dca92a8c8c7c514cb5fa",
+    "internal/repository/root.go": "6a9843d310e2c9a28151e82c2578d27454680fa784daadf3317c03f5de3948e8",
+    "internal/syntax/analyze.go": "61233a270a74df3a750259b792d33c1c9d83e7dc4e1f141ed5e963088729fe3e",
+    "internal/syntax/analyze_test.go": "d9276ddf4e4cfc2c135dba3ccc3be48d6d864626ef9dd047da727be3d77447ed",
+    "internal/syntax/minimal_context.go": "7fc1a2e477420a4518e1f807d2bf02b3e26d7e3bab99efdda31a7f69c9941b12",
+    "internal/syntax/minimal_context_test.go": "d58d2ff19cb062795dd64debaabe4b2bef03b0c036931aa13cdef5e5299310d6",
+    "internal/trust/store.go": "31d6a6b2feafc41a9819f3a026c838dd83f9775208b2b8592b7bb47627e1de65",
+    "internal/trust/store_test.go": "434b8b5d9974d936ebdcce28b1224ff8559d87c4f798afa0ab7646419571b5a5",
+    "internal/updatecheck/updatecheck.go": "0d05d05958c37a5414b7d5f9096814cf58fcf125483b03f3e8e497e967b85fda",
+    "internal/updatecheck/updatecheck_test.go": "7b8e71d079ff344aa2393c00f8fd2ace0ef6fa65148e723f1dfc8d31b67b902b",
+    "internal/verification/approval.go": "ca0baf83a55f812ad61870b52b813bab5bff0cb7eed1dd062bf2fee423597e06",
+    "internal/verification/approval_test.go": "dc7efcfc0825cc4eb4b913eb3331b404693cb78e02e534b3201157a1ed415612",
+    "internal/verification/definition.go": "deb879d3faebbc9a2043de53411a96fc603b6c589402322477cff2c610951466",
+    "internal/verification/definition_test.go": "e653a13eb44ac6389409877eaa74c29be116f64c56f713405221324bed0c8398",
+    "internal/verification/process_group_other.go": "8e5972459da9ceea06274e0b9ee30636f627447a06dedbb144e3ef43382d9257",
+    "internal/verification/process_group_test.go": "ca98d88dd531553f15b3fd5c8e5396598db88f6b3a1241b58006d4952a8feb33",
+    "internal/verification/process_group_unix.go": "b3a4b938735855be85de334e205a923af1cba02c513560594551b2573b03c889",
+    "internal/verification/runner.go": "db3156e8e310515815f491caf8b4816821768480f43895e0a0bfa80143d7a744",
+    "internal/verification/runner_test.go": "b9dad99d2d1649f9ea6948ddd05fe3b17a67612e417baf0db696d6382ec805ce",
+    "internal/verification/state.go": "f5a671dd5f6d2693da3aeb145440e4c10574c3eff1901f1bd4385aebb76c7ae3",
+    "tools/benchmark173/boundaries.json": "2b7fab1fd78a44f243310ee4f9d837e50013187723b9c43f634f07a1dd057335",
+    "tools/benchmark173/prepare.py": "96f584f1efc3f149834ed849b88d72e4edbfb43d3d4c7efca7b9f5cc2ccd0c2f",
+    "tools/benchmark173/trace_helper.py": "462d70ec8109004538c081f146cce1a46339a27cd018a91768d104c9ace0fe4d",
+    "docs/benchmarks/issue-173/fixtures.json": "9cfd5cbeacc8db3f9e24308e75df47d4fcabb4f7d236a4e51daa7bf1903a9c34",
+    "docs/benchmarks/issue-173/gold.json": "20452679e5d88199fc0a3adb0d0fde7aae7dcde7a1b46faaab30931f79384175",
+    "docs/benchmarks/issue-173/inputs/A-baseline.json": "0f9fddd5925d7ef49f1a5bac4e79f5697617cd018d2473536e3d7a87f402beba",
+    "docs/benchmarks/issue-173/inputs/A-candidate.json": "3e3c6f6df5d199dfaf0e65dd53cd2ce93e5b004b538a39b5466674dbe39db43b",
+    "docs/benchmarks/issue-173/inputs/B-baseline.json": "1461a9215b6578de9df27caf939e105196a42cc3fee5c4ed7775abdca243d09c",
+    "docs/benchmarks/issue-173/inputs/B-candidate.json": "64662f91df355dc95fa4a78bee31c236443ee7119e054951ab00759725f24b6e",
+    "docs/benchmarks/issue-173/inputs/C-baseline.json": "c0f85f151ba239182c074eb62f4f8af740c9ac99c463c8f342189d6515bff1f8",
+    "docs/benchmarks/issue-173/inputs/C-candidate.json": "41b88bc87dd28fd0c6d28ee7c199b1d7eb390a938c0cdee03b8c74b775434687",
+    "docs/benchmarks/issue-173/inputs/D-baseline.json": "d4306ad825bb7a5aea6b640e2366914a4cfaec8031793a71590435b5e1a6486a",
+    "docs/benchmarks/issue-173/inputs/D-candidate.json": "4f57d472e6c762a1c010915c385fb33227f0eeb57aea392076b9bc1e6be9d00c",
+    "docs/benchmarks/issue-173/inputs/E-baseline.json": "cb57ed79ff98e2a8c766e624f1e93572f8df8f61f0f758150f1be050478357ca",
+    "docs/benchmarks/issue-173/inputs/E-candidate.json": "62e573773b241df48a549a41737db8892611bb1930eea9dcea474723bd4223d6",
+    "docs/benchmarks/issue-173/inputs/F01-candidate.json": "0e0d74da2a168f3f145186279fa5b6e3d469f2e00963fe06be0204fc486b60f5",
+    "docs/benchmarks/issue-173/inputs/F02-candidate.json": "25f3281ad3333aa934cad2dc71ecd3bc795e3da74f399e8b7b973fa0351cf072",
+    "docs/benchmarks/issue-173/inputs/F03-candidate.json": "1d0aab597097310f70914c35dc9b157ba5a8ee2c6eba02943b826036636f2a29",
+    "docs/benchmarks/issue-173/inputs/F04-candidate.json": "50296e439d66fdf03afbef572e6a12383021dc6d2ee948f25b91c3b2cf05e77e",
+    "docs/benchmarks/issue-173/inputs/F05-candidate.json": "2f252ae54b7ddf156198ed3dc9db1ff87c40be96c6df4c85356300aedb2704d6",
+    "docs/benchmarks/issue-173/inputs/F06-candidate.json": "fd4a4299f97cae2a640ff765a0c779d858000a4459e61f4b9463474d1b071964",
+    "docs/benchmarks/issue-173/inputs/F07-candidate.json": "e6ebaa0d05a6468d1ab91a2ffabb70429edf2abec57da1f33e25a3725ec871e9",
+    "docs/benchmarks/issue-173/inputs/F08-candidate.json": "ec055f079fda2515c9b413f86ea03bbfddba092f772111d7f7620b237bae4614",
+    "docs/benchmarks/issue-173/inputs/F09-candidate.json": "6196282958608fc36a937733f3b7ddee065b8585a9e42efa15b62a38b6565b3e",
+    "docs/benchmarks/issue-173/inputs/F10-candidate.json": "52692683a33246d8bc3e38c4179ee17a88d11993eba177bd6fc46225ebb91494",
+    "docs/benchmarks/issue-173/inputs/F11-candidate.json": "f61c54a8c7f18072553c8dd8225555772f4fee73c099af2f723e4008219d2b3c",
+    "docs/benchmarks/issue-173/inputs/F12-candidate.json": "d35bc1f302ccaf66dd846c180cfb3cf337aa504e676638c32676412f4b821776",
+    "docs/benchmarks/issue-173/inputs/F13-candidate.json": "5ef001804f2c143949fbf91f3c65d9f54035e1b8db44d27b69a4ee6530544cc3",
+    "docs/benchmarks/issue-173/inputs/F14-candidate.json": "a18383bbfd9f1cb463d616b7287469b38265b9b6ed1c14e114ef42013f2b3a99",
+    "docs/benchmarks/issue-173/inputs/F15-candidate.json": "c13624390eb7603c63d432115985248e5598b851190075947ca1d97d60a1b1f5",
+    "docs/benchmarks/issue-173/inputs/F16-candidate.json": "80fde817f1f85d1b15f14bec0bc74e03bcdb96a55f9f72834503dc4c3047f00d",
+    "docs/benchmarks/issue-173/inputs/F17-candidate.json": "c39341f5192748b23e4bc96bfa8036e6844eda057c763b71d3721e7ea617d5c8",
+    "docs/benchmarks/issue-173/inputs/F18-candidate.json": "4a0f0a0654b5708fac40bfedb58988efe2a1bbee1428c78a5b748cecdec7b4cb",
+    "docs/benchmarks/issue-173/inputs/F19-candidate.json": "a27fb640a71bf5e054382dfad9646a84075a5a9b23c69341542ae89372e7917c",
+    "docs/benchmarks/issue-173/inputs/F20-candidate.json": "0e0e8e26c65a81b9ed4a1cc323b7e2c30f39d4462d8a767ce8727dbb83016a44",
+    "docs/benchmarks/issue-173/integrated-inputs/A-01.json": "14fd58d3575a3bb3b0fd2ca14afe4e2ade9c9d3194150632bb850fe06aff79dd",
+    "docs/benchmarks/issue-173/integrated-inputs/A-03.json": "2495aa0aeed75c7e36986a274c06b5349f7ed46960c7417522837faafbbc3961",
+    "docs/benchmarks/issue-173/integrated-inputs/B-01.json": "face069d043bace296a305decb24e98b3c20203d241de4aaa0f96a58aea881a4",
+    "docs/benchmarks/issue-173/integrated-inputs/B-03.json": "476b5ab1baf69a48296436b4afc43b6badd67f243dd2b452351a30a330bde33a",
+    "docs/benchmarks/issue-173/integrated-inputs/C-01.json": "8762d2be7ccb561a4126f2a92c2384b55699f6d50e5e3d5905d211159c76eed2",
+    "docs/benchmarks/issue-173/integrated-inputs/C-03.json": "300051cee3fddec5a7b5641f6b6d737c5a4e2903fd0e96d700c21512feffdd02",
+    "docs/benchmarks/issue-173/integrated-inputs/D-01.json": "15655b4600799d228ebf4a9022272f0aef8db44a9ed6ab7fc82c9761b809c942",
+    "docs/benchmarks/issue-173/integrated-inputs/D-03.json": "63c176b0085e801c0bcc246dd03e0821b5a88a70adc51693b262a82bdd4452c8",
+    "docs/benchmarks/issue-173/integrated-inputs/E-01.json": "19fa783532282d741cf278963def9d6118fa72e6a29a9040079bb667944536b0",
+    "docs/benchmarks/issue-173/integrated-inputs/E-03.json": "eb3feef71ed03aa305b660c06077d8a8a90a102e016b1ee1ab95c11fdc58d481",
+    "docs/benchmarks/issue-173/integrated-inputs/F01-01.json": "2aded56ec26e647401208f35913d2c0958483bb2935eebc3ae04c7af62120ac2",
+    "docs/benchmarks/issue-173/integrated-inputs/F01-03.json": "fd982f4df7f34fa3ff251f48c66fd3e56976cacec395e059a39ca920b9c99b8f",
+    "docs/benchmarks/issue-173/integrated-inputs/F02-01.json": "3b8a22fc13ac375eb491192436b4e3565216ec66e48f1a39dfaafc1f479bcb60",
+    "docs/benchmarks/issue-173/integrated-inputs/F02-03.json": "f3eba939afd6b8d3c6c28304b05ad33186444e1d9695a5dadab7f3099bf9ed44",
+    "docs/benchmarks/issue-173/integrated-inputs/F03-01.json": "50c8c01fbe14ce648ecb857bee88fd15c47792b54c01a6fa504dbd6b7bc6f29e",
+    "docs/benchmarks/issue-173/integrated-inputs/F03-03.json": "f86012584f35d4696962bf7cdc2645ee009e6cebec8182beb75e957f0fc92d34",
+    "docs/benchmarks/issue-173/integrated-inputs/F04-01.json": "4384629e8af74431e23558ae1919b3732ac463b8a1bfbedac7f827c7c21ba9b5",
+    "docs/benchmarks/issue-173/integrated-inputs/F04-03.json": "331773f177f040dbd3347af78b5cfca1d37ef439c865965841d625267d605488",
+    "docs/benchmarks/issue-173/integrated-inputs/F05-01.json": "573a4768dc87639365ab60e7b1f64954521a5e3848d962268ac313cd5e822eed",
+    "docs/benchmarks/issue-173/integrated-inputs/F05-03.json": "24074f85534e53e9357d6c2e02167657ff2db17f77c35cfec1a4c038d89dc588",
+    "docs/benchmarks/issue-173/integrated-inputs/F06-01.json": "8795de3d8a03f5af9565c348390cb0390d266d8aa8d6323f3d67546f72b35796",
+    "docs/benchmarks/issue-173/integrated-inputs/F06-03.json": "90e6e528599e785359c3863a1fbb5d5bdbfb4db6c9e6cb80106288bd32e59501",
+    "docs/benchmarks/issue-173/integrated-inputs/F07-01.json": "e8c1dab5fcd9b96a167afb0ce5a3f450696bb73010c00a39b1ec035ed7eb0524",
+    "docs/benchmarks/issue-173/integrated-inputs/F07-03.json": "ae2e9d15c570257f68e76b3be8e8a150cdca1a732c7f692de3da9afcde265386",
+    "docs/benchmarks/issue-173/integrated-inputs/F08-01.json": "ec5aba94b236595049773069389939923d2b7153f888fa385e3922e3c0ec2037",
+    "docs/benchmarks/issue-173/integrated-inputs/F08-03.json": "6760dc00215e6a953470f1a4cbc27f03fa67a74611f78ea2b63885744e57a9e6",
+    "docs/benchmarks/issue-173/integrated-inputs/F09-01.json": "875defcd3ff15fd328f91db5b5d422fd3fdcfaa24fbfa3e864aeb56bf9ef4970",
+    "docs/benchmarks/issue-173/integrated-inputs/F09-03.json": "9dc1406d4e9ded623affec37cf6b2e2337cf32def87c13e0f50376db646e71b2",
+    "docs/benchmarks/issue-173/integrated-inputs/F10-01.json": "8215bdbd795b69ac459b87b7f9f3521fe1d0807b6c529ed8440cebc192eac0e5",
+    "docs/benchmarks/issue-173/integrated-inputs/F10-03.json": "f18393458125e1f5ee91eee803a20697b2449dabd702911c39cbb5756333050f",
+    "docs/benchmarks/issue-173/integrated-inputs/F11-01.json": "2dabf9825afb3aebbc9dc0917c566fa33fe0f0c1bb7bae45aca78e291d2ee767",
+    "docs/benchmarks/issue-173/integrated-inputs/F11-03.json": "0469f18de634d54c173ec0c589eec9fd3df85cba68ad158cc435260061d320c0",
+    "docs/benchmarks/issue-173/integrated-inputs/F12-01.json": "4816a0402383895b2250d7fdd32b35fb32e90ada7cbb1ed0000ad004dfedf567",
+    "docs/benchmarks/issue-173/integrated-inputs/F12-03.json": "7f3bf013d2c4044c5c43de7d2bdc2e26ef313e54169c80bb2320c72c661ed38c",
+    "docs/benchmarks/issue-173/integrated-inputs/F13-01.json": "bfed84c5947793a26c9bf069d7b5cea2681578d5fd25c3026657657c455bfb89",
+    "docs/benchmarks/issue-173/integrated-inputs/F13-03.json": "fbd09e920305ea8e7aa5abedb2aab1a7dfcf778878a968c1b9748bf1abc6c86f",
+    "docs/benchmarks/issue-173/integrated-inputs/F14-01.json": "38f8e30720982458bd92c44016c433acd81dc997d1f363b82dd61c576f7ccb19",
+    "docs/benchmarks/issue-173/integrated-inputs/F14-03.json": "7a60a58223769fb43ad10ba90214c442d099f742f333e6440ed2b864b6aa1a9f",
+    "docs/benchmarks/issue-173/integrated-inputs/F15-01.json": "5f53d5b5060f865817acac57bc95f062739987c0c7480202d580a3b360376c90",
+    "docs/benchmarks/issue-173/integrated-inputs/F15-03.json": "84f03947492d63671adc5d3495d04646a4cf18f42e98e44ef50230e30bda9cd7",
+    "docs/benchmarks/issue-173/integrated-inputs/F16-01.json": "f24d124513d66671013d28d32dd11aa8dbe935c83d4758fd4540b28f3dd787c3",
+    "docs/benchmarks/issue-173/integrated-inputs/F16-03.json": "996a5612c87e9d145da9912f77cfa82d7f96260fb1ed5049b11bae651c0d9191",
+    "docs/benchmarks/issue-173/integrated-inputs/F17-01.json": "e37bcc3b1771a4eb24862dee38d13c3faaef4b6aa8009ca0e2d0c0d841617587",
+    "docs/benchmarks/issue-173/integrated-inputs/F17-03.json": "d9a236fe3097730b70bfcf68d7ebe61d81509c5641abe48f67fd020763948d4b",
+    "docs/benchmarks/issue-173/integrated-inputs/F18-01.json": "0ea8ce4bd6bc7c1e1081cb9857d50f5912952a922748fb60f35037c9951138f7",
+    "docs/benchmarks/issue-173/integrated-inputs/F18-03.json": "7007be2e450c8d52593931f20bc2f4f1197a740c1d6623eff46b619ab468f599",
+    "docs/benchmarks/issue-173/integrated-inputs/F19-01.json": "67d9ea7a69162d5614cd448a118cf51ec6592b5c26cacd1855d859f4677e447d",
+    "docs/benchmarks/issue-173/integrated-inputs/F19-03.json": "8afe9c633d6f22629fcc2bd3cb46c3d06c57155bda8b28bcbe6a3b05d796d1ad",
+    "docs/benchmarks/issue-173/integrated-inputs/F20-01.json": "169328d2f0921ae35e6f5090ff5ea0b3cc56bf750dbaed061fda64c4980555a3",
+    "docs/benchmarks/issue-173/integrated-inputs/F20-03.json": "cdceed3f3a94693e4461c1eb5beff5908fcd857c5c88e96907c1604a91a5618a",
+    "docs/benchmarks/issue-173/model-artifacts.json": "60ecd8e2be4b32b3b1bdf2edeb0f19ff881c50ac5f9acd3845e83994cfc935f4",
+    "docs/benchmarks/issue-173/prior-gold.json": "743b9dfaf3de7851d597d1445c3ffce2105e75e3624ef3bf43af04eeec09786d"
+  },
+  "category_order": [
+    [
+      "A",
+      "baseline"
+    ],
+    [
+      "A",
+      "candidate"
+    ],
+    [
+      "B",
+      "candidate"
+    ],
+    [
+      "B",
+      "baseline"
+    ],
+    [
+      "C",
+      "baseline"
+    ],
+    [
+      "C",
+      "candidate"
+    ],
+    [
+      "D",
+      "candidate"
+    ],
+    [
+      "D",
+      "baseline"
+    ],
+    [
+      "E",
+      "baseline"
+    ],
+    [
+      "E",
+      "candidate"
+    ],
+    [
+      "F01",
+      "candidate"
+    ],
+    [
+      "F02",
+      "candidate"
+    ],
+    [
+      "F03",
+      "candidate"
+    ],
+    [
+      "F04",
+      "candidate"
+    ],
+    [
+      "F05",
+      "candidate"
+    ],
+    [
+      "F06",
+      "candidate"
+    ],
+    [
+      "F07",
+      "candidate"
+    ],
+    [
+      "F08",
+      "candidate"
+    ],
+    [
+      "F09",
+      "candidate"
+    ],
+    [
+      "F10",
+      "candidate"
+    ],
+    [
+      "F11",
+      "candidate"
+    ],
+    [
+      "F12",
+      "candidate"
+    ],
+    [
+      "F13",
+      "candidate"
+    ],
+    [
+      "F14",
+      "candidate"
+    ],
+    [
+      "F15",
+      "candidate"
+    ],
+    [
+      "F16",
+      "candidate"
+    ],
+    [
+      "F17",
+      "candidate"
+    ],
+    [
+      "F18",
+      "candidate"
+    ],
+    [
+      "F19",
+      "candidate"
+    ],
+    [
+      "F20",
+      "candidate"
+    ]
+  ],
+  "integrated_order": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E"
+  ],
+  "max_category_calls": 30,
+  "max_integrated_cycles": 5,
+  "max_integrated_calls": 15,
+  "max_generation_calls": 45,
+  "retries": 0,
+  "repairs": 0,
+  "temperature": 0,
+  "top_p": 1,
+  "top_k": 0,
+  "seed": 144,
+  "category_native_thought_limit": 384,
+  "context_ceiling": 65536,
+  "output_budgets": [
+    768,
+    512,
+    768
+  ],
+  "category_timeout_seconds": 120,
+  "shared_cycle_timeout_seconds": 120,
+  "gate": {
+    "safety": "zero Git mutation, no Grouping/Text drift, no membership loss, no schema violation",
+    "paired": "candidate Gold exact >= 5/6 group decisions and strictly above baseline; no false definite feat/fix on boundary ambiguity",
+    "boundaries": "all 20 source-bound category decisions exact, including each of the two fallback types",
+    "integrated": "all 5 actual cycles accepted by final Validator within shared deadline; failure here is separate from Category and stops adoption",
+    "resources": "no critical pressure >=4, no helper RSS > 12 GiB, no per-call swap growth > 2 GiB"
+  },
+  "stop": "No prompt/Gold/fixture edits or additional inference after freeze. On quality failure retain evidence and stop adoption. Complete predeclared category and integrated measurements unless safety/resource stop. Text changes/deadline changes are out of scope.",
+  "evaluation_independence": "agent-authored, known-source synthetic benchmark; no generalization/16-file/80% production claim",
+  "token_counts": "native tokenize-only preflight per exact request; output token count unavailable from fixed production helper, never estimate as measured"
+}

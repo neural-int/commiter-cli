@@ -1,0 +1,21 @@
+{
+  "status": "pass",
+  "checks": {
+    "go test ./...": "pass",
+    "go vet ./...": "pass",
+    "go build ./...": "pass",
+    "python3 -m unittest discover -s .github/scripts/release-notes -p test_*.py": "pass",
+    "git diff --check": "pass",
+    "gofmt changed Go files": "pass",
+    "python3 -m py_compile tools/benchmark173/*.py": "pass"
+  },
+  "ci": "not_run",
+  "initial_failure": {
+    "command": "go test ./...",
+    "package": "tools/benchmark146",
+    "reason": "old Category packet adapter depended on removed file_ids/id/files; prototype erased its diff",
+    "baseline_reproduction": "same focused tests pass at 0f9278c33c2f477372bc7dd07c7616a738dd6268",
+    "repair": "adapt benchmark packet reader and fixture projector; retain source/Gold/measurements; frozen production binary unchanged"
+  },
+  "goal_final_quality_gate": "not_certified: Issue completion conditions remain unmet; these checks are regression validation"
+}
