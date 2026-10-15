@@ -116,7 +116,8 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 	}
 	var generated planning.Result
 	if values.Planner == config.CandidatePlanner {
-		generated, err = (planning.ThreePhaseGenerator{Client: client}).Generate(ctx, prepared, language, sensitive)
+		codexRecords := optionalCodexContext(ctx, root, snapshot, values, relationFiles, sensitive)
+		generated, err = (planning.ThreePhaseGenerator{Client: client, CodexContext: codexRecords}).Generate(ctx, prepared, language, sensitive)
 	} else {
 		generated, err = (planning.Generator{Client: client}).Generate(ctx, prepared, language, sensitive)
 	}

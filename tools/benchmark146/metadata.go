@@ -116,9 +116,26 @@ func strictDecode(data []byte, output any) error {
 
 type finalizedGroup struct {
 	ID      string              `json:"id"`
-	FileIDs []string            `json:"file_ids"`
+	FileIDs []string            `json:"-"`
 	Files   []contextinput.File `json:"files"`
+	Type    string              `json:"type,omitempty"`
 }
+
+// Restore host identities from visible path IDs; group file_ids are no longer
+// serialized in production prompts. This does not change fixture partitions.
+func restoreFileIDs(visible, original []contextinput.File) []string {
+	var ids []string
+	for _, file := range visible {
+		for _, source := range original {
+			if source.NewPath != nil && file.ID == "path:"+*source.NewPath {
+				ids = append(ids, source.ID)
+				break
+			}
+		}
+	}
+	return ids
+}
+
 type category struct {
 	Type      string `json:"type"`
 	Reference string `json:"breaking_evidence_ref"`
@@ -167,7 +184,7 @@ func finalMetadata(ctx context.Context, f fixture, p partition, backend llm.Opti
 			break
 		}
 	}
-	recorder := &recordingClient{Backend: backend}
+	recorder := &recordingClient{Backend: backend, Files: f.Files}
 	categories := map[string]category{}
 	texts := map[string]commitText{}
 	// No summary is requested until every category packet has succeeded.
@@ -176,6 +193,11 @@ func finalMetadata(ctx context.Context, f fixture, p partition, backend llm.Opti
 		prototype := template.Schema["properties"].(map[string]any)["G001"].(map[string]any)
 		for offset := 0; offset < len(groups); offset += 4 {
 			batch := groups[offset:min(offset+4, len(groups))]
+			if profile == "bounded-text" {
+				for i := range batch {
+					batch[i].Type = categories[batch[i].ID].Type
+				}
+			}
 			properties := map[string]any{}
 			names := []string{}
 			recorder.IDs = nil

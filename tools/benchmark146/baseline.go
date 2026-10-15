@@ -15,6 +15,7 @@ import (
 
 type recordingClient struct {
 	Backend         llm.OptionsBackend
+	Files           []contextinput.File
 	IDs             []string
 	Calls           []callMetric
 	ValidatedGroups [][]string
@@ -27,13 +28,13 @@ func (c *recordingClient) ChatWithOptions(ctx context.Context, m []llm.Message, 
 	if o.GenerationProfile == "bounded-category" {
 		var payload struct {
 			Groups []struct {
-				FileIDs []string `json:"file_ids"`
+				Files []contextinput.File `json:"files"`
 			} `json:"groups"`
 		}
 		if json.Unmarshal([]byte(m[1].Content), &payload) == nil {
 			c.ValidatedGroups = nil
 			for _, g := range payload.Groups {
-				c.ValidatedGroups = append(c.ValidatedGroups, g.FileIDs)
+				c.ValidatedGroups = append(c.ValidatedGroups, restoreFileIDs(g.Files, c.Files))
 			}
 		}
 	}
@@ -73,7 +74,7 @@ func runBaseline(parent context.Context, f fixture, mode string, backend llm.Opt
 		o.Unresolved = true
 		return o
 	}
-	c := &recordingClient{Backend: backend, IDs: idsFor(f.Graph)}
+	c := &recordingClient{Backend: backend, IDs: idsFor(f.Graph), Files: f.Files}
 	r, err := (planning.ThreePhaseGenerator{Client: c}).Generate(parent, contextinput.Prepared{Document: d, Prompt: prompt, Budget: contextinput.Budget{ContextTokens: 16384}}, planning.English, planning.SensitiveValues{})
 	o.Calls = c.Calls
 	o.BackendCalls = len(c.Calls)
