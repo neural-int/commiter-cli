@@ -114,7 +114,7 @@ func TestDefaultsCoverEverySchemaKey(t *testing.T) {
 	if effective.Values.Backend != "mlx" {
 		t.Fatalf("default backend = %q", effective.Values.Backend)
 	}
-	if effective.Values.Context != "16k" || effective.Values.MaxTokens != 16384 {
+	if effective.Values.Context != "auto" || effective.Values.MaxTokens != 65536 {
 		t.Fatalf("adaptive context defaults = %q/%d", effective.Values.Context, effective.Values.MaxTokens)
 	}
 	entries := effective.Entries()
@@ -380,7 +380,7 @@ func writeTestFile(t *testing.T, path, content string) {
 	}
 }
 
-func TestThreePhaseDefaultRequiresPinnedCandidateAndFixedContext(t *testing.T) {
+func TestThreePhaseDefaultRequiresPinnedCandidateAndMinContext(t *testing.T) {
 	values := Defaults().Values
 	if values.Planner != CandidatePlanner || values.Model != CandidateModel || values.ModelRevision != CandidateRevision || values.ModelQuantization != "4bit" {
 		t.Fatalf("candidate defaults = %#v", values)
@@ -398,13 +398,20 @@ func TestThreePhaseDefaultRequiresPinnedCandidateAndFixedContext(t *testing.T) {
 			case "backend":
 				changed.Backend = "ollama"
 			case "context":
-				changed.Context = "32k"
-				changed.MaxTokens = 32768
+				changed.Context = "8k"
+				changed.MaxTokens = 8192
 			}
 			if err := validateValues(changed, t.TempDir()); err == nil {
 				t.Fatal("unsupported candidate accepted")
 			}
 		})
+	}
+	for _, ceiling := range []struct{ context string; max int }{{"16k", 16384}, {"32k", 32768}, {"64k", 65536}, {"auto", 32768}} {
+		changed := values
+		changed.Context, changed.MaxTokens = ceiling.context, ceiling.max
+		if err := validateValues(changed, t.TempDir()); err != nil {
+			t.Fatalf("three-phase rejected supported context %s/%d: %v", ceiling.context, ceiling.max, err)
+		}
 	}
 }
 

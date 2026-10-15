@@ -61,6 +61,11 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 		return planning.Plan{}, err
 	}
 	attachRelationContext(&document, snapshot.Changes, relationFiles)
+	if values.Planner == config.CandidatePlanner {
+		if err := attachGroupingSyntaxContext(ctx, root, &document, relationFiles); err != nil {
+			return planning.Plan{}, err
+		}
+	}
 	fileIDs := make([]string, len(document.Files))
 	for index, file := range document.Files {
 		fileIDs[index] = file.ID
@@ -82,10 +87,24 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 		return planning.Plan{}, err
 	}
 	if values.Planner == config.CandidatePlanner {
-		// The candidate uses a fixed context, rather than the legacy tier choice.
-		prepared.Budget.ContextTokens = contextinput.Context16K
+		// Stage 1 carries raw diffs not visible in Prepare's structural prompt.
+		// Pass the configured ceiling; each phase chooses the smallest fitting tier.
+		switch values.Context {
+		case "auto":
+			prepared.Budget.ContextTokens = values.MaxTokens
+		case "16k":
+			prepared.Budget.ContextTokens = contextinput.Context16K
+		case "32k":
+			prepared.Budget.ContextTokens = contextinput.Context32K
+		case "64k":
+			prepared.Budget.ContextTokens = contextinput.Context64K
+		}
 	}
 	contextStage := fmt.Sprintf("%dk", prepared.Budget.ContextTokens/1024)
+	if values.Planner == config.CandidatePlanner {
+		recorder.SetContextCeiling(contextStage)
+		contextStage = "" // No phase window has been requested yet.
+	}
 	recorder.SetContext(values.Model, contextStage)
 	if client == nil {
 		runtime, err := ollama.Open(ctx, values)
@@ -102,6 +121,9 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 		generated, err = (planning.Generator{Client: client}).Generate(ctx, prepared, language, sensitive)
 	}
 	recordGeneratedTelemetry(recorder, generated)
+	if generated.Telemetry.ContextTokens > 0 {
+		contextStage = fmt.Sprintf("%dk", generated.Telemetry.ContextTokens/1024)
+	}
 	if err != nil {
 		return planning.Plan{}, err
 	}
@@ -157,6 +179,9 @@ func recordSummarization(recorder *runmetrics.Recorder, prepared contextinput.Pr
 }
 
 func recordGeneratedTelemetry(recorder *runmetrics.Recorder, generated planning.Result) {
+	if generated.Telemetry.ContextTokens > 0 {
+		recorder.SetContext("", fmt.Sprintf("%dk", generated.Telemetry.ContextTokens/1024))
+	}
 	availability := generated.Telemetry.Availability
 	if !availability.Any() {
 		return

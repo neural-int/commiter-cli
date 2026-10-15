@@ -138,8 +138,8 @@ func Defaults() Effective {
 			ModelQuantization: "4bit",
 			Backend:           "mlx",
 			Endpoint:          "http://127.0.0.1:11434",
-			Context:           "16k",
-			MaxTokens:         16384,
+			Context:           "auto",
+			MaxTokens:         65536,
 			Untracked:         "auto-safe",
 			Include:           []string{},
 			Exclude:           []string{},
@@ -420,8 +420,8 @@ func validateValues(v Values, repoRoot string) error {
 		if v.Backend != "mlx" || v.Model != CandidateModel || v.ModelRevision != CandidateRevision || v.ModelQuantization != "4bit" {
 			return fmt.Errorf("three-phase planner requires the pinned Gemma MLX 4bit candidate; use single-pass for another model or backend")
 		}
-		if v.Context != "16k" || v.MaxTokens != 16384 {
-			return fmt.Errorf("three-phase planner requires llm.context = 16k and llm.max_context_tokens = 16384")
+		if v.Context == "8k" || (v.Context == "auto" && v.MaxTokens < 16384) {
+			return fmt.Errorf("three-phase planner requires a context ceiling of at least 16k")
 		}
 	}
 	if err := validateEndpoint(v.Endpoint); err != nil {

@@ -22,7 +22,7 @@ This design is intended to keep repository content local, reduce the amount of w
 - **Multi-commit planning** — groups file-level changes by purpose and generates Conventional Commits messages.
 - **Local LLM inference** — MLX uses a local Swift helper and Ollama uses a loopback endpoint; repository content is not sent to a cloud LLM by `commiter`.
 - **Syntax-aware preprocessing** — uses Tree-sitter where supported instead of asking the model to infer syntax from raw text alone.
-- **Bounded context handling** — the provisional three-phase default uses fixed 16K context; explicit single-pass retains adaptive compression and context tiers.
+- **Bounded context handling** — the provisional three-phase default chooses 16K, 32K, or 64K for each phase within the configured ceiling; explicit single-pass retains adaptive compression and context tiers.
 - **Sensitive-file protection** — clearly sensitive files are always excluded; ambiguous candidates require approval before their contents are read.
 - **Plan validation and approval** — validates model output and, by default, requires approval before commits are created.
 - **Repository-scoped verification** — supports explicit verification commands and package-script autodetection with repository-scoped trust.
@@ -197,15 +197,15 @@ Important defaults include:
 | `llm.model_revision` | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` |
 | `llm.model_quantization` | `"4bit"` |
 | `llm.endpoint` | `"http://127.0.0.1:11434"` |
-| `llm.context` | `"16k"` |
-| `llm.max_context_tokens` | `16384` |
+| `llm.context` | `"auto"` |
+| `llm.max_context_tokens` | `65536` |
 | `verification.autodetect` | `true` |
 | `verification.timeout_seconds` | `600` |
 | `metrics.persist` | `false` |
 
 The Ollama endpoint must be a loopback HTTP URL. Verification configuration is repository-scoped and cannot be configured globally.
 
-The provisional Gemma three-phase default accepts at most four selected files, uncompressed input, fixed 16K context, and a shared 120-second timeout, with no retry or repair. Select `llm.planner = "single-pass"` explicitly for a different backend, model, revision, quantization, or context. The [selection record](docs/decisions/issue-143-production-candidate.md) documents evidence, remaining semantic questions, and unmet timing conditions. `commiter setup` displays the repository, pinned revision, quantization, estimated size, and cache destination before asking to download. `commiter setup --update-model` refreshes the configured pin; change the revision in configuration to move to a newer model. Model files are stored under the user's `commiter/mlx-models` cache directory and checked against the pinned file digests. A normal run never contacts the model registry or downloads a model. Packaged macOS releases include the private `commiter-mlx-helper` and `mlx.metallib` side by side under `libexec`; MLX planning locates that bundled helper and never searches `PATH` or falls back to Ollama. A source build must place the helper and Metal library in the same `bin/` and `libexec/` layout.
+The provisional Gemma three-phase default accepts at most four selected files, uncompressed input, per-phase 16K/32K/64K context selection within the configured ceiling (64K by default), and a shared 120-second timeout, with no retry or repair. Select `llm.planner = "single-pass"` explicitly for a different backend, model, revision, or quantization. The [selection record](docs/decisions/issue-143-production-candidate.md) documents evidence, remaining semantic questions, and unmet timing conditions. `commiter setup` displays the repository, pinned revision, quantization, estimated size, and cache destination before asking to download. `commiter setup --update-model` refreshes the configured pin; change the revision in configuration to move to a newer model. Model files are stored under the user's `commiter/mlx-models` cache directory and checked against the pinned file digests. A normal run never contacts the model registry or downloads a model. Packaged macOS releases include the private `commiter-mlx-helper` and `mlx.metallib` side by side under `libexec`; MLX planning locates that bundled helper and never searches `PATH` or falls back to Ollama. A source build must place the helper and Metal library in the same `bin/` and `libexec/` layout.
 
 For the complete configuration schema and source restrictions, see the [Software Requirements Specification](SOFTWARE_REQUIREMENTS_SPECIFICATION_en.md).
 
@@ -242,6 +242,8 @@ The explicit MLX setup path requests only the configured model repository, revis
 ### Push behavior
 
 Push follows normal Git semantics. If the current branch already contains outgoing commits created before the current `commiter` run, those commits may be included in the same push. Pre-existing outgoing commits are not re-analyzed or sensitive-classified by the current run.
+
+For three-phase planning, metrics `context_ceiling` records the configured limit and `context` records the largest context window requested across the phases. For example, a 64K limit with 32K/16K/16K phase requests records `context_ceiling: "64k"` and `context: "32k"`. These are window sizes, not actual prompt-token counts. The doctor capability probe currently checks basic operation at 16K; it does not certify 32K/64K runtime performance.
 
 Persistent metrics are disabled by default. When enabled, they are local records and are not intended to contain repository paths, messages, diffs, prompts, user feedback, or sensitive values.
 

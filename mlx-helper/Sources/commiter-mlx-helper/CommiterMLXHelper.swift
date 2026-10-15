@@ -231,6 +231,9 @@ struct CommiterMLXHelper {
                   modelID == "mlx-community/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2" else {
                 throw HelperError.malformedRequest
             }
+            do {
+                try BoundedRequestLimits.validate(profile: profile, context: request.contextTokens, output: request.outputTokens)
+            } catch { throw HelperError.malformedRequest }
         }
         let schemaData = try JSONSerialization.data(withJSONObject: request.schema.foundationValue, options: [.sortedKeys])
         guard let schema = String(data: schemaData, encoding: .utf8) else {
@@ -318,10 +321,7 @@ struct CommiterMLXHelper {
 
     private static func generateBounded(_ request: Request, profile: String, schema: String, context: ModelContext) async throws -> String {
         let nativeLimit = profile == "bounded-grouping" ? 512 : (profile == "bounded-category" ? 384 : 0)
-        let budget = profile == "bounded-category" ? 512 : 768
-        guard request.outputTokens == budget, request.contextTokens > 0, request.contextTokens <= 16384 else {
-            throw HelperError.malformedRequest
-        }
+        let budget = request.outputTokens // Validated by handle before model loading.
         let chat = request.messages.map { Chat.Message(role: $0.role, content: $0.content) }
         let input = try await context.processor.prepare(input: UserInput(chat: chat, additionalContext: ["enable_thinking": nativeLimit > 0]))
         do { try TokenBudget.validate(context: request.contextTokens, prompt: input.text.tokens.size, output: budget) }
@@ -346,8 +346,18 @@ struct CommiterMLXHelper {
             nativeState = state
             components = GenerationComponents(logitProcessorFactory: { NativeThoughtBudgetProcessor(state: state) })
         }
+        var parameters = GenerateParameters(maxTokens: budget, temperature: 0, topP: 1, topK: 0, seed: 144)
+        if request.contextTokens > 16384 {
+            // The dependency submits prefill chunks asynchronously. At long
+            // contexts, wait for each chunk before submitting the next and
+            // release unused buffers; keep token order and KV contents intact.
+            parameters.prefill.progress = { _, _ in
+                Stream().synchronize()
+                Memory.clearCache()
+            }
+        }
         let stream = try generate(input: input,
-            parameters: GenerateParameters(maxTokens: budget, temperature: 0, topP: 1, topK: 0, seed: 144),
+            parameters: parameters,
             context: context, components: components)
         var output = ""
         var completed = false

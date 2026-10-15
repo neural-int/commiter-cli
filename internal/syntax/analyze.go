@@ -75,6 +75,8 @@ type ChangeResult struct {
 	Mode     Mode            `json:"mode"`
 	RawDiff  string          `json:"raw_diff,omitempty"`
 	Evidence []Evidence      `json:"evidence,omitempty"`
+	// Host-only source for the Stage 1 projection; it does not change Mode.
+	GroupingRawDiff string `json:"-"`
 }
 
 type languageFactory func() unsafe.Pointer
@@ -183,7 +185,7 @@ func AnalyzeChangeContext(ctx context.Context, input ChangeInput) (ChangeResult,
 		return ChangeResult{Change: input.Change, Mode: ModeMetadataOnly}, nil
 	}
 	if input.Change.WorktreeKind == "deleted" {
-		return ChangeResult{Change: input.Change, Mode: ModeRawDiff, RawDiff: input.RawDiff}, nil
+		return ChangeResult{Change: input.Change, Mode: ModeRawDiff, RawDiff: input.RawDiff, GroupingRawDiff: input.RawDiff}, nil
 	}
 	if input.Change.WorktreeKind != "file" {
 		return ChangeResult{Change: input.Change, Mode: ModeMetadataOnly}, nil
@@ -203,7 +205,7 @@ func AnalyzeChangeContext(ctx context.Context, input ChangeInput) (ChangeResult,
 	if err != nil {
 		return ChangeResult{}, err
 	}
-	result := ChangeResult{Change: input.Change, Mode: analysis.Mode, Evidence: analysis.Evidence}
+	result := ChangeResult{Change: input.Change, Mode: analysis.Mode, Evidence: analysis.Evidence, GroupingRawDiff: input.RawDiff}
 	if analysis.Mode == ModeRawDiff {
 		result.RawDiff = input.RawDiff
 	}
