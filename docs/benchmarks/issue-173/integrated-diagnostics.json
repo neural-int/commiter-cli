@@ -1,0 +1,111 @@
+[
+  {
+    "case": "A",
+    "plan_accepted": false,
+    "cli_error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_schema)",
+    "phase_request_matches_frozen": {
+      "01": true,
+      "03": true
+    },
+    "text_lengths": {
+      "G001": {
+        "scope_characters": 20,
+        "summary_characters": 54,
+        "scope_over_16": true,
+        "summary_over_48": true
+      }
+    },
+    "category_output": {
+      "G001": {
+        "breaking_evidence_ref": "none",
+        "type": "update"
+      }
+    },
+    "grouping_partition_exact": true,
+    "category_request_matches_frozen": true
+  },
+  {
+    "case": "B",
+    "plan_accepted": false,
+    "cli_error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_schema)",
+    "phase_request_matches_frozen": {
+      "01": true,
+      "03": true
+    },
+    "text_lengths": {
+      "G001": {
+        "scope_characters": 9,
+        "summary_characters": 54,
+        "scope_over_16": false,
+        "summary_over_48": true
+      }
+    },
+    "category_output": {
+      "G001": {
+        "breaking_evidence_ref": "none",
+        "type": "update"
+      }
+    },
+    "grouping_partition_exact": true,
+    "category_request_matches_frozen": true
+  },
+  {
+    "case": "C",
+    "plan_accepted": false,
+    "cli_error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_schema)",
+    "phase_request_matches_frozen": {
+      "01": true,
+      "03": true
+    },
+    "text_lengths": {
+      "G001": {
+        "scope_characters": 8,
+        "summary_characters": 59,
+        "scope_over_16": false,
+        "summary_over_48": true
+      },
+      "G002": {
+        "scope_characters": 8,
+        "summary_characters": 43,
+        "scope_over_16": false,
+        "summary_over_48": false
+      }
+    },
+    "category_output": {
+      "G001": {
+        "breaking_evidence_ref": "none",
+        "type": "feat"
+      },
+      "G002": {
+        "breaking_evidence_ref": "none",
+        "type": "feat"
+      }
+    },
+    "grouping_partition_exact": true,
+    "category_request_matches_frozen": true
+  },
+  {
+    "case": "D",
+    "plan_accepted": false,
+    "cli_error": "LLM backend could not produce a safe, completely assigned commit plan",
+    "phase_request_matches_frozen": {
+      "01": true
+    },
+    "text_lengths": null,
+    "category_output": null,
+    "grouping_partition_exact": true,
+    "category_request_matches_frozen": true
+  },
+  {
+    "case": "E",
+    "plan_accepted": false,
+    "cli_error": "LLM backend could not produce a safe, completely assigned commit plan",
+    "phase_request_matches_frozen": {
+      "01": true
+    },
+    "text_lengths": null,
+    "category_output": null,
+    "grouping_partition_exact": true,
+    "category_request_matches_frozen": true
+  }
+]

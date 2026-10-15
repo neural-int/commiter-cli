@@ -409,6 +409,8 @@ LLM は各ファイルの実際の変更内容から変更目的を判断し、�
 
 `type` は `feat`、`fix`、`docs`、`style`、`refactor`、`perf`、`test`、`build`、`ci`、`chore`、`revert` のいずれかとします。
 
+Issue #173の検証ブランチでは、共通の許容typeに`update`と`change`を追加します。`update`は具体的な動作変更の候補がfeat/fixに限られ、その識別が不能な場合、`change`は他の具体的Categoryも合理的に特定できない場合です。テストの有無だけでは決めません。両typeはsingle-passでもSchemaとValidatorを通し、scopeとしては拒否します。Conventional Commitsは独自typeを許容しますが、これらに暗黙のSemVer効果はありません。利用側のcommitlintのtype enumとリリース規約に扱いを定義します。検証候補の実装は採用・品質達成を意味しません。
+
 `scope` は必須の単一行文字列とし、空文字列は許可しません。また、前後の空白を除去したうえで大文字小文字を区別せず、`feat`、`fix`、`docs`、`style`、`refactor`、`perf`、`test`、`build`、`ci`、`chore`、`revert` のいずれかの Conventional Commit type 名と一致する scope を使用してはなりません。該当する計画は生成後の決定的検証で無効として検出し、自動修復の対象にします。
 
 `breaking` は boolean とし、`true` は公開 API、CLI、設定形式、または保存形式の非互換変更を差分から説明できる場合だけに指定します。通常の UI 変更や内部リファクタリングだけでは `breaking=true` にしてはなりません。`true` の場合のみ件名（subject）の scope の直後に `!` を付与します。
@@ -792,3 +794,7 @@ ANSI エスケープシーケンス、制御文字、改行を含むパス、LLM
 v1 の受け入れ完了後に、llama.cpp バックエンド、追加言語への対応、Homebrew Tap などの後続配布チャネル、実測値に基づく性能ゲート（基準値）の策定を検討します。
 
 将来候補の検討事項は、v1 における実行時の依存関係、CLI、JSON コミット計画スキーマ、および安全確認のデフォルト値を変更しません。
+
+### Issue #173 仮採用の状態
+
+グループ単位のRaw Diffと関連テストのCategory投影、update/changeを含む13種類の分類、Iteration 3短縮Promptを仮採用します。Grouping・Text・4ファイル上限・共通120秒deadline・Git安全性と最終Validatorの契約は維持します。分類精度・完成plan・token件数の未達は[仮採用記録](docs/decisions/issue-173-provisional-category.md)に分離して保持し、過去の検証判定を書き換えません。

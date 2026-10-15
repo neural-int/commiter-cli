@@ -1,0 +1,203 @@
+{
+  "F01": {
+    "groups": {
+      "G001": "feat"
+    },
+    "identifiability": "identifiable",
+    "reason": "A new callable greeting operation introduces observable output.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F02": {
+    "groups": {
+      "G001": "fix"
+    },
+    "identifiability": "identifiable",
+    "reason": "The unchanged contract requires inclusive eligibility; boundary regression added.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F03": {
+    "groups": {
+      "G001": "update"
+    },
+    "identifiability": "feat_fix_ambiguous",
+    "reason": "Implementation, contract comment and expected value change together; prior error versus new requirement is unidentified.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F04": {
+    "groups": {
+      "G001": "fix"
+    },
+    "identifiability": "identifiable",
+    "reason": "No tests are provided; unchanged contract and arithmetic show the correction.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F05": {
+    "groups": {
+      "G001": "fix"
+    },
+    "identifiability": "identifiable",
+    "reason": "A helper addition corrects an explicitly documented case-insensitive comparison.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F06": {
+    "groups": {
+      "G001": "refactor"
+    },
+    "identifiability": "identifiable",
+    "reason": "Equivalent integer sum is extracted into a helper without behavior change.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F07": {
+    "groups": {
+      "G001": "perf"
+    },
+    "identifiability": "identifiable",
+    "reason": "Exact byte result is retained while repeated quadratic concatenation becomes strings.Join.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F08": {
+    "groups": {
+      "G001": "docs"
+    },
+    "identifiability": "identifiable",
+    "reason": "Only prose documentation changes.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F09": {
+    "groups": {
+      "G001": "style"
+    },
+    "identifiability": "identifiable",
+    "reason": "Only whitespace changes.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F10": {
+    "groups": {
+      "G001": "update"
+    },
+    "identifiability": "feat_fix_ambiguous",
+    "reason": "Visible UI color changes; no prior requirement distinguishes a new appearance from a correction. It is not formatting.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F11": {
+    "groups": {
+      "G001": "test"
+    },
+    "identifiability": "identifiable",
+    "reason": "Only a test is added to an existing test file.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F12": {
+    "groups": {
+      "G001": "build"
+    },
+    "identifiability": "identifiable",
+    "reason": "Only a build target changes.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F13": {
+    "groups": {
+      "G001": "ci"
+    },
+    "identifiability": "identifiable",
+    "reason": "Only a GitHub Actions workflow command changes.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F14": {
+    "groups": {
+      "G001": "chore"
+    },
+    "identifiability": "identifiable",
+    "reason": "Ignore local editor files; no product behavior or build changes.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F15": {
+    "groups": {
+      "G001": "revert"
+    },
+    "identifiability": "identifiable",
+    "reason": "The supplied patch explicitly describes undoing a prior experimental change, restoring its previous value.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F16": {
+    "groups": {
+      "G001": "update"
+    },
+    "identifiability": "feat_fix_ambiguous",
+    "reason": "A threshold changes observably; input cannot tell enhancement from bug correction.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F17": {
+    "groups": {
+      "G001": "change"
+    },
+    "identifiability": "category_ambiguous",
+    "reason": "Opaque binary modification exposes no content evidence to select a specific category.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F18": {
+    "groups": {
+      "G001": "change"
+    },
+    "identifiability": "category_ambiguous",
+    "reason": "One indivisible file independently adds a greeting feature and fixes arithmetic; neither is representative.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F19": {
+    "groups": {
+      "G001": "feat"
+    },
+    "identifiability": "identifiable",
+    "reason": "New callable operation and its supporting test have one feature purpose.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "F20": {
+    "groups": {
+      "G001": "fix"
+    },
+    "identifiability": "identifiable",
+    "reason": "An unchanged test exists but is not selected/read. The selected code contract itself identifies the bug.",
+    "independence": "agent-authored synthetic Gold, not independent human evaluation"
+  },
+  "A": {
+    "groups": {
+      "G001": "fix"
+    },
+    "identifiability": "identifiable",
+    "reason": "Reuse exact PR #172 source-bound Gold; do not rewrite prior evidence.",
+    "independence": "known reused fixtures"
+  },
+  "B": {
+    "groups": {
+      "G001": "fix"
+    },
+    "identifiability": "identifiable",
+    "reason": "Reuse exact PR #172 source-bound Gold; do not rewrite prior evidence.",
+    "independence": "known reused fixtures"
+  },
+  "C": {
+    "groups": {
+      "G001": "fix",
+      "G002": "fix"
+    },
+    "identifiability": "identifiable",
+    "reason": "Reuse exact PR #172 source-bound Gold; do not rewrite prior evidence.",
+    "independence": "known reused fixtures"
+  },
+  "D": {
+    "groups": {
+      "G001": "fix"
+    },
+    "identifiability": "identifiable",
+    "reason": "Reuse exact PR #172 source-bound Gold; do not rewrite prior evidence.",
+    "independence": "known reused fixtures"
+  },
+  "E": {
+    "groups": {
+      "G001": "fix"
+    },
+    "identifiability": "identifiable",
+    "reason": "Reuse exact PR #172 source-bound Gold; do not rewrite prior evidence.",
+    "independence": "known reused fixtures"
+  }
+}

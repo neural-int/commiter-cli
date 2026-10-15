@@ -1,0 +1,685 @@
+{
+  "existing": {
+    "A": {
+      "requests": 5,
+      "schema_valid": 5,
+      "timeouts": 0,
+      "groups": 6,
+      "gold_exact": 0,
+      "fix_selected": 0,
+      "feat_selected": 2,
+      "update_selected": 4,
+      "change_selected": 0,
+      "false_definite_feat_fix": 2,
+      "type_counts": {
+        "update": 4,
+        "feat": 2
+      },
+      "confusion": {
+        "fix->update": 4,
+        "fix->feat": 2
+      },
+      "wall_seconds": {
+        "median": 33.988,
+        "max": 119.698
+      },
+      "helper_peak_rss_max_bytes": 3603890176,
+      "swap_delta_max_mib": 106.8100000000004,
+      "input_tokens": null,
+      "output_tokens": null
+    },
+    "B": {
+      "requests": 5,
+      "schema_valid": 5,
+      "timeouts": 0,
+      "groups": 6,
+      "gold_exact": 1,
+      "fix_selected": 1,
+      "feat_selected": 4,
+      "update_selected": 0,
+      "change_selected": 1,
+      "false_definite_feat_fix": 4,
+      "type_counts": {
+        "change": 1,
+        "fix": 1,
+        "feat": 4
+      },
+      "confusion": {
+        "fix->change": 1,
+        "fix->fix": 1,
+        "fix->feat": 4
+      },
+      "wall_seconds": {
+        "median": 31.811,
+        "max": 116.631
+      },
+      "helper_peak_rss_max_bytes": 3843194880,
+      "swap_delta_max_mib": 435.5,
+      "input_tokens": null,
+      "output_tokens": null
+    }
+  },
+  "boundary_all": {
+    "A": {
+      "requests": 20,
+      "schema_valid": 20,
+      "timeouts": 0,
+      "groups": 20,
+      "gold_exact": 11,
+      "fix_selected": 0,
+      "feat_selected": 3,
+      "update_selected": 6,
+      "change_selected": 1,
+      "false_definite_feat_fix": 1,
+      "type_counts": {
+        "feat": 3,
+        "update": 6,
+        "refactor": 2,
+        "docs": 1,
+        "style": 2,
+        "test": 1,
+        "chore": 3,
+        "revert": 1,
+        "change": 1
+      },
+      "confusion": {
+        "feat->feat": 2,
+        "fix->update": 3,
+        "update->update": 2,
+        "fix->feat": 1,
+        "refactor->refactor": 1,
+        "perf->refactor": 1,
+        "docs->docs": 1,
+        "style->style": 1,
+        "update->style": 1,
+        "test->test": 1,
+        "build->chore": 1,
+        "ci->chore": 1,
+        "chore->chore": 1,
+        "revert->revert": 1,
+        "change->change": 1,
+        "change->update": 1
+      },
+      "wall_seconds": {
+        "median": 27.369,
+        "max": 34.598
+      },
+      "helper_peak_rss_max_bytes": 4077535232,
+      "swap_delta_max_mib": 1.8099999999999454,
+      "input_tokens": null,
+      "output_tokens": null
+    },
+    "B": {
+      "requests": 20,
+      "schema_valid": 20,
+      "timeouts": 0,
+      "groups": 20,
+      "gold_exact": 14,
+      "fix_selected": 4,
+      "feat_selected": 2,
+      "update_selected": 0,
+      "change_selected": 4,
+      "false_definite_feat_fix": 0,
+      "type_counts": {
+        "feat": 2,
+        "fix": 4,
+        "change": 4,
+        "refactor": 2,
+        "docs": 1,
+        "style": 2,
+        "test": 2,
+        "chore": 2,
+        "revert": 1
+      },
+      "confusion": {
+        "feat->feat": 2,
+        "fix->fix": 4,
+        "update->change": 2,
+        "refactor->refactor": 1,
+        "perf->refactor": 1,
+        "docs->docs": 1,
+        "style->style": 1,
+        "update->style": 1,
+        "test->test": 1,
+        "build->chore": 1,
+        "ci->test": 1,
+        "chore->chore": 1,
+        "revert->revert": 1,
+        "change->change": 2
+      },
+      "wall_seconds": {
+        "median": 27.2705,
+        "max": 36.53
+      },
+      "helper_peak_rss_max_bytes": 3984703488,
+      "swap_delta_max_mib": 331.3800000000001,
+      "input_tokens": null,
+      "output_tokens": null
+    }
+  },
+  "former_update_groups": [
+    {
+      "group": "A/G001",
+      "gold": "fix",
+      "iteration1": "update",
+      "A": "update",
+      "B": "change"
+    },
+    {
+      "group": "B/G001",
+      "gold": "fix",
+      "iteration1": "update",
+      "A": "update",
+      "B": "fix"
+    },
+    {
+      "group": "D/G001",
+      "gold": "fix",
+      "iteration1": "update",
+      "A": "update",
+      "B": "feat"
+    },
+    {
+      "group": "E/G001",
+      "gold": "fix",
+      "iteration1": "update",
+      "A": "update",
+      "B": "feat"
+    }
+  ],
+  "former_update_destinations": {
+    "change": 1,
+    "fix": 1,
+    "feat": 2
+  },
+  "feat_fix_ambiguous": {
+    "A": {
+      "cases": [
+        {
+          "case": "F03",
+          "expected": "update",
+          "actual": "update",
+          "identifiability": "feat_fix_ambiguous"
+        },
+        {
+          "case": "F10",
+          "expected": "update",
+          "actual": "style",
+          "identifiability": "feat_fix_ambiguous"
+        },
+        {
+          "case": "F16",
+          "expected": "update",
+          "actual": "update",
+          "identifiability": "feat_fix_ambiguous"
+        }
+      ],
+      "forced_definite_feat_fix": 0,
+      "change_escape": 0,
+      "label_match_to_update": 2
+    },
+    "B": {
+      "cases": [
+        {
+          "case": "F03",
+          "expected": "update",
+          "actual": "change",
+          "identifiability": "feat_fix_ambiguous"
+        },
+        {
+          "case": "F10",
+          "expected": "update",
+          "actual": "style",
+          "identifiability": "feat_fix_ambiguous"
+        },
+        {
+          "case": "F16",
+          "expected": "update",
+          "actual": "change",
+          "identifiability": "feat_fix_ambiguous"
+        }
+      ],
+      "forced_definite_feat_fix": 0,
+      "change_escape": 2,
+      "label_match_to_update": 0
+    }
+  },
+  "identifiable_boundaries": {
+    "A": {
+      "metrics": {
+        "requests": 15,
+        "schema_valid": 15,
+        "timeouts": 0,
+        "groups": 15,
+        "gold_exact": 8,
+        "fix_selected": 0,
+        "feat_selected": 3,
+        "update_selected": 3,
+        "change_selected": 0,
+        "false_definite_feat_fix": 1,
+        "type_counts": {
+          "feat": 3,
+          "update": 3,
+          "refactor": 2,
+          "docs": 1,
+          "style": 1,
+          "test": 1,
+          "chore": 3,
+          "revert": 1
+        },
+        "confusion": {
+          "feat->feat": 2,
+          "fix->update": 3,
+          "fix->feat": 1,
+          "refactor->refactor": 1,
+          "perf->refactor": 1,
+          "docs->docs": 1,
+          "style->style": 1,
+          "test->test": 1,
+          "build->chore": 1,
+          "ci->chore": 1,
+          "chore->chore": 1,
+          "revert->revert": 1
+        },
+        "wall_seconds": {
+          "median": 27.431,
+          "max": 34.598
+        },
+        "helper_peak_rss_max_bytes": 4077535232,
+        "swap_delta_max_mib": 0.0,
+        "input_tokens": null,
+        "output_tokens": null
+      },
+      "by_type": {
+        "feat": {
+          "gold_groups": 2,
+          "correct": 2,
+          "missed": 0,
+          "selected": 3,
+          "false_selection": 1
+        },
+        "fix": {
+          "gold_groups": 4,
+          "correct": 0,
+          "missed": 4,
+          "selected": 0,
+          "false_selection": 0
+        },
+        "docs": {
+          "gold_groups": 1,
+          "correct": 1,
+          "missed": 0,
+          "selected": 1,
+          "false_selection": 0
+        },
+        "style": {
+          "gold_groups": 1,
+          "correct": 1,
+          "missed": 0,
+          "selected": 1,
+          "false_selection": 0
+        },
+        "refactor": {
+          "gold_groups": 1,
+          "correct": 1,
+          "missed": 0,
+          "selected": 2,
+          "false_selection": 1
+        },
+        "perf": {
+          "gold_groups": 1,
+          "correct": 0,
+          "missed": 1,
+          "selected": 0,
+          "false_selection": 0
+        },
+        "test": {
+          "gold_groups": 1,
+          "correct": 1,
+          "missed": 0,
+          "selected": 1,
+          "false_selection": 0
+        },
+        "build": {
+          "gold_groups": 1,
+          "correct": 0,
+          "missed": 1,
+          "selected": 0,
+          "false_selection": 0
+        },
+        "ci": {
+          "gold_groups": 1,
+          "correct": 0,
+          "missed": 1,
+          "selected": 0,
+          "false_selection": 0
+        },
+        "chore": {
+          "gold_groups": 1,
+          "correct": 1,
+          "missed": 0,
+          "selected": 3,
+          "false_selection": 2
+        },
+        "revert": {
+          "gold_groups": 1,
+          "correct": 1,
+          "missed": 0,
+          "selected": 1,
+          "false_selection": 0
+        }
+      },
+      "false_fix_on_non_fix": 0
+    },
+    "B": {
+      "metrics": {
+        "requests": 15,
+        "schema_valid": 15,
+        "timeouts": 0,
+        "groups": 15,
+        "gold_exact": 12,
+        "fix_selected": 4,
+        "feat_selected": 2,
+        "update_selected": 0,
+        "change_selected": 0,
+        "false_definite_feat_fix": 0,
+        "type_counts": {
+          "feat": 2,
+          "fix": 4,
+          "refactor": 2,
+          "docs": 1,
+          "style": 1,
+          "test": 2,
+          "chore": 2,
+          "revert": 1
+        },
+        "confusion": {
+          "feat->feat": 2,
+          "fix->fix": 4,
+          "refactor->refactor": 1,
+          "perf->refactor": 1,
+          "docs->docs": 1,
+          "style->style": 1,
+          "test->test": 1,
+          "build->chore": 1,
+          "ci->test": 1,
+          "chore->chore": 1,
+          "revert->revert": 1
+        },
+        "wall_seconds": {
+          "median": 28.269,
+          "max": 36.53
+        },
+        "helper_peak_rss_max_bytes": 3915153408,
+        "swap_delta_max_mib": 0.0,
+        "input_tokens": null,
+        "output_tokens": null
+      },
+      "by_type": {
+        "feat": {
+          "gold_groups": 2,
+          "correct": 2,
+          "missed": 0,
+          "selected": 2,
+          "false_selection": 0
+        },
+        "fix": {
+          "gold_groups": 4,
+          "correct": 4,
+          "missed": 0,
+          "selected": 4,
+          "false_selection": 0
+        },
+        "docs": {
+          "gold_groups": 1,
+          "correct": 1,
+          "missed": 0,
+          "selected": 1,
+          "false_selection": 0
+        },
+        "style": {
+          "gold_groups": 1,
+          "correct": 1,
+          "missed": 0,
+          "selected": 1,
+          "false_selection": 0
+        },
+        "refactor": {
+          "gold_groups": 1,
+          "correct": 1,
+          "missed": 0,
+          "selected": 2,
+          "false_selection": 1
+        },
+        "perf": {
+          "gold_groups": 1,
+          "correct": 0,
+          "missed": 1,
+          "selected": 0,
+          "false_selection": 0
+        },
+        "test": {
+          "gold_groups": 1,
+          "correct": 1,
+          "missed": 0,
+          "selected": 2,
+          "false_selection": 1
+        },
+        "build": {
+          "gold_groups": 1,
+          "correct": 0,
+          "missed": 1,
+          "selected": 0,
+          "false_selection": 0
+        },
+        "ci": {
+          "gold_groups": 1,
+          "correct": 0,
+          "missed": 1,
+          "selected": 0,
+          "false_selection": 0
+        },
+        "chore": {
+          "gold_groups": 1,
+          "correct": 1,
+          "missed": 0,
+          "selected": 2,
+          "false_selection": 1
+        },
+        "revert": {
+          "gold_groups": 1,
+          "correct": 1,
+          "missed": 0,
+          "selected": 1,
+          "false_selection": 0
+        }
+      },
+      "false_fix_on_non_fix": 0
+    }
+  },
+  "category_ambiguous": {
+    "A": [
+      {
+        "case": "F17",
+        "expected": "change",
+        "actual": "change"
+      },
+      {
+        "case": "F18",
+        "expected": "change",
+        "actual": "update"
+      }
+    ],
+    "B": [
+      {
+        "case": "F17",
+        "expected": "change",
+        "actual": "change"
+      },
+      {
+        "case": "F18",
+        "expected": "change",
+        "actual": "change"
+      }
+    ]
+  },
+  "replication_arm_a_vs_iteration1": {
+    "existing": 6,
+    "existing_groups": 6,
+    "boundary": 20,
+    "boundary_groups": 20
+  },
+  "integrated_timing": [
+    {
+      "case": "A",
+      "arm": "A",
+      "grouping_seconds": 22.543,
+      "category_seconds": 20.516,
+      "text_seconds": 6.681,
+      "total_seconds": 49.74,
+      "any_timeout": false,
+      "exceeds_product_120s": false,
+      "grouping_schema_valid": true,
+      "category_schema_valid": true,
+      "text_schema_valid": false,
+      "all_phase_schemas_valid": false
+    },
+    {
+      "case": "A",
+      "arm": "B",
+      "grouping_seconds": 22.543,
+      "category_seconds": 23.934,
+      "text_seconds": 6.681,
+      "total_seconds": 53.158,
+      "any_timeout": false,
+      "exceeds_product_120s": false,
+      "grouping_schema_valid": true,
+      "category_schema_valid": true,
+      "text_schema_valid": false,
+      "all_phase_schemas_valid": false
+    },
+    {
+      "case": "B",
+      "arm": "A",
+      "grouping_seconds": 31.157,
+      "category_seconds": 25.164,
+      "text_seconds": 13.484,
+      "total_seconds": 69.805,
+      "any_timeout": false,
+      "exceeds_product_120s": false,
+      "grouping_schema_valid": true,
+      "category_schema_valid": true,
+      "text_schema_valid": false,
+      "all_phase_schemas_valid": false
+    },
+    {
+      "case": "B",
+      "arm": "B",
+      "grouping_seconds": 31.157,
+      "category_seconds": 23.69,
+      "text_seconds": 13.484,
+      "total_seconds": 68.331,
+      "any_timeout": false,
+      "exceeds_product_120s": false,
+      "grouping_schema_valid": true,
+      "category_schema_valid": true,
+      "text_schema_valid": false,
+      "all_phase_schemas_valid": false
+    },
+    {
+      "case": "C",
+      "arm": "A",
+      "grouping_seconds": 44.186,
+      "category_seconds": 33.988,
+      "text_seconds": 19.26,
+      "total_seconds": 97.434,
+      "any_timeout": false,
+      "exceeds_product_120s": false,
+      "grouping_schema_valid": true,
+      "category_schema_valid": true,
+      "text_schema_valid": false,
+      "all_phase_schemas_valid": false
+    },
+    {
+      "case": "C",
+      "arm": "B",
+      "grouping_seconds": 44.186,
+      "category_seconds": 31.811,
+      "text_seconds": 19.26,
+      "total_seconds": 95.257,
+      "any_timeout": false,
+      "exceeds_product_120s": false,
+      "grouping_schema_valid": true,
+      "category_schema_valid": true,
+      "text_schema_valid": false,
+      "all_phase_schemas_valid": false
+    },
+    {
+      "case": "D",
+      "arm": "A",
+      "grouping_seconds": 79.46,
+      "category_seconds": 78.388,
+      "text_seconds": 9.123,
+      "total_seconds": 166.971,
+      "any_timeout": false,
+      "exceeds_product_120s": true,
+      "grouping_schema_valid": true,
+      "category_schema_valid": true,
+      "text_schema_valid": false,
+      "all_phase_schemas_valid": false
+    },
+    {
+      "case": "D",
+      "arm": "B",
+      "grouping_seconds": 79.46,
+      "category_seconds": 60.647,
+      "text_seconds": 9.123,
+      "total_seconds": 149.23,
+      "any_timeout": false,
+      "exceeds_product_120s": true,
+      "grouping_schema_valid": true,
+      "category_schema_valid": true,
+      "text_schema_valid": false,
+      "all_phase_schemas_valid": false
+    },
+    {
+      "case": "E",
+      "arm": "A",
+      "grouping_seconds": 132.495,
+      "category_seconds": 119.698,
+      "text_seconds": 12.522,
+      "total_seconds": 264.715,
+      "any_timeout": false,
+      "exceeds_product_120s": true,
+      "grouping_schema_valid": true,
+      "category_schema_valid": true,
+      "text_schema_valid": false,
+      "all_phase_schemas_valid": false
+    },
+    {
+      "case": "E",
+      "arm": "B",
+      "grouping_seconds": 132.495,
+      "category_seconds": 116.631,
+      "text_seconds": 12.522,
+      "total_seconds": 261.648,
+      "any_timeout": false,
+      "exceeds_product_120s": true,
+      "grouping_schema_valid": true,
+      "category_schema_valid": true,
+      "text_schema_valid": false,
+      "all_phase_schemas_valid": false
+    }
+  ],
+  "generation_calls": 60,
+  "category_schema_valid": 50,
+  "category_requests": 50,
+  "timeouts": 0,
+  "repository_not_opened": true,
+  "tokens": "unavailable; production helper response has no token fields; byte counts are not token counts",
+  "hypothesis": "partial",
+  "adoption": "not_adopted",
+  "iteration1_nogo_overturned": false,
+  "product_source_changed": false,
+  "completed": true
+}

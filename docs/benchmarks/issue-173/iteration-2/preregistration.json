@@ -1,0 +1,922 @@
+{
+  "experiment": "issue-173 iteration 2: exclude update from category choices",
+  "source_iteration": "docs/benchmarks/issue-173",
+  "iteration1_preregistration_sha256": "e0eeabae6b9000b3bc6042f8c802ab4164528c011e08082a1565ba86618dbdd8",
+  "iteration1_category_results_sha256": "17f84b8d0b9864b7847697b42f7124d043e14b4a3e19f7c475dea303e648d487",
+  "iteration1_gold_sha256": "20452679e5d88199fc0a3adb0d0fde7aae7dcde7a1b46faaab30931f79384175",
+  "model": "mlx-community/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2",
+  "helper_sha256": "29e9aac1b2782c0fe255b7c01f50fed1c7e1cba364062c0a9b8757cf05c3cf83",
+  "model_artifacts_sha256": "60ecd8e2be4b32b3b1bdf2edeb0f19ff881c50ac5f9acd3845e83994cfc935f4",
+  "production_planning_source_unchanged": true,
+  "product_cycle_timeout_seconds_unchanged": 120,
+  "shared_deadline_enforced": false,
+  "safety_timeout_seconds": 600,
+  "safety_timeout_reason": "Finite hang guard. The longest Iteration 1 phase was grouping E at 115.540s and category E at 102.313s. The same 600s cap applies to every phase and both arms.",
+  "temperature": 0,
+  "top_p": 1,
+  "top_k": 0,
+  "seed": 144,
+  "category_native_thought_limit": 384,
+  "output_budgets": {
+    "grouping": 768,
+    "category": 512,
+    "text": 768
+  },
+  "retries": 0,
+  "repairs": 0,
+  "additional_quality_calls": 0,
+  "order": [
+    {
+      "case": "A",
+      "phase": "grouping"
+    },
+    {
+      "case": "A",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "A",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "A",
+      "phase": "text"
+    },
+    {
+      "case": "B",
+      "phase": "grouping"
+    },
+    {
+      "case": "B",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "B",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "B",
+      "phase": "text"
+    },
+    {
+      "case": "C",
+      "phase": "grouping"
+    },
+    {
+      "case": "C",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "C",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "C",
+      "phase": "text"
+    },
+    {
+      "case": "D",
+      "phase": "grouping"
+    },
+    {
+      "case": "D",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "D",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "D",
+      "phase": "text"
+    },
+    {
+      "case": "E",
+      "phase": "grouping"
+    },
+    {
+      "case": "E",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "E",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "E",
+      "phase": "text"
+    },
+    {
+      "case": "F01",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F01",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F02",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F02",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F03",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F03",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F04",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F04",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F05",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F05",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F06",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F06",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F07",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F07",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F08",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F08",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F09",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F09",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F10",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F10",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F11",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F11",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F12",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F12",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F13",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F13",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F14",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F14",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F15",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F15",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F16",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F16",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F17",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F17",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F18",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F18",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F19",
+      "phase": "category",
+      "arm": "B"
+    },
+    {
+      "case": "F19",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F20",
+      "phase": "category",
+      "arm": "A"
+    },
+    {
+      "case": "F20",
+      "phase": "category",
+      "arm": "B"
+    }
+  ],
+  "max_generation_calls": 60,
+  "former_update_groups": [
+    "A/G001",
+    "B/G001",
+    "D/G001",
+    "E/G001"
+  ],
+  "feat_fix_ambiguous_cases": [
+    "F03",
+    "F10",
+    "F16"
+  ],
+  "category_ambiguous_cases": [
+    "F17",
+    "F18"
+  ],
+  "input_sha256": {
+    "inputs/A-A.json": "3e3c6f6df5d199dfaf0e65dd53cd2ce93e5b004b538a39b5466674dbe39db43b",
+    "inputs/A-B.json": "0780b15fe3eeb9c5f9f703cd8c0b838a21e4858912041e9a6870f37a805e0660",
+    "inputs/A-grouping.json": "14fd58d3575a3bb3b0fd2ca14afe4e2ade9c9d3194150632bb850fe06aff79dd",
+    "inputs/A-text.json": "2495aa0aeed75c7e36986a274c06b5349f7ed46960c7417522837faafbbc3961",
+    "inputs/B-A.json": "64662f91df355dc95fa4a78bee31c236443ee7119e054951ab00759725f24b6e",
+    "inputs/B-B.json": "6661b23a98feeb663dd6c9d26e9f187d86289573a02150abee4402501af60c91",
+    "inputs/B-grouping.json": "face069d043bace296a305decb24e98b3c20203d241de4aaa0f96a58aea881a4",
+    "inputs/B-text.json": "476b5ab1baf69a48296436b4afc43b6badd67f243dd2b452351a30a330bde33a",
+    "inputs/C-A.json": "41b88bc87dd28fd0c6d28ee7c199b1d7eb390a938c0cdee03b8c74b775434687",
+    "inputs/C-B.json": "f3e7f4b4610778dd2d8db676bab3ec278304f804fb1fb9017b29c08bd02a9404",
+    "inputs/C-grouping.json": "8762d2be7ccb561a4126f2a92c2384b55699f6d50e5e3d5905d211159c76eed2",
+    "inputs/C-text.json": "300051cee3fddec5a7b5641f6b6d737c5a4e2903fd0e96d700c21512feffdd02",
+    "inputs/D-A.json": "4f57d472e6c762a1c010915c385fb33227f0eeb57aea392076b9bc1e6be9d00c",
+    "inputs/D-B.json": "afc6976f8f0148175bbacf151f6bd9e88d08f796b8a04a511c5a37325443aaa3",
+    "inputs/D-grouping.json": "15655b4600799d228ebf4a9022272f0aef8db44a9ed6ab7fc82c9761b809c942",
+    "inputs/D-text.json": "63c176b0085e801c0bcc246dd03e0821b5a88a70adc51693b262a82bdd4452c8",
+    "inputs/E-A.json": "62e573773b241df48a549a41737db8892611bb1930eea9dcea474723bd4223d6",
+    "inputs/E-B.json": "ae1149b7a6a53553bd47b4745b70f218dfa1058812df80a08a30c5e76546671a",
+    "inputs/E-grouping.json": "19fa783532282d741cf278963def9d6118fa72e6a29a9040079bb667944536b0",
+    "inputs/E-text.json": "eb3feef71ed03aa305b660c06077d8a8a90a102e016b1ee1ab95c11fdc58d481",
+    "inputs/F01-A.json": "0e0d74da2a168f3f145186279fa5b6e3d469f2e00963fe06be0204fc486b60f5",
+    "inputs/F01-B.json": "8b2e51f57d5e206c19b3fefc5bb76a70e57e513ec0610c5d5ffa21613e5a271d",
+    "inputs/F02-A.json": "25f3281ad3333aa934cad2dc71ecd3bc795e3da74f399e8b7b973fa0351cf072",
+    "inputs/F02-B.json": "e0a5fd1264bc18ee5cc8934ef277fba324804917848a0e758840b6146a220bc1",
+    "inputs/F03-A.json": "1d0aab597097310f70914c35dc9b157ba5a8ee2c6eba02943b826036636f2a29",
+    "inputs/F03-B.json": "9612431f62b4a210e61e199cf7ad4d5725732f7c95af4308f0f873c7546effa6",
+    "inputs/F04-A.json": "50296e439d66fdf03afbef572e6a12383021dc6d2ee948f25b91c3b2cf05e77e",
+    "inputs/F04-B.json": "c47c878c986cb6bc39f493f502ceb397ad583721e6a6f224f534582cacd7f086",
+    "inputs/F05-A.json": "2f252ae54b7ddf156198ed3dc9db1ff87c40be96c6df4c85356300aedb2704d6",
+    "inputs/F05-B.json": "c9826fa1cb68b560aa9ef6237d5f517d8332f2b3d62cd14973fba2497d7f48a8",
+    "inputs/F06-A.json": "fd4a4299f97cae2a640ff765a0c779d858000a4459e61f4b9463474d1b071964",
+    "inputs/F06-B.json": "6dc1021e96f4207ecfaafad379eb7937e57665fb4e77e668db524e17ef9558ad",
+    "inputs/F07-A.json": "e6ebaa0d05a6468d1ab91a2ffabb70429edf2abec57da1f33e25a3725ec871e9",
+    "inputs/F07-B.json": "fe74e2ee136790783e0b7eadcf05fb1f28e43c10f53937caecb201148362fbca",
+    "inputs/F08-A.json": "ec055f079fda2515c9b413f86ea03bbfddba092f772111d7f7620b237bae4614",
+    "inputs/F08-B.json": "52715cd827a2050a65f9ac8d530702a6ef4ebab4758999a446d21ffc35b98e84",
+    "inputs/F09-A.json": "6196282958608fc36a937733f3b7ddee065b8585a9e42efa15b62a38b6565b3e",
+    "inputs/F09-B.json": "6bbcad9f77e98c602d9ecbb3e27654632db6d3edd7f7597a663e6729d7ab1b94",
+    "inputs/F10-A.json": "52692683a33246d8bc3e38c4179ee17a88d11993eba177bd6fc46225ebb91494",
+    "inputs/F10-B.json": "e43ac0573ad4334fe70c5fc62b4acd326f5ba573c3c188326ff363b019f84435",
+    "inputs/F11-A.json": "f61c54a8c7f18072553c8dd8225555772f4fee73c099af2f723e4008219d2b3c",
+    "inputs/F11-B.json": "d3f2fd1ad4045ab67ce52efcf777a6261b70ab275b54ff5e14f8336e86b79bad",
+    "inputs/F12-A.json": "d35bc1f302ccaf66dd846c180cfb3cf337aa504e676638c32676412f4b821776",
+    "inputs/F12-B.json": "f61c6f98839b870de3afa7df441469ff2fec9df4009c0299f47ad93024d5d368",
+    "inputs/F13-A.json": "5ef001804f2c143949fbf91f3c65d9f54035e1b8db44d27b69a4ee6530544cc3",
+    "inputs/F13-B.json": "1a9dbdf8686f42cd9db5d96812e376c9b21fac45682bc52f6a406bb181ffe046",
+    "inputs/F14-A.json": "a18383bbfd9f1cb463d616b7287469b38265b9b6ed1c14e114ef42013f2b3a99",
+    "inputs/F14-B.json": "bc89e7a58546eeb24f16bf0aa8eb8a0401087703f2a9abbd329e834161c2c514",
+    "inputs/F15-A.json": "c13624390eb7603c63d432115985248e5598b851190075947ca1d97d60a1b1f5",
+    "inputs/F15-B.json": "3706c52120c437500d90654da30aa1c49467cb9a492396baf9513cf9471072ad",
+    "inputs/F16-A.json": "80fde817f1f85d1b15f14bec0bc74e03bcdb96a55f9f72834503dc4c3047f00d",
+    "inputs/F16-B.json": "b6b11b4902cd6445b2b5e18918cc390945875a385c1e6d8c0bd616cc51791c39",
+    "inputs/F17-A.json": "c39341f5192748b23e4bc96bfa8036e6844eda057c763b71d3721e7ea617d5c8",
+    "inputs/F17-B.json": "5edefba70f1147b779885311e85383ec16ea09e9ab1f2250733d092f13373ec7",
+    "inputs/F18-A.json": "4a0f0a0654b5708fac40bfedb58988efe2a1bbee1428c78a5b748cecdec7b4cb",
+    "inputs/F18-B.json": "1903409d47d9120a7d55af7bac17f01f73fb43d58129f65014158a071492ed3c",
+    "inputs/F19-A.json": "a27fb640a71bf5e054382dfad9646a84075a5a9b23c69341542ae89372e7917c",
+    "inputs/F19-B.json": "b5f0a85994f3dac644538fc10646daf3568243615f7b0804617b8ca25a2defeb",
+    "inputs/F20-A.json": "0e0e8e26c65a81b9ed4a1cc323b7e2c30f39d4462d8a767ce8727dbb83016a44",
+    "inputs/F20-B.json": "95c683ac474ba06e8ed6ea89fa8a7d212048df578c53b2845217512c5c4e3a1e"
+  },
+  "manifest": [
+    {
+      "case": "A",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "B",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "C",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ],
+        "G002": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "D",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "E",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F01",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F02",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F03",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F04",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F05",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F06",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F07",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F08",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F09",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F10",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F11",
+      "test_only_groups": [
+        "G001"
+      ],
+      "arm_b_type_enums": {
+        "G001": [
+          "test"
+        ]
+      }
+    },
+    {
+      "case": "F12",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F13",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F14",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F15",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F16",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F17",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F18",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F19",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    },
+    {
+      "case": "F20",
+      "test_only_groups": [],
+      "arm_b_type_enums": {
+        "G001": [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+          "change"
+        ]
+      }
+    }
+  ],
+  "comparison": {
+    "A": "Iteration 1 candidate: 11 conventional types plus update and change. Frozen request bytes.",
+    "B": "Same user content, model, and sampling. Type enum omits update. Fallback text requires feat or fix when only those two remain, and forbids change as that escape.",
+    "unchanged": "Group-scoped raw diff, related tests, grouping requests, text requests, membership, test-only schema, Gold, Iteration 1 results."
+  },
+  "decision_rule": {
+    "primary": "Compare this run's arm A with arm B. Iteration 1 candidate outputs are a replication check for arm A, not the paired control.",
+    "existing_groups": "For the four historical update groups, record B's type individually. Report gold matches and fix selections on all six groups separately from false feat/fix assertions.",
+    "ambiguous_boundaries": "On gold identifiability feat_fix_ambiguous, a B output of feat or fix is a forced definite assertion. It is not gold agreement and is not an accuracy gain.",
+    "change_escape": "change on a feat/fix-ambiguous group is an escape from the required binary choice.",
+    "other_categories": "Report gold matches and false selections for the other boundary classes separately.",
+    "plans": "Sum of grouping, category, and text wall times is a deadline observation. A completed text schema does not improve the category conclusion and is not compared with Iteration 1 accepted-plan rate.",
+    "adoption": "Do not edit product types or the 120s deadline. Do not overturn the Iteration 1 NO-GO. Record whether the update-exclusion hypothesis is supported.",
+    "hypothesis_not_supported": "Arm B gold matches on the six existing fix groups are not strictly greater than arm A, or none of the four historical update groups becomes fix.",
+    "hypothesis_not_specific": "Fix selections rise while false fix selections on identifiable non-fix boundaries also rise."
+  },
+  "stop": "No edits to Gold, fixtures, prompts, or Iteration 1 files after this freeze. No second generation of a completed call. An interrupted call without a result may be continued once and must be marked resumed. Stop on memory pressure >= 4, helper RSS > 12 GiB, or per-call swap growth > 2 GiB."
+}

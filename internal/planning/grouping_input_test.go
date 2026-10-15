@@ -56,7 +56,7 @@ func TestThreePhaseProjectsOnlyGroupingAndPreservesOriginalInput(t *testing.T) {
 			Files []contextinput.File `json:"files"`
 		} `json:"groups"`
 	}
-	for phase := 1; phase <= 2; phase++ {
+	for _, phase := range []int{2} {
 		if err := json.Unmarshal([]byte(c.messages[phase][1].Content), &metadata); err != nil {
 			t.Fatal(err)
 		}

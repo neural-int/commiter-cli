@@ -302,3 +302,13 @@ v1 の提供範囲において、以下の機能は意図的に対象外とし�
 ## ライセンス
 
 `commiter-cli` は [MIT License](LICENSE) の下で公開されています。
+
+## Categoryの検証候補（Issue #173）
+
+この検証ブランチでは、確定済みグループの変更差分をCategory専用入力へ投影します。同一グループ内の既存のsource/testパス対応だけを使って変更テストの役割を整理し、対応不明・同一ファイル内のテストは差分全体を主入力に残します。未変更テストを自動で追加読込しません。Grouping・Text・4ファイル上限・共通120秒制約は維持します。
+
+`update` は具体的な動作変更の候補がfeat/fixに絞れ、区別だけが不能な場合、`change` は具体的なCategoryを合理的に選べない場合の検証候補です。テストがないことだけを理由に選びません。共通SchemaとValidatorではsingle-passを含めて許容し、scopeにtype名を指定する制約は維持します。採用・意味品質の達成は固定検証結果と分けて判断します。
+
+[Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) は独自typeを許容しますが、自動的なSemVer上の意味は定めていません。利用リポジトリのcommitlintでは両typeの許可、リリース規約では両typeの扱いを明示する必要があります。本リポジトリの件名生成は検証済みtypeを保持し、リリースノートはPRの明示的メタデータに基づきます。破壊的変更の根拠と`!`は独立した契約です。
+
+Issue #173の仮採用判断により、グループ差分入力・update/change・Iteration 3短縮Promptを製品コードへ反映します。既存のNO-GO記録は維持し、分類精度や完成planの受け入れ達成とは区別します。詳細は[仮採用記録](docs/decisions/issue-173-provisional-category.md)を参照してください。

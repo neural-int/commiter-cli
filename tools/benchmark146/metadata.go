@@ -49,7 +49,6 @@ func (c *templateClient) ChatWithOptions(_ context.Context, m []llm.Message, s j
 }
 func metadataTemplates() (map[string]phaseTemplate, error) {
 	prototype := fixtures()[0].Files[0]
-	prototype.RawDiff = ""
 	d := contextinput.Document{SchemaVersion: 1, Files: []contextinput.File{prototype}}
 	prompt, err := planning.Renderer(planning.English)(d)
 	if err != nil {
@@ -119,6 +118,38 @@ type finalizedGroup struct {
 	FileIDs []string            `json:"file_ids"`
 	Files   []contextinput.File `json:"files"`
 }
+
+// This adapter covers the benchmark's selected plain-text fixture files only.
+// The request-equality test detects drift from the production Category packet.
+type benchmarkCategoryGroup struct {
+	ID           string                            `json:"group_id"`
+	Contents     map[string]string                 `json:"contents"`
+	RelatedTests map[string]string                 `json:"related_tests"`
+	Metadata     map[string]benchmarkCategoryState `json:"file_metadata"`
+}
+type benchmarkCategoryState struct {
+	Status   string `json:"status"`
+	Language string `json:"language"`
+}
+
+func benchmarkCategoryProjection(groups []finalizedGroup) []benchmarkCategoryGroup {
+	out := make([]benchmarkCategoryGroup, 0, len(groups))
+	for _, group := range groups {
+		item := benchmarkCategoryGroup{ID: group.ID, Contents: map[string]string{}, Metadata: map[string]benchmarkCategoryState{}}
+		for _, file := range group.Files {
+			p := *file.NewPath
+			diff := file.GroupingRawDiff
+			if diff == "" {
+				diff = file.RawDiff
+			}
+			item.Contents[p] = diff
+			item.Metadata[p] = benchmarkCategoryState{Status: file.Status, Language: file.Language}
+		}
+		out = append(out, item)
+	}
+	return out
+}
+
 type category struct {
 	Type      string `json:"type"`
 	Reference string `json:"breaking_evidence_ref"`
@@ -203,6 +234,9 @@ func finalMetadata(ctx context.Context, f fixture, p partition, backend llm.Opti
 				payload[k] = v
 			}
 			payload["groups"] = batch
+			if profile == "bounded-category" {
+				payload["groups"] = benchmarkCategoryProjection(batch)
+			}
 			encoded, _ := json.Marshal(payload)
 			system := template.System + string(shape)
 			budget := 768
