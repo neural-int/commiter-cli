@@ -794,3 +794,7 @@ ANSI エスケープシーケンス、制御文字、改行を含むパス、LLM
 v1 の受け入れ完了後に、llama.cpp バックエンド、追加言語への対応、Homebrew Tap などの後続配布チャネル、実測値に基づく性能ゲート（基準値）の策定を検討します。
 
 将来候補の検討事項は、v1 における実行時の依存関係、CLI、JSON コミット計画スキーマ、および安全確認のデフォルト値を変更しません。
+
+### Issue #173 仮採用の状態
+
+グループ単位のRaw Diffと関連テストのCategory投影、update/changeを含む13種類の分類、Iteration 3短縮Promptを仮採用します。Grouping・Text・4ファイル上限・共通120秒deadline・Git安全性と最終Validatorの契約は維持します。分類精度・完成plan・token件数の未達は[仮採用記録](docs/decisions/issue-173-provisional-category.md)に分離して保持し、過去の検証判定を書き換えません。
