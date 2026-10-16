@@ -326,25 +326,27 @@ struct CommiterMLXHelper {
         let input = try await context.processor.prepare(input: UserInput(chat: chat, additionalContext: ["enable_thinking": nativeLimit > 0]))
         do { try TokenBudget.validate(context: request.contextTokens, prompt: input.text.tokens.size, output: budget) }
         catch { throw HelperError.inputTooLarge }
-        var components = GenerationComponents()
+        let components: GenerationComponents
         var nativeState: NativeThoughtBudgetState?
+        let vocab = TokenizerVocabExtractor.extractForGrammar(from: context.tokenizer)
+        let tokenizer = try GrammarTokenizer(vocab: vocab.vocab, vocabType: vocab.vocabType, eosTokenId: Int32(context.tokenizer.eosTokenId ?? 0))
+        let factory: @Sendable () throws -> GrammarConstraint = { try GrammarConstraint(tokenizer: tokenizer, jsonSchema: schema, fastForward: false) }
+        var stops = context.configuration.eosTokenIds
+        if let eos = context.tokenizer.eosTokenId { stops.insert(eos) }
+        for token in context.configuration.extraEOSTokens {
+            if let id = context.tokenizer.convertTokenToId(token) { stops.insert(id) }
+        }
+        let response = GrammarSamplingState(constraint: try factory(), vocabSize: tokenizer.vocabSize,
+            eos: context.tokenizer.eosTokenId ?? 0, whitespace: WhitespaceTokenBias.compute(tokenizer: context.tokenizer).tokenIDs,
+            runtimeStopIDs: stops, unknownID: context.tokenizer.unknownTokenId, alignRuntimeStops: true, factory: factory)
         if nativeLimit > 0 {
             guard context.tokenizer.convertTokenToId("<|channel>") == 100,
                   context.tokenizer.convertTokenToId("<channel|>") == 101 else { throw HelperError.grammarFailure }
-            let vocab = TokenizerVocabExtractor.extractForGrammar(from: context.tokenizer)
-            let tokenizer = try GrammarTokenizer(vocab: vocab.vocab, vocabType: vocab.vocabType, eosTokenId: Int32(context.tokenizer.eosTokenId ?? 0))
-            let factory: @Sendable () throws -> GrammarConstraint = { try GrammarConstraint(tokenizer: tokenizer, jsonSchema: schema, fastForward: false) }
-            var stops = context.configuration.eosTokenIds
-            if let eos = context.tokenizer.eosTokenId { stops.insert(eos) }
-            for token in context.configuration.extraEOSTokens {
-                if let id = context.tokenizer.convertTokenToId(token) { stops.insert(id) }
-            }
-            let response = GrammarSamplingState(constraint: try factory(), vocabSize: tokenizer.vocabSize,
-                eos: context.tokenizer.eosTokenId ?? 0, whitespace: WhitespaceTokenBias.compute(tokenizer: context.tokenizer).tokenIDs,
-                runtimeStopIDs: stops, unknownID: context.tokenizer.unknownTokenId, alignRuntimeStops: true, factory: factory)
             let state = NativeThoughtBudgetState(limit: nativeLimit, open: 100, close: 101, eos: context.tokenizer.eosTokenId ?? 0, response: response, forceOpen: true)
             nativeState = state
             components = GenerationComponents(logitProcessorFactory: { NativeThoughtBudgetProcessor(state: state) })
+        } else {
+            components = GenerationComponents(logitProcessorFactory: { GrammarSamplingProcessor(state: response) })
         }
         var parameters = GenerateParameters(maxTokens: budget, temperature: 0, topP: 1, topK: 0, seed: 144)
         if request.contextTokens > 16384 {
@@ -378,6 +380,10 @@ struct CommiterMLXHelper {
         guard completed else { throw HelperError.cancelled }
         if let nativeState, !nativeState.succeeded {
             FileHandle.standardError.write(Data("candidate_native_failure code=\(nativeState.diagnostic)\n".utf8))
+            throw HelperError.grammarFailure
+        }
+        if nativeLimit == 0, !response.succeeded {
+            FileHandle.standardError.write(Data("candidate_text_failure code=\(response.diagnostic)\n".utf8))
             throw HelperError.grammarFailure
         }
         do { return try CandidateOutput.finalJSON(output, native: nativeLimit > 0) }
