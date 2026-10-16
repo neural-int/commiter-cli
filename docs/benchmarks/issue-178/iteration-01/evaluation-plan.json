@@ -1,0 +1,35 @@
+{
+  "status": "pending_release_helper_and_metal_smoke; not authorized to infer from this draft alone",
+  "baseline": "../issue-177/iteration-02",
+  "conditions": "Same two unmodified fixtures, exploratory Gold, prompts, backend/model/revision, source projection, output budgets and 360s evaluation-only overlay. Treatment is rebuilt helper enabling text grammar; no prompt/Gold changes.",
+  "order": [
+    "C01-A",
+    "C01-B",
+    "C02-A",
+    "C02-B"
+  ],
+  "max_model_calls": 12,
+  "per_cycle_timeout_seconds": 360,
+  "production_cycle_timeout_seconds": 120,
+  "output_budgets": [
+    768,
+    512,
+    768
+  ],
+  "context_ceiling": 65536,
+  "temperature": 0,
+  "seed": 144,
+  "retries": 0,
+  "repairs": 0,
+  "stop_branches": "Stop failed cycle without repairing; continue only remaining preregistered cycles. No extra probes/judge/inference after four cycles. Report before further conditions.",
+  "source_changes": {
+    "mlx-helper/Sources/commiter-mlx-helper/CommiterMLXHelper.swift": "e23e5301309dd529a9042156dd4c6233c704eed034bf7d0616d16e90e8528085"
+  },
+  "runtime_precondition": "Freeze actual release binary, shared Metal resource, all relevant source hashes and unchanged fixture/Gold/capture hashes. Verify same dependency lock. Use fresh output/trace roots.",
+  "caveats": [
+    "Scope=docs is not excluded by maxLength grammar; retained host rejection.",
+    "Grouped C02 partition differs from reference; category/text of partial groups not scored as whole reference correct.",
+    "Two known cases and agent-authored reference do not establish holdout quality.",
+    "Release rebuild is part of runtime treatment; phase timing is observational."
+  ]
+}
