@@ -1,0 +1,11 @@
+--- internal/planning/three_phase.go
++++ internal/planning/three_phase.go
+@@ -34,7 +34,7 @@
+ 	Fact    string   `json:"fact"`
+ }
+ 
+-const CandidateCycleTimeout = 120 * time.Second
++const CandidateCycleTimeout = 360 * time.Second
+ const CandidateMaxFiles = 4
+ 
+ const membershipSystem = `Group the supplied Git changes by distinct change purposes.
