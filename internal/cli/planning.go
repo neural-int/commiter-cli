@@ -65,6 +65,10 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 		if err := attachGroupingSyntaxContext(ctx, root, &document, relationFiles); err != nil {
 			return planning.Plan{}, err
 		}
+		document, err = candidateSourceProjection(document)
+		if err != nil {
+			return planning.Plan{}, err
+		}
 	}
 	fileIDs := make([]string, len(document.Files))
 	for index, file := range document.Files {
@@ -81,6 +85,7 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 	}
 	prepared, err := contextinput.Prepare(ctx, document, contextinput.BudgetConfig{
 		Context: values.Context, MaxContextTokens: values.MaxTokens, PromptOverheadBytes: len(systemMessage),
+		RequireUncompressed: values.Planner == config.CandidatePlanner,
 	}, renderer, nil)
 	recordSummarization(recorder, prepared)
 	if err != nil {

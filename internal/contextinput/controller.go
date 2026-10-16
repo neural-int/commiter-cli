@@ -68,6 +68,9 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 		summarizer = standard
 	}
 	baseConfig := normalBudgetConfig(config)
+	if config.RequireUncompressed {
+		baseConfig = config
+	}
 	progress := func(stage SummaryStage, profile CompressionProfile, count int) Prepared {
 		return Prepared{SummaryStage: stage, CompressionProfile: profile, SummaryCount: count, SummaryDuration: summaryDuration, OriginalPromptBytes: originalPromptBytes, RelationContextOmitted: current.RelationContextStatus != nil && current.RelationContextStatus.Omitted}
 	}
@@ -104,6 +107,10 @@ func Prepare(ctx context.Context, document Document, config BudgetConfig, render
 		fallback, fallbackErr := Prepare(ctx, fallbackDocument, config, render, summarizer)
 		fallback.RelationContextOmitted = true
 		return fallback, fallbackErr
+	}
+
+	if config.RequireUncompressed {
+		return prepared, err
 	}
 
 	summaryCount := 0
