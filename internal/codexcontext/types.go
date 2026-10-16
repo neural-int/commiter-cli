@@ -17,12 +17,9 @@ type Record struct {
 	FinalResponse string   `json:"final_response,omitempty"`
 }
 
+// Target identifies a changed path in the fixed planning snapshot.
 type Target struct {
 	Path string
-	Diff string
-	// FinalDiff is the authoritative HEAD-to-worktree change being committed.
-	// When area diffs are supplied, cancelled intermediate edits cannot qualify.
-	FinalDiff string
 }
 
 type Result struct {

@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "id": "hook-dependency-maintenance",
+  "status": "diagnostic",
+  "semantic_case_candidates": [
+    3
+  ],
+  "gold_status": "undetermined",
+  "limitations": "依存配列の修正であり、振る舞いを変えない refactor の正解例とは確定できない。依頼も Implement the plan. のみ。",
+  "provenance": {
+    "repository": "my-site",
+    "rollout_file": "rollout-2026-04-25T13-18-48-019dc2dc-92f2-7400-bb97-4e204c1117f7.jsonl",
+    "thread_id": "019dc2dc-92f2-7400-bb97-4e204c1117f7",
+    "turn_id": "019dc310-f25b-7a10-9469-ebe68bdc5b90",
+    "source_items": [
+      {
+        "line": 720,
+        "sha256": "df6e618268d7ea37a0f649defc094b0ff1810598049730d22bc68962e83f41ad",
+        "source_type": "UserMessage"
+      },
+      {
+        "line": 745,
+        "sha256": "7c7a73854fd55e601b226e98c04f5bc2758c8db7678f53ce53fad4d75023b204",
+        "source_type": "FileChange"
+      },
+      {
+        "line": 774,
+        "sha256": "d7a39f7eaa8e247a9ec50237fc11cd13d033fe548ec37658e4cb012591fd27d5",
+        "source_type": "AgentMessage"
+      }
+    ],
+    "transformations": [
+      "native item_completed projection to App Server-shaped test items, not a captured RPC response",
+      "absolute edited paths to repository-relative paths",
+      "worktree/home/temp paths and email redaction in text",
+      "text parts only; attachments, commands, tool output, settings and credentials not copied",
+      "replay time window surrounds copied user/edit/final events, not historical HEAD time"
+    ]
+  },
+  "supporting_context": [
+    {
+      "role": "assistant_plan",
+      "line": 713,
+      "sha256": "f3877323fcbe3141b9567189d1a62107bc2f122552a8895e310aae8ae64ad0a1",
+      "text": "<proposed_plan>\n# `dia-text-reveal` の hook 警告修正\n\n## Summary\n- `src/components/ui/dia-text-reveal.jsx` の `react-hooks/exhaustive-deps` 警告を解消する。\n- 挙動は変えず、依存配列の不足だけを最小修正する。\n- 変更対象はこの1ファイルに限定する。\n\n## Key Changes\n- `useEffect` 内で参照している `gradientDepsTick` を依存配列に追加する。\n- 必要なら、同 effect 内で使っている値の参照関係を整理して、lint が再発しない形にする。\n- 新しい依存追加や他コンポーネントへの波及は行わない。\n\n## Test Plan\n- `npm run lint`\n- `npm run test:run`\n- `npm run build`\n\n## Assumptions\n- この警告は表示崩れではなく、依存配列の不整合による品質警告として扱う。\n- `motion()` の非推奨警告や AVIF 警告は今回の対象外とする。\n</proposed_plan>",
+      "usage": "manual_review_only_not_collector_input"
+    }
+  ],
+  "snapshot": {
+    "kind": "git_commit_path_slice",
+    "base": "61d533df2ede2774e45d1f8a671fc43e6a344966",
+    "head": "04f5bcc58a29e85d03502795d41f631fbec53df1",
+    "original_file_count": 1,
+    "selected_file_count": 1,
+    "limitation": "コミット前後の対象パスの差分。歴史上の staged/unstaged 分離は復元していない"
+  },
+  "turns": [
+    {
+      "id": "019dc310-f25b-7a10-9469-ebe68bdc5b90",
+      "started_at": 1777094161,
+      "items": [
+        {
+          "turnId": "019dc310-f25b-7a10-9469-ebe68bdc5b90",
+          "item": {
+            "id": "item-58",
+            "type": "userMessage",
+            "content": [
+              {
+                "type": "text",
+                "text": "Implement the plan."
+              }
+            ]
+          }
+        },
+        {
+          "turnId": "019dc310-f25b-7a10-9469-ebe68bdc5b90",
+          "item": {
+            "id": "call_kjBjfXzJYh7DX5X91C6m96ml",
+            "type": "fileChange",
+            "status": "completed",
+            "changes": [
+              {
+                "path": "src/components/ui/dia-text-reveal.jsx",
+                "kind": {
+                  "type": "update",
+                  "move_path": null
+                },
+                "diff": "@@ -121,3 +121,3 @@\n     gradientDepsTick.set(gradientDepsTick.get() + 1);\n-  }, [colors, delay, duration, repeat, repeatDelay, text, textColor, texts]);\n+  }, [colors, delay, duration, repeat, repeatDelay, text, textColor, texts, gradientDepsTick]);\n \n"
+              }
+            ]
+          }
+        },
+        {
+          "turnId": "019dc310-f25b-7a10-9469-ebe68bdc5b90",
+          "item": {
+            "id": "item-67",
+            "type": "agentMessage",
+            "phase": "final_answer",
+            "text": "結論：`react-hooks/exhaustive-deps` の警告を解消しました。変更は [src/components/ui/dia-text-reveal.jsx](<WORKTREE>/src/components/ui/dia-text-reveal.jsx) の依存配列に `gradientDepsTick` を追加した最小修正です。\n\n手順:\n- `useEffect` で `gradientDepsTick` を参照しているのに依存配列に入っていなかったため、依存を追加しました。\n- 検証を通しました。\n  - `npm run lint` 成功\n  - `npm run test:run` 成功\n  - `npm run build` 成功\n  - `git diff --check` 成功\n\n注意点:\n- `test:run` の既存警告として `motion() is deprecated` と jsdom の `canvas.getContext()` 未実装メッセージは残っています。\n- `build` の AVIF 警告も残っていますが、今回の lint 警告とは別件で、ビルド失敗ではありません。"
+          }
+        }
+      ]
+    }
+  ],
+  "window": {
+    "start": 1777094160,
+    "end": 1777094211
+  },
+  "targets": [
+    {
+      "path": "src/components/ui/dia-text-reveal.jsx",
+      "diff": "diff --git a/src/components/ui/dia-text-reveal.jsx b/src/components/ui/dia-text-reveal.jsx\nindex c9b9c68..ef8764a 100644\n--- a/src/components/ui/dia-text-reveal.jsx\n+++ b/src/components/ui/dia-text-reveal.jsx\n@@ -119,7 +119,7 @@ export function DiaTextReveal({\n       texts,\n     };\n     gradientDepsTick.set(gradientDepsTick.get() + 1);\n-  }, [colors, delay, duration, repeat, repeatDelay, text, textColor, texts]);\n+  }, [colors, delay, duration, repeat, repeatDelay, text, textColor, texts, gradientDepsTick]);\n \n   const backgroundImage = useTransform([sweepPos, gradientDepsTick], ([pos]) =>\n     buildGradient(pos, optsRef.current.colors, optsRef.current.textColor),\n",
+      "final_diff": "diff --git a/src/components/ui/dia-text-reveal.jsx b/src/components/ui/dia-text-reveal.jsx\nindex c9b9c68..ef8764a 100644\n--- a/src/components/ui/dia-text-reveal.jsx\n+++ b/src/components/ui/dia-text-reveal.jsx\n@@ -119,7 +119,7 @@ export function DiaTextReveal({\n       texts,\n     };\n     gradientDepsTick.set(gradientDepsTick.get() + 1);\n-  }, [colors, delay, duration, repeat, repeatDelay, text, textColor, texts]);\n+  }, [colors, delay, duration, repeat, repeatDelay, text, textColor, texts, gradientDepsTick]);\n \n   const backgroundImage = useTransform([sweepPos, gradientDepsTick], ([pos]) =>\n     buildGradient(pos, optsRef.current.colors, optsRef.current.textColor),\n"
+    }
+  ]
+}

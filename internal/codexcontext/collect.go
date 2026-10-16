@@ -46,7 +46,6 @@ type item struct {
 	Status  string `json:"status"`
 	Changes []struct {
 		Path string `json:"path"`
-		Diff string `json:"diff"`
 		Kind struct {
 			Type     string  `json:"type"`
 			MovePath *string `json:"move_path"`
@@ -58,7 +57,6 @@ type entry struct {
 	Item   item   `json:"item"`
 }
 type observation struct {
-	turnID  string
 	started int64
 	record  Record
 }
@@ -99,11 +97,11 @@ func collect(client caller, request Request) Result {
 		rootFilter = append(rootFilter, candidate)
 	}
 	sort.Strings(rootFilter)
-	targets := map[string][]Target{}
+	targets := map[string]bool{}
 	for _, target := range request.Targets {
 		path := localPath(root, target.Path)
 		if path != "" && request.AllowPath(path) {
-			targets[path] = append(targets[path], target)
+			targets[path] = true
 		}
 	}
 	var observations []observation
@@ -195,8 +193,8 @@ func collect(client caller, request Request) Result {
 	return finish(false)
 }
 
-func readTurn(client caller, root, sessionCwd, threadID string, tr turn, targets map[string][]Target, request Request) (*observation, bool) {
-	obs := observation{turnID: tr.ID, started: *tr.Started}
+func readTurn(client caller, root, sessionCwd, threadID string, tr turn, targets map[string]bool, request Request) (*observation, bool) {
+	obs := observation{started: *tr.Started}
 	paths := map[string]bool{}
 	seenItems := map[string]bool{}
 	cursor := ""
@@ -257,14 +255,8 @@ func readTurn(client caller, root, sessionCwd, threadID string, tr turn, targets
 						}
 						continue
 					}
-					for _, target := range targets[path] {
-						final := target.FinalDiff
-						if final == "" {
-							final = target.Diff
-						}
-						if matches(target.Diff, change.Diff, change.Kind.Type) && matches(final, change.Diff, change.Kind.Type) {
-							paths[path] = true
-						}
+					if targets[path] {
+						paths[path] = true
 					}
 				}
 			}
@@ -292,28 +284,10 @@ func readTurn(client caller, root, sessionCwd, threadID string, tr turn, targets
 }
 
 func selectRecords(observations []observation) Result {
-	owners := map[string]map[string]bool{}
-	for _, obs := range observations {
-		for _, path := range obs.record.Paths {
-			if owners[path] == nil {
-				owners[path] = map[string]bool{}
-			}
-			owners[path][obs.turnID] = true
-		}
-	}
 	sort.SliceStable(observations, func(i, j int) bool { return observations[i].started > observations[j].started })
 	var records []Record
 	for _, obs := range observations {
 		record := obs.record
-		record.Paths = nil
-		for _, path := range obs.record.Paths {
-			if len(owners[path]) == 1 {
-				record.Paths = append(record.Paths, path)
-			}
-		}
-		if len(record.Paths) == 0 {
-			continue
-		}
 		candidate := append(append([]Record(nil), records...), record)
 		encoded, _ := json.Marshal(map[string]any{"codex_context": candidate})
 		if len(encoded) > MaxContextBytes {

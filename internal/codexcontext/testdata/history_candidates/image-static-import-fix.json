@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "id": "image-static-import-fix",
+  "status": "diagnostic",
+  "semantic_case_candidates": [
+    1
+  ],
+  "gold_status": "undetermined",
+  "limitations": "依頼が Implement the plan. のみ。事前計画を別欄に残すが collector 入力へ補わない。Git の独立した前後状態を確定していないため、編集直後の patch 投影であり意味評価用の確定 fixture ではない。",
+  "provenance": {
+    "repository": "my-site",
+    "rollout_file": "rollout-2026-04-25T13-18-48-019dc2dc-92f2-7400-bb97-4e204c1117f7.jsonl",
+    "thread_id": "019dc2dc-92f2-7400-bb97-4e204c1117f7",
+    "turn_id": "019dc304-5ce9-7802-91c6-0273d4b6e15c",
+    "source_items": [
+      {
+        "line": 576,
+        "sha256": "c34e24254f42cbf119b0409488f643dd9924f3da62e30a33a79567dbb766f87a",
+        "source_type": "UserMessage"
+      },
+      {
+        "line": 599,
+        "sha256": "214a99193e790ad7bd971308ba6daba8240a09808025ad8b337d2341f77ce5ae",
+        "source_type": "FileChange"
+      },
+      {
+        "line": 626,
+        "sha256": "bef3a791c81ea567aac3bb156d8577167af8fefba404ae421b08a28943be324e",
+        "source_type": "AgentMessage"
+      }
+    ],
+    "transformations": [
+      "native item_completed projection to App Server-shaped test items, not a captured RPC response",
+      "absolute edited paths to repository-relative paths",
+      "worktree/home/temp paths and email redaction in text",
+      "text parts only; attachments, commands, tool output, settings and credentials not copied",
+      "replay time window surrounds copied user/edit/final events, not historical HEAD time"
+    ]
+  },
+  "supporting_context": [
+    {
+      "role": "assistant_plan",
+      "line": 569,
+      "sha256": "4603922bfe25bc24c079c36f0c0c4b207ed9e988681e914bc6ef722073e56c6a",
+      "text": "<proposed_plan>\n# ヒーロー画像 404 修正\n\n## Summary\n- `GET /[object Object] 404` は、Next.js の画像アセット import がオブジェクトになっているのに、`<img src>` / `<source srcSet>` にそのまま渡していることが原因です。\n- 修正は `ProgressiveImage` 側で画像ソースを文字列URLへ正規化する最小対応にします。\n- これで `Hero.jsx` の既存 import 形は変えずに、表示崩れを止めます。\n\n## Key Changes\n- `src/components/common/progressiveimage/ProgressiveImage.jsx`\n  - 画像ソースを `string | { src: string }` の両方受けられるように正規化する。\n  - `src` / `srcSet` / `sizes` に渡す前に必ず文字列URLへ変換する。\n  - `hero.avif`, `hero.webp`, `hero.jpg` のような Next 画像 import でも `[object Object]` にならないようにする。\n- 必要なら `Hero.jsx` 側はそのまま維持する。\n  - ここを触ると影響範囲が広がるので、まずは共通コンポーネントで吸収する。\n\n## Test Plan\n- ブラウザで `/` を開き、Network に `[object Object]` の 404 が出ないことを確認する。\n- ヒーロー背景画像が実際に描画されることを確認する。\n- `npm run test:run`\n- `npm run lint`\n- `npm run build`\n\n## Assumptions\n- 変更対象はヒーロー画像の正規化に限定する。\n- 既存のアニメーション、レイヤー構造、表示順は変えない。\n- 他の SVG/画像 import については、今回の症状が出ている箇所を優先し、必要があれば別途横展開する。\n</proposed_plan>",
+      "usage": "manual_review_only_not_collector_input"
+    }
+  ],
+  "snapshot": {
+    "kind": "logged_patch_projection",
+    "limitation": "Git HEAD/index/worktree を復元したものではない"
+  },
+  "turns": [
+    {
+      "id": "019dc304-5ce9-7802-91c6-0273d4b6e15c",
+      "started_at": 1777093336,
+      "items": [
+        {
+          "turnId": "019dc304-5ce9-7802-91c6-0273d4b6e15c",
+          "item": {
+            "id": "item-38",
+            "type": "userMessage",
+            "content": [
+              {
+                "type": "text",
+                "text": "Implement the plan."
+              }
+            ]
+          }
+        },
+        {
+          "turnId": "019dc304-5ce9-7802-91c6-0273d4b6e15c",
+          "item": {
+            "id": "call_PbqrHW1H8ZjicCVJUdOJARb8",
+            "type": "fileChange",
+            "status": "completed",
+            "changes": [
+              {
+                "path": "src/components/common/progressiveimage/ProgressiveImage.jsx",
+                "kind": {
+                  "type": "update",
+                  "move_path": null
+                },
+                "diff": "@@ -1,2 +1,3 @@\n import clsx from 'clsx';\n+import { resolveStaticAssetSrc } from \"../../../lib/staticAsset\";\n \n@@ -9,3 +10,3 @@\n       const byWidth = responsiveSources[width];\n-      const src = byWidth?.[format];\n+      const src = resolveStaticAssetSrc(byWidth?.[format]);\n       return src ? `${src} ${width}w` : null;\n@@ -53,2 +54,5 @@\n   const jpgSrcSet = buildResponsiveSrcSet(responsive, 'jpg');\n+  const avifSrc = resolveStaticAssetSrc(sources.avif);\n+  const webpSrc = resolveStaticAssetSrc(sources.webp);\n+  const jpgSrc = resolveStaticAssetSrc(sources.jpg);\n \n@@ -56,5 +60,5 @@\n     <picture className={clsx('block pointer-events-none', pictureClassName)}>\n-      {sources.avif && (\n+      {avifSrc && (\n         <source\n-          srcSet={avifSrcSet || sources.avif}\n+          srcSet={avifSrcSet || avifSrc}\n           sizes={avifSrcSet ? sizes : undefined}\n@@ -63,5 +67,5 @@\n       )}\n-      {sources.webp && (\n+      {webpSrc && (\n         <source\n-          srcSet={webpSrcSet || sources.webp}\n+          srcSet={webpSrcSet || webpSrc}\n           sizes={webpSrcSet ? sizes : undefined}\n@@ -71,3 +75,3 @@\n       <img\n-        src={sources.jpg}\n+        src={jpgSrc}\n         srcSet={jpgSrcSet}\n"
+              },
+              {
+                "path": "src/components/common/svg/AISummaryBadge.jsx",
+                "kind": {
+                  "type": "update",
+                  "move_path": null
+                },
+                "diff": "@@ -2,2 +2,3 @@\n import iconSrc from \"../../../aisummary-icon-latest.svg\";\n+import { resolveStaticAssetSrc } from \"../../../lib/staticAsset\";\n \n@@ -5,3 +6,3 @@\n   <img\n-    src={iconSrc}\n+    src={resolveStaticAssetSrc(iconSrc)}\n     alt=\"要約を表すロボットのアイコン\"\n"
+              },
+              {
+                "path": "src/lib/staticAsset.js",
+                "kind": {
+                  "type": "add",
+                  "move_path": null
+                },
+                "diff": "export const resolveStaticAssetSrc = (asset) => {\n  if (typeof asset === \"string\") {\n    return asset;\n  }\n\n  if (asset && typeof asset === \"object\" && typeof asset.src === \"string\") {\n    return asset.src;\n  }\n\n  return \"\";\n};\n"
+              }
+            ]
+          }
+        },
+        {
+          "turnId": "019dc304-5ce9-7802-91c6-0273d4b6e15c",
+          "item": {
+            "id": "item-43",
+            "type": "agentMessage",
+            "phase": "final_answer",
+            "text": "結論：修正しました。`[object Object]` 404 はヒーロー画像の静的 import が Next.js でオブジェクト化され、そのまま `src` / `srcSet` に渡っていたのが原因でした。\n\n手順：\n- [src/lib/staticAsset.js](<WORKTREE>/src/lib/staticAsset.js) を追加し、静的 import を文字列URLへ正規化する共通ヘルパーを作成\n- [src/components/common/progressiveimage/ProgressiveImage.jsx](<WORKTREE>/src/components/common/progressiveimage/ProgressiveImage.jsx) で `avif/webp/jpg` と `srcSet` を正規化してから描画するよう修正\n- [src/components/common/svg/AISummaryBadge.jsx](<WORKTREE>/src/components/common/svg/AISummaryBadge.jsx) も同じヘルパーを使うよう修正し、同種の事故を予防\n\n確認結果：\n- `npm run test:run` 成功\n- `npm run lint` 成功\n- `npm run build` 成功\n- `build` の AVIF 警告は残りますが、これは「最適化非対応」の警告で、今回の 404 とは別件です\n\n注意点：\n- まだブラウザ上での再確認はしていませんが、原因のコード経路は塞いでいます\n- `dia-text-reveal.jsx` の既存 hook 警告は未対応のままです\n\n必要なら次に、ブラウザの Network タブで `[object Object]` が消えたかまで一緒に確認します。"
+          }
+        }
+      ]
+    }
+  ],
+  "window": {
+    "start": 1777093335,
+    "end": 1777093387
+  },
+  "targets": [
+    {
+      "path": "src/components/common/progressiveimage/ProgressiveImage.jsx",
+      "diff": "@@ -1,2 +1,3 @@\n import clsx from 'clsx';\n+import { resolveStaticAssetSrc } from \"../../../lib/staticAsset\";\n \n@@ -9,3 +10,3 @@\n       const byWidth = responsiveSources[width];\n-      const src = byWidth?.[format];\n+      const src = resolveStaticAssetSrc(byWidth?.[format]);\n       return src ? `${src} ${width}w` : null;\n@@ -53,2 +54,5 @@\n   const jpgSrcSet = buildResponsiveSrcSet(responsive, 'jpg');\n+  const avifSrc = resolveStaticAssetSrc(sources.avif);\n+  const webpSrc = resolveStaticAssetSrc(sources.webp);\n+  const jpgSrc = resolveStaticAssetSrc(sources.jpg);\n \n@@ -56,5 +60,5 @@\n     <picture className={clsx('block pointer-events-none', pictureClassName)}>\n-      {sources.avif && (\n+      {avifSrc && (\n         <source\n-          srcSet={avifSrcSet || sources.avif}\n+          srcSet={avifSrcSet || avifSrc}\n           sizes={avifSrcSet ? sizes : undefined}\n@@ -63,5 +67,5 @@\n       )}\n-      {sources.webp && (\n+      {webpSrc && (\n         <source\n-          srcSet={webpSrcSet || sources.webp}\n+          srcSet={webpSrcSet || webpSrc}\n           sizes={webpSrcSet ? sizes : undefined}\n@@ -71,3 +75,3 @@\n       <img\n-        src={sources.jpg}\n+        src={jpgSrc}\n         srcSet={jpgSrcSet}\n",
+      "final_diff": "@@ -1,2 +1,3 @@\n import clsx from 'clsx';\n+import { resolveStaticAssetSrc } from \"../../../lib/staticAsset\";\n \n@@ -9,3 +10,3 @@\n       const byWidth = responsiveSources[width];\n-      const src = byWidth?.[format];\n+      const src = resolveStaticAssetSrc(byWidth?.[format]);\n       return src ? `${src} ${width}w` : null;\n@@ -53,2 +54,5 @@\n   const jpgSrcSet = buildResponsiveSrcSet(responsive, 'jpg');\n+  const avifSrc = resolveStaticAssetSrc(sources.avif);\n+  const webpSrc = resolveStaticAssetSrc(sources.webp);\n+  const jpgSrc = resolveStaticAssetSrc(sources.jpg);\n \n@@ -56,5 +60,5 @@\n     <picture className={clsx('block pointer-events-none', pictureClassName)}>\n-      {sources.avif && (\n+      {avifSrc && (\n         <source\n-          srcSet={avifSrcSet || sources.avif}\n+          srcSet={avifSrcSet || avifSrc}\n           sizes={avifSrcSet ? sizes : undefined}\n@@ -63,5 +67,5 @@\n       )}\n-      {sources.webp && (\n+      {webpSrc && (\n         <source\n-          srcSet={webpSrcSet || sources.webp}\n+          srcSet={webpSrcSet || webpSrc}\n           sizes={webpSrcSet ? sizes : undefined}\n@@ -71,3 +75,3 @@\n       <img\n-        src={sources.jpg}\n+        src={jpgSrc}\n         srcSet={jpgSrcSet}\n"
+    },
+    {
+      "path": "src/components/common/svg/AISummaryBadge.jsx",
+      "diff": "@@ -2,2 +2,3 @@\n import iconSrc from \"../../../aisummary-icon-latest.svg\";\n+import { resolveStaticAssetSrc } from \"../../../lib/staticAsset\";\n \n@@ -5,3 +6,3 @@\n   <img\n-    src={iconSrc}\n+    src={resolveStaticAssetSrc(iconSrc)}\n     alt=\"要約を表すロボットのアイコン\"\n",
+      "final_diff": "@@ -2,2 +2,3 @@\n import iconSrc from \"../../../aisummary-icon-latest.svg\";\n+import { resolveStaticAssetSrc } from \"../../../lib/staticAsset\";\n \n@@ -5,3 +6,3 @@\n   <img\n-    src={iconSrc}\n+    src={resolveStaticAssetSrc(iconSrc)}\n     alt=\"要約を表すロボットのアイコン\"\n"
+    },
+    {
+      "path": "src/lib/staticAsset.js",
+      "diff": "@@ -0,0 +1 @@\n+export const resolveStaticAssetSrc = (asset) => {\n+  if (typeof asset === \"string\") {\n+    return asset;\n+  }\n+\n+  if (asset && typeof asset === \"object\" && typeof asset.src === \"string\") {\n+    return asset.src;\n+  }\n+\n+  return \"\";\n+};\n",
+      "final_diff": "@@ -0,0 +1 @@\n+export const resolveStaticAssetSrc = (asset) => {\n+  if (typeof asset === \"string\") {\n+    return asset;\n+  }\n+\n+  if (asset && typeof asset === \"object\" && typeof asset.src === \"string\") {\n+    return asset.src;\n+  }\n+\n+  return \"\";\n+};\n"
+    }
+  ]
+}

@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"strings"
 	"testing"
 	"time"
 
@@ -13,7 +12,7 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/relation"
 )
 
-func TestCodexContextCapturesBothGitAreasOnceWithoutMutation(t *testing.T) {
+func TestCodexContextCapturesChangedPathsOnceWithoutMutation(t *testing.T) {
 	repo := cliRepository(t)
 	cliWrite(t, repo, "one.txt", "old\nstable\nstable2\ntail\n", 0o644)
 	cliGit(t, repo, "add", "one.txt")
@@ -40,14 +39,8 @@ func TestCodexContextCapturesBothGitAreasOnceWithoutMutation(t *testing.T) {
 		if !ok || time.Until(deadline) > codexcontext.Timeout {
 			t.Fatal("unbounded collection")
 		}
-		if len(request.Targets) != 2 {
-			t.Fatalf("staged/unstaged targets=%d", len(request.Targets))
-		}
-		if !strings.Contains(request.Targets[0].Diff, "-old\n+new") || !strings.Contains(request.Targets[1].Diff, "-new\n+old") {
-			t.Fatal("lost cancelling staged/unstaged changes")
-		}
-		if strings.Contains(request.Targets[0].FinalDiff, "+new") || !strings.Contains(request.Targets[0].FinalDiff, "+changed-tail") {
-			t.Fatal("cancelled edits entered authoritative diff")
+		if len(request.Targets) != 1 || request.Targets[0].Path != "one.txt" {
+			t.Fatalf("staged/unstaged paths not deduplicated: %+v", request.Targets)
 		}
 		if request.AllowPath(".env") || request.AllowPath("private/config.txt") {
 			t.Fatal("sensitive policy bypass")

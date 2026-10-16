@@ -73,7 +73,7 @@ func optionalCodexContext(ctx context.Context, root string, snapshot gitstate.Sn
 	}}
 	// A Codex session can start in the main checkout and edit a dedicated
 	// worktree. Discover candidates only within this repository's worktree set;
-	// the edit matcher still requires paths inside the selected worktree.
+	// the path association still requires edits inside the selected worktree.
 	worktrees := exec.CommandContext(collectCtx, "git", "-C", root, "worktree", "list", "--porcelain", "-z")
 	worktrees.Env = append(os.Environ(), "GIT_OPTIONAL_LOCKS=0", "LC_ALL=C")
 	if output, err := worktrees.Output(); err == nil {
@@ -87,6 +87,7 @@ func optionalCodexContext(ctx context.Context, root string, snapshot gitstate.Sn
 			}
 		}
 	}
+	seenPaths := map[string]bool{}
 	for _, file := range files {
 		change := file.Change
 		if change.Binary || change.Opaque || change.Sensitive {
@@ -96,33 +97,9 @@ func optionalCodexContext(ctx context.Context, root string, snapshot gitstate.Sn
 			if !allowPath(path) {
 				continue
 			}
-			finalDiff, err := worktreeDiffContext(collectCtx, root, []string{path})
-			if err != nil {
-				return nil
-			}
-			if finalDiff == "" && change.Status != "untracked" {
-				continue
-			}
-			// Retain staged and unstaged evidence separately, including changes
-			// that cancel in HEAD-to-worktree diff. No Git mutation is performed.
-			for _, cached := range []bool{true, false} {
-				args := []string{"-C", root, "diff", "--no-ext-diff", "--no-textconv", "--unified=0"}
-				if cached {
-					args = append(args, "--cached", snapshot.Head)
-				}
-				args = append(args, "--", path)
-				cmd := exec.CommandContext(collectCtx, "git", args...)
-				cmd.Env = append(os.Environ(), "GIT_OPTIONAL_LOCKS=0", "GIT_LITERAL_PATHSPECS=1", "LC_ALL=C")
-				diff, err := cmd.Output()
-				if err != nil {
-					return nil
-				}
-				if len(diff) > 0 {
-					request.Targets = append(request.Targets, codexcontext.Target{Path: path, Diff: string(diff), FinalDiff: finalDiff})
-				}
-			}
-			if change.Status == "untracked" && len(file.Content) > 0 {
-				request.Targets = append(request.Targets, codexcontext.Target{Path: path, Diff: addedFileDiff(file.Content)})
+			if !seenPaths[path] {
+				request.Targets = append(request.Targets, codexcontext.Target{Path: path})
+				seenPaths[path] = true
 			}
 		}
 	}

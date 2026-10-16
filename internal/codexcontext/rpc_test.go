@@ -98,7 +98,7 @@ func TestRPCCancellationUnblocksHangingChild(t *testing.T) {
 
 func TestMissingCodexFallsBack(t *testing.T) {
 	t.Setenv("PATH", t.TempDir())
-	result := Collect(context.Background(), Request{Root: t.TempDir(), Start: time.Unix(1, 0), End: time.Now(), Targets: []Target{{Path: "a.go", Diff: testDiff}}})
+	result := Collect(context.Background(), Request{Root: t.TempDir(), Start: time.Unix(1, 0), End: time.Now(), Targets: []Target{{Path: "a.go"}}})
 	if result.Status != "unavailable" || len(result.Records) != 0 {
 		t.Fatalf("result=%+v", result)
 	}

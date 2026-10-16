@@ -61,7 +61,7 @@ func testHistory(t *testing.T) (*historyFixture, Request) {
 		logItem("turn", "progress", "agentMessage", map[string]any{"phase": "commentary", "text": "unverified hypothesis"}),
 		logItem("turn", "answer", "agentMessage", map[string]any{"phase": "final_answer", "text": "Corrected the boundary"}),
 	}
-	r := Request{Root: root, Start: time.Unix(100, 0), End: time.Unix(200, 0), Targets: []Target{{Path: "one.go", Diff: testDiff}}, SafeText: func(s string) bool { return !strings.Contains(s, "PRIVATE") }, AllowPath: func(s string) bool { return !strings.HasPrefix(s, ".env") }}
+	r := Request{Root: root, Start: time.Unix(100, 0), End: time.Unix(200, 0), Targets: []Target{{Path: "one.go"}}, SafeText: func(s string) bool { return !strings.Contains(s, "PRIVATE") }, AllowPath: func(s string) bool { return !strings.HasPrefix(s, ".env") }}
 	return f, r
 }
 
@@ -78,7 +78,7 @@ func editItem(turn, id, path, diff, status string) map[string]any {
 
 func TestCollectUsesDirectEditsAndDeduplicatesSharedRequest(t *testing.T) {
 	f, r := testHistory(t)
-	r.Targets = append(r.Targets, Target{Path: "two.go", Diff: testDiff})
+	r.Targets = append(r.Targets, Target{Path: "two.go"})
 	f.items["turn"] = append(f.items["turn"], editItem("turn", "patch2", filepath.Join(r.Root, "two.go"), testDiff, "completed"))
 	// Replayed inherited turn/item IDs must not duplicate evidence.
 	f.turns = append(f.turns, f.turns[0])
@@ -98,22 +98,16 @@ func TestCollectUsesDirectEditsAndDeduplicatesSharedRequest(t *testing.T) {
 }
 
 func TestCollectFallsBackForUnrelatedFailedCancelledAndUnsafeEdits(t *testing.T) {
-	for _, name := range []string{"path_only", "other_path", "other_worktree", "failed", "reverted", "cancelled_in_final", "unknown_time", "old_turn", "future_turn", "private_request", "private_edit"} {
+	for _, name := range []string{"other_path", "other_worktree", "failed", "cancelled", "unknown_time", "old_turn", "future_turn", "private_request", "private_edit"} {
 		t.Run(name, func(t *testing.T) {
 			f, r := testHistory(t)
 			switch name {
-			case "path_only":
-				f.items["turn"][1] = editItem("turn", "patch", "one.go", "@@ -1 +1 @@\n-other\n+edit\n", "completed")
 			case "other_path":
 				f.items["turn"][1] = editItem("turn", "patch", "other.go", testDiff, "completed")
 			case "other_worktree":
 				f.items["turn"][1] = editItem("turn", "patch", filepath.Join(filepath.Dir(r.Root), "another", "one.go"), testDiff, "completed")
-			case "failed":
-				f.items["turn"][1] = editItem("turn", "patch", "one.go", testDiff, "failed")
-			case "reverted":
-				r.Targets[0].Diff = "@@ -1 +1 @@\n-new\n+old\n"
-			case "cancelled_in_final":
-				r.Targets[0].FinalDiff = "@@ -10 +10 @@\n-tail\n+changed-tail\n"
+			case "failed", "cancelled":
+				f.items["turn"][1] = editItem("turn", "patch", "one.go", testDiff, name)
 			case "unknown_time":
 				delete(f.turns[0], "startedAt")
 			case "old_turn":
@@ -172,7 +166,7 @@ func TestCollectPartialFailureDoesNotAdoptIncompleteTurn(t *testing.T) {
 	}
 }
 
-func TestCollectRejectsConflictingSessionsButNotRepeatedWording(t *testing.T) {
+func TestCollectKeepsMultipleRequestsForSamePath(t *testing.T) {
 	for _, conflict := range []bool{false, true} {
 		f, r := testHistory(t)
 		f.turns = append(f.turns, map[string]any{"id": "another", "startedAt": 130})
@@ -180,13 +174,10 @@ func TestCollectRejectsConflictingSessionsButNotRepeatedWording(t *testing.T) {
 		if conflict {
 			path = "one.go"
 		}
-		r.Targets = append(r.Targets, Target{Path: path, Diff: testDiff})
+		r.Targets = append(r.Targets, Target{Path: path})
 		f.items["another"] = []map[string]any{logItem("another", "request2", "userMessage", map[string]any{"content": []map[string]string{{"type": "text", "text": "Correct the boundary"}}}), editItem("another", "patch2", path, testDiff, "completed")}
 		result := collect(f, r)
 		want := 2
-		if conflict {
-			want = 0
-		}
 		if len(result.Records) != want {
 			t.Fatalf("conflict=%v records=%d", conflict, len(result.Records))
 		}
@@ -206,17 +197,13 @@ func TestContextBudgetKeepsRequestAndOmitsLargeFinalWithoutTruncating(t *testing
 	}
 }
 
-func TestMatchIgnoresCoordinatesAndRejectsDifferentOperations(t *testing.T) {
-	if !matches(testDiff, "@@ -40 +40 @@\n-old\n+new\n", "update") {
-		t.Fatal("line shift rejected")
-	}
-	if matches(testDiff, "@@ -1 +1 @@\n-new\n+old\n", "update") {
-		t.Fatal("inverse edit accepted")
-	}
-	if matches(testDiff, "old -> new", "update") {
-		t.Fatal("unstructured text accepted")
-	}
-	if !matches("@@ -0,0 +1 @@\n+new\n", "new\n", "add") {
-		t.Fatal("full added content rejected")
+func TestCollectUsesCompletedEditedPathRegardlessOfHistoricalContent(t *testing.T) {
+	for _, diff := range []string{"@@ -1 +1 @@\n-other\n+intermediate\n", ""} {
+		f, r := testHistory(t)
+		f.items["turn"][1] = editItem("turn", "patch", "one.go", diff, "completed")
+		result := collect(f, r)
+		if result.Status != "available" || len(result.Records) != 1 || strings.Join(result.Records[0].Paths, ",") != "one.go" {
+			t.Fatalf("path-related history rejected: status=%s records=%d", result.Status, len(result.Records))
+		}
 	}
 }

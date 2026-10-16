@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "id": "motion-feature",
+  "status": "diagnostic",
+  "semantic_case_candidates": [
+    2,
+    4
+  ],
+  "gold_status": "undetermined",
+  "limitations": "画像添付はコピーしていない。依頼本文は修正してという短い参照で目的が不足し、final_answer の native item もない。動き追加と余白変更が含まれるが、独立した二目的の Gold は未確定。",
+  "provenance": {
+    "repository": "trial",
+    "rollout_file": "rollout-2026-10-14T13-36-17-01a138b2-5f22-71e1-a6ca-4e45b56af5cb.jsonl",
+    "thread_id": "01a138b2-5f22-71e1-a6ca-4e45b56af5cb",
+    "turn_id": "01a139af-3ed9-7511-a2f9-ce8991939df0",
+    "source_items": [
+      {
+        "line": 689,
+        "sha256": "78b6e40878e5025d553f9d4f2e3cab8d0b5fc627db82b4687ba98923c50d8fae",
+        "source_type": "UserMessage"
+      },
+      {
+        "line": 718,
+        "sha256": "2fcdfb78f2feea6fbcf0d3138788072cee7ccc0c0efee582c972f1b1a46e32f9",
+        "source_type": "FileChange"
+      }
+    ],
+    "transformations": [
+      "native item_completed projection to App Server-shaped test items, not a captured RPC response",
+      "absolute edited paths to repository-relative paths",
+      "worktree/home/temp paths and email redaction in text",
+      "text parts only; attachments, commands, tool output, settings and credentials not copied",
+      "replay time window surrounds copied user/edit/final events, not historical HEAD time"
+    ]
+  },
+  "supporting_context": [],
+  "snapshot": {
+    "kind": "git_commit_path_slice",
+    "base": "dc333e27be5514bcf32b3064ee267109b982adb7",
+    "head": "3a385bdc0a9bb7e4a7a673cd8922951fd211d995",
+    "original_file_count": 3,
+    "selected_file_count": 3,
+    "limitation": "コミット前後の対象パスの差分。歴史上の staged/unstaged 分離は復元していない"
+  },
+  "turns": [
+    {
+      "id": "01a139af-3ed9-7511-a2f9-ce8991939df0",
+      "started_at": 1791969148,
+      "items": [
+        {
+          "turnId": "01a139af-3ed9-7511-a2f9-ce8991939df0",
+          "item": {
+            "id": "01a139af-3fe0-7900-a516-cf26cf4ea368",
+            "type": "userMessage",
+            "content": [
+              {
+                "type": "text",
+                "text": "\n# Files mentioned by the user:\n\n## codex-clipboard-1f69e009-1235-499d-a177-3bc9543e663d.png: [LOCAL_TEMP_PATH]\nImage attachment: true\n\nDistinguish instructions in attached documents from the user's request.\n\n## My request:\nあなたが直接編集して修正して。\nブランチはです\n"
+              }
+            ]
+          }
+        },
+        {
+          "turnId": "01a139af-3ed9-7511-a2f9-ce8991939df0",
+          "item": {
+            "id": "exec-87b128db-a5ee-450d-97e1-9f55b0087db2",
+            "type": "fileChange",
+            "status": "completed",
+            "changes": [
+              {
+                "path": "assets/css/style.css",
+                "kind": {
+                  "type": "update",
+                  "move_path": null
+                },
+                "diff": "@@ -2075,2 +2075,54 @@\n \n+html.js-ready :where(.hero__media, .finale__media).js-photo img {\n+  transform: scale(1.04);\n+  transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);\n+}\n+\n+html.js-ready :where(.hero__media, .finale__media).js-photo.is-inview img {\n+  transform: scale(1);\n+}\n+\n+html.js-ready .js-filament {\n+  transform: scaleX(0);\n+  transform-origin: left center;\n+}\n+\n+html.js-ready .js-filament.is-inview {\n+  animation: line-grow 0.5s ease-out 0.2s forwards;\n+}\n+\n+html.js-ready .js-path-step {\n+  opacity: 0;\n+  transform: translateY(10px);\n+}\n+\n+html.js-ready .js-path-step.is-inview {\n+  animation: rise 0.4s ease-out both;\n+}\n+\n+@media (min-width: 600px) {\n+  html.js-ready .js-path-step.is-inview:nth-child(2) {\n+    animation-delay: 0.12s;\n+  }\n+\n+  html.js-ready .js-path-step.is-inview:nth-child(3) {\n+    animation-delay: 0.24s;\n+  }\n+\n+  html.js-ready .js-path::before {\n+    transform: scaleX(0);\n+    transform-origin: left center;\n+  }\n+\n+  html.js-ready .js-path.is-inview::before {\n+    animation: line-grow 0.72s ease-out both;\n+  }\n+}\n+\n+@keyframes line-grow {\n+  to {\n+    transform: scaleX(1);\n+  }\n+}\n+\n .hero :focus-visible,\n@@ -2119,3 +2171,9 @@\n   html.js-ready .js-title .title-line,\n-  html.js-ready .js-title.is-inview .title-line {\n+  html.js-ready .js-title.is-inview .title-line,\n+  html.js-ready .js-filament,\n+  html.js-ready .js-filament.is-inview,\n+  html.js-ready .js-path-step,\n+  html.js-ready .js-path-step.is-inview,\n+  html.js-ready .js-path::before,\n+  html.js-ready .js-path.is-inview::before {\n     opacity: 1;\n"
+              },
+              {
+                "path": "index.html",
+                "kind": {
+                  "type": "update",
+                  "move_path": null
+                },
+                "diff": "@@ -59,3 +59,3 @@\n             <h1><span class=\"title-line\">まだ、</span><span class=\"title-line\">本気を出せていない</span></h1>\n-            <p class=\"filament\" aria-hidden=\"true\"></p>\n+            <p class=\"filament js-filament\" aria-hidden=\"true\"></p>\n           </div>\n@@ -77,3 +77,3 @@\n               <h2 class=\"page__title js-title\"><span class=\"title-line\">もう一度</span><span class=\"title-line\">選び直したい</span></h2>\n-              <p class=\"filament filament--restart\" aria-hidden=\"true\"></p>\n+              <p class=\"filament filament--restart js-filament\" aria-hidden=\"true\"></p>\n             </div>\n@@ -196,4 +196,4 @@\n         </div>\n-        <ol class=\"path\" aria-label=\"入社からの流れ\">\n-          <li>\n+        <ol class=\"path js-path\" aria-label=\"入社からの流れ\">\n+          <li class=\"js-path-step\">\n             <span class=\"path__icon\"><img src=\"/assets/images/beginner-384.webp\" srcset=\"/assets/images/beginner-192.webp 192w, /assets/images/beginner-384.webp 384w\" sizes=\"128px\" alt=\"\" width=\"575\" height=\"650\" loading=\"lazy\" decoding=\"async\"></span>\n@@ -203,3 +203,3 @@\n           </li>\n-          <li>\n+          <li class=\"js-path-step\">\n             <span class=\"path__icon\"><img src=\"/assets/images/coworker-384.webp\" srcset=\"/assets/images/coworker-192.webp 192w, /assets/images/coworker-384.webp 384w\" sizes=\"128px\" alt=\"\" width=\"870\" height=\"611\" loading=\"lazy\" decoding=\"async\"></span>\n@@ -209,3 +209,3 @@\n           </li>\n-          <li>\n+          <li class=\"js-path-step\">\n             <span class=\"path__icon\"><img src=\"/assets/images/study-man-384.webp\" srcset=\"/assets/images/study-man-192.webp 192w, /assets/images/study-man-384.webp 384w\" sizes=\"128px\" alt=\"\" width=\"637\" height=\"634\" loading=\"lazy\" decoding=\"async\"></span>\n"
+              },
+              {
+                "path": "assets/js/script.js",
+                "kind": {
+                  "type": "update",
+                  "move_path": null
+                },
+                "diff": "@@ -99,3 +99,5 @@\n   function initInview() {\n-    const nodes = document.querySelectorAll(\".js-inview, .js-title, .js-photo\");\n+    const nodes = document.querySelectorAll(\n+      \".js-inview, .js-title, .js-photo, .js-filament, .js-path, .js-path-step\"\n+    );\n     if (reduceMotion.matches) {\n"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "window": {
+    "start": 1791969147,
+    "end": 1791969263
+  },
+  "targets": [
+    {
+      "path": "assets/css/style.css",
+      "diff": "diff --git a/assets/css/style.css b/assets/css/style.css\nindex ab2e851..0ccb17b 100644\n--- a/assets/css/style.css\n+++ b/assets/css/style.css\n@@ -1280,6 +1280,10 @@ html.js-ready .js-inview.is-inview {\n   padding-top: 0;\n }\n \n+#chapter-08 .chapter-follow .prose p + p {\n+  margin-top: 0.4em;\n+}\n+\n @media (min-width: 900px) {\n   #chapter-08 .chapter-follow .prose {\n     max-width: none;\n@@ -2073,6 +2077,58 @@ html.js-ready .js-photo.is-inview img {\n   transform: scale(1.04);\n }\n \n+html.js-ready :where(.hero__media, .finale__media).js-photo img {\n+  transform: scale(1.04);\n+  transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);\n+}\n+\n+html.js-ready :where(.hero__media, .finale__media).js-photo.is-inview img {\n+  transform: scale(1);\n+}\n+\n+html.js-ready .js-filament {\n+  transform: scaleX(0);\n+  transform-origin: left center;\n+}\n+\n+html.js-ready .js-filament.is-inview {\n+  animation: line-grow 0.5s ease-out 0.2s forwards;\n+}\n+\n+html.js-ready .js-path-step {\n+  opacity: 0;\n+  transform: translateY(10px);\n+}\n+\n+html.js-ready .js-path-step.is-inview {\n+  animation: rise 0.4s ease-out both;\n+}\n+\n+@media (min-width: 600px) {\n+  html.js-ready .js-path-step.is-inview:nth-child(2) {\n+    animation-delay: 0.12s;\n+  }\n+\n+  html.js-ready .js-path-step.is-inview:nth-child(3) {\n+    animation-delay: 0.24s;\n+  }\n+\n+  html.js-ready .js-path::before {\n+    transform: scaleX(0);\n+    transform-origin: left center;\n+  }\n+\n+  html.js-ready .js-path.is-inview::before {\n+    animation: line-grow 0.72s ease-out both;\n+  }\n+}\n+\n+@keyframes line-grow {\n+  to {\n+    transform: scaleX(1);\n+  }\n+}\n+\n .hero :focus-visible,\n .site-footer :focus-visible {\n   outline-color: var(--color-yellow);\n@@ -2117,7 +2173,13 @@ html.js-ready .js-photo.is-inview img {\n   html.js-ready .js-inview,\n   html.js-ready .js-inview.is-inview,\n   html.js-ready .js-title .title-line,\n-  html.js-ready .js-title.is-inview .title-line {\n+  html.js-ready .js-title.is-inview .title-line,\n+  html.js-ready .js-filament,\n+  html.js-ready .js-filament.is-inview,\n+  html.js-ready .js-path-step,\n+  html.js-ready .js-path-step.is-inview,\n+  html.js-ready .js-path::before,\n+  html.js-ready .js-path.is-inview::before {\n     opacity: 1;\n     transform: none;\n     animation: none;\n",
+      "final_diff": "diff --git a/assets/css/style.css b/assets/css/style.css\nindex ab2e851..0ccb17b 100644\n--- a/assets/css/style.css\n+++ b/assets/css/style.css\n@@ -1280,6 +1280,10 @@ html.js-ready .js-inview.is-inview {\n   padding-top: 0;\n }\n \n+#chapter-08 .chapter-follow .prose p + p {\n+  margin-top: 0.4em;\n+}\n+\n @media (min-width: 900px) {\n   #chapter-08 .chapter-follow .prose {\n     max-width: none;\n@@ -2073,6 +2077,58 @@ html.js-ready .js-photo.is-inview img {\n   transform: scale(1.04);\n }\n \n+html.js-ready :where(.hero__media, .finale__media).js-photo img {\n+  transform: scale(1.04);\n+  transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);\n+}\n+\n+html.js-ready :where(.hero__media, .finale__media).js-photo.is-inview img {\n+  transform: scale(1);\n+}\n+\n+html.js-ready .js-filament {\n+  transform: scaleX(0);\n+  transform-origin: left center;\n+}\n+\n+html.js-ready .js-filament.is-inview {\n+  animation: line-grow 0.5s ease-out 0.2s forwards;\n+}\n+\n+html.js-ready .js-path-step {\n+  opacity: 0;\n+  transform: translateY(10px);\n+}\n+\n+html.js-ready .js-path-step.is-inview {\n+  animation: rise 0.4s ease-out both;\n+}\n+\n+@media (min-width: 600px) {\n+  html.js-ready .js-path-step.is-inview:nth-child(2) {\n+    animation-delay: 0.12s;\n+  }\n+\n+  html.js-ready .js-path-step.is-inview:nth-child(3) {\n+    animation-delay: 0.24s;\n+  }\n+\n+  html.js-ready .js-path::before {\n+    transform: scaleX(0);\n+    transform-origin: left center;\n+  }\n+\n+  html.js-ready .js-path.is-inview::before {\n+    animation: line-grow 0.72s ease-out both;\n+  }\n+}\n+\n+@keyframes line-grow {\n+  to {\n+    transform: scaleX(1);\n+  }\n+}\n+\n .hero :focus-visible,\n .site-footer :focus-visible {\n   outline-color: var(--color-yellow);\n@@ -2117,7 +2173,13 @@ html.js-ready .js-photo.is-inview img {\n   html.js-ready .js-inview,\n   html.js-ready .js-inview.is-inview,\n   html.js-ready .js-title .title-line,\n-  html.js-ready .js-title.is-inview .title-line {\n+  html.js-ready .js-title.is-inview .title-line,\n+  html.js-ready .js-filament,\n+  html.js-ready .js-filament.is-inview,\n+  html.js-ready .js-path-step,\n+  html.js-ready .js-path-step.is-inview,\n+  html.js-ready .js-path::before,\n+  html.js-ready .js-path.is-inview::before {\n     opacity: 1;\n     transform: none;\n     animation: none;\n"
+    },
+    {
+      "path": "assets/js/script.js",
+      "diff": "diff --git a/assets/js/script.js b/assets/js/script.js\nindex 0e34130..edf5903 100644\n--- a/assets/js/script.js\n+++ b/assets/js/script.js\n@@ -97,7 +97,9 @@\n   const stageSessions = [];\n \n   function initInview() {\n-    const nodes = document.querySelectorAll(\".js-inview, .js-title, .js-photo\");\n+    const nodes = document.querySelectorAll(\n+      \".js-inview, .js-title, .js-photo, .js-filament, .js-path, .js-path-step\"\n+    );\n     if (reduceMotion.matches) {\n       nodes.forEach(function (node) {\n         node.classList.add(\"is-inview\");\n",
+      "final_diff": "diff --git a/assets/js/script.js b/assets/js/script.js\nindex 0e34130..edf5903 100644\n--- a/assets/js/script.js\n+++ b/assets/js/script.js\n@@ -97,7 +97,9 @@\n   const stageSessions = [];\n \n   function initInview() {\n-    const nodes = document.querySelectorAll(\".js-inview, .js-title, .js-photo\");\n+    const nodes = document.querySelectorAll(\n+      \".js-inview, .js-title, .js-photo, .js-filament, .js-path, .js-path-step\"\n+    );\n     if (reduceMotion.matches) {\n       nodes.forEach(function (node) {\n         node.classList.add(\"is-inview\");\n"
+    },
+    {
+      "path": "index.html",
+      "diff": "diff --git a/index.html b/index.html\nindex 40fa77c..8387d7b 100644\n--- a/index.html\n+++ b/index.html\n@@ -57,7 +57,7 @@\n         <div class=\"container hero__copy\">\n           <div class=\"hero__title js-title\">\n             <h1><span class=\"title-line\">まだ、</span><span class=\"title-line\">本気を出せていない</span></h1>\n-            <p class=\"filament\" aria-hidden=\"true\"></p>\n+            <p class=\"filament js-filament\" aria-hidden=\"true\"></p>\n           </div>\n           <div class=\"prose prose--large\"><p>言われた仕事をこなし、怒られないように1日を終える。</p><p>大きな失敗はしなかったけれど、自分だからできたと思える仕事もなかった。このまま何年経っても、何も変わらない。</p><p>そんな気がして、少しだけ怖くなった。</p></div>\n         </div>\n@@ -75,7 +75,7 @@\n           <div class=\"chapter__copy\">\n             <div class=\"chapter__heading\">\n               <h2 class=\"page__title js-title\"><span class=\"title-line\">もう一度</span><span class=\"title-line\">選び直したい</span></h2>\n-              <p class=\"filament filament--restart\" aria-hidden=\"true\"></p>\n+              <p class=\"filament filament--restart js-filament\" aria-hidden=\"true\"></p>\n             </div>\n             <p class=\"intro\">特別な才能も、誇れる経歴もない。それでも、このままでいいとは思えなかった。</p>\n             <div class=\"prose\"><p>過去を全部やり直すことはできないけれど、これから働く場所は選び直せる。</p><p>僕は、自分の仕事人生をここで仕切り直すことにした。</p></div>\n@@ -194,20 +194,20 @@\n         <div class=\"chapter-follow\">\n           <div class=\"prose\"><p>電気工事の知識も資格もなかった。分からないことは確認しながら進められた。</p><p>会社も全力で支えてくれる。</p></div>\n         </div>\n-        <ol class=\"path\" aria-label=\"入社からの流れ\">\n-          <li>\n+        <ol class=\"path js-path\" aria-label=\"入社からの流れ\">\n+          <li class=\"js-path-step\">\n             <span class=\"path__icon\"><img src=\"/assets/images/beginner-384.webp\" srcset=\"/assets/images/beginner-192.webp 192w, /assets/images/beginner-384.webp 384w\" sizes=\"128px\" alt=\"\" width=\"575\" height=\"650\" loading=\"lazy\" decoding=\"async\"></span>\n             <span class=\"path__mark\" aria-hidden=\"true\"></span>\n             <span class=\"path__label\">入社のとき</span>\n             <span class=\"path__text\">知識も、資格も、ゼロから。</span>\n           </li>\n-          <li>\n+          <li class=\"js-path-step\">\n             <span class=\"path__icon\"><img src=\"/assets/images/coworker-384.webp\" srcset=\"/assets/images/coworker-192.webp 192w, /assets/images/coworker-384.webp 384w\" sizes=\"128px\" alt=\"\" width=\"870\" height=\"611\" loading=\"lazy\" decoding=\"async\"></span>\n             <span class=\"path__mark\" aria-hidden=\"true\"></span>\n             <span class=\"path__label\">現場で</span>\n             <span class=\"path__text\">一つずつ、できることが増えていった。</span>\n           </li>\n-          <li>\n+          <li class=\"js-path-step\">\n             <span class=\"path__icon\"><img src=\"/assets/images/study-man-384.webp\" srcset=\"/assets/images/study-man-192.webp 192w, /assets/images/study-man-384.webp 384w\" sizes=\"128px\" alt=\"\" width=\"637\" height=\"634\" loading=\"lazy\" decoding=\"async\"></span>\n             <span class=\"path__mark\" aria-hidden=\"true\"></span>\n             <span class=\"path__label\">そのあと</span>\n",
+      "final_diff": "diff --git a/index.html b/index.html\nindex 40fa77c..8387d7b 100644\n--- a/index.html\n+++ b/index.html\n@@ -57,7 +57,7 @@\n         <div class=\"container hero__copy\">\n           <div class=\"hero__title js-title\">\n             <h1><span class=\"title-line\">まだ、</span><span class=\"title-line\">本気を出せていない</span></h1>\n-            <p class=\"filament\" aria-hidden=\"true\"></p>\n+            <p class=\"filament js-filament\" aria-hidden=\"true\"></p>\n           </div>\n           <div class=\"prose prose--large\"><p>言われた仕事をこなし、怒られないように1日を終える。</p><p>大きな失敗はしなかったけれど、自分だからできたと思える仕事もなかった。このまま何年経っても、何も変わらない。</p><p>そんな気がして、少しだけ怖くなった。</p></div>\n         </div>\n@@ -75,7 +75,7 @@\n           <div class=\"chapter__copy\">\n             <div class=\"chapter__heading\">\n               <h2 class=\"page__title js-title\"><span class=\"title-line\">もう一度</span><span class=\"title-line\">選び直したい</span></h2>\n-              <p class=\"filament filament--restart\" aria-hidden=\"true\"></p>\n+              <p class=\"filament filament--restart js-filament\" aria-hidden=\"true\"></p>\n             </div>\n             <p class=\"intro\">特別な才能も、誇れる経歴もない。それでも、このままでいいとは思えなかった。</p>\n             <div class=\"prose\"><p>過去を全部やり直すことはできないけれど、これから働く場所は選び直せる。</p><p>僕は、自分の仕事人生をここで仕切り直すことにした。</p></div>\n@@ -194,20 +194,20 @@\n         <div class=\"chapter-follow\">\n           <div class=\"prose\"><p>電気工事の知識も資格もなかった。分からないことは確認しながら進められた。</p><p>会社も全力で支えてくれる。</p></div>\n         </div>\n-        <ol class=\"path\" aria-label=\"入社からの流れ\">\n-          <li>\n+        <ol class=\"path js-path\" aria-label=\"入社からの流れ\">\n+          <li class=\"js-path-step\">\n             <span class=\"path__icon\"><img src=\"/assets/images/beginner-384.webp\" srcset=\"/assets/images/beginner-192.webp 192w, /assets/images/beginner-384.webp 384w\" sizes=\"128px\" alt=\"\" width=\"575\" height=\"650\" loading=\"lazy\" decoding=\"async\"></span>\n             <span class=\"path__mark\" aria-hidden=\"true\"></span>\n             <span class=\"path__label\">入社のとき</span>\n             <span class=\"path__text\">知識も、資格も、ゼロから。</span>\n           </li>\n-          <li>\n+          <li class=\"js-path-step\">\n             <span class=\"path__icon\"><img src=\"/assets/images/coworker-384.webp\" srcset=\"/assets/images/coworker-192.webp 192w, /assets/images/coworker-384.webp 384w\" sizes=\"128px\" alt=\"\" width=\"870\" height=\"611\" loading=\"lazy\" decoding=\"async\"></span>\n             <span class=\"path__mark\" aria-hidden=\"true\"></span>\n             <span class=\"path__label\">現場で</span>\n             <span class=\"path__text\">一つずつ、できることが増えていった。</span>\n           </li>\n-          <li>\n+          <li class=\"js-path-step\">\n             <span class=\"path__icon\"><img src=\"/assets/images/study-man-384.webp\" srcset=\"/assets/images/study-man-192.webp 192w, /assets/images/study-man-384.webp 384w\" sizes=\"128px\" alt=\"\" width=\"637\" height=\"634\" loading=\"lazy\" decoding=\"async\"></span>\n             <span class=\"path__mark\" aria-hidden=\"true\"></span>\n             <span class=\"path__label\">そのあと</span>\n"
+    }
+  ]
+}
