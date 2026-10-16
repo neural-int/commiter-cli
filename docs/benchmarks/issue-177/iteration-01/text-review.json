@@ -1,0 +1,31 @@
+{
+  "reference_status": "frozen exploratory agent-authored reference; not independent human adjudication",
+  "review_method": "agent reviewed actual text against pre-frozen required_meanings/forbidden_claims; no judge model or repair calls",
+  "cases": [
+    {
+      "case": "C01",
+      "arm": "A",
+      "text_semantic_matches_reference": false,
+      "reason": "Mentions asset resolution and component updates; does not connect URL normalization to correction of existing404/display bug. Category refactor differs fromfix.",
+      "summary_characters": 29
+    },
+    {
+      "case": "C01",
+      "arm": "B",
+      "text_semantic_matches_reference": true,
+      "reason": "Explicitly normalizes static imports to URL strings and fixes image404. No forbidden claim.",
+      "summary_characters": 51,
+      "structural_result": "invalid_schema:51>48; no final plan"
+    },
+    {
+      "case": "C02",
+      "arm": "A",
+      "status": "not_evaluated_no_text"
+    },
+    {
+      "case": "C02",
+      "arm": "B",
+      "status": "not_evaluated_no_text"
+    }
+  ]
+}
