@@ -1,0 +1,153 @@
+{
+  "gold_sha256": "94cfc6fb6eeafc145e3981619c320d353153ebdaead5fdd900e0c5a6428c61d2",
+  "observations": [
+    {
+      "case": "C01",
+      "arm": "A",
+      "model_calls": 3,
+      "accepted_plan": true,
+      "pipeline_error": "",
+      "grouping_exact": true,
+      "partition": [
+        [
+          "src/components/common/progressiveimage/ProgressiveImage.jsx",
+          "src/components/common/svg/AISummaryBadge.jsx",
+          "src/lib/staticAsset.js"
+        ]
+      ],
+      "category_matches_reference": false,
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "refactor"
+        }
+      },
+      "text": {
+        "G001": {
+          "scope": "ProgressiveImage",
+          "summary": "画像表示のためのプログレッシブ画像コンポーネントを実装"
+        }
+      },
+      "text_semantic_review": "pending",
+      "phases": {
+        "bounded-grouping": {
+          "stop": "completed",
+          "content": {
+            "path:src/components/common/progressiveimage/ProgressiveImage.jsx": "G001",
+            "path:src/components/common/svg/AISummaryBadge.jsx": "G001",
+            "path:src/lib/staticAsset.js": "G001"
+          },
+          "backend_error": "",
+          "wall_seconds": 31.008804208
+        },
+        "bounded-category": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "breaking_evidence_ref": "none",
+              "type": "refactor"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 36.968879167
+        },
+        "bounded-text": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "scope": "ProgressiveImage",
+              "summary": "画像表示のためのプログレッシブ画像コンポーネントを実装"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 22.560757667
+        }
+      },
+      "wall_seconds": 90.543668417
+    },
+    {
+      "case": "C01",
+      "arm": "B",
+      "model_calls": 3,
+      "accepted_plan": false,
+      "pipeline_error": "LLM backend could not produce a safe, completely assigned commit plan",
+      "grouping_exact": true,
+      "partition": [
+        [
+          "src/components/common/progressiveimage/ProgressiveImage.jsx",
+          "src/components/common/svg/AISummaryBadge.jsx",
+          "src/lib/staticAsset.js"
+        ]
+      ],
+      "category_matches_reference": true,
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "fix"
+        }
+      },
+      "text": null,
+      "text_semantic_review": "not_evaluated",
+      "phases": {
+        "bounded-grouping": {
+          "stop": "completed",
+          "content": {
+            "path:src/components/common/progressiveimage/ProgressiveImage.jsx": "G001",
+            "path:src/components/common/svg/AISummaryBadge.jsx": "G001",
+            "path:src/lib/staticAsset.js": "G001"
+          },
+          "backend_error": "",
+          "wall_seconds": 48.168855375
+        },
+        "bounded-category": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "breaking_evidence_ref": "none",
+              "type": "fix"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 65.717880625
+        },
+        "bounded-text": {
+          "stop": "",
+          "content": null,
+          "backend_error": "MLX helper timed out",
+          "wall_seconds": 6.35030875
+        }
+      },
+      "wall_seconds": 120.254142459
+    },
+    {
+      "case": "C02",
+      "arm": "A",
+      "model_calls": 0,
+      "accepted_plan": false,
+      "pipeline_error": "provisional three-phase planner does not support compressed input",
+      "grouping_exact": null,
+      "partition": null,
+      "category_matches_reference": null,
+      "category": null,
+      "text": null,
+      "text_semantic_review": "not_evaluated",
+      "phases": {},
+      "wall_seconds": 0.000169375
+    },
+    {
+      "case": "C02",
+      "arm": "B",
+      "model_calls": 0,
+      "accepted_plan": false,
+      "pipeline_error": "provisional three-phase planner does not support compressed input",
+      "grouping_exact": null,
+      "partition": null,
+      "category_matches_reference": null,
+      "category": null,
+      "text": null,
+      "text_semantic_review": "not_evaluated",
+      "phases": {},
+      "wall_seconds": 0.000151791
+    }
+  ]
+}

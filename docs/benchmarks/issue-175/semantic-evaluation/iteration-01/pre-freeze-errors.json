@@ -1,0 +1,25 @@
+{
+  "model_calls": 0,
+  "events": [
+    {
+      "stage": "materialization-01",
+      "failure": "Attempted staging of file absent in base after inverse patch",
+      "repair": "Stage only existing base files; recreate in new output root; preserve first root"
+    },
+    {
+      "stage": "capture-01/02 C02",
+      "failure": "Original prompt 1047993 bytes; summary_count 5, strong compression and evidence reduction; ThreePhase refuses compressed input",
+      "action": "No model call or fixture shrink; retain admission failure"
+    },
+    {
+      "stage": "tokenizer-01",
+      "failure": "Old helper bundle lacks Metal library",
+      "repair": "Copy existing binary with matching dependency-lock Metal resource into a separate runtime directory"
+    },
+    {
+      "stage": "tokenizer-02",
+      "failure": "Older tokenize-only helper rejects 32k protocol request",
+      "repair": "Use 16k tokenize-only protocol for identical text/profile; compare token count to actual captured generation ceiling; production helper checks actual request again"
+    }
+  ]
+}

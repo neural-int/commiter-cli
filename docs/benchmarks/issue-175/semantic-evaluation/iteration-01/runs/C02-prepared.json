@@ -1,0 +1,3380 @@
+{
+  "schema_version": 1,
+  "repository": {
+    "head": "83924a3ff65582567e0d2b745a50603043d35dbc",
+    "branch": "codex/fixture",
+    "index_identity": "4bb8a0c60e2cede2e5a94559d18d4c1a20a9e99bb9c985249461bcd2a99972ec"
+  },
+  "files": [
+    {
+      "id": "F001",
+      "status": "added",
+      "old_path": null,
+      "new_path": "docs/decisions/issue-167-file-first.md",
+      "old_mode": null,
+      "new_mode": "100644",
+      "head_identity": null,
+      "worktree_kind": "file",
+      "worktree_identity": "f6fcd5c4b37410f2d724ad9816629c39e1b7f14e0eb783e5cf540a345bbc1f70",
+      "language": "Markdown",
+      "change_hash": "e41f23f2bdf235b675347aac32ed1f680482f66b1de77dab767a0d07372db90c",
+      "size": 7908,
+      "binary": false,
+      "vendor": false,
+      "opaque": false,
+      "staged": false,
+      "unstaged": true,
+      "mode": "raw_diff",
+      "summary": "hunk: @@ -0,0 +1,63 @@\nchunk 1: lines=48 additions=47 deletions=0 context=0 sha256=0ca272c7ca5d65c6c528da6a16a786fd3e60c5ce68ee80b30c4d6cb3d50e5c9e\nadded: # Issue #167: File-first Phase 1\nomitted: additions=22 deletions=0\nadded: |---|---|\nomitted: additions=22 deletions=0\nadded: 受入テストは、1〜16 files の全 file 数、対象外の部分ス...変換・外部 Git コマンドを検査する。\nhunk: @@ -0,0 +1,63 @@\nchunk 2: lines=16 additions=16 deletions=0 context=0 sha256=95fba313b8738a89ec75c718d460d90a26521a3d314339f8df9d8a3748dd4fad\nadded: \nomitted: additions=6 deletions=0\nadded: 最終 tree 一致は、全変更が失われずに stage/replay できる...イル内の複数目的も分割されない。\nomitted: additions=7 deletions=0\nadded: Issue 全体は未完了。Phase 2/3 の未実装・未計測を Gate 成功として扱わない。"
+    },
+    {
+      "id": "F002",
+      "status": "modified",
+      "old_path": "internal/gitstate/collect.go",
+      "new_path": "internal/gitstate/collect.go",
+      "old_mode": "100644",
+      "new_mode": "100644",
+      "head_identity": "7937c3802413c8659113702b6aff2f53e09ddb77",
+      "worktree_kind": "file",
+      "worktree_identity": "a56e5143b2e00b313f27d17316a2158f8622599a8085271629cc668447b65900",
+      "language": "Go",
+      "change_hash": "5b87045215164c6f75e84ff8e4ac6356b62ff25ac99cda07d11ed4330b348cd5",
+      "size": 6846,
+      "binary": false,
+      "vendor": false,
+      "opaque": false,
+      "staged": false,
+      "unstaged": true,
+      "mode": "structural",
+      "evidence": [
+        {
+          "kind": "function_declaration",
+          "name": "Collect",
+          "start_line": 8,
+          "end_line": 33,
+          "start_byte": 49,
+          "end_byte": 697
+        },
+        {
+          "kind": "block",
+          "enclosing_declaration": "Collect",
+          "start_line": 8,
+          "end_line": 33,
+          "start_byte": 123,
+          "end_byte": 697
+        },
+        {
+          "kind": "return_statement",
+          "enclosing_declaration": "Collect",
+          "start_line": 32,
+          "end_line": 32,
+          "start_byte": 655,
+          "end_byte": 695
+        },
+        {
+          "kind": "call_expression",
+          "enclosing_declaration": "Collect",
+          "role": "call",
+          "start_line": 32,
+          "end_line": 32,
+          "start_byte": 662,
+          "end_byte": 695
+        },
+        {
+          "kind": "expression_list",
+          "enclosing_declaration": "Collect",
+          "start_line": 32,
+          "end_line": 32,
+          "start_byte": 662,
+          "end_byte": 695
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "Collect",
+          "start_line": 32,
+          "end_line": 32,
+          "start_byte": 682,
+          "end_byte": 689
+        },
+        {
+          "kind": "comment",
+          "start_line": 36,
+          "end_line": 36,
+          "start_byte": 777,
+          "end_byte": 854
+        },
+        {
+          "kind": "function_declaration",
+          "name": "collectLocked",
+          "start_line": 37,
+          "end_line": 171,
+          "start_byte": 855,
+          "end_byte": 5524
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "collectLocked",
+          "start_line": 37,
+          "end_line": 37,
+          "start_byte": 860,
+          "end_byte": 873
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "root",
+          "start_line": 37,
+          "end_line": 37,
+          "start_byte": 874,
+          "end_byte": 878
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "root",
+          "start_line": 37,
+          "end_line": 37,
+          "start_byte": 874,
+          "end_byte": 885
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "options",
+          "start_line": 37,
+          "end_line": 37,
+          "start_byte": 887,
+          "end_byte": 894
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "options",
+          "start_line": 37,
+          "end_line": 37,
+          "start_byte": 887,
+          "end_byte": 902
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "ctx",
+          "start_line": 37,
+          "end_line": 37,
+          "start_byte": 904,
+          "end_byte": 907
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "ctx",
+          "start_line": 37,
+          "end_line": 37,
+          "start_byte": 904,
+          "end_byte": 923
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "ctx",
+          "start_line": 37,
+          "end_line": 37,
+          "start_byte": 916,
+          "end_byte": 923
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "snapshot",
+          "start_line": 37,
+          "end_line": 37,
+          "start_byte": 926,
+          "end_byte": 934
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "snapshot",
+          "start_line": 37,
+          "end_line": 37,
+          "start_byte": 926,
+          "end_byte": 943
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "snapshot",
+          "start_line": 37,
+          "end_line": 37,
+          "start_byte": 935,
+          "end_byte": 943
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "err",
+          "start_line": 37,
+          "end_line": 37,
+          "start_byte": 945,
+          "end_byte": 948
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "err",
+          "start_line": 37,
+          "end_line": 37,
+          "start_byte": 945,
+          "end_byte": 954
+        },
+        {
+          "kind": "block",
+          "enclosing_declaration": "collectLocked",
+          "start_line": 37,
+          "end_line": 171,
+          "start_byte": 956,
+          "end_byte": 5524
+        }
+      ],
+      "evidence_reduction": {
+        "level": "medium",
+        "original_count": 35,
+        "original_bytes": 4094,
+        "original_digest": "340a8dc05dffc84a54920faa5e91a84b4ea89cd4f0b10727a4606e8646dc3841",
+        "retained_count": 22,
+        "retained_bytes": 2542,
+        "retained_digest": "ff7a0cbcbddd13431c5bf9f3350c7ef7ad6930838fccab72e5325c4180a04855",
+        "coverage_count": 15,
+        "original_coverage_digest": "f14487a3db013edcf5d87e5974f4cb283c7bf782c0da3ca2df6022a52cf3f595",
+        "retained_coverage_digest": "f14487a3db013edcf5d87e5974f4cb283c7bf782c0da3ca2df6022a52cf3f595"
+      }
+    },
+    {
+      "id": "F003",
+      "status": "added",
+      "old_path": null,
+      "new_path": "internal/gitstate/file_first.go",
+      "old_mode": null,
+      "new_mode": "100644",
+      "head_identity": null,
+      "worktree_kind": "file",
+      "worktree_identity": "0379367b6ddb3d5f600b0cdc56468e0561aa48027f313aa0210993033cf3ffc2",
+      "language": "Go",
+      "change_hash": "564969e0b3195773b9dda3ca2e12ab471a96fd78b20ac776599b0a29f2a69aeb",
+      "size": 16947,
+      "binary": false,
+      "vendor": false,
+      "opaque": false,
+      "staged": false,
+      "unstaged": true,
+      "mode": "structural",
+      "evidence": [
+        {
+          "kind": "package_clause",
+          "start_line": 1,
+          "end_line": 1,
+          "start_byte": 0,
+          "end_byte": 16
+        },
+        {
+          "kind": "package_identifier",
+          "start_line": 1,
+          "end_line": 1,
+          "start_byte": 8,
+          "end_byte": 16
+        },
+        {
+          "kind": "import_declaration",
+          "role": "import",
+          "start_line": 3,
+          "end_line": 15,
+          "start_byte": 18,
+          "end_byte": 139
+        },
+        {
+          "kind": "import_spec_list",
+          "role": "import",
+          "start_line": 3,
+          "end_line": 15,
+          "start_byte": 25,
+          "end_byte": 139
+        },
+        {
+          "kind": "interpreted_string_literal",
+          "start_line": 9,
+          "end_line": 9,
+          "start_byte": 70,
+          "end_byte": 79
+        },
+        {
+          "kind": "interpreted_string_literal_content",
+          "start_line": 9,
+          "end_line": 9,
+          "start_byte": 71,
+          "end_byte": 78
+        },
+        {
+          "kind": "const_spec",
+          "name": "FileFirstMaxFiles",
+          "start_line": 17,
+          "end_line": 17,
+          "start_byte": 147,
+          "end_byte": 169
+        },
+        {
+          "kind": "const_declaration",
+          "start_line": 18,
+          "end_line": 18,
+          "start_byte": 170,
+          "end_byte": 203
+        },
+        {
+          "kind": "const_spec",
+          "name": "fileFirstMaxBytes",
+          "start_line": 18,
+          "end_line": 18,
+          "start_byte": 176,
+          "end_byte": 203
+        },
+        {
+          "kind": "binary_expression",
+          "start_line": 18,
+          "end_line": 18,
+          "start_byte": 196,
+          "end_byte": 203
+        },
+        {
+          "kind": "expression_list",
+          "start_line": 18,
+          "end_line": 18,
+          "start_byte": 196,
+          "end_byte": 203
+        },
+        {
+          "kind": "int_literal",
+          "start_line": 18,
+          "end_line": 18,
+          "start_byte": 201,
+          "end_byte": 203
+        },
+        {
+          "kind": "type_spec",
+          "name": "FileFirstGroup",
+          "start_line": 23,
+          "end_line": 26,
+          "start_byte": 393,
+          "end_byte": 450
+        },
+        {
+          "kind": "field_identifier",
+          "enclosing_declaration": "FileID",
+          "start_line": 24,
+          "end_line": 24,
+          "start_byte": 418,
+          "end_byte": 424
+        },
+        {
+          "kind": "field_declaration",
+          "name": "FileID",
+          "start_line": 24,
+          "end_line": 24,
+          "start_byte": 418,
+          "end_byte": 431
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "FileID",
+          "start_line": 24,
+          "end_line": 24,
+          "start_byte": 425,
+          "end_byte": 431
+        },
+        {
+          "kind": "field_identifier",
+          "enclosing_declaration": "Paths",
+          "start_line": 25,
+          "end_line": 25,
+          "start_byte": 433,
+          "end_byte": 438
+        },
+        {
+          "kind": "field_declaration",
+          "name": "Paths",
+          "start_line": 25,
+          "end_line": 25,
+          "start_byte": 433,
+          "end_byte": 448
+        },
+        {
+          "kind": "slice_type",
+          "enclosing_declaration": "Paths",
+          "start_line": 25,
+          "end_line": 25,
+          "start_byte": 440,
+          "end_byte": 448
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "Paths",
+          "start_line": 25,
+          "end_line": 25,
+          "start_byte": 442,
+          "end_byte": 448
+        },
+        {
+          "kind": "type_spec",
+          "name": "FileFirstPreview",
+          "start_line": 30,
+          "end_line": 35,
+          "start_byte": 616,
+          "end_byte": 731
+        },
+        {
+          "kind": "field_identifier",
+          "enclosing_declaration": "Groups",
+          "start_line": 31,
+          "end_line": 31,
+          "start_byte": 643,
+          "end_byte": 649
+        },
+        {
+          "kind": "field_declaration",
+          "name": "Groups",
+          "start_line": 31,
+          "end_line": 31,
+          "start_byte": 643,
+          "end_byte": 670
+        },
+        {
+          "kind": "slice_type",
+          "enclosing_declaration": "Groups",
+          "start_line": 31,
+          "end_line": 31,
+          "start_byte": 654,
+          "end_byte": 670
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "Groups",
+          "start_line": 31,
+          "end_line": 31,
+          "start_byte": 656,
+          "end_byte": 670
+        },
+        {
+          "kind": "field_identifier",
+          "enclosing_declaration": "BaseTree",
+          "start_line": 32,
+          "end_line": 32,
+          "start_byte": 672,
+          "end_byte": 680
+        },
+        {
+          "kind": "field_declaration",
+          "name": "BaseTree",
+          "start_line": 32,
+          "end_line": 32,
+          "start_byte": 672,
+          "end_byte": 689
+        },
+        {
+          "kind": "field_identifier",
+          "enclosing_declaration": "FinalTree",
+          "start_line": 33,
+          "end_line": 33,
+          "start_byte": 691,
+          "end_byte": 700
+        },
+        {
+          "kind": "field_declaration",
+          "name": "FinalTree",
+          "start_line": 33,
+          "end_line": 33,
+          "start_byte": 691,
+          "end_byte": 708
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "FinalTree",
+          "start_line": 33,
+          "end_line": 33,
+          "start_byte": 702,
+          "end_byte": 708
+        },
+        {
+          "kind": "field_identifier",
+          "enclosing_declaration": "StageTrees",
+          "start_line": 34,
+          "end_line": 34,
+          "start_byte": 710,
+          "end_byte": 720
+        },
+        {
+          "kind": "field_declaration",
+          "name": "StageTrees",
+          "start_line": 34,
+          "end_line": 34,
+          "start_byte": 710,
+          "end_byte": 729
+        },
+        {
+          "kind": "slice_type",
+          "enclosing_declaration": "StageTrees",
+          "start_line": 34,
+          "end_line": 34,
+          "start_byte": 721,
+          "end_byte": 729
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "StageTrees",
+          "start_line": 34,
+          "end_line": 34,
+          "start_byte": 723,
+          "end_byte": 729
+        },
+        {
+          "kind": "type_spec",
+          "name": "fileFirstEntry",
+          "start_line": 37,
+          "end_line": 39,
+          "start_byte": 738,
+          "end_byte": 790
+        },
+        {
+          "kind": "struct_type",
+          "start_line": 37,
+          "end_line": 39,
+          "start_byte": 753,
+          "end_byte": 790
+        },
+        {
+          "kind": "field_declaration",
+          "name": "path",
+          "start_line": 38,
+          "end_line": 38,
+          "start_byte": 763,
+          "end_byte": 788
+        },
+        {
+          "kind": "field_identifier",
+          "enclosing_declaration": "path",
+          "start_line": 38,
+          "end_line": 38,
+          "start_byte": 769,
+          "end_byte": 773
+        },
+        {
+          "kind": "type_identifier",
+          "start_line": 41,
+          "end_line": 41,
+          "start_byte": 797,
+          "end_byte": 811
+        },
+        {
+          "kind": "type_spec",
+          "name": "fileFirstBlock",
+          "start_line": 41,
+          "end_line": 44,
+          "start_byte": 797,
+          "end_byte": 883
+        },
+        {
+          "kind": "field_identifier",
+          "enclosing_declaration": "group",
+          "start_line": 42,
+          "end_line": 42,
+          "start_byte": 822,
+          "end_byte": 827
+        },
+        {
+          "kind": "field_declaration",
+          "name": "group",
+          "start_line": 42,
+          "end_line": 42,
+          "start_byte": 822,
+          "end_byte": 850
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "group",
+          "start_line": 42,
+          "end_line": 42,
+          "start_byte": 836,
+          "end_byte": 850
+        },
+        {
+          "kind": "field_declaration",
+          "name": "before",
+          "start_line": 43,
+          "end_line": 43,
+          "start_byte": 852,
+          "end_byte": 881
+        },
+        {
+          "kind": "field_identifier",
+          "enclosing_declaration": "before",
+          "start_line": 43,
+          "end_line": 43,
+          "start_byte": 860,
+          "end_byte": 865
+        },
+        {
+          "kind": "comment",
+          "start_line": 47,
+          "end_line": 47,
+          "start_byte": 960,
+          "end_byte": 1038
+        },
+        {
+          "kind": "function_declaration",
+          "name": "PreviewFileFirst",
+          "start_line": 53,
+          "end_line": 304,
+          "start_byte": 1406,
+          "end_byte": 9496
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "snapshot",
+          "start_line": 53,
+          "end_line": 53,
+          "start_byte": 1428,
+          "end_byte": 1436
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "snapshot",
+          "start_line": 53,
+          "end_line": 53,
+          "start_byte": 1428,
+          "end_byte": 1445
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "options",
+          "start_line": 53,
+          "end_line": 53,
+          "start_byte": 1447,
+          "end_byte": 1454
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "options",
+          "start_line": 53,
+          "end_line": 53,
+          "start_byte": 1447,
+          "end_byte": 1462
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "preview",
+          "start_line": 53,
+          "end_line": 53,
+          "start_byte": 1465,
+          "end_byte": 1472
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "preview",
+          "start_line": 53,
+          "end_line": 53,
+          "start_byte": 1465,
+          "end_byte": 1489
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "err",
+          "start_line": 53,
+          "end_line": 53,
+          "start_byte": 1491,
+          "end_byte": 1494
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "err",
+          "start_line": 53,
+          "end_line": 53,
+          "start_byte": 1491,
+          "end_byte": 1500
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "err",
+          "start_line": 53,
+          "end_line": 53,
+          "start_byte": 1495,
+          "end_byte": 1500
+        },
+        {
+          "kind": "comment",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 122,
+          "end_line": 122,
+          "start_byte": 3634,
+          "end_byte": 3709
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "input",
+          "start_line": 137,
+          "end_line": 137,
+          "start_byte": 4201,
+          "end_byte": 4206
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "input",
+          "start_line": 137,
+          "end_line": 137,
+          "start_byte": 4201,
+          "end_byte": 4213
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "input",
+          "start_line": 137,
+          "end_line": 137,
+          "start_byte": 4209,
+          "end_byte": 4213
+        },
+        {
+          "kind": "variadic_parameter_declaration",
+          "name": "args",
+          "start_line": 137,
+          "end_line": 137,
+          "start_byte": 4215,
+          "end_byte": 4229
+        },
+        {
+          "kind": "selector_expression",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 143,
+          "end_line": 143,
+          "start_byte": 4560,
+          "end_byte": 4567
+        },
+        {
+          "kind": "field_identifier",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 143,
+          "end_line": 143,
+          "start_byte": 4564,
+          "end_byte": 4567
+        },
+        {
+          "kind": "func_literal",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 149,
+          "end_line": 152,
+          "start_byte": 4688,
+          "end_byte": 4802
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "args",
+          "start_line": 149,
+          "end_line": 149,
+          "start_byte": 4693,
+          "end_byte": 4697
+        },
+        {
+          "kind": "variadic_parameter_declaration",
+          "name": "args",
+          "start_line": 149,
+          "end_line": 149,
+          "start_byte": 4693,
+          "end_byte": 4707
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "args",
+          "start_line": 149,
+          "end_line": 149,
+          "start_byte": 4701,
+          "end_byte": 4707
+        },
+        {
+          "kind": "parameter_declaration",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 149,
+          "end_line": 149,
+          "start_byte": 4710,
+          "end_byte": 4716
+        },
+        {
+          "kind": "short_var_declaration",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 158,
+          "end_line": 158,
+          "start_byte": 4926,
+          "end_byte": 4979
+        },
+        {
+          "kind": "type_conversion_expression",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 158,
+          "end_line": 158,
+          "start_byte": 4944,
+          "end_byte": 4957
+        },
+        {
+          "kind": "call_expression",
+          "enclosing_declaration": "PreviewFileFirst",
+          "role": "call",
+          "start_line": 159,
+          "end_line": 159,
+          "start_byte": 4981,
+          "end_byte": 5062
+        },
+        {
+          "kind": "expression_statement",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 159,
+          "end_line": 159,
+          "start_byte": 4981,
+          "end_byte": 5062
+        },
+        {
+          "kind": "argument_list",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 159,
+          "end_line": 159,
+          "start_byte": 4991,
+          "end_byte": 5062
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "i",
+          "start_line": 159,
+          "end_line": 159,
+          "start_byte": 5006,
+          "end_byte": 5014
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "i",
+          "start_line": 159,
+          "end_line": 159,
+          "start_byte": 5009,
+          "end_byte": 5010
+        },
+        {
+          "kind": "slice_type",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 160,
+          "end_line": 160,
+          "start_byte": 5079,
+          "end_byte": 5095
+        },
+        {
+          "kind": "map_type",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 161,
+          "end_line": 161,
+          "start_byte": 5124,
+          "end_byte": 5141
+        },
+        {
+          "kind": "nil",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 164,
+          "end_line": 164,
+          "start_byte": 5254,
+          "end_byte": 5257
+        },
+        {
+          "kind": "parenthesized_expression",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 169,
+          "end_line": 169,
+          "start_byte": 5405,
+          "end_byte": 5496
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 169,
+          "end_line": 169,
+          "start_byte": 5447,
+          "end_byte": 5452
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 170,
+          "end_line": 170,
+          "start_byte": 5511,
+          "end_byte": 5527
+        },
+        {
+          "kind": "expression_list",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 176,
+          "end_line": 176,
+          "start_byte": 5666,
+          "end_byte": 5680
+        },
+        {
+          "kind": "return_statement",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 180,
+          "end_line": 180,
+          "start_byte": 5809,
+          "end_byte": 5839
+        },
+        {
+          "kind": "statement_list",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 183,
+          "end_line": 189,
+          "start_byte": 5885,
+          "end_byte": 6126
+        },
+        {
+          "kind": "int_literal",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 183,
+          "end_line": 183,
+          "start_byte": 5900,
+          "end_byte": 5901
+        },
+        {
+          "kind": "if_statement",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 186,
+          "end_line": 188,
+          "start_byte": 5989,
+          "end_byte": 6125
+        },
+        {
+          "kind": "index_expression",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 186,
+          "end_line": 186,
+          "start_byte": 5992,
+          "end_byte": 6007
+        },
+        {
+          "kind": "rune_literal",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 186,
+          "end_line": 186,
+          "start_byte": 6028,
+          "end_byte": 6031
+        },
+        {
+          "kind": "interpreted_string_literal_content",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 187,
+          "end_line": 187,
+          "start_byte": 6072,
+          "end_byte": 6119
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "block",
+          "start_line": 190,
+          "end_line": 190,
+          "start_byte": 6146,
+          "end_byte": 6151
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "block",
+          "start_line": 190,
+          "end_line": 190,
+          "start_byte": 6146,
+          "end_byte": 6166
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "forward",
+          "start_line": 190,
+          "end_line": 190,
+          "start_byte": 6168,
+          "end_byte": 6175
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "forward",
+          "start_line": 190,
+          "end_line": 190,
+          "start_byte": 6168,
+          "end_byte": 6180
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "forward",
+          "start_line": 190,
+          "end_line": 190,
+          "start_byte": 6176,
+          "end_byte": 6180
+        },
+        {
+          "kind": "for_statement",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 191,
+          "end_line": 195,
+          "start_byte": 6192,
+          "end_byte": 6335
+        },
+        {
+          "kind": "assignment_statement",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 208,
+          "end_line": 208,
+          "start_byte": 6681,
+          "end_byte": 6729
+        },
+        {
+          "kind": "composite_literal",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 209,
+          "end_line": 209,
+          "start_byte": 6753,
+          "end_byte": 6771
+        },
+        {
+          "kind": "literal_value",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 209,
+          "end_line": 209,
+          "start_byte": 6769,
+          "end_byte": 6771
+        },
+        {
+          "kind": "literal_element",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 220,
+          "end_line": 220,
+          "start_byte": 7041,
+          "end_byte": 7045
+        },
+        {
+          "kind": "false",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 249,
+          "end_line": 249,
+          "start_byte": 7966,
+          "end_byte": 7971
+        },
+        {
+          "kind": "unary_expression",
+          "enclosing_declaration": "PreviewFileFirst",
+          "start_line": 267,
+          "end_line": 267,
+          "start_byte": 8478,
+          "end_byte": 8491
+        },
+        {
+          "kind": "function_declaration",
+          "name": "sameFileFirstSnapshot",
+          "start_line": 306,
+          "end_line": 324,
+          "start_byte": 9498,
+          "end_byte": 10181
+        },
+        {
+          "kind": "parameter_list",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 306,
+          "end_line": 306,
+          "start_byte": 9524,
+          "end_byte": 9548
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "before",
+          "start_line": 306,
+          "end_line": 306,
+          "start_byte": 9525,
+          "end_byte": 9547
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "before",
+          "start_line": 306,
+          "end_line": 306,
+          "start_byte": 9539,
+          "end_byte": 9547
+        },
+        {
+          "kind": "binary_expression",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 307,
+          "end_line": 307,
+          "start_byte": 9589,
+          "end_byte": 9614
+        },
+        {
+          "kind": "unary_expression",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 308,
+          "end_line": 308,
+          "start_byte": 9755,
+          "end_byte": 9808
+        },
+        {
+          "kind": "selector_expression",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 308,
+          "end_line": 308,
+          "start_byte": 9774,
+          "end_byte": 9790
+        },
+        {
+          "kind": "call_expression",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "role": "call",
+          "start_line": 308,
+          "end_line": 308,
+          "start_byte": 9812,
+          "end_byte": 9831
+        },
+        {
+          "kind": "argument_list",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 308,
+          "end_line": 308,
+          "start_byte": 9815,
+          "end_byte": 9831
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 308,
+          "end_line": 308,
+          "start_byte": 9839,
+          "end_byte": 9844
+        },
+        {
+          "kind": "short_var_declaration",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 311,
+          "end_line": 311,
+          "start_byte": 9875,
+          "end_byte": 9904
+        },
+        {
+          "kind": "composite_literal",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 311,
+          "end_line": 311,
+          "start_byte": 9885,
+          "end_byte": 9904
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 311,
+          "end_line": 311,
+          "start_byte": 9889,
+          "end_byte": 9895
+        },
+        {
+          "kind": "literal_value",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 311,
+          "end_line": 311,
+          "start_byte": 9902,
+          "end_byte": 9904
+        },
+        {
+          "kind": "if_statement",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 313,
+          "end_line": 315,
+          "start_byte": 9948,
+          "end_byte": 10018
+        },
+        {
+          "kind": "block",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 313,
+          "end_line": 315,
+          "start_byte": 9997,
+          "end_byte": 10018
+        },
+        {
+          "kind": "statement_list",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 314,
+          "end_line": 315,
+          "start_byte": 10002,
+          "end_byte": 10015
+        },
+        {
+          "kind": "expression_list",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 316,
+          "end_line": 316,
+          "start_byte": 10021,
+          "end_byte": 10038
+        },
+        {
+          "kind": "for_statement",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 318,
+          "end_line": 322,
+          "start_byte": 10052,
+          "end_byte": 10166
+        },
+        {
+          "kind": "return_statement",
+          "enclosing_declaration": "sameFileFirstSnapshot",
+          "start_line": 320,
+          "end_line": 320,
+          "start_byte": 10147,
+          "end_byte": 10159
+        },
+        {
+          "kind": "function_declaration",
+          "name": "fileFirstReadBlock",
+          "start_line": 326,
+          "end_line": 418,
+          "start_byte": 10183,
+          "end_byte": 14336
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "ctx",
+          "start_line": 326,
+          "end_line": 326,
+          "start_byte": 10207,
+          "end_byte": 10226
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "root",
+          "start_line": 326,
+          "end_line": 326,
+          "start_byte": 10228,
+          "end_byte": 10239
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "change",
+          "start_line": 326,
+          "end_line": 326,
+          "start_byte": 10241,
+          "end_byte": 10247
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "change",
+          "start_line": 326,
+          "end_line": 326,
+          "start_byte": 10241,
+          "end_byte": 10254
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "run",
+          "start_line": 326,
+          "end_line": 326,
+          "start_byte": 10256,
+          "end_byte": 10259
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "run",
+          "start_line": 326,
+          "end_line": 326,
+          "start_byte": 10256,
+          "end_byte": 10299
+        },
+        {
+          "kind": "variadic_parameter_declaration",
+          "enclosing_declaration": "run",
+          "start_line": 326,
+          "end_line": 326,
+          "start_byte": 10273,
+          "end_byte": 10282
+        },
+        {
+          "kind": "slice_type",
+          "enclosing_declaration": "run",
+          "start_line": 326,
+          "end_line": 326,
+          "start_byte": 10285,
+          "end_byte": 10291
+        },
+        {
+          "kind": "parameter_list",
+          "enclosing_declaration": "fileFirstReadBlock",
+          "start_line": 326,
+          "end_line": 326,
+          "start_byte": 10301,
+          "end_byte": 10324
+        },
+        {
+          "kind": "parameter_declaration",
+          "enclosing_declaration": "fileFirstReadBlock",
+          "start_line": 326,
+          "end_line": 326,
+          "start_byte": 10318,
+          "end_byte": 10323
+        },
+        {
+          "kind": "slice_type",
+          "enclosing_declaration": "fileFirstReadBlock",
+          "start_line": 328,
+          "end_line": 328,
+          "start_byte": 10416,
+          "end_byte": 10425
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "fileFirstReadBlock",
+          "start_line": 328,
+          "end_line": 328,
+          "start_byte": 10419,
+          "end_byte": 10425
+        },
+        {
+          "kind": "literal_value",
+          "enclosing_declaration": "fileFirstReadBlock",
+          "start_line": 349,
+          "end_line": 349,
+          "start_byte": 11228,
+          "end_byte": 11284
+        },
+        {
+          "kind": "selector_expression",
+          "enclosing_declaration": "fileFirstReadBlock",
+          "start_line": 349,
+          "end_line": 349,
+          "start_byte": 11264,
+          "end_byte": 11283
+        },
+        {
+          "kind": "unary_expression",
+          "enclosing_declaration": "fileFirstReadBlock",
+          "start_line": 359,
+          "end_line": 359,
+          "start_byte": 11719,
+          "end_byte": 11754
+        },
+        {
+          "kind": "binary_expression",
+          "enclosing_declaration": "fileFirstReadBlock",
+          "start_line": 364,
+          "end_line": 364,
+          "start_byte": 11863,
+          "end_byte": 11926
+        },
+        {
+          "kind": "statement_list",
+          "enclosing_declaration": "fileFirstReadBlock",
+          "start_line": 365,
+          "end_line": 366,
+          "start_byte": 11993,
+          "end_byte": 12062
+        },
+        {
+          "kind": "interpreted_string_literal",
+          "enclosing_declaration": "fileFirstReadBlock",
+          "start_line": 375,
+          "end_line": 375,
+          "start_byte": 12522,
+          "end_byte": 12565
+        },
+        {
+          "kind": "for_clause",
+          "enclosing_declaration": "fileFirstReadBlock",
+          "start_line": 377,
+          "end_line": 377,
+          "start_byte": 12577,
+          "end_byte": 12608
+        },
+        {
+          "kind": "assignment_statement",
+          "enclosing_declaration": "fileFirstReadBlock",
+          "start_line": 377,
+          "end_line": 377,
+          "start_byte": 12602,
+          "end_byte": 12608
+        },
+        {
+          "kind": "short_var_declaration",
+          "enclosing_declaration": "fileFirstReadBlock",
+          "start_line": 382,
+          "end_line": 382,
+          "start_byte": 12758,
+          "end_byte": 12829
+        },
+        {
+          "kind": "argument_list",
+          "enclosing_declaration": "fileFirstReadBlock",
+          "start_line": 382,
+          "end_line": 382,
+          "start_byte": 12782,
+          "end_byte": 12829
+        },
+        {
+          "kind": "function_declaration",
+          "name": "fileFirstRegularMode",
+          "start_line": 420,
+          "end_line": 420,
+          "start_byte": 14338,
+          "end_byte": 14429
+        },
+        {
+          "kind": "parameter_list",
+          "enclosing_declaration": "fileFirstRegularMode",
+          "start_line": 420,
+          "end_line": 420,
+          "start_byte": 14363,
+          "end_byte": 14376
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "mode",
+          "start_line": 420,
+          "end_line": 420,
+          "start_byte": 14364,
+          "end_byte": 14368
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "mode",
+          "start_line": 420,
+          "end_line": 420,
+          "start_byte": 14364,
+          "end_byte": 14375
+        },
+        {
+          "kind": "block",
+          "enclosing_declaration": "fileFirstRegularMode",
+          "start_line": 420,
+          "end_line": 420,
+          "start_byte": 14382,
+          "end_byte": 14429
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "fileFirstRegularMode",
+          "start_line": 420,
+          "end_line": 420,
+          "start_byte": 14391,
+          "end_byte": 14395
+        },
+        {
+          "kind": "interpreted_string_literal",
+          "enclosing_declaration": "fileFirstRegularMode",
+          "start_line": 420,
+          "end_line": 420,
+          "start_byte": 14419,
+          "end_byte": 14427
+        },
+        {
+          "kind": "function_declaration",
+          "name": "fileFirstCheckExternalGitCommands",
+          "start_line": 422,
+          "end_line": 451,
+          "start_byte": 14431,
+          "end_byte": 15516
+        },
+        {
+          "kind": "parameter_list",
+          "enclosing_declaration": "fileFirstCheckExternalGitCommands",
+          "start_line": 422,
+          "end_line": 422,
+          "start_byte": 14469,
+          "end_byte": 14503
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "ctx",
+          "start_line": 422,
+          "end_line": 422,
+          "start_byte": 14470,
+          "end_byte": 14473
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "ctx",
+          "start_line": 422,
+          "end_line": 422,
+          "start_byte": 14470,
+          "end_byte": 14489
+        },
+        {
+          "kind": "qualified_type",
+          "name": "Context",
+          "enclosing_declaration": "ctx",
+          "start_line": 422,
+          "end_line": 422,
+          "start_byte": 14474,
+          "end_byte": 14489
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "root",
+          "start_line": 422,
+          "end_line": 422,
+          "start_byte": 14491,
+          "end_byte": 14495
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "root",
+          "start_line": 422,
+          "end_line": 422,
+          "start_byte": 14491,
+          "end_byte": 14502
+        },
+        {
+          "kind": "slice_type",
+          "enclosing_declaration": "fileFirstCheckExternalGitCommands",
+          "start_line": 423,
+          "end_line": 423,
+          "start_byte": 14537,
+          "end_byte": 14545
+        },
+        {
+          "kind": "literal_value",
+          "enclosing_declaration": "fileFirstCheckExternalGitCommands",
+          "start_line": 423,
+          "end_line": 423,
+          "start_byte": 14545,
+          "end_byte": 14599
+        },
+        {
+          "kind": "raw_string_literal_content",
+          "enclosing_declaration": "fileFirstCheckExternalGitCommands",
+          "start_line": 423,
+          "end_line": 423,
+          "start_byte": 14580,
+          "end_byte": 14597
+        },
+        {
+          "kind": "pointer_type",
+          "enclosing_declaration": "fileFirstCheckExternalGitCommands",
+          "start_line": 426,
+          "end_line": 426,
+          "start_byte": 14717,
+          "end_byte": 14732
+        },
+        {
+          "kind": "qualified_type",
+          "name": "ExitError",
+          "enclosing_declaration": "fileFirstCheckExternalGitCommands",
+          "start_line": 426,
+          "end_line": 426,
+          "start_byte": 14718,
+          "end_byte": 14732
+        },
+        {
+          "kind": "selector_expression",
+          "enclosing_declaration": "fileFirstCheckExternalGitCommands",
+          "start_line": 430,
+          "end_line": 430,
+          "start_byte": 14811,
+          "end_byte": 14818
+        },
+        {
+          "kind": "block",
+          "enclosing_declaration": "fileFirstCheckExternalGitCommands",
+          "start_line": 430,
+          "end_line": 432,
+          "start_byte": 14828,
+          "end_byte": 14855
+        },
+        {
+          "kind": "if_statement",
+          "enclosing_declaration": "fileFirstCheckExternalGitCommands",
+          "start_line": 435,
+          "end_line": 437,
+          "start_byte": 14936,
+          "end_byte": 15039
+        },
+        {
+          "kind": "argument_list",
+          "enclosing_declaration": "fileFirstCheckExternalGitCommands",
+          "start_line": 435,
+          "end_line": 435,
+          "start_byte": 14942,
+          "end_byte": 14948
+        },
+        {
+          "kind": "expression_list",
+          "enclosing_declaration": "fileFirstCheckExternalGitCommands",
+          "start_line": 441,
+          "end_line": 441,
+          "start_byte": 15192,
+          "end_byte": 15204
+        },
+        {
+          "kind": "interpreted_string_literal_content",
+          "enclosing_declaration": "fileFirstCheckExternalGitCommands",
+          "start_line": 441,
+          "end_line": 441,
+          "start_byte": 15229,
+          "end_byte": 15237
+        },
+        {
+          "kind": "for_statement",
+          "enclosing_declaration": "fileFirstCheckExternalGitCommands",
+          "start_line": 445,
+          "end_line": 449,
+          "start_byte": 15337,
+          "end_byte": 15502
+        },
+        {
+          "kind": "function_declaration",
+          "name": "fileFirstWithinLineBudget",
+          "start_line": 453,
+          "end_line": 459,
+          "start_byte": 15518,
+          "end_byte": 15724
+        },
+        {
+          "kind": "parameter_list",
+          "enclosing_declaration": "fileFirstWithinLineBudget",
+          "start_line": 453,
+          "end_line": 453,
+          "start_byte": 15548,
+          "end_byte": 15564
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "content",
+          "start_line": 453,
+          "end_line": 453,
+          "start_byte": 15549,
+          "end_byte": 15556
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "content",
+          "start_line": 453,
+          "end_line": 453,
+          "start_byte": 15549,
+          "end_byte": 15563
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "content",
+          "start_line": 453,
+          "end_line": 453,
+          "start_byte": 15559,
+          "end_byte": 15563
+        },
+        {
+          "kind": "expression_list",
+          "enclosing_declaration": "fileFirstWithinLineBudget",
+          "start_line": 454,
+          "end_line": 454,
+          "start_byte": 15582,
+          "end_byte": 15616
+        },
+        {
+          "kind": "slice_type",
+          "enclosing_declaration": "fileFirstWithinLineBudget",
+          "start_line": 454,
+          "end_line": 454,
+          "start_byte": 15603,
+          "end_byte": 15609
+        },
+        {
+          "kind": "literal_value",
+          "enclosing_declaration": "fileFirstWithinLineBudget",
+          "start_line": 454,
+          "end_line": 454,
+          "start_byte": 15609,
+          "end_byte": 15615
+        },
+        {
+          "kind": "call_expression",
+          "enclosing_declaration": "fileFirstWithinLineBudget",
+          "role": "call",
+          "start_line": 455,
+          "end_line": 455,
+          "start_byte": 15621,
+          "end_byte": 15633
+        },
+        {
+          "kind": "index_expression",
+          "enclosing_declaration": "fileFirstWithinLineBudget",
+          "start_line": 455,
+          "end_line": 455,
+          "start_byte": 15641,
+          "end_byte": 15664
+        },
+        {
+          "kind": "int_literal",
+          "enclosing_declaration": "fileFirstWithinLineBudget",
+          "start_line": 455,
+          "end_line": 455,
+          "start_byte": 15662,
+          "end_byte": 15663
+        },
+        {
+          "kind": "inc_statement",
+          "enclosing_declaration": "fileFirstWithinLineBudget",
+          "start_line": 456,
+          "end_line": 456,
+          "start_byte": 15677,
+          "end_byte": 15684
+        },
+        {
+          "kind": "type_spec",
+          "name": "fileFirstFiles",
+          "start_line": 461,
+          "end_line": 461,
+          "start_byte": 15731,
+          "end_byte": 15763
+        },
+        {
+          "kind": "method_declaration",
+          "name": "ReadFile",
+          "start_line": 463,
+          "end_line": 484,
+          "start_byte": 15765,
+          "end_byte": 16363
+        },
+        {
+          "kind": "parameter_list",
+          "enclosing_declaration": "ReadFile",
+          "start_line": 463,
+          "end_line": 463,
+          "start_byte": 15795,
+          "end_byte": 15808
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "path",
+          "start_line": 463,
+          "end_line": 463,
+          "start_byte": 15796,
+          "end_byte": 15807
+        },
+        {
+          "kind": "slice_type",
+          "enclosing_declaration": "ReadFile",
+          "start_line": 463,
+          "end_line": 463,
+          "start_byte": 15810,
+          "end_byte": 15816
+        },
+        {
+          "kind": "short_var_declaration",
+          "enclosing_declaration": "ReadFile",
+          "start_line": 469,
+          "end_line": 469,
+          "start_byte": 15914,
+          "end_byte": 15938
+        },
+        {
+          "kind": "selector_expression",
+          "enclosing_declaration": "ReadFile",
+          "start_line": 473,
+          "end_line": 473,
+          "start_byte": 15982,
+          "end_byte": 16003
+        },
+        {
+          "kind": "call_expression",
+          "enclosing_declaration": "ReadFile",
+          "role": "call",
+          "start_line": 473,
+          "end_line": 473,
+          "start_byte": 16009,
+          "end_byte": 16020
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "ReadFile",
+          "start_line": 473,
+          "end_line": 473,
+          "start_byte": 16023,
+          "end_byte": 16040
+        },
+        {
+          "kind": "statement_list",
+          "enclosing_declaration": "ReadFile",
+          "start_line": 474,
+          "end_line": 475,
+          "start_byte": 16045,
+          "end_byte": 16122
+        },
+        {
+          "kind": "int_literal",
+          "enclosing_declaration": "ReadFile",
+          "start_line": 476,
+          "end_line": 476,
+          "start_byte": 16192,
+          "end_byte": 16193
+        },
+        {
+          "kind": "interpreted_string_literal",
+          "enclosing_declaration": "ReadFile",
+          "start_line": 481,
+          "end_line": 481,
+          "start_byte": 16294,
+          "end_byte": 16336
+        },
+        {
+          "kind": "function_declaration",
+          "name": "fileFirstEnvironment",
+          "start_line": 486,
+          "end_line": 498,
+          "start_byte": 16365,
+          "end_byte": 16946
+        },
+        {
+          "kind": "parameter_list",
+          "enclosing_declaration": "fileFirstEnvironment",
+          "start_line": 486,
+          "end_line": 486,
+          "start_byte": 16390,
+          "end_byte": 16424
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "index",
+          "start_line": 486,
+          "end_line": 486,
+          "start_byte": 16391,
+          "end_byte": 16423
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "index",
+          "start_line": 486,
+          "end_line": 486,
+          "start_byte": 16398,
+          "end_byte": 16405
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "index",
+          "start_line": 486,
+          "end_line": 486,
+          "start_byte": 16417,
+          "end_byte": 16423
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "fileFirstEnvironment",
+          "start_line": 487,
+          "end_line": 487,
+          "start_byte": 16446,
+          "end_byte": 16452
+        },
+        {
+          "kind": "for_statement",
+          "enclosing_declaration": "fileFirstEnvironment",
+          "start_line": 488,
+          "end_line": 495,
+          "start_byte": 16456,
+          "end_byte": 16739
+        },
+        {
+          "kind": "short_var_declaration",
+          "enclosing_declaration": "fileFirstEnvironment",
+          "start_line": 489,
+          "end_line": 489,
+          "start_byte": 16495,
+          "end_byte": 16535
+        },
+        {
+          "kind": "expression_list",
+          "enclosing_declaration": "fileFirstEnvironment",
+          "start_line": 489,
+          "end_line": 489,
+          "start_byte": 16503,
+          "end_byte": 16535
+        },
+        {
+          "kind": "int_literal",
+          "enclosing_declaration": "fileFirstEnvironment",
+          "start_line": 489,
+          "end_line": 489,
+          "start_byte": 16533,
+          "end_byte": 16534
+        },
+        {
+          "kind": "expression_case",
+          "enclosing_declaration": "fileFirstEnvironment",
+          "start_line": 491,
+          "end_line": 493,
+          "start_byte": 16554,
+          "end_byte": 16706
+        },
+        {
+          "kind": "continue_statement",
+          "enclosing_declaration": "fileFirstEnvironment",
+          "start_line": 492,
+          "end_line": 492,
+          "start_byte": 16697,
+          "end_byte": 16705
+        },
+        {
+          "kind": "call_expression",
+          "enclosing_declaration": "fileFirstEnvironment",
+          "role": "call",
+          "start_line": 494,
+          "end_line": 494,
+          "start_byte": 16718,
+          "end_byte": 16736
+        },
+        {
+          "kind": "binary_expression",
+          "enclosing_declaration": "fileFirstEnvironment",
+          "start_line": 496,
+          "end_line": 496,
+          "start_byte": 16785,
+          "end_byte": 16816
+        }
+      ],
+      "evidence_reduction": {
+        "level": "medium",
+        "original_count": 3375,
+        "original_bytes": 462107,
+        "original_digest": "e8a7752285b7ef1f50bf694d1e55fe2316c4382729de4d5cd59f254d383bfc26",
+        "retained_count": 208,
+        "retained_bytes": 26818,
+        "retained_digest": "bf1a458ae6b3cad19b11616af5a5137c16332ec854f70eda99474579dbbd8f2f",
+        "coverage_count": 74,
+        "original_coverage_digest": "47b82c75bcbef9f0e43b9128571c64a5c405c138ee5483274117e3d628cf35bc",
+        "retained_coverage_digest": "47b82c75bcbef9f0e43b9128571c64a5c405c138ee5483274117e3d628cf35bc"
+      }
+    },
+    {
+      "id": "F004",
+      "status": "added",
+      "old_path": null,
+      "new_path": "internal/gitstate/file_first_test.go",
+      "old_mode": null,
+      "new_mode": "100644",
+      "head_identity": null,
+      "worktree_kind": "file",
+      "worktree_identity": "312fcc39be68b1f4bca8adb81044c05cb224b0e20f43020883f34f15977a4092",
+      "language": "Go",
+      "change_hash": "80537d19856ecdafbaf94509510fa14cecca83f1413803842cf24747a1b06478",
+      "size": 14393,
+      "binary": false,
+      "vendor": false,
+      "opaque": false,
+      "staged": false,
+      "unstaged": true,
+      "mode": "structural",
+      "evidence": [
+        {
+          "kind": "package_clause",
+          "start_line": 1,
+          "end_line": 1,
+          "start_byte": 0,
+          "end_byte": 16
+        },
+        {
+          "kind": "package_identifier",
+          "start_line": 1,
+          "end_line": 1,
+          "start_byte": 8,
+          "end_byte": 16
+        },
+        {
+          "kind": "import_declaration",
+          "role": "import",
+          "start_line": 3,
+          "end_line": 13,
+          "start_byte": 18,
+          "end_byte": 122
+        },
+        {
+          "kind": "import_spec_list",
+          "role": "import",
+          "start_line": 3,
+          "end_line": 13,
+          "start_byte": 25,
+          "end_byte": 122
+        },
+        {
+          "kind": "import_spec",
+          "role": "import",
+          "start_line": 8,
+          "end_line": 8,
+          "start_byte": 61,
+          "end_byte": 70
+        },
+        {
+          "kind": "interpreted_string_literal",
+          "start_line": 8,
+          "end_line": 8,
+          "start_byte": 61,
+          "end_byte": 70
+        },
+        {
+          "kind": "interpreted_string_literal_content",
+          "start_line": 8,
+          "end_line": 8,
+          "start_byte": 62,
+          "end_byte": 69
+        },
+        {
+          "kind": "function_declaration",
+          "name": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 15,
+          "end_line": 65,
+          "start_byte": 124,
+          "end_byte": 2172
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "t",
+          "start_line": 15,
+          "end_line": 15,
+          "start_byte": 190,
+          "end_byte": 202
+        },
+        {
+          "kind": "func_literal",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 18,
+          "end_line": 63,
+          "start_byte": 318,
+          "end_byte": 2166
+        },
+        {
+          "kind": "parameter_list",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 18,
+          "end_line": 18,
+          "start_byte": 322,
+          "end_byte": 336
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "t",
+          "start_line": 18,
+          "end_line": 18,
+          "start_byte": 323,
+          "end_byte": 335
+        },
+        {
+          "kind": "inc_statement",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 21,
+          "end_line": 21,
+          "start_byte": 443,
+          "end_byte": 446
+        },
+        {
+          "kind": "for_statement",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 26,
+          "end_line": 28,
+          "start_byte": 596,
+          "end_byte": 732
+        },
+        {
+          "kind": "for_clause",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 26,
+          "end_line": 26,
+          "start_byte": 600,
+          "end_byte": 622
+        },
+        {
+          "kind": "escape_sequence",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 27,
+          "end_line": 27,
+          "start_byte": 696,
+          "end_byte": 698
+        },
+        {
+          "kind": "interpreted_string_literal_content",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 27,
+          "end_line": 27,
+          "start_byte": 698,
+          "end_byte": 714
+        },
+        {
+          "kind": "expression_statement",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 30,
+          "end_line": 30,
+          "start_byte": 796,
+          "end_byte": 830
+        },
+        {
+          "kind": "int_literal",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 31,
+          "end_line": 31,
+          "start_byte": 893,
+          "end_byte": 898
+        },
+        {
+          "kind": "keyed_element",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 32,
+          "end_line": 32,
+          "start_byte": 919,
+          "end_byte": 948
+        },
+        {
+          "kind": "slice_type",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 32,
+          "end_line": 32,
+          "start_byte": 930,
+          "end_byte": 938
+        },
+        {
+          "kind": "composite_literal",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 32,
+          "end_line": 32,
+          "start_byte": 930,
+          "end_byte": 948
+        },
+        {
+          "kind": "literal_element",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 32,
+          "end_line": 32,
+          "start_byte": 930,
+          "end_byte": 948
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 32,
+          "end_line": 32,
+          "start_byte": 932,
+          "end_byte": 938
+        },
+        {
+          "kind": "literal_value",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 32,
+          "end_line": 32,
+          "start_byte": 938,
+          "end_byte": 948
+        },
+        {
+          "kind": "call_expression",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "role": "call",
+          "start_line": 35,
+          "end_line": 35,
+          "start_byte": 1013,
+          "end_byte": 1025
+        },
+        {
+          "kind": "argument_list",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 35,
+          "end_line": 35,
+          "start_byte": 1020,
+          "end_byte": 1025
+        },
+        {
+          "kind": "short_var_declaration",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 37,
+          "end_line": 37,
+          "start_byte": 1034,
+          "end_byte": 1086
+        },
+        {
+          "kind": "expression_list",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 38,
+          "end_line": 38,
+          "start_byte": 1090,
+          "end_byte": 1096
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 39,
+          "end_line": 39,
+          "start_byte": 1146,
+          "end_byte": 1149
+        },
+        {
+          "kind": "binary_expression",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 43,
+          "end_line": 43,
+          "start_byte": 1334,
+          "end_byte": 1373
+        },
+        {
+          "kind": "block",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 43,
+          "end_line": 45,
+          "start_byte": 1374,
+          "end_byte": 1451
+        },
+        {
+          "kind": "statement_list",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 44,
+          "end_line": 45,
+          "start_byte": 1380,
+          "end_byte": 1447
+        },
+        {
+          "kind": "range_clause",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 46,
+          "end_line": 46,
+          "start_byte": 1459,
+          "end_byte": 1491
+        },
+        {
+          "kind": "selector_expression",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 47,
+          "end_line": 47,
+          "start_byte": 1501,
+          "end_byte": 1513
+        },
+        {
+          "kind": "field_identifier",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 47,
+          "end_line": 47,
+          "start_byte": 1507,
+          "end_byte": 1513
+        },
+        {
+          "kind": "assignment_statement",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 53,
+          "end_line": 53,
+          "start_byte": 1726,
+          "end_byte": 1809
+        },
+        {
+          "kind": "index_expression",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 53,
+          "end_line": 53,
+          "start_byte": 1747,
+          "end_byte": 1766
+        },
+        {
+          "kind": "unary_expression",
+          "enclosing_declaration": "TestFileFirstReplayOneThroughSixteenFilesPreservesRepository",
+          "start_line": 60,
+          "end_line": 60,
+          "start_byte": 2055,
+          "end_byte": 2088
+        },
+        {
+          "kind": "function_declaration",
+          "name": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 67,
+          "end_line": 110,
+          "start_byte": 2174,
+          "end_byte": 4079
+        },
+        {
+          "kind": "parameter_list",
+          "enclosing_declaration": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 67,
+          "end_line": 67,
+          "start_byte": 2225,
+          "end_byte": 2239
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "t",
+          "start_line": 67,
+          "end_line": 67,
+          "start_byte": 2226,
+          "end_byte": 2238
+        },
+        {
+          "kind": "range_clause",
+          "enclosing_declaration": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 70,
+          "end_line": 70,
+          "start_byte": 2303,
+          "end_byte": 2515
+        },
+        {
+          "kind": "map_type",
+          "enclosing_declaration": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 70,
+          "end_line": 70,
+          "start_byte": 2323,
+          "end_byte": 2340
+        },
+        {
+          "kind": "keyed_element",
+          "enclosing_declaration": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 70,
+          "end_line": 70,
+          "start_byte": 2421,
+          "end_byte": 2441
+        },
+        {
+          "kind": "literal_element",
+          "enclosing_declaration": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 70,
+          "end_line": 70,
+          "start_byte": 2433,
+          "end_byte": 2441
+        },
+        {
+          "kind": "interpreted_string_literal_content",
+          "enclosing_declaration": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 78,
+          "end_line": 78,
+          "start_byte": 2792,
+          "end_byte": 2802
+        },
+        {
+          "kind": "escape_sequence",
+          "enclosing_declaration": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 80,
+          "end_line": 80,
+          "start_byte": 2910,
+          "end_byte": 2912
+        },
+        {
+          "kind": "expression_statement",
+          "enclosing_declaration": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 83,
+          "end_line": 83,
+          "start_byte": 3069,
+          "end_byte": 3081
+        },
+        {
+          "kind": "argument_list",
+          "enclosing_declaration": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 86,
+          "end_line": 86,
+          "start_byte": 3168,
+          "end_byte": 3173
+        },
+        {
+          "kind": "expression_list",
+          "enclosing_declaration": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 92,
+          "end_line": 92,
+          "start_byte": 3395,
+          "end_byte": 3408
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 92,
+          "end_line": 92,
+          "start_byte": 3426,
+          "end_byte": 3433
+        },
+        {
+          "kind": "literal_value",
+          "enclosing_declaration": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 92,
+          "end_line": 92,
+          "start_byte": 3433,
+          "end_byte": 3435
+        },
+        {
+          "kind": "statement_list",
+          "enclosing_declaration": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 94,
+          "end_line": 95,
+          "start_byte": 3456,
+          "end_byte": 3469
+        },
+        {
+          "kind": "if_statement",
+          "enclosing_declaration": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 101,
+          "end_line": 103,
+          "start_byte": 3801,
+          "end_byte": 3834
+        },
+        {
+          "kind": "field_identifier",
+          "enclosing_declaration": "TestFileFirstMixedGitBoundariesAndBinaryReplay",
+          "start_line": 102,
+          "end_line": 102,
+          "start_byte": 3821,
+          "end_byte": 3826
+        },
+        {
+          "kind": "function_declaration",
+          "name": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "start_line": 112,
+          "end_line": 171,
+          "start_byte": 4081,
+          "end_byte": 6418
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "t",
+          "start_line": 112,
+          "end_line": 112,
+          "start_byte": 4151,
+          "end_byte": 4163
+        },
+        {
+          "kind": "for_statement",
+          "enclosing_declaration": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "start_line": 114,
+          "end_line": 170,
+          "start_byte": 4198,
+          "end_byte": 6416
+        },
+        {
+          "kind": "range_clause",
+          "enclosing_declaration": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "start_line": 114,
+          "end_line": 114,
+          "start_byte": 4202,
+          "end_byte": 4428
+        },
+        {
+          "kind": "literal_element",
+          "enclosing_declaration": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "start_line": 114,
+          "end_line": 114,
+          "start_byte": 4365,
+          "end_byte": 4381
+        },
+        {
+          "kind": "parameter_list",
+          "enclosing_declaration": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "start_line": 115,
+          "end_line": 115,
+          "start_byte": 4453,
+          "end_byte": 4467
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "t",
+          "start_line": 115,
+          "end_line": 115,
+          "start_byte": 4454,
+          "end_byte": 4466
+        },
+        {
+          "kind": "escape_sequence",
+          "enclosing_declaration": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "start_line": 122,
+          "end_line": 122,
+          "start_byte": 4748,
+          "end_byte": 4750
+        },
+        {
+          "kind": "composite_literal",
+          "enclosing_declaration": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "start_line": 127,
+          "end_line": 127,
+          "start_byte": 4857,
+          "end_byte": 4866
+        },
+        {
+          "kind": "expression_switch_statement",
+          "enclosing_declaration": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "start_line": 128,
+          "end_line": 160,
+          "start_byte": 4870,
+          "end_byte": 6047
+        },
+        {
+          "kind": "assignment_statement",
+          "enclosing_declaration": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "start_line": 136,
+          "end_line": 136,
+          "start_byte": 5106,
+          "end_byte": 5166
+        },
+        {
+          "kind": "interpreted_string_literal",
+          "enclosing_declaration": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "start_line": 136,
+          "end_line": 136,
+          "start_byte": 5150,
+          "end_byte": 5165
+        },
+        {
+          "kind": "selector_expression",
+          "enclosing_declaration": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "start_line": 138,
+          "end_line": 138,
+          "start_byte": 5194,
+          "end_byte": 5224
+        },
+        {
+          "kind": "expression_statement",
+          "enclosing_declaration": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "start_line": 142,
+          "end_line": 142,
+          "start_byte": 5360,
+          "end_byte": 5390
+        },
+        {
+          "kind": "expression_case",
+          "enclosing_declaration": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "start_line": 143,
+          "end_line": 145,
+          "start_byte": 5394,
+          "end_byte": 5474
+        },
+        {
+          "kind": "call_expression",
+          "enclosing_declaration": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "role": "call",
+          "start_line": 146,
+          "end_line": 146,
+          "start_byte": 5504,
+          "end_byte": 5547
+        },
+        {
+          "kind": "short_var_declaration",
+          "enclosing_declaration": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "start_line": 157,
+          "end_line": 157,
+          "start_byte": 5951,
+          "end_byte": 6006
+        },
+        {
+          "kind": "binary_expression",
+          "enclosing_declaration": "TestFileFirstStopsOnDriftAndInvalidOwnershipWithoutPartialResult",
+          "start_line": 163,
+          "end_line": 163,
+          "start_byte": 6153,
+          "end_byte": 6163
+        },
+        {
+          "kind": "function_declaration",
+          "name": "TestFileFirstRejectsUnsupportedStatesAndBudgets",
+          "start_line": 173,
+          "end_line": 253,
+          "start_byte": 6420,
+          "end_byte": 9576
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "t",
+          "start_line": 173,
+          "end_line": 173,
+          "start_byte": 6473,
+          "end_byte": 6485
+        },
+        {
+          "kind": "range_clause",
+          "enclosing_declaration": "TestFileFirstRejectsUnsupportedStatesAndBudgets",
+          "start_line": 175,
+          "end_line": 175,
+          "start_byte": 6524,
+          "end_byte": 6716
+        },
+        {
+          "kind": "func_literal",
+          "enclosing_declaration": "TestFileFirstRejectsUnsupportedStatesAndBudgets",
+          "start_line": 176,
+          "end_line": 251,
+          "start_byte": 6737,
+          "end_byte": 9570
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "t",
+          "start_line": 176,
+          "end_line": 176,
+          "start_byte": 6742,
+          "end_byte": 6743
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "t",
+          "start_line": 176,
+          "end_line": 176,
+          "start_byte": 6742,
+          "end_byte": 6754
+        },
+        {
+          "kind": "pointer_type",
+          "enclosing_declaration": "t",
+          "start_line": 176,
+          "end_line": 176,
+          "start_byte": 6744,
+          "end_byte": 6754
+        },
+        {
+          "kind": "qualified_type",
+          "name": "T",
+          "enclosing_declaration": "t",
+          "start_line": 176,
+          "end_line": 176,
+          "start_byte": 6745,
+          "end_byte": 6754
+        },
+        {
+          "kind": "for_statement",
+          "enclosing_declaration": "TestFileFirstRejectsUnsupportedStatesAndBudgets",
+          "start_line": 188,
+          "end_line": 190,
+          "start_byte": 7107,
+          "end_byte": 7203
+        },
+        {
+          "kind": "inc_statement",
+          "enclosing_declaration": "TestFileFirstRejectsUnsupportedStatesAndBudgets",
+          "start_line": 188,
+          "end_line": 188,
+          "start_byte": 7127,
+          "end_byte": 7130
+        },
+        {
+          "kind": "int_literal",
+          "enclosing_declaration": "TestFileFirstRejectsUnsupportedStatesAndBudgets",
+          "start_line": 201,
+          "end_line": 201,
+          "start_byte": 7676,
+          "end_byte": 7677
+        },
+        {
+          "kind": "escape_sequence",
+          "enclosing_declaration": "TestFileFirstRejectsUnsupportedStatesAndBudgets",
+          "start_line": 203,
+          "end_line": 203,
+          "start_byte": 7751,
+          "end_byte": 7753
+        },
+        {
+          "kind": "expression_statement",
+          "enclosing_declaration": "TestFileFirstRejectsUnsupportedStatesAndBudgets",
+          "start_line": 208,
+          "end_line": 208,
+          "start_byte": 8022,
+          "end_byte": 8096
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "TestFileFirstRejectsUnsupportedStatesAndBudgets",
+          "start_line": 210,
+          "end_line": 210,
+          "start_byte": 8123,
+          "end_byte": 8124
+        },
+        {
+          "kind": "argument_list",
+          "enclosing_declaration": "TestFileFirstRejectsUnsupportedStatesAndBudgets",
+          "start_line": 212,
+          "end_line": 212,
+          "start_byte": 8202,
+          "end_byte": 8246
+        },
+        {
+          "kind": "selector_expression",
+          "enclosing_declaration": "TestFileFirstRejectsUnsupportedStatesAndBudgets",
+          "start_line": 217,
+          "end_line": 217,
+          "start_byte": 8419,
+          "end_byte": 8426
+        },
+        {
+          "kind": "block",
+          "enclosing_declaration": "TestFileFirstRejectsUnsupportedStatesAndBudgets",
+          "start_line": 222,
+          "end_line": 224,
+          "start_byte": 8557,
+          "end_byte": 8580
+        },
+        {
+          "kind": "if_statement",
+          "enclosing_declaration": "TestFileFirstRejectsUnsupportedStatesAndBudgets",
+          "start_line": 228,
+          "end_line": 232,
+          "start_byte": 8699,
+          "end_byte": 8853
+        },
+        {
+          "kind": "composite_literal",
+          "enclosing_declaration": "TestFileFirstRejectsUnsupportedStatesAndBudgets",
+          "start_line": 244,
+          "end_line": 244,
+          "start_byte": 9280,
+          "end_byte": 9289
+        },
+        {
+          "kind": "unary_expression",
+          "enclosing_declaration": "TestFileFirstRejectsUnsupportedStatesAndBudgets",
+          "start_line": 245,
+          "end_line": 245,
+          "start_byte": 9311,
+          "end_byte": 9358
+        },
+        {
+          "kind": "function_declaration",
+          "name": "fileFirstExpectedTree",
+          "start_line": 257,
+          "end_line": 281,
+          "start_byte": 9735,
+          "end_byte": 10556
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "t",
+          "start_line": 257,
+          "end_line": 257,
+          "start_byte": 9762,
+          "end_byte": 9774
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "repo",
+          "start_line": 257,
+          "end_line": 257,
+          "start_byte": 9776,
+          "end_byte": 9787
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "snapshot",
+          "start_line": 257,
+          "end_line": 257,
+          "start_byte": 9789,
+          "end_byte": 9797
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "snapshot",
+          "start_line": 257,
+          "end_line": 257,
+          "start_byte": 9789,
+          "end_byte": 9806
+        },
+        {
+          "kind": "func_literal",
+          "enclosing_declaration": "fileFirstExpectedTree",
+          "start_line": 260,
+          "end_line": 268,
+          "start_byte": 9948,
+          "end_byte": 10209
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "args",
+          "start_line": 260,
+          "end_line": 260,
+          "start_byte": 9953,
+          "end_byte": 9957
+        },
+        {
+          "kind": "variadic_parameter_declaration",
+          "name": "args",
+          "start_line": 260,
+          "end_line": 260,
+          "start_byte": 9953,
+          "end_byte": 9967
+        },
+        {
+          "kind": "short_var_declaration",
+          "enclosing_declaration": "fileFirstExpectedTree",
+          "start_line": 261,
+          "end_line": 261,
+          "start_byte": 9980,
+          "end_byte": 10048
+        },
+        {
+          "kind": "expression_list",
+          "enclosing_declaration": "fileFirstExpectedTree",
+          "start_line": 263,
+          "end_line": 263,
+          "start_byte": 10079,
+          "end_byte": 10099
+        },
+        {
+          "kind": "argument_list",
+          "enclosing_declaration": "fileFirstExpectedTree",
+          "start_line": 265,
+          "end_line": 265,
+          "start_byte": 10129,
+          "end_byte": 10162
+        },
+        {
+          "kind": "interpreted_string_literal_content",
+          "enclosing_declaration": "fileFirstExpectedTree",
+          "start_line": 265,
+          "end_line": 265,
+          "start_byte": 10131,
+          "end_byte": 10144
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "fileFirstExpectedTree",
+          "start_line": 267,
+          "end_line": 267,
+          "start_byte": 10194,
+          "end_byte": 10200
+        },
+        {
+          "kind": "for_statement",
+          "enclosing_declaration": "fileFirstExpectedTree",
+          "start_line": 270,
+          "end_line": 279,
+          "start_byte": 10237,
+          "end_byte": 10528
+        },
+        {
+          "kind": "block",
+          "enclosing_declaration": "fileFirstExpectedTree",
+          "start_line": 270,
+          "end_line": 279,
+          "start_byte": 10272,
+          "end_byte": 10528
+        },
+        {
+          "kind": "slice_type",
+          "enclosing_declaration": "fileFirstExpectedTree",
+          "start_line": 271,
+          "end_line": 271,
+          "start_byte": 10285,
+          "end_byte": 10293
+        },
+        {
+          "kind": "if_statement",
+          "enclosing_declaration": "fileFirstExpectedTree",
+          "start_line": 272,
+          "end_line": 274,
+          "start_byte": 10298,
+          "end_byte": 10360
+        },
+        {
+          "kind": "binary_expression",
+          "enclosing_declaration": "fileFirstExpectedTree",
+          "start_line": 275,
+          "end_line": 275,
+          "start_byte": 10366,
+          "end_byte": 10432
+        },
+        {
+          "kind": "unary_expression",
+          "enclosing_declaration": "fileFirstExpectedTree",
+          "start_line": 275,
+          "end_line": 275,
+          "start_byte": 10421,
+          "end_byte": 10431
+        },
+        {
+          "kind": "literal_element",
+          "enclosing_declaration": "fileFirstExpectedTree",
+          "start_line": 278,
+          "end_line": 278,
+          "start_byte": 10498,
+          "end_byte": 10503
+        },
+        {
+          "kind": "function_declaration",
+          "name": "fileFirstRepositoryState",
+          "start_line": 285,
+          "end_line": 321,
+          "start_byte": 10714,
+          "end_byte": 11453
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "t",
+          "start_line": 285,
+          "end_line": 285,
+          "start_byte": 10744,
+          "end_byte": 10756
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "repo",
+          "start_line": 285,
+          "end_line": 285,
+          "start_byte": 10758,
+          "end_byte": 10762
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "repo",
+          "start_line": 285,
+          "end_line": 285,
+          "start_byte": 10758,
+          "end_byte": 10769
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "repo",
+          "start_line": 285,
+          "end_line": 285,
+          "start_byte": 10763,
+          "end_byte": 10769
+        },
+        {
+          "kind": "map_type",
+          "enclosing_declaration": "fileFirstRepositoryState",
+          "start_line": 287,
+          "end_line": 287,
+          "start_byte": 10813,
+          "end_byte": 10830
+        },
+        {
+          "kind": "composite_literal",
+          "enclosing_declaration": "fileFirstRepositoryState",
+          "start_line": 287,
+          "end_line": 287,
+          "start_byte": 10813,
+          "end_byte": 10832
+        },
+        {
+          "kind": "func_literal",
+          "enclosing_declaration": "fileFirstRepositoryState",
+          "start_line": 288,
+          "end_line": 316,
+          "start_byte": 10864,
+          "end_byte": 11401
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "path",
+          "start_line": 288,
+          "end_line": 288,
+          "start_byte": 10869,
+          "end_byte": 10873
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "path",
+          "start_line": 288,
+          "end_line": 288,
+          "start_byte": 10869,
+          "end_byte": 10880
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "d",
+          "start_line": 288,
+          "end_line": 288,
+          "start_byte": 10882,
+          "end_byte": 10883
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "d",
+          "start_line": 288,
+          "end_line": 288,
+          "start_byte": 10882,
+          "end_byte": 10895
+        },
+        {
+          "kind": "package_identifier",
+          "enclosing_declaration": "d",
+          "start_line": 288,
+          "end_line": 288,
+          "start_byte": 10884,
+          "end_byte": 10886
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "err",
+          "start_line": 288,
+          "end_line": 288,
+          "start_byte": 10897,
+          "end_byte": 10900
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "err",
+          "start_line": 288,
+          "end_line": 288,
+          "start_byte": 10897,
+          "end_byte": 10906
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "err",
+          "start_line": 288,
+          "end_line": 288,
+          "start_byte": 10901,
+          "end_byte": 10906
+        },
+        {
+          "kind": "if_statement",
+          "enclosing_declaration": "fileFirstRepositoryState",
+          "start_line": 300,
+          "end_line": 302,
+          "start_byte": 11088,
+          "end_byte": 11121
+        },
+        {
+          "kind": "block",
+          "enclosing_declaration": "fileFirstRepositoryState",
+          "start_line": 300,
+          "end_line": 302,
+          "start_byte": 11102,
+          "end_byte": 11121
+        },
+        {
+          "kind": "var_declaration",
+          "enclosing_declaration": "fileFirstRepositoryState",
+          "start_line": 303,
+          "end_line": 303,
+          "start_byte": 11124,
+          "end_byte": 11139
+        },
+        {
+          "kind": "call_expression",
+          "enclosing_declaration": "fileFirstRepositoryState",
+          "role": "call",
+          "start_line": 304,
+          "end_line": 304,
+          "start_byte": 11145,
+          "end_byte": 11156
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "fileFirstRepositoryState",
+          "start_line": 304,
+          "end_line": 304,
+          "start_byte": 11157,
+          "end_byte": 11159
+        },
+        {
+          "kind": "field_identifier",
+          "enclosing_declaration": "fileFirstRepositoryState",
+          "start_line": 304,
+          "end_line": 304,
+          "start_byte": 11160,
+          "end_byte": 11171
+        },
+        {
+          "kind": "slice_type",
+          "enclosing_declaration": "fileFirstRepositoryState",
+          "start_line": 307,
+          "end_line": 307,
+          "start_byte": 11233,
+          "end_byte": 11239
+        },
+        {
+          "kind": "assignment_statement",
+          "enclosing_declaration": "fileFirstRepositoryState",
+          "start_line": 309,
+          "end_line": 309,
+          "start_byte": 11261,
+          "end_byte": 11290
+        },
+        {
+          "kind": "interpreted_string_literal",
+          "enclosing_declaration": "fileFirstRepositoryState",
+          "start_line": 314,
+          "end_line": 314,
+          "start_byte": 11358,
+          "end_byte": 11365
+        },
+        {
+          "kind": "expression_statement",
+          "enclosing_declaration": "fileFirstRepositoryState",
+          "start_line": 318,
+          "end_line": 318,
+          "start_byte": 11422,
+          "end_byte": 11434
+        },
+        {
+          "kind": "function_declaration",
+          "name": "TestFileFirstPreservesLiteralPathsWithAlternateDirectorySeparator",
+          "start_line": 323,
+          "end_line": 349,
+          "start_byte": 11455,
+          "end_byte": 12493
+        },
+        {
+          "kind": "parameter_list",
+          "enclosing_declaration": "TestFileFirstPreservesLiteralPathsWithAlternateDirectorySeparator",
+          "start_line": 323,
+          "end_line": 323,
+          "start_byte": 11525,
+          "end_byte": 11539
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "t",
+          "start_line": 323,
+          "end_line": 323,
+          "start_byte": 11526,
+          "end_byte": 11538
+        },
+        {
+          "kind": "interpreted_string_literal",
+          "enclosing_declaration": "TestFileFirstPreservesLiteralPathsWithAlternateDirectorySeparator",
+          "start_line": 334,
+          "end_line": 334,
+          "start_byte": 12023,
+          "end_byte": 12031
+        },
+        {
+          "kind": "expression_statement",
+          "enclosing_declaration": "TestFileFirstPreservesLiteralPathsWithAlternateDirectorySeparator",
+          "start_line": 335,
+          "end_line": 335,
+          "start_byte": 12041,
+          "end_byte": 12069
+        },
+        {
+          "kind": "identifier",
+          "enclosing_declaration": "TestFileFirstPreservesLiteralPathsWithAlternateDirectorySeparator",
+          "start_line": 335,
+          "end_line": 335,
+          "start_byte": 12048,
+          "end_byte": 12052
+        },
+        {
+          "kind": "short_var_declaration",
+          "enclosing_declaration": "TestFileFirstPreservesLiteralPathsWithAlternateDirectorySeparator",
+          "start_line": 338,
+          "end_line": 338,
+          "start_byte": 12161,
+          "end_byte": 12202
+        },
+        {
+          "kind": "block",
+          "enclosing_declaration": "TestFileFirstPreservesLiteralPathsWithAlternateDirectorySeparator",
+          "start_line": 339,
+          "end_line": 341,
+          "start_byte": 12218,
+          "end_byte": 12237
+        },
+        {
+          "kind": "composite_literal",
+          "enclosing_declaration": "TestFileFirstPreservesLiteralPathsWithAlternateDirectorySeparator",
+          "start_line": 342,
+          "end_line": 342,
+          "start_byte": 12282,
+          "end_byte": 12291
+        },
+        {
+          "kind": "if_statement",
+          "enclosing_declaration": "TestFileFirstPreservesLiteralPathsWithAlternateDirectorySeparator",
+          "start_line": 343,
+          "end_line": 345,
+          "start_byte": 12294,
+          "end_byte": 12375
+        },
+        {
+          "kind": "field_identifier",
+          "enclosing_declaration": "TestFileFirstPreservesLiteralPathsWithAlternateDirectorySeparator",
+          "start_line": 343,
+          "end_line": 343,
+          "start_byte": 12323,
+          "end_byte": 12329
+        },
+        {
+          "kind": "unary_expression",
+          "enclosing_declaration": "TestFileFirstPreservesLiteralPathsWithAlternateDirectorySeparator",
+          "start_line": 346,
+          "end_line": 346,
+          "start_byte": 12380,
+          "end_byte": 12452
+        },
+        {
+          "kind": "slice_type",
+          "enclosing_declaration": "TestFileFirstPreservesLiteralPathsWithAlternateDirectorySeparator",
+          "start_line": 346,
+          "end_line": 346,
+          "start_byte": 12429,
+          "end_byte": 12435
+        },
+        {
+          "kind": "function_declaration",
+          "name": "fileFirstIsolateGitConfig",
+          "start_line": 351,
+          "end_line": 357,
+          "start_byte": 12495,
+          "end_byte": 12786
+        },
+        {
+          "kind": "parameter_list",
+          "enclosing_declaration": "fileFirstIsolateGitConfig",
+          "start_line": 351,
+          "end_line": 351,
+          "start_byte": 12525,
+          "end_byte": 12539
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "t",
+          "start_line": 351,
+          "end_line": 351,
+          "start_byte": 12526,
+          "end_byte": 12538
+        },
+        {
+          "kind": "block",
+          "enclosing_declaration": "fileFirstIsolateGitConfig",
+          "start_line": 351,
+          "end_line": 357,
+          "start_byte": 12540,
+          "end_byte": 12786
+        },
+        {
+          "kind": "comment",
+          "enclosing_declaration": "fileFirstIsolateGitConfig",
+          "start_line": 354,
+          "end_line": 354,
+          "start_byte": 12628,
+          "end_byte": 12703
+        },
+        {
+          "kind": "call_expression",
+          "enclosing_declaration": "fileFirstIsolateGitConfig",
+          "role": "call",
+          "start_line": 355,
+          "end_line": 355,
+          "start_byte": 12705,
+          "end_byte": 12741
+        },
+        {
+          "kind": "argument_list",
+          "enclosing_declaration": "fileFirstIsolateGitConfig",
+          "start_line": 355,
+          "end_line": 355,
+          "start_byte": 12713,
+          "end_byte": 12741
+        },
+        {
+          "kind": "selector_expression",
+          "enclosing_declaration": "fileFirstIsolateGitConfig",
+          "start_line": 356,
+          "end_line": 356,
+          "start_byte": 12743,
+          "end_byte": 12751
+        },
+        {
+          "kind": "function_declaration",
+          "name": "TestFileFirstDetectsConcurrentWorktreeChangeDuringReplay",
+          "start_line": 359,
+          "end_line": 401,
+          "start_byte": 12788,
+          "end_byte": 14392
+        },
+        {
+          "kind": "parameter_list",
+          "enclosing_declaration": "TestFileFirstDetectsConcurrentWorktreeChangeDuringReplay",
+          "start_line": 359,
+          "end_line": 359,
+          "start_byte": 12849,
+          "end_byte": 12863
+        },
+        {
+          "kind": "parameter_declaration",
+          "name": "t",
+          "start_line": 359,
+          "end_line": 359,
+          "start_byte": 12850,
+          "end_byte": 12862
+        },
+        {
+          "kind": "escape_sequence",
+          "enclosing_declaration": "TestFileFirstDetectsConcurrentWorktreeChangeDuringReplay",
+          "start_line": 365,
+          "end_line": 365,
+          "start_byte": 13069,
+          "end_byte": 13071
+        },
+        {
+          "kind": "short_var_declaration",
+          "enclosing_declaration": "TestFileFirstDetectsConcurrentWorktreeChangeDuringReplay",
+          "start_line": 371,
+          "end_line": 371,
+          "start_byte": 13205,
+          "end_byte": 13241
+        },
+        {
+          "kind": "expression_statement",
+          "enclosing_declaration": "TestFileFirstDetectsConcurrentWorktreeChangeDuringReplay",
+          "start_line": 376,
+          "end_line": 384,
+          "start_byte": 13299,
+          "end_byte": 13581
+        },
+        {
+          "kind": "raw_string_literal_content",
+          "enclosing_declaration": "TestFileFirstDetectsConcurrentWorktreeChangeDuringReplay",
+          "start_line": 376,
+          "end_line": 384,
+          "start_byte": 13322,
+          "end_byte": 13572
+        },
+        {
+          "kind": "interpreted_string_literal",
+          "enclosing_declaration": "TestFileFirstDetectsConcurrentWorktreeChangeDuringReplay",
+          "start_line": 386,
+          "end_line": 386,
+          "start_byte": 13633,
+          "end_byte": 13655
+        },
+        {
+          "kind": "call_expression",
+          "enclosing_declaration": "TestFileFirstDetectsConcurrentWorktreeChangeDuringReplay",
+          "role": "call",
+          "start_line": 387,
+          "end_line": 387,
+          "start_byte": 13725,
+          "end_byte": 13754
+        },
+        {
+          "kind": "selector_expression",
+          "enclosing_declaration": "TestFileFirstDetectsConcurrentWorktreeChangeDuringReplay",
+          "start_line": 388,
+          "end_line": 388,
+          "start_byte": 13808,
+          "end_byte": 13817
+        },
+        {
+          "kind": "type_identifier",
+          "enclosing_declaration": "TestFileFirstDetectsConcurrentWorktreeChangeDuringReplay",
+          "start_line": 389,
+          "end_line": 389,
+          "start_byte": 13871,
+          "end_byte": 13878
+        },
+        {
+          "kind": "if_statement",
+          "enclosing_declaration": "TestFileFirstDetectsConcurrentWorktreeChangeDuringReplay",
+          "start_line": 390,
+          "end_line": 392,
+          "start_byte": 13883,
+          "end_byte": 14088
+        },
+        {
+          "kind": "block",
+          "enclosing_declaration": "TestFileFirstDetectsConcurrentWorktreeChangeDuringReplay",
+          "start_line": 390,
+          "end_line": 392,
+          "start_byte": 14017,
+          "end_byte": 14088
+        },
+        {
+          "kind": "assignment_statement",
+          "enclosing_declaration": "TestFileFirstDetectsConcurrentWorktreeChangeDuringReplay",
+          "start_line": 397,
+          "end_line": 397,
+          "start_byte": 14179,
+          "end_byte": 14255
+        }
+      ],
+      "evidence_reduction": {
+        "level": "medium",
+        "original_count": 3337,
+        "original_bytes": 568702,
+        "original_digest": "c13b2164d0f0f99f7866d6a9b72eadec96fda31cd98a1d2cdab594e4e128436a",
+        "retained_count": 175,
+        "retained_bytes": 27272,
+        "retained_digest": "95fdd20456667a4c3f930ec331a8606eae7444df263f3630532a6696025cbd05",
+        "coverage_count": 47,
+        "original_coverage_digest": "1eac5ca38844190d0b79fe2be7d1381b35792b56bc37b922ba09e8b8ca5a3e14",
+        "retained_coverage_digest": "1eac5ca38844190d0b79fe2be7d1381b35792b56bc37b922ba09e8b8ca5a3e14"
+      }
+    }
+  ],
+  "relation_context_status": {
+    "omitted": true,
+    "reason": "over_budget",
+    "observation_count": 40,
+    "observations_by_outcome": {
+      "ambiguous": 17,
+      "unsupported": 23
+    }
+  }
+}

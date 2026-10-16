@@ -1,0 +1,37 @@
+{
+  "goal_complete": false,
+  "issue_complete": false,
+  "reason": "Only the initial paired run is finished. C02 admission failed; C01-B did not yield a final plan. Wider semantic risk coverage and production adoption are not proved.",
+  "requirements": [
+    {
+      "requirement": "Codex schema/API/storage/support",
+      "state": "prior evidence exists; not fully reaudited in this iteration",
+      "source": "docs/decisions/issue-175-codex-context.md and earlier Issue comments"
+    },
+    {
+      "requirement": "extract requests/responses/tool/path examples",
+      "state": "copied examples and existing read-only smoke evidence exist"
+    },
+    {
+      "requirement": "single/multiple purposes, repeated edits, reverts, multiple/unrelated sessions",
+      "state": "collector tests exist; actual model semantic coverage incomplete"
+    },
+    {
+      "requirement": "fallback for absent/failure/unsupported/partial/unrelated logs",
+      "state": "covered by existing collector/CLI tests; no live fault injection in this iteration"
+    },
+    {
+      "requirement": "Grouping/Category usefulness and misattribution risk; feat/fix evidence",
+      "state": "C01 supplies one fix observation; C02 feat not evaluated; misattribution not established"
+    },
+    {
+      "requirement": "Git invariants, secret boundary and resources",
+      "state": "fixture Git invariants proved; secret boundary tests exist; only partial process RSS resource evidence"
+    },
+    {
+      "requirement": "measured adoption decision and minimal implementation",
+      "state": "not established for general adoption by this run"
+    }
+  ],
+  "final_quality_gate": "not declared passed because Issue verification is incomplete; related development checks are recorded separately"
+}
