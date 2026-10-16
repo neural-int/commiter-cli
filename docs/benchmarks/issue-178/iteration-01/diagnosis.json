@@ -1,0 +1,24 @@
+{
+  "observed_utc": "2026-10-16T03:30:14.880763+00:00",
+  "base_commit": "382ca030ba31d36d1bbc65bc31485f19ff0dd288",
+  "historical_failures": {
+    "C01-B": "summary51>48",
+    "C02-A": "scope=docs rejected by existing Validator",
+    "C02-B": "scope38/28/36>16"
+  },
+  "diagnosis": {
+    "lengths": "bounded-text nativeLimit0 leaves GenerationComponents empty in base helper; no grammar matcher is created or checked. This was intentional in #143 selection record, not accidental omission.",
+    "scope_docs": "Validator rejects every Conventional Commit type as scope; textSystem says component, not type. Schema has no negative enum; dependency converter explicitly warns not keyword unsupported."
+  },
+  "checks": {
+    "go_historical_failures": "passed: all saved failure classes rejected, zero returned commits",
+    "go_test_all": "passed",
+    "go_vet_all": "passed",
+    "go_build_all": "passed",
+    "swift_xcode_driver": "failed missing PACKAGE-TARGET:CudaBuild and MLXHuggingFaceMacros; no model inference",
+    "swift_standard_driver": "passed: GrammarSamplingTests11, including real Japanese48/49 boundary and captured51/38 overflows",
+    "swift_full_suite": "see swift-all-tests.log",
+    "release_build": "running; no new inference calls"
+  },
+  "new_inference_calls": 0
+}
