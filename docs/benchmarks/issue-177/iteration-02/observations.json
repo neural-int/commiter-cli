@@ -1,0 +1,337 @@
+{
+  "gold_sha256": "94cfc6fb6eeafc145e3981619c320d353153ebdaead5fdd900e0c5a6428c61d2",
+  "observations": [
+    {
+      "case": "C01",
+      "arm": "A",
+      "model_calls": 3,
+      "accepted_plan": true,
+      "pipeline_error": "",
+      "grouping_exact": true,
+      "partition": [
+        [
+          "src/components/common/progressiveimage/ProgressiveImage.jsx",
+          "src/components/common/svg/AISummaryBadge.jsx",
+          "src/lib/staticAsset.js"
+        ]
+      ],
+      "category_matches_reference": false,
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "refactor"
+        }
+      },
+      "text": {
+        "G001": {
+          "scope": "Asset Resolution",
+          "summary": "静的アセットの解決を導入し、コンポーネントを更新しました。"
+        }
+      },
+      "text_semantic_review": "pending",
+      "phases": {
+        "bounded-grouping": {
+          "stop": "completed",
+          "content": {
+            "path:src/components/common/progressiveimage/ProgressiveImage.jsx": "G001",
+            "path:src/components/common/svg/AISummaryBadge.jsx": "G001",
+            "path:src/lib/staticAsset.js": "G001"
+          },
+          "backend_error": "",
+          "wall_seconds": 28.795051916
+        },
+        "bounded-category": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "breaking_evidence_ref": "none",
+              "type": "refactor"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 22.8234935
+        },
+        "bounded-text": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "scope": "Asset Resolution",
+              "summary": "静的アセットの解決を導入し、コンポーネントを更新しました。"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 8.165493
+        }
+      },
+      "wall_seconds": 59.790019292
+    },
+    {
+      "case": "C01",
+      "arm": "B",
+      "model_calls": 3,
+      "accepted_plan": false,
+      "pipeline_error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_schema)",
+      "grouping_exact": true,
+      "partition": [
+        [
+          "src/components/common/progressiveimage/ProgressiveImage.jsx",
+          "src/components/common/svg/AISummaryBadge.jsx",
+          "src/lib/staticAsset.js"
+        ]
+      ],
+      "category_matches_reference": true,
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "fix"
+        }
+      },
+      "text": {
+        "G001": {
+          "scope": "Asset Loading",
+          "summary": "静的アセットのインポートを文字列URLに正規化するヘルパーを導入し、画像表示の404エラーを修正した。"
+        }
+      },
+      "text_semantic_review": "pending",
+      "phases": {
+        "bounded-grouping": {
+          "stop": "completed",
+          "content": {
+            "path:src/components/common/progressiveimage/ProgressiveImage.jsx": "G001",
+            "path:src/components/common/svg/AISummaryBadge.jsx": "G001",
+            "path:src/lib/staticAsset.js": "G001"
+          },
+          "backend_error": "",
+          "wall_seconds": 29.275093625
+        },
+        "bounded-category": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "breaking_evidence_ref": "none",
+              "type": "fix"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 30.691132125
+        },
+        "bounded-text": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "scope": "Asset Loading",
+              "summary": "静的アセットのインポートを文字列URLに正規化するヘルパーを導入し、画像表示の404エラーを修正した。"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 17.027383375
+        }
+      },
+      "wall_seconds": 77.01986375
+    },
+    {
+      "case": "C02",
+      "arm": "A",
+      "model_calls": 3,
+      "accepted_plan": false,
+      "pipeline_error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_scope)",
+      "grouping_exact": false,
+      "partition": [
+        [
+          "docs/decisions/issue-167-file-first.md",
+          "internal/gitstate/file_first.go"
+        ],
+        [
+          "internal/gitstate/collect.go"
+        ],
+        [
+          "internal/gitstate/file_first_test.go"
+        ]
+      ],
+      "category_matches_reference": null,
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        },
+        "G002": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        },
+        "G003": {
+          "breaking_evidence_ref": "none",
+          "type": "test"
+        }
+      },
+      "text": {
+        "G001": {
+          "scope": "docs",
+          "summary": "Phase 1のファイルごとの所有権と構造検証の契約を文書化"
+        },
+        "G002": {
+          "scope": "gitstate",
+          "summary": "Collect関数をロック機構と結合し、ファイルごとの所有権を確立"
+        },
+        "G003": {
+          "scope": "gitstate",
+          "summary": "ファイルごとのリプレイと検証のためのテストコードを追加"
+        }
+      },
+      "text_semantic_review": "pending",
+      "phases": {
+        "bounded-grouping": {
+          "stop": "completed",
+          "content": {
+            "path:docs/decisions/issue-167-file-first.md": "G001",
+            "path:internal/gitstate/collect.go": "G002",
+            "path:internal/gitstate/file_first_test.go": "G003",
+            "path:internal/gitstate/file_first.go": "G001"
+          },
+          "backend_error": "",
+          "wall_seconds": 112.259245875
+        },
+        "bounded-category": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "breaking_evidence_ref": "none",
+              "type": "feat"
+            },
+            "G002": {
+              "breaking_evidence_ref": "none",
+              "type": "feat"
+            },
+            "G003": {
+              "breaking_evidence_ref": "none",
+              "type": "test"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 96.146419125
+        },
+        "bounded-text": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "scope": "docs",
+              "summary": "Phase 1のファイルごとの所有権と構造検証の契約を文書化"
+            },
+            "G002": {
+              "scope": "gitstate",
+              "summary": "Collect関数をロック機構と結合し、ファイルごとの所有権を確立"
+            },
+            "G003": {
+              "scope": "gitstate",
+              "summary": "ファイルごとのリプレイと検証のためのテストコードを追加"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 70.826235583
+        }
+      },
+      "wall_seconds": 279.243513042
+    },
+    {
+      "case": "C02",
+      "arm": "B",
+      "model_calls": 3,
+      "accepted_plan": false,
+      "pipeline_error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_schema)",
+      "grouping_exact": false,
+      "partition": [
+        [
+          "docs/decisions/issue-167-file-first.md",
+          "internal/gitstate/file_first.go"
+        ],
+        [
+          "internal/gitstate/collect.go"
+        ],
+        [
+          "internal/gitstate/file_first_test.go"
+        ]
+      ],
+      "category_matches_reference": null,
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        },
+        "G002": {
+          "breaking_evidence_ref": "none",
+          "type": "refactor"
+        },
+        "G003": {
+          "breaking_evidence_ref": "none",
+          "type": "test"
+        }
+      },
+      "text": {
+        "G001": {
+          "scope": "docs/decisions/issue-167-file-first.md",
+          "summary": "Issue #167: ファイルごとの完全な変更を保持する構造経路を実装・検証"
+        },
+        "G002": {
+          "scope": "internal/gitstate/collect.go",
+          "summary": "ファイルごとの変更を収集するロジックをロック機構と共に実装"
+        },
+        "G003": {
+          "scope": "internal/gitstate/file_first_test.go",
+          "summary": "ファイルごとの変更の完全性とリプレイを検証するテストを追加"
+        }
+      },
+      "text_semantic_review": "pending",
+      "phases": {
+        "bounded-grouping": {
+          "stop": "completed",
+          "content": {
+            "path:docs/decisions/issue-167-file-first.md": "G001",
+            "path:internal/gitstate/collect.go": "G002",
+            "path:internal/gitstate/file_first_test.go": "G003",
+            "path:internal/gitstate/file_first.go": "G001"
+          },
+          "backend_error": "",
+          "wall_seconds": 112.432120667
+        },
+        "bounded-category": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "breaking_evidence_ref": "none",
+              "type": "feat"
+            },
+            "G002": {
+              "breaking_evidence_ref": "none",
+              "type": "refactor"
+            },
+            "G003": {
+              "breaking_evidence_ref": "none",
+              "type": "test"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 99.681723666
+        },
+        "bounded-text": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "scope": "docs/decisions/issue-167-file-first.md",
+              "summary": "Issue #167: ファイルごとの完全な変更を保持する構造経路を実装・検証"
+            },
+            "G002": {
+              "scope": "internal/gitstate/collect.go",
+              "summary": "ファイルごとの変更を収集するロジックをロック機構と共に実装"
+            },
+            "G003": {
+              "scope": "internal/gitstate/file_first_test.go",
+              "summary": "ファイルごとの変更の完全性とリプレイを検証するテストを追加"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 84.3361785
+        }
+      },
+      "wall_seconds": 296.459356458
+    }
+  ]
+}

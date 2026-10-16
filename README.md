@@ -37,7 +37,7 @@ A normal run follows this flow:
 1. Validate the repository, branch, HEAD, index, conflicts, and in-progress Git operations.
 2. Collect staged, unstaged, and untracked state and determine the target files at file granularity.
 3. Classify sensitive paths before reading file contents; automatically exclude clearly sensitive files and ask before reading sensitive candidates.
-4. Build Git metadata and syntax-aware structural evidence. Unsupported text formats fall back to raw diff plus Git metadata.
+4. Build Git metadata and syntax-aware structural evidence. The three-phase planner uses the smaller of structural evidence and the complete approved raw diff for each supported text file, while preserving analysis on the host. Unsupported text formats fall back to raw diff plus Git metadata.
 5. Ask the configured local model for a commit plan. The default three-phase planner generates membership, type / breaking evidence reference, and scope / summary, with validation at every phase and on the final plan.
 6. Validate file assignment and safety rules, then show the plan for approval.
 7. Run the approved repository-scoped verification definition and revalidate Git state before creating commits.
