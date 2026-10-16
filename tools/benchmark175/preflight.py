@@ -22,9 +22,12 @@ def main():
      request['model_path']=runtime['model_path'];request['preflight_only']=True;start=time.monotonic()
      proc=subprocess.run([runtime['preflight_helper']],input=json.dumps(request).encode()+b'\n',capture_output=True,timeout=120,check=True)
      response=json.loads(proc.stdout);n=response.get('benchmark_input_tokens')
-     admitted=response.get('ok') is True and response.get('generated_json')=='{}' and isinstance(n,int) and n+request['output_tokens']<=actual_context
+     counted=isinstance(n,int) and n>0
+     native_success=response.get('ok') is True and response.get('generated_json')=='{}'
+     tokenizer_ceiling_rejection=(response.get('ok') is False and response.get('error_class')=='input_too_large' and counted and n+request['output_tokens']>request['context_tokens'] and not response.get('generated_json'))
+     admitted=counted and (native_success or tokenizer_ceiling_rejection) and n+request['output_tokens']<=actual_context
      assert response.get('benchmark_output_tokens') in [None,0]
-     row={'case':cid,'arm':arm,'phase':phase,'request_sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'native_input_tokens':n,'context_tokens':actual_context,'tokenizer_helper_context_tokens':request['context_tokens'],'output_reservation':request['output_tokens'],'admitted':admitted,'generated_tokens':0,'wall_seconds':time.monotonic()-start,'stop_reason':response.get('stop_reason'),'error_class':response.get('error_class')}
+     row={'case':cid,'arm':arm,'phase':phase,'request_sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'native_input_tokens':n,'context_tokens':actual_context,'tokenizer_helper_context_tokens':request['context_tokens'],'output_reservation':request['output_tokens'],'budget_arithmetic_fits_generation_context':admitted,'tokenizer_helper_ok':native_success,'tokenizer_ceiling_rejection':tokenizer_ceiling_rejection,'admission_scope':'count-only preflight; production helper must independently accept actual context','generated_tokens':0,'wall_seconds':time.monotonic()-start,'stop_reason':response.get('stop_reason'),'error_class':response.get('error_class')}
      receipt.write(json.dumps(row)+'\n');receipt.flush();print(json.dumps(row),flush=True)
      if not admitted:raise RuntimeError('admission failed; stop before inference')
 if __name__=='__main__':main()

@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"go/ast"
@@ -101,6 +102,33 @@ func TestIssue175Evaluation(t *testing.T) {
 		if err = attachGroupingSyntaxContext(context.Background(), repo.Root, &document, relationFiles); err != nil {
 			t.Fatal(err)
 		}
+		hostDocument := document
+		document, err = candidateSourceProjection(document)
+		if err != nil {
+			t.Fatal(err)
+		}
+		projectionAudit := []map[string]any{}
+		for i, before := range hostDocument.Files {
+			after := document.Files[i]
+			beforeJSON, _ := json.Marshal(before)
+			afterJSON, _ := json.Marshal(after)
+			preserved := after.RawDiff == before.GroupingRawDiff
+			if after.Mode == before.Mode {
+				preserved = len(after.Evidence) == len(before.Evidence)
+			}
+			if !preserved {
+				t.Fatal("approved source lost")
+			}
+			projectionAudit = append(projectionAudit, map[string]any{
+				"path": before.NewPath, "before_mode": before.Mode, "after_mode": after.Mode,
+				"host_evidence_count": len(before.Evidence), "before_bytes": len(beforeJSON), "after_bytes": len(afterJSON),
+				"approved_diff_sha256":      fmt.Sprintf("%x", sha256.Sum256([]byte(before.GroupingRawDiff))),
+				"selected_raw_diff_sha256":  fmt.Sprintf("%x", sha256.Sum256([]byte(after.RawDiff))),
+				"approved_source_preserved": preserved,
+			})
+		}
+		write175(t, filepath.Join(out, repo.CaseID+"-projection-audit.json"), projectionAudit)
+
 		ids := []string{}
 		for _, f := range document.Files {
 			ids = append(ids, f.ID)
@@ -109,7 +137,7 @@ func TestIssue175Evaluation(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		prepared, err := contextinput.Prepare(context.Background(), document, contextinput.BudgetConfig{Context: "auto", MaxContextTokens: 65536, PromptOverheadBytes: len(system)}, planning.Renderer(planning.Japanese), nil)
+		prepared, err := contextinput.Prepare(context.Background(), document, contextinput.BudgetConfig{RequireUncompressed: true, Context: "auto", MaxContextTokens: 65536, PromptOverheadBytes: len(system)}, planning.Renderer(planning.Japanese), nil)
 		if err != nil {
 			t.Fatal(err)
 		}
