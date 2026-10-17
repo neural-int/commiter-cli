@@ -1,0 +1,337 @@
+{
+  "gold_sha256": "94cfc6fb6eeafc145e3981619c320d353153ebdaead5fdd900e0c5a6428c61d2",
+  "observations": [
+    {
+      "case": "C01",
+      "arm": "A",
+      "model_calls": 3,
+      "accepted_plan": true,
+      "pipeline_error": "",
+      "grouping_exact": true,
+      "partition": [
+        [
+          "src/components/common/progressiveimage/ProgressiveImage.jsx",
+          "src/components/common/svg/AISummaryBadge.jsx",
+          "src/lib/staticAsset.js"
+        ]
+      ],
+      "category_matches_reference": false,
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "refactor"
+        }
+      },
+      "text": {
+        "G001": {
+          "scope": "Asset Resolution",
+          "summary": "静的アセットの解決を導入し、画像コンポーネントとバッジを更新しました。"
+        }
+      },
+      "text_semantic_review": "pending",
+      "phases": {
+        "bounded-grouping": {
+          "stop": "completed",
+          "content": {
+            "path:src/components/common/progressiveimage/ProgressiveImage.jsx": "G001",
+            "path:src/components/common/svg/AISummaryBadge.jsx": "G001",
+            "path:src/lib/staticAsset.js": "G001"
+          },
+          "backend_error": "",
+          "wall_seconds": 34.937742666
+        },
+        "bounded-category": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "breaking_evidence_ref": "none",
+              "type": "refactor"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 24.478828084
+        },
+        "bounded-text": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "scope": "Asset Resolution",
+              "summary": "静的アセットの解決を導入し、画像コンポーネントとバッジを更新しました。"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 9.704160375
+        }
+      },
+      "wall_seconds": 69.129682208
+    },
+    {
+      "case": "C01",
+      "arm": "B",
+      "model_calls": 3,
+      "accepted_plan": true,
+      "pipeline_error": "",
+      "grouping_exact": true,
+      "partition": [
+        [
+          "src/components/common/progressiveimage/ProgressiveImage.jsx",
+          "src/components/common/svg/AISummaryBadge.jsx",
+          "src/lib/staticAsset.js"
+        ]
+      ],
+      "category_matches_reference": true,
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "fix"
+        }
+      },
+      "text": {
+        "G001": {
+          "scope": "Static Asset URL",
+          "summary": "静的アセットのインポートを文字列URLに正規化するヘルパーを導入し、画像表示の404エラーを修正"
+        }
+      },
+      "text_semantic_review": "pending",
+      "phases": {
+        "bounded-grouping": {
+          "stop": "completed",
+          "content": {
+            "path:src/components/common/progressiveimage/ProgressiveImage.jsx": "G001",
+            "path:src/components/common/svg/AISummaryBadge.jsx": "G001",
+            "path:src/lib/staticAsset.js": "G001"
+          },
+          "backend_error": "",
+          "wall_seconds": 30.341824375
+        },
+        "bounded-category": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "breaking_evidence_ref": "none",
+              "type": "fix"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 59.95206175
+        },
+        "bounded-text": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "scope": "Static Asset URL",
+              "summary": "静的アセットのインポートを文字列URLに正規化するヘルパーを導入し、画像表示の404エラーを修正"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 15.369948333
+        }
+      },
+      "wall_seconds": 105.669924042
+    },
+    {
+      "case": "C02",
+      "arm": "A",
+      "model_calls": 3,
+      "accepted_plan": false,
+      "pipeline_error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_scope)",
+      "grouping_exact": false,
+      "partition": [
+        [
+          "docs/decisions/issue-167-file-first.md",
+          "internal/gitstate/file_first.go"
+        ],
+        [
+          "internal/gitstate/collect.go"
+        ],
+        [
+          "internal/gitstate/file_first_test.go"
+        ]
+      ],
+      "category_matches_reference": null,
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        },
+        "G002": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        },
+        "G003": {
+          "breaking_evidence_ref": "none",
+          "type": "test"
+        }
+      },
+      "text": {
+        "G001": {
+          "scope": "docs",
+          "summary": "Issue #167: File-first Phase まとめと実装の契約を記述。"
+        },
+        "G002": {
+          "scope": "internal/git_api",
+          "summary": "Collect関数をロック機構とファイルファーストリプレイに対応させる。"
+        },
+        "G003": {
+          "scope": "internal/git_api",
+          "summary": "ファイルファースト機能の動作検証と境界条件をテストコードで実装。"
+        }
+      },
+      "text_semantic_review": "pending",
+      "phases": {
+        "bounded-grouping": {
+          "stop": "completed",
+          "content": {
+            "path:docs/decisions/issue-167-file-first.md": "G001",
+            "path:internal/gitstate/collect.go": "G002",
+            "path:internal/gitstate/file_first_test.go": "G003",
+            "path:internal/gitstate/file_first.go": "G001"
+          },
+          "backend_error": "",
+          "wall_seconds": 114.444034167
+        },
+        "bounded-category": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "breaking_evidence_ref": "none",
+              "type": "feat"
+            },
+            "G002": {
+              "breaking_evidence_ref": "none",
+              "type": "feat"
+            },
+            "G003": {
+              "breaking_evidence_ref": "none",
+              "type": "test"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 97.851802209
+        },
+        "bounded-text": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "scope": "docs",
+              "summary": "Issue #167: File-first Phase まとめと実装の契約を記述。"
+            },
+            "G002": {
+              "scope": "internal/git_api",
+              "summary": "Collect関数をロック機構とファイルファーストリプレイに対応させる。"
+            },
+            "G003": {
+              "scope": "internal/git_api",
+              "summary": "ファイルファースト機能の動作検証と境界条件をテストコードで実装。"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 67.955726708
+        }
+      },
+      "wall_seconds": 280.258530167
+    },
+    {
+      "case": "C02",
+      "arm": "B",
+      "model_calls": 3,
+      "accepted_plan": false,
+      "pipeline_error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_scope)",
+      "grouping_exact": false,
+      "partition": [
+        [
+          "docs/decisions/issue-167-file-first.md",
+          "internal/gitstate/file_first.go"
+        ],
+        [
+          "internal/gitstate/collect.go"
+        ],
+        [
+          "internal/gitstate/file_first_test.go"
+        ]
+      ],
+      "category_matches_reference": null,
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        },
+        "G002": {
+          "breaking_evidence_ref": "none",
+          "type": "refactor"
+        },
+        "G003": {
+          "breaking_evidence_ref": "none",
+          "type": "test"
+        }
+      },
+      "text": {
+        "G001": {
+          "scope": "docs",
+          "summary": "Issue #167 Phase1の構造経路を実装し、検証済み。"
+        },
+        "G002": {
+          "scope": "internal/git_api",
+          "summary": "Collect関数をロック機構と分離し、ファイルファーストリプレイに対応。"
+        },
+        "G003": {
+          "scope": "internal/git_api",
+          "summary": "ファイルファーストリプレイの完全なテストスイートを追加。"
+        }
+      },
+      "text_semantic_review": "pending",
+      "phases": {
+        "bounded-grouping": {
+          "stop": "completed",
+          "content": {
+            "path:docs/decisions/issue-167-file-first.md": "G001",
+            "path:internal/gitstate/collect.go": "G002",
+            "path:internal/gitstate/file_first_test.go": "G003",
+            "path:internal/gitstate/file_first.go": "G001"
+          },
+          "backend_error": "",
+          "wall_seconds": 113.907376375
+        },
+        "bounded-category": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "breaking_evidence_ref": "none",
+              "type": "feat"
+            },
+            "G002": {
+              "breaking_evidence_ref": "none",
+              "type": "refactor"
+            },
+            "G003": {
+              "breaking_evidence_ref": "none",
+              "type": "test"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 101.774222666
+        },
+        "bounded-text": {
+          "stop": "completed",
+          "content": {
+            "G001": {
+              "scope": "docs",
+              "summary": "Issue #167 Phase1の構造経路を実装し、検証済み。"
+            },
+            "G002": {
+              "scope": "internal/git_api",
+              "summary": "Collect関数をロック機構と分離し、ファイルファーストリプレイに対応。"
+            },
+            "G003": {
+              "scope": "internal/git_api",
+              "summary": "ファイルファーストリプレイの完全なテストスイートを追加。"
+            }
+          },
+          "backend_error": "",
+          "wall_seconds": 69.877374709
+        }
+      },
+      "wall_seconds": 285.577458417
+    }
+  ]
+}

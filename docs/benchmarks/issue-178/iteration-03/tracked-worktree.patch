@@ -1,0 +1,313 @@
+diff --git a/README.md b/README.md
+index cd994924..31fa078f 100644
+--- a/README.md
++++ b/README.md
+@@ -37,7 +37,7 @@ A normal run follows this flow:
+ 1. Validate the repository, branch, HEAD, index, conflicts, and in-progress Git operations.
+ 2. Collect staged, unstaged, and untracked state and determine the target files at file granularity.
+ 3. Classify sensitive paths before reading file contents; automatically exclude clearly sensitive files and ask before reading sensitive candidates.
+-4. Build Git metadata and syntax-aware structural evidence. The three-phase planner uses the smaller of structural evidence and the complete approved raw diff for each supported text file, while preserving analysis on the host. Unsupported text formats fall back to raw diff plus Git metadata.
++4. Build Git metadata and syntax-aware structural evidence. The three-phase planner uses complete approved raw diffs in all phases. Grouping also receives minimal syntax context; Category and Text use finalized groups, raw diffs, Git metadata and available work history, with Text retaining the finalized type. Detailed syntax analysis stays on the host. Unsupported text formats fall back to raw diff plus Git metadata.
+ 5. Ask the configured local model for a commit plan. The default three-phase planner generates membership, type / breaking evidence reference, and scope / summary, with validation at every phase and on the final plan.
+ 6. Validate file assignment and safety rules, then show the plan for approval.
+ 7. Run the approved repository-scoped verification definition and revalidate Git state before creating commits.
+diff --git a/README_ja.md b/README_ja.md
+index 7d454e22..844f954e 100644
+--- a/README_ja.md
++++ b/README_ja.md
+@@ -37,7 +37,7 @@ Git の状態把握、対象ファイルの選定、機密ファイルの判別
+ 1. リポジトリの状態、ブランチ、HEAD、インデックス（ステージングエリア）、コンフリクト、進行中の Git 操作（rebase、merge など）を検証します。
+ 2. staged / unstaged / untracked の状態を収集し、処理対象となるファイルをファイル単位で確定します。
+ 3. ファイル内容を読み取る前にパス情報から機密性を判定します。明らかな機密ファイルは自動で除外され、判断が分かれる候補ファイルについては読み取り前にユーザーへ確認を求めます。
+-4. Git のメタデータと、Tree-sitter による構文構造エビデンス（structural evidence）を抽出します。3段構成では、対応するテキストファイルごとに構文情報と許可済みdiff全文の小さい方を入力へ使用し、構文解析の結果はホスト側に保持します。構文解析に未対応のテキスト形式については、生の diff と Git メタデータへのフォールバックで対応します。
++4. Git のメタデータと、Tree-sitter による構文構造エビデンス（structural evidence）を抽出します。3段構成では、全段階に許可済みdiff全文を渡します。Groupingには最小構造化情報を追加し、Category・Textには確定グループ、diff、Gitメタデータ、取得できた作業履歴を渡します。Textには確定typeと出力条件も渡し、詳細な構文解析結果はホスト側に保持します。構文解析に未対応のテキスト形式については、生の diff と Git メタデータへのフォールバックで対応します。
+ 5. 設定されたローカルモデルでコミット計画を生成します。既定の3段構成は membership、type / breaking evidence reference、scope / summary の順に生成し、各段階と最終 plan を検証します。
+ 6. ファイルの割り当て妥当性と安全規約を検証した上で、生成された計画を画面に表示してユーザーに承認を求めます。
+ 7. 承認済みのリポジトリ単位の検証処理（verification）を実行し、コミット作成直前に Git の状態を再検証します。
+diff --git a/internal/cli/candidate_source.go b/internal/cli/candidate_source.go
+deleted file mode 100644
+index 072e6ba1..00000000
+--- a/internal/cli/candidate_source.go
++++ /dev/null
+@@ -1,38 +0,0 @@
+-package cli
+-
+-import (
+-	"encoding/json"
+-
+-	"github.com/natsuki0413/commiter-cli/internal/contextinput"
+-	"github.com/natsuki0413/commiter-cli/internal/syntax"
+-)
+-
+-// candidateSourceProjection chooses an existing input representation per file.
+-// It never truncates the approved diff. Syntax results and relation extraction
+-// remain host-side; the projection changes only the Three-phase model input.
+-func candidateSourceProjection(document contextinput.Document) (contextinput.Document, error) {
+-	projected := document
+-	projected.Files = append([]contextinput.File(nil), document.Files...)
+-	for i, file := range document.Files {
+-		if file.Mode != syntax.ModeStructural || file.Binary || file.Opaque || file.GroupingRawDiff == "" {
+-			continue
+-		}
+-		raw := file
+-		raw.Mode = syntax.ModeRawDiff
+-		raw.RawDiff = file.GroupingRawDiff
+-		raw.Evidence = nil
+-		raw.EvidenceReduction = nil
+-		structuralJSON, err := json.Marshal(file)
+-		if err != nil {
+-			return contextinput.Document{}, err
+-		}
+-		rawJSON, err := json.Marshal(raw)
+-		if err != nil {
+-			return contextinput.Document{}, err
+-		}
+-		if len(rawJSON) < len(structuralJSON) {
+-			projected.Files[i] = raw
+-		}
+-	}
+-	return projected, nil
+-}
+diff --git a/internal/cli/candidate_source_test.go b/internal/cli/candidate_source_test.go
+deleted file mode 100644
+index 6af2b9c5..00000000
+--- a/internal/cli/candidate_source_test.go
++++ /dev/null
+@@ -1,54 +0,0 @@
+-package cli
+-
+-import (
+-	"encoding/json"
+-	"reflect"
+-	"strings"
+-	"testing"
+-
+-	"github.com/natsuki0413/commiter-cli/internal/contextinput"
+-	"github.com/natsuki0413/commiter-cli/internal/syntax"
+-)
+-
+-func TestCandidateSourceProjectionRetainsCompleteDiffAndHostEvidence(t *testing.T) {
+-	source := "package example\n" + strings.Repeat("// unchanged comment\n", 40) + "func Added() int { return 1 }\n"
+-	analysis := syntax.Analyze(syntax.Input{Language: "go", Content: []byte(source), Hunks: []syntax.Hunk{{StartLine: 1, EndLine: 42}}})
+-	if analysis.Mode != syntax.ModeStructural || len(analysis.Evidence) == 0 {
+-		t.Fatal("fixture must produce structural evidence")
+-	}
+-	// A whole added file includes every source line, not just a purpose hint.
+-	diff := "@@ -0,0 +1,42 @@\n+" + strings.ReplaceAll(strings.TrimSuffix(source, "\n"), "\n", "\n+") + "\n"
+-	path := "added.go"
+-	original := contextinput.Document{Files: []contextinput.File{{ID: "F001", NewPath: &path, ChangeHash: "identity", Mode: syntax.ModeStructural, Evidence: analysis.Evidence, GroupingRawDiff: diff, GroupingSyntaxContext: []syntax.MinimalContext{{HunkIndex: 0, EnclosingDeclaration: "Added"}}}}}
+-	before, _ := json.Marshal(original)
+-	projected, err := candidateSourceProjection(original)
+-	if err != nil {
+-		t.Fatal(err)
+-	}
+-	file := projected.Files[0]
+-	if file.Mode != syntax.ModeRawDiff || file.RawDiff != diff || file.GroupingRawDiff != diff || len(file.Evidence) != 0 || file.ID != "F001" || file.ChangeHash != "identity" || !reflect.DeepEqual(file.GroupingSyntaxContext, original.Files[0].GroupingSyntaxContext) {
+-		t.Fatal("approved source or identity lost")
+-	}
+-	after, _ := json.Marshal(original)
+-	if string(before) != string(after) || len(original.Files[0].Evidence) != len(analysis.Evidence) {
+-		t.Fatal("host evidence mutated")
+-	}
+-}
+-
+-func TestCandidateSourceProjectionKeepsSmallerEvidenceAndOpaqueBoundary(t *testing.T) {
+-	path := "large.go"
+-	evidence := []syntax.Evidence{{Kind: "function_declaration", Name: "Changed"}}
+-	original := contextinput.Document{Files: []contextinput.File{
+-		{ID: "F001", NewPath: &path, Mode: syntax.ModeStructural, Evidence: evidence, GroupingRawDiff: strings.Repeat("+changed source\n", 200)},
+-		{ID: "F002", Mode: syntax.ModeMetadataOnly, Opaque: true},
+-		{ID: "F003", Mode: syntax.ModeMetadataOnly, Binary: true},
+-		{ID: "F004", Mode: syntax.ModeStructural, Evidence: evidence},
+-	}}
+-	projected, err := candidateSourceProjection(original)
+-	if err != nil {
+-		t.Fatal(err)
+-	}
+-	if !reflect.DeepEqual(projected, original) {
+-		t.Fatal("existing compact/metadata-only representation changed")
+-	}
+-}
+diff --git a/internal/cli/grouping_context_test.go b/internal/cli/grouping_context_test.go
+index fc77e8cd..9947c2d7 100644
+--- a/internal/cli/grouping_context_test.go
++++ b/internal/cli/grouping_context_test.go
+@@ -93,7 +93,11 @@ func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
+ 			if err := attachGroupingSyntaxContext(context.Background(), root, &document, sources); err != nil {
+ 				t.Fatal(err)
+ 			}
+-			prepared, err := contextinput.Prepare(context.Background(), document, contextinput.BudgetConfig{Context: "16k"}, planning.Renderer(planning.English), nil)
++			document, err = contextinput.RawDiffProjection(document)
++			if err != nil {
++				t.Fatal(err)
++			}
++			prepared, err := contextinput.Prepare(context.Background(), document, contextinput.BudgetConfig{RequireUncompressed: true, Context: "16k"}, planning.Renderer(planning.English), nil)
+ 			if err != nil {
+ 				t.Fatal(err)
+ 			}
+@@ -133,6 +137,24 @@ func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
+ 			} else if len(input.Files[0].SyntaxContext) != 1 || input.Files[0].SyntaxContext[0].EnclosingDeclaration != "Value" {
+ 				t.Fatalf("context lost: %+v", input.Files[0])
+ 			}
++			for phase := 1; phase <= 2; phase++ {
++				var metadata struct {
++					Groups []struct {
++						Files []contextinput.File `json:"files"`
++						Type  string              `json:"type"`
++					} `json:"groups"`
++				}
++				if err := json.Unmarshal([]byte(client.messages[phase][1].Content), &metadata); err != nil {
++					t.Fatal(err)
++				}
++				file := metadata.Groups[0].Files[0]
++				if file.Mode != "raw_diff" || file.RawDiff != document.Files[0].GroupingRawDiff || len(file.Evidence) != 0 || strings.Contains(client.messages[phase][1].Content, `"syntax_context"`) {
++					t.Fatalf("phase %d violated raw-diff contract", phase)
++				}
++				if phase == 2 && metadata.Groups[0].Type != "fix" {
++					t.Fatal("Text lost finalized category")
++				}
++			}
+ 			final, err := gitstate.Collect(root, gitstate.Options{})
+ 			if err != nil {
+ 				t.Fatal(err)
+diff --git a/internal/cli/issue175_evaluation_test.go b/internal/cli/issue175_evaluation_test.go
+index cdc33dce..c54b3203 100644
+--- a/internal/cli/issue175_evaluation_test.go
++++ b/internal/cli/issue175_evaluation_test.go
+@@ -103,7 +103,7 @@ func TestIssue175Evaluation(t *testing.T) {
+ 			t.Fatal(err)
+ 		}
+ 		hostDocument := document
+-		document, err = candidateSourceProjection(document)
++		document, err = contextinput.RawDiffProjection(document)
+ 		if err != nil {
+ 			t.Fatal(err)
+ 		}
+diff --git a/internal/cli/planning.go b/internal/cli/planning.go
+index dab19414..56ca79b0 100644
+--- a/internal/cli/planning.go
++++ b/internal/cli/planning.go
+@@ -65,7 +65,7 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
+ 		if err := attachGroupingSyntaxContext(ctx, root, &document, relationFiles); err != nil {
+ 			return planning.Plan{}, err
+ 		}
+-		document, err = candidateSourceProjection(document)
++		document, err = contextinput.RawDiffProjection(document)
+ 		if err != nil {
+ 			return planning.Plan{}, err
+ 		}
+diff --git a/internal/contextinput/input.go b/internal/contextinput/input.go
+index 8ccf56d7..2593b628 100644
+--- a/internal/contextinput/input.go
++++ b/internal/contextinput/input.go
+@@ -42,8 +42,9 @@ type File struct {
+ 	EvidenceReduction *EvidenceReduction `json:"evidence_reduction,omitempty"`
+ 	RawDiff           string             `json:"raw_diff,omitempty"`
+ 	Summary           string             `json:"summary,omitempty"`
+-	// Host-only sources for Three-phase Stage 1. Category/Text and single-pass
+-	// serialization retain the original structural/raw_diff contract.
++	// Host-only sources for Grouping. Three-phase serializes complete raw
++	// diffs in all phases and adds minimal syntax context only to Grouping.
++	// Single-pass retains its original structural/raw_diff contract.
+ 	GroupingRawDiff       string                  `json:"-"`
+ 	GroupingSyntaxContext []syntax.MinimalContext `json:"-"`
+ 	summaryLines          []summaryLine
+diff --git a/internal/planning/grouping_input.go b/internal/planning/grouping_input.go
+index 483ecef9..9aa50c1e 100644
+--- a/internal/planning/grouping_input.go
++++ b/internal/planning/grouping_input.go
+@@ -7,7 +7,8 @@ import (
+ )
+ 
+ // groupingFile contains only the LLM projection, never Git identities or AST
+-// coordinates. Original files still supply Category/Text and validation.
++// coordinates. Category/Text use raw diffs and Git metadata without syntax
++// context; original Git identities remain available to host validation.
+ type groupingFile struct {
+ 	ID            string                  `json:"id"`
+ 	Status        string                  `json:"status"`
+diff --git a/internal/planning/grouping_input_test.go b/internal/planning/grouping_input_test.go
+index 3678516f..5e6792af 100644
+--- a/internal/planning/grouping_input_test.go
++++ b/internal/planning/grouping_input_test.go
+@@ -11,7 +11,7 @@ import (
+ 	"github.com/natsuki0413/commiter-cli/internal/syntax"
+ )
+ 
+-func TestThreePhaseProjectsOnlyGroupingAndPreservesOriginalInput(t *testing.T) {
++func TestThreePhaseUsesRawDiffInAllPhasesAndPreservesHostInput(t *testing.T) {
+ 	p := candidatePrepared(t)
+ 	file := &p.Document.Files[0]
+ 	identity, mode := "host-identity", "100644"
+@@ -61,7 +61,7 @@ func TestThreePhaseProjectsOnlyGroupingAndPreservesOriginalInput(t *testing.T) {
+ 			t.Fatal(err)
+ 		}
+ 		originalFile := metadata.Groups[0].Files[1]
+-		if originalFile.Mode != syntax.ModeStructural || originalFile.RawDiff != "" || originalFile.HeadIdentity == nil || *originalFile.HeadIdentity != identity || !reflect.DeepEqual(originalFile.Evidence, file.Evidence) {
++		if originalFile.Mode != syntax.ModeRawDiff || originalFile.RawDiff != file.GroupingRawDiff || originalFile.HeadIdentity == nil || *originalFile.HeadIdentity != identity || len(originalFile.Evidence) != 0 {
+ 			t.Fatalf("phase %d lost original data: %+v", phase, originalFile)
+ 		}
+ 		if strings.Contains(c.messages[phase][1].Content, `"syntax_context"`) {
+diff --git a/internal/planning/three_phase.go b/internal/planning/three_phase.go
+index aa893c63..72476c7b 100644
+--- a/internal/planning/three_phase.go
++++ b/internal/planning/three_phase.go
+@@ -100,7 +100,14 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
+ 	if err := json.Unmarshal(prepared.Prompt, &original); err != nil {
+ 		return result, errors.New("invalid candidate input")
+ 	}
+-	files := append([]contextinput.File(nil), prepared.Document.Files...)
++	// All phases use complete diffs; only Grouping adds minimal syntax context.
++	// Normalize here as well as before Prepare so alternate callers cannot
++	// reintroduce the legacy detailed-evidence representation.
++	projected, err := contextinput.RawDiffProjection(prepared.Document)
++	if err != nil {
++		return result, err
++	}
++	files := projected.Files
+ 	sort.Slice(files, func(i, j int) bool {
+ 		pi, pj := candidatePath(files[i]), candidatePath(files[j])
+ 		ti, tj := strings.HasSuffix(pi, "_test.go"), strings.HasSuffix(pj, "_test.go")
+diff --git a/internal/planning/three_phase_test.go b/internal/planning/three_phase_test.go
+index 49a4a393..e92c7de1 100644
+--- a/internal/planning/three_phase_test.go
++++ b/internal/planning/three_phase_test.go
+@@ -89,7 +89,7 @@ func TestThreePhaseRestoresIDsAndUsesSharedBoundedProfiles(t *testing.T) {
+ 		t.Fatal("generated category fed back into text phase")
+ 	}
+ }
+-func TestThreePhaseScalesGroupingContextWithinConfiguredCeiling(t *testing.T) {
++func TestThreePhaseScalesRawDiffContextWithinConfiguredCeiling(t *testing.T) {
+ 	p := candidatePrepared(t)
+ 	p.Budget.ContextTokens = contextinput.Context32K
+ 	p.Document.Files[0].GroupingRawDiff = strings.Repeat("+ some changed code\n", 1000)
+@@ -98,7 +98,7 @@ func TestThreePhaseScalesGroupingContextWithinConfiguredCeiling(t *testing.T) {
+ 	if err != nil || result.Calls != 3 {
+ 		t.Fatalf("adaptive grouping: result=%+v err=%v", result, err)
+ 	}
+-	for i, expected := range []int{contextinput.Context32K, contextinput.Context16K, contextinput.Context16K} {
++	for i, expected := range []int{contextinput.Context32K, contextinput.Context32K, contextinput.Context32K} {
+ 		if c.options[i].ContextTokens != expected {
+ 			t.Fatalf("phase %d context=%d, want %d", i, c.options[i].ContextTokens, expected)
+ 		}
+diff --git a/tools/benchmark146/metadata.go b/tools/benchmark146/metadata.go
+index 7e763fd7..60e7dc47 100644
+--- a/tools/benchmark146/metadata.go
++++ b/tools/benchmark146/metadata.go
+@@ -152,11 +152,15 @@ func finalMetadata(ctx context.Context, f fixture, p partition, backend llm.Opti
+ 	if p.Reason != "" || len(p.Unknown) > 0 || !complete(idsFor(f.Graph), p.Groups) {
+ 		return planning.Plan{}, nil, "global_grouping_not_final"
+ 	}
++	projected, err := contextinput.RawDiffProjection(contextinput.Document{Files: f.Files})
++	if err != nil {
++		return planning.Plan{}, nil, "metadata_source_contract"
++	}
+ 	templates, err := metadataTemplates()
+ 	if err != nil {
+ 		return planning.Plan{}, nil, "metadata_template_contract"
+ 	}
+-	files := append([]contextinput.File(nil), f.Files...)
++	files := projected.Files
+ 	sort.Slice(files, func(i, j int) bool {
+ 		pi, pj := *files[i].NewPath, *files[j].NewPath
+ 		ti, tj := strings.HasSuffix(pi, "_test.go"), strings.HasSuffix(pj, "_test.go")
