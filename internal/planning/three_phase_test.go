@@ -89,7 +89,7 @@ func TestThreePhaseRestoresIDsAndUsesSharedBoundedProfiles(t *testing.T) {
 		t.Fatal("generated category fed back into text phase")
 	}
 }
-func TestThreePhaseScalesGroupingContextWithinConfiguredCeiling(t *testing.T) {
+func TestThreePhaseScalesRawDiffContextWithinConfiguredCeiling(t *testing.T) {
 	p := candidatePrepared(t)
 	p.Budget.ContextTokens = contextinput.Context32K
 	p.Document.Files[0].GroupingRawDiff = strings.Repeat("+ some changed code\n", 1000)
@@ -98,7 +98,7 @@ func TestThreePhaseScalesGroupingContextWithinConfiguredCeiling(t *testing.T) {
 	if err != nil || result.Calls != 3 {
 		t.Fatalf("adaptive grouping: result=%+v err=%v", result, err)
 	}
-	for i, expected := range []int{contextinput.Context32K, contextinput.Context16K, contextinput.Context16K} {
+	for i, expected := range []int{contextinput.Context32K, contextinput.Context32K, contextinput.Context32K} {
 		if c.options[i].ContextTokens != expected {
 			t.Fatalf("phase %d context=%d, want %d", i, c.options[i].ContextTokens, expected)
 		}

@@ -65,7 +65,7 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 		if err := attachGroupingSyntaxContext(ctx, root, &document, relationFiles); err != nil {
 			return planning.Plan{}, err
 		}
-		document, err = candidateSourceProjection(document)
+		document, err = contextinput.RawDiffProjection(document)
 		if err != nil {
 			return planning.Plan{}, err
 		}

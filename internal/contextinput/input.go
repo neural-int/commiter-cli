@@ -42,8 +42,9 @@ type File struct {
 	EvidenceReduction *EvidenceReduction `json:"evidence_reduction,omitempty"`
 	RawDiff           string             `json:"raw_diff,omitempty"`
 	Summary           string             `json:"summary,omitempty"`
-	// Host-only sources for Three-phase Stage 1. Category/Text and single-pass
-	// serialization retain the original structural/raw_diff contract.
+	// Host-only sources for Grouping. Three-phase serializes complete raw
+	// diffs in all phases and adds minimal syntax context only to Grouping.
+	// Single-pass retains its original structural/raw_diff contract.
 	GroupingRawDiff       string                  `json:"-"`
 	GroupingSyntaxContext []syntax.MinimalContext `json:"-"`
 	summaryLines          []summaryLine

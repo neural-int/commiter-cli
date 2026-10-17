@@ -103,7 +103,7 @@ func TestIssue175Evaluation(t *testing.T) {
 			t.Fatal(err)
 		}
 		hostDocument := document
-		document, err = candidateSourceProjection(document)
+		document, err = contextinput.RawDiffProjection(document)
 		if err != nil {
 			t.Fatal(err)
 		}

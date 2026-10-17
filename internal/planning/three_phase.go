@@ -100,7 +100,14 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 	if err := json.Unmarshal(prepared.Prompt, &original); err != nil {
 		return result, errors.New("invalid candidate input")
 	}
-	files := append([]contextinput.File(nil), prepared.Document.Files...)
+	// All phases use complete diffs; only Grouping adds minimal syntax context.
+	// Normalize here as well as before Prepare so alternate callers cannot
+	// reintroduce the legacy detailed-evidence representation.
+	projected, err := contextinput.RawDiffProjection(prepared.Document)
+	if err != nil {
+		return result, err
+	}
+	files := projected.Files
 	sort.Slice(files, func(i, j int) bool {
 		pi, pj := candidatePath(files[i]), candidatePath(files[j])
 		ti, tj := strings.HasSuffix(pi, "_test.go"), strings.HasSuffix(pj, "_test.go")

@@ -152,11 +152,15 @@ func finalMetadata(ctx context.Context, f fixture, p partition, backend llm.Opti
 	if p.Reason != "" || len(p.Unknown) > 0 || !complete(idsFor(f.Graph), p.Groups) {
 		return planning.Plan{}, nil, "global_grouping_not_final"
 	}
+	projected, err := contextinput.RawDiffProjection(contextinput.Document{Files: f.Files})
+	if err != nil {
+		return planning.Plan{}, nil, "metadata_source_contract"
+	}
 	templates, err := metadataTemplates()
 	if err != nil {
 		return planning.Plan{}, nil, "metadata_template_contract"
 	}
-	files := append([]contextinput.File(nil), f.Files...)
+	files := projected.Files
 	sort.Slice(files, func(i, j int) bool {
 		pi, pj := *files[i].NewPath, *files[j].NewPath
 		ti, tj := strings.HasSuffix(pi, "_test.go"), strings.HasSuffix(pj, "_test.go")
