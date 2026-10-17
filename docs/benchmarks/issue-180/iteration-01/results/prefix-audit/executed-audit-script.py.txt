@@ -1,0 +1,31 @@
+"""Prepare the actual fixed model input without sampling any output token."""
+import argparse, hashlib, json, pathlib, subprocess
+
+def main():
+    p=argparse.ArgumentParser();p.add_argument('--helper',type=pathlib.Path,required=True);p.add_argument('--model-path',required=True);p.add_argument('--capture',type=pathlib.Path,required=True);p.add_argument('--out',type=pathlib.Path,required=True);a=p.parse_args()
+    a.out.mkdir(exist_ok=False)
+    rows=[]
+    for cid in ['C01','C02']:
+        reqs=[]
+        for n in ['02','03']:
+            req=json.loads((a.capture/cid/f'{n}-request.json').read_text());req['model_path']=a.model_path;reqs.append(req)
+        wire=''.join(json.dumps(r,ensure_ascii=False)+'\n' for r in reqs)
+        result=subprocess.run([str(a.helper),'--benchmark-token-audit'],input=wire,text=True,capture_output=True)
+        (a.out/f'{cid}-stdout.jsonl').write_text(result.stdout);(a.out/f'{cid}-stderr.log').write_text(result.stderr)
+        if result.returncode:raise RuntimeError('audit helper failed')
+        responses=[json.loads(line) for line in result.stdout.splitlines()]
+        if len(responses)!=2 or not all(r['ok'] for r in responses):raise RuntimeError('incomplete audit')
+        tokens=[json.loads(r['generated_json'])['token_ids'] for r in responses]
+        common=0
+        for x,y in zip(*tokens):
+            if x!=y:break
+            common+=1
+        rows.append({'case':cid,'messages_shared':reqs[0]['messages'][:2]==reqs[1]['messages'][:2],
+            'input_tokens':[len(t) for t in tokens],'longest_common_prefix_tokens':common,
+            'first_token_ids':[t[:12] for t in tokens],
+            'rendered_tokens_sha256':[hashlib.sha256(json.dumps(t).encode()).hexdigest() for t in tokens],
+            'shared_facts_cache_eligible':common>256,
+            'eligibility_rule':'must include shared facts, not just the model template header; LCP<=256 is ineligible',
+            'model_generation_calls':0})
+    (a.out/'prefix-audit.json').write_text(json.dumps(rows,indent=2)+'\n');print(json.dumps(rows,indent=2))
+if __name__=='__main__':main()
