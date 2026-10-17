@@ -128,6 +128,7 @@ private struct Response: Encodable {
     let runtime: String?
     let errorClass: String?
     var generationProfile: String? = nil
+    var benchmarkMetrics: BenchmarkMetrics? = nil
 
     enum CodingKeys: String, CodingKey {
         case ok
@@ -137,6 +138,7 @@ private struct Response: Encodable {
         case runtime
         case errorClass = "error_class"
         case generationProfile = "generation_profile"
+        case benchmarkMetrics = "benchmark_metrics"
     }
 }
 
@@ -156,6 +158,34 @@ private final class OutputBox: @unchecked Sendable {
     var value = ""
 }
 
+// Explicit research entry points only; normal one-shot protocol stays unchanged.
+private final class BenchmarkState: @unchecked Sendable {
+    var container: ModelContainer?
+    var modelPath: String?
+    var modelID: String?
+    let retainModel: Bool
+    let auditOnly: Bool
+    var metrics = BenchmarkMetrics()
+    init(retainModel: Bool, auditOnly: Bool) {
+        self.retainModel = retainModel
+        self.auditOnly = auditOnly
+    }
+}
+private struct BenchmarkMetrics: Encodable {
+    var loadSeconds = 0.0
+    var prepareSeconds = 0.0
+    var grammarSetupSeconds = 0.0
+    var generationWallSeconds = 0.0
+    var runtimePromptSeconds: Double?
+    var runtimeGenerationSeconds: Double?
+    var inputTokens = 0
+    var generatedTokens: Int?
+    var cacheReusedTokens = 0
+    var modelReused = false
+    var activeMemoryBytes = 0
+    var peakMemoryBytes = 0
+}
+
 @main
 struct CommiterMLXHelper {
     static func main() async {
@@ -167,6 +197,11 @@ struct CommiterMLXHelper {
             }
             guard ready else { exit(1) }
             FileHandle.standardOutput.write(Data("metal_ok\n".utf8))
+            return
+        }
+        if CommandLine.arguments.count == 2,
+           ["--benchmark-single", "--benchmark-cycle", "--benchmark-token-audit"].contains(CommandLine.arguments[1]) {
+            await benchmarkMain(mode: CommandLine.arguments[1])
             return
         }
         do {
@@ -217,7 +252,7 @@ struct CommiterMLXHelper {
         }
     }
 
-    private static func handle(_ request: Request) async throws -> Response {
+    private static func handle(_ request: Request, benchmark: BenchmarkState? = nil) async throws -> Response {
         guard let modelPath = request.modelPath?.trimmingCharacters(in: .whitespacesAndNewlines),
               !modelPath.isEmpty,
               isModelDirectory(modelPath) else {
@@ -245,15 +280,29 @@ struct CommiterMLXHelper {
         do {
             try Task.checkCancellation()
             let modelDirectory = URL(fileURLWithPath: modelPath, isDirectory: true)
-            let container = try await loadModelContainer(
-                from: modelDirectory,
-                using: #huggingFaceTokenizerLoader())
+            let loadStart = ProcessInfo.processInfo.systemUptime
+            let container: ModelContainer
+            if let retained = benchmark?.container {
+                guard benchmark?.modelPath == modelPath, benchmark?.modelID == modelID else {
+                    throw HelperError.malformedRequest
+                }
+                container = retained
+                benchmark?.metrics.modelReused = true
+            } else {
+                container = try await loadModelContainer(from: modelDirectory, using: #huggingFaceTokenizerLoader())
+                if benchmark?.retainModel == true {
+                    benchmark?.container = container
+                    benchmark?.modelPath = modelPath
+                    benchmark?.modelID = modelID
+                }
+            }
+            benchmark?.metrics.loadSeconds = ProcessInfo.processInfo.systemUptime - loadStart
             let outputBox = OutputBox()
             let generated = try await container.perform { context in
                 try Task.checkCancellation()
                 let chat = messages.map { Chat.Message(role: $0.role, content: $0.content) }
                 if let profile = request.generationProfile {
-                    return try await generateBounded(request, profile: profile, schema: schema, context: context)
+                    return try await generateBounded(request, profile: profile, schema: schema, context: context, benchmark: benchmark)
                 }
                 let grammarVocab = TokenizerVocabExtractor.extractForGrammar(from: context.tokenizer)
                 let grammarTokenizer = try GrammarTokenizer(
@@ -304,7 +353,8 @@ struct CommiterMLXHelper {
                 model: modelID,
                 runtime: "mlx",
                 errorClass: nil,
-                generationProfile: request.generationProfile
+                generationProfile: request.generationProfile,
+                benchmarkMetrics: benchmark?.metrics
             )
         } catch {
             let reason = classify(error)
@@ -314,16 +364,25 @@ struct CommiterMLXHelper {
                 generatedJSON: nil,
                 model: modelID,
                 runtime: "mlx",
-                errorClass: classifyError(error)
+                errorClass: classifyError(error),
+                benchmarkMetrics: benchmark?.metrics
             )
         }
     }
 
-    private static func generateBounded(_ request: Request, profile: String, schema: String, context: ModelContext) async throws -> String {
+    private static func generateBounded(_ request: Request, profile: String, schema: String, context: ModelContext, benchmark: BenchmarkState? = nil) async throws -> String {
         let nativeLimit = profile == "bounded-grouping" ? 512 : (profile == "bounded-category" ? 384 : 0)
         let budget = request.outputTokens // Validated by handle before model loading.
         let chat = request.messages.map { Chat.Message(role: $0.role, content: $0.content) }
+        let prepareStart = ProcessInfo.processInfo.systemUptime
         let input = try await context.processor.prepare(input: UserInput(chat: chat, additionalContext: ["enable_thinking": nativeLimit > 0]))
+        benchmark?.metrics.prepareSeconds = ProcessInfo.processInfo.systemUptime - prepareStart
+        benchmark?.metrics.inputTokens = input.text.tokens.size
+        if benchmark?.auditOnly == true {
+            let data = try JSONSerialization.data(withJSONObject: ["token_ids": input.text.tokens.asArray(Int.self), "enable_thinking": nativeLimit > 0], options: [.sortedKeys])
+            return String(decoding: data, as: UTF8.self)
+        }
+        let grammarStart = ProcessInfo.processInfo.systemUptime
         do { try TokenBudget.validate(context: request.contextTokens, prompt: input.text.tokens.size, output: budget) }
         catch { throw HelperError.inputTooLarge }
         let components: GenerationComponents
@@ -358,6 +417,8 @@ struct CommiterMLXHelper {
                 Memory.clearCache()
             }
         }
+        benchmark?.metrics.grammarSetupSeconds = ProcessInfo.processInfo.systemUptime - grammarStart
+        let generationStart = ProcessInfo.processInfo.systemUptime
         let stream = try generate(input: input,
             parameters: parameters,
             context: context, components: components)
@@ -368,6 +429,9 @@ struct CommiterMLXHelper {
             switch event {
             case .chunk(let chunk): output += chunk
             case .info(let info):
+                benchmark?.metrics.runtimePromptSeconds = info.promptTime
+                benchmark?.metrics.runtimeGenerationSeconds = info.generateTime
+                benchmark?.metrics.generatedTokens = info.generationTokenCount
                 switch info.stopReason {
                 case .stop: completed = true
                 case .length: throw HelperError.maxTokens
@@ -377,6 +441,9 @@ struct CommiterMLXHelper {
             }
             guard output.utf8.count <= maxResponseBytes else { throw HelperError.responseTooLarge }
         }
+        benchmark?.metrics.generationWallSeconds = ProcessInfo.processInfo.systemUptime - generationStart
+        benchmark?.metrics.activeMemoryBytes = Memory.activeMemory
+        benchmark?.metrics.peakMemoryBytes = Memory.peakMemory
         guard completed else { throw HelperError.cancelled }
         if let nativeState, !nativeState.succeeded {
             FileHandle.standardError.write(Data("candidate_native_failure code=\(nativeState.diagnostic)\n".utf8))
@@ -390,6 +457,31 @@ struct CommiterMLXHelper {
         catch {
             FileHandle.standardError.write(Data("candidate_final_json_invalid native=\(nativeLimit > 0)\n".utf8))
             throw HelperError.grammarFailure
+        }
+    }
+
+    private static func benchmarkMain(mode: String) async {
+        let audit = mode == "--benchmark-token-audit"
+        let state = BenchmarkState(retainModel: mode != "--benchmark-single", auditOnly: audit)
+        let reader = BenchmarkLineReader(handle: .standardInput, maximumBytes: maxRequestBytes)
+        let profiles = audit ? ["bounded-category", "bounded-text"] : ["bounded-grouping", "bounded-category", "bounded-text"]
+        var count = 0
+        do {
+            while let data = try reader.next() {
+                guard count < profiles.count else { throw HelperError.trailingInput }
+                let request = try decodeRequest(data)
+                if mode != "--benchmark-single" {
+                    guard request.generationProfile == profiles[count] else { throw HelperError.malformedRequest }
+                }
+                state.metrics = BenchmarkMetrics()
+                let response = try await handle(request, benchmark: state)
+                try writeResponse(response)
+                count += 1
+                if !response.ok || mode == "--benchmark-single" || count == profiles.count { return }
+            }
+        } catch {
+            try? writeResponse(Response(ok: false, stopReason: classify(error), generatedJSON: nil,
+                model: nil, runtime: "mlx", errorClass: classifyError(error)))
         }
     }
 
