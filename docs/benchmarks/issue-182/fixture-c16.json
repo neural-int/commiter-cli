@@ -1,0 +1,113 @@
+{
+  "case_id": "C16",
+  "data_classification": "authored_synthetic_public_fixture",
+  "reference_human_approved": false,
+  "groups": [
+    {
+      "files": [
+        "expiry/expired.go",
+        "expiry/expired_test.go",
+        "expiry/README.md",
+        "expiry/examples.json"
+      ],
+      "type": "fix",
+      "purpose": "有効期限と同時刻のキャッシュを期限切れにする",
+      "breaking": false
+    },
+    {
+      "files": [
+        "pagination/limit.go",
+        "pagination/limit_test.go",
+        "pagination/README.md",
+        "pagination/examples.json"
+      ],
+      "type": "fix",
+      "purpose": "ページ件数を上限に制限する",
+      "breaking": false
+    },
+    {
+      "files": [
+        "retry/canretry.go",
+        "retry/canretry_test.go",
+        "retry/README.md",
+        "retry/examples.json"
+      ],
+      "type": "fix",
+      "purpose": "最大試行回数に達した再試行を停止する",
+      "breaking": false
+    },
+    {
+      "files": [
+        "httpstatus/issuccess.go",
+        "httpstatus/issuccess_test.go",
+        "httpstatus/README.md",
+        "httpstatus/examples.json"
+      ],
+      "type": "fix",
+      "purpose": "HTTP 300を成功扱いしない",
+      "breaking": false
+    }
+  ],
+  "codex_context": [
+    {
+      "paths": [
+        "expiry/expired.go",
+        "expiry/expired_test.go",
+        "expiry/README.md",
+        "expiry/examples.json"
+      ],
+      "user_request": "有効期限と同時刻のキャッシュを期限切れにする。実装・境界テスト・説明・例を一緒に更新する。",
+      "final_response": "対応する境界条件とテスト・説明・例を修正した。"
+    },
+    {
+      "paths": [
+        "pagination/limit.go",
+        "pagination/limit_test.go",
+        "pagination/README.md",
+        "pagination/examples.json"
+      ],
+      "user_request": "ページ件数を上限に制限する。実装・境界テスト・説明・例を一緒に更新する。",
+      "final_response": "対応する境界条件とテスト・説明・例を修正した。"
+    },
+    {
+      "paths": [
+        "retry/canretry.go",
+        "retry/canretry_test.go",
+        "retry/README.md",
+        "retry/examples.json"
+      ],
+      "user_request": "最大試行回数に達した再試行を停止する。実装・境界テスト・説明・例を一緒に更新する。",
+      "final_response": "対応する境界条件とテスト・説明・例を修正した。"
+    },
+    {
+      "paths": [
+        "httpstatus/issuccess.go",
+        "httpstatus/issuccess_test.go",
+        "httpstatus/README.md",
+        "httpstatus/examples.json"
+      ],
+      "user_request": "HTTP 300を成功扱いしない。実装・境界テスト・説明・例を一緒に更新する。",
+      "final_response": "対応する境界条件とテスト・説明・例を修正した。"
+    }
+  ],
+  "scoring": "exact file-set commit recall (matched exact groups / 4); category accuracy on exact matched groups; end-to-end validator acceptance; summaries manually reviewed against purpose; no model judge",
+  "limitations": "one simple authored fixture; no held-out set or production-quality claim",
+  "files_sha256": {
+    "expiry/README.md": "8f2f02834ffbab460e7cba941f575d35a6260d794a405456575c3f0ee9a55d1e",
+    "expiry/examples.json": "b407dab1f4ddbd805f3ecc7e997b1ae25d9b9854830c62f11c8181222e205fd9",
+    "expiry/expired.go": "966bc64241a43b0265517c698f895c93e544cccb19dccd57d73e2339ab3b3f77",
+    "expiry/expired_test.go": "a40a8cc4bd31380d781ffbf0b8be16dbdd7623e42aadcc767e167d3b98a18e86",
+    "httpstatus/README.md": "d08962cbbf0f473bec0cba30d1645948dd1859d422cd17b4f490b1a292377f31",
+    "httpstatus/examples.json": "f8a61d92b28107cfc924ec9682ec192efe7a20b9517fe827d789c44f7a471191",
+    "httpstatus/issuccess.go": "3963b980edad1ae6fb6771d9a46ecc50a90d81e32b692f289888bb6616b26d94",
+    "httpstatus/issuccess_test.go": "8e574aa57ee2095e42e8a73ff912aa2ad1b82353746833af08179873db37b203",
+    "pagination/README.md": "4309486899bd2f480c6186bab89e0172464ab034343dcec1bf3f558126d4902e",
+    "pagination/examples.json": "297c3f5ab0e4e395226d3fa640d82865f83c5e98348f3c10c57ab905e6c559dc",
+    "pagination/limit.go": "fc1ee6b373e006128c8aa37965146013087d8717044f98ca48beaf0b6e6b88f0",
+    "pagination/limit_test.go": "68604cec9645e8e0ff8d204afa4eabc88efd80a27fa0ae1f05b6202e70cefca6",
+    "retry/README.md": "bf269c7c5d746b5af961ff75a84ba7f1643b53b23e7a6a8a7a24c2ec515b3e58",
+    "retry/canretry.go": "49f10a14159b81d97c7ef1ab78f9edbadc6c3e09134d64cd749500bd2f493ea8",
+    "retry/canretry_test.go": "d662ed98cd33cc28b1dfa12532daa2a8ba120d6ca40a0e53c01f3e1b0b7d4a29",
+    "retry/examples.json": "5503b9c991715f7bb1257331c6ca8db563967d3378d370a2cab9308a196c72ed"
+  }
+}

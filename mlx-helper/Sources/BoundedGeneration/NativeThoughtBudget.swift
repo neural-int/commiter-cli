@@ -11,7 +11,7 @@ public struct NativeThoughtBudgetStats: Sendable {
 // Bounded transition for explicitly verified model markers. Stores counts, never thought tokens.
 public final class NativeThoughtBudgetState: @unchecked Sendable {
     private let lock = NSLock()
-    private let limit: Int
+    private let limit: Int?
     private let open: Int
     private let close: Int
     private let eos: Int
@@ -26,11 +26,12 @@ public final class NativeThoughtBudgetState: @unchecked Sendable {
     private var responseSamples = 0
     private var firstFailure: String?
 
-    public init(limit: Int, open: Int, close: Int, eos: Int, response: GrammarSamplingState, forceOpen: Bool = false) {
+    public init(limit: Int?, open: Int, close: Int, eos: Int, response: GrammarSamplingState, forceOpen: Bool = false, promptHasOpen: Bool = false) {
+        self.seenOpen = promptHasOpen
         self.limit = limit; self.open = open; self.close = close
         self.eos = eos; self.response = response; self.forceOpen = forceOpen
-        self.failed = limit < 1
-        self.firstFailure = limit < 1 ? "native_invalid_budget" : nil
+        self.failed = limit.map { $0 < 1 } ?? false
+        self.firstFailure = (limit.map { $0 < 1 } ?? false) ? "native_invalid_budget" : nil
     }
     public var succeeded: Bool {
         lock.lock(); defer { lock.unlock() }
@@ -59,7 +60,7 @@ public final class NativeThoughtBudgetState: @unchecked Sendable {
         if failed { return only(eos, count: count) }
         if inResponse { return response.maskValues(count: count) }
         if forceOpen && prefixTokens == 0 { return only(open, count: count) }
-        if prefixTokens >= limit {
+        if let limit, prefixTokens >= limit {
             guard seenOpen else { fail("native_budget_before_open"); return only(eos, count: count) }
             closeScheduled = true
             return only(close, count: count)

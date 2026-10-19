@@ -4,12 +4,35 @@ import MLXGuidedGeneration
 
 @Suite("Bounded native thought transition")
 struct NativeThoughtBudgetTests {
-    func state(forceOpen: Bool = false) throws -> NativeThoughtBudgetState {
+    func state(forceOpen: Bool = false, promptHasOpen: Bool = false) throws -> NativeThoughtBudgetState {
         let tokenizer = try GrammarTokenizer(vocab: ["<|channel>", "thought ", "<channel|>", "{\"candidate_id\":\"C001\"}", "<eos>"], vocabType: .raw, eosTokenId: 4)
         let schema = "{\"type\":\"object\",\"properties\":{\"candidate_id\":{\"type\":\"string\",\"enum\":[\"C001\"]}},\"required\":[\"candidate_id\"],\"additionalProperties\":false}"
         let factory: @Sendable () throws -> GrammarConstraint = { try GrammarConstraint(tokenizer: tokenizer, jsonSchema: schema, fastForward: false) }
         let response = GrammarSamplingState(constraint: try factory(), vocabSize: 5, eos: 4, factory: factory)
-        return NativeThoughtBudgetState(limit: 2, open: 0, close: 2, eos: 4, response: response, forceOpen: forceOpen)
+        return NativeThoughtBudgetState(limit: 2, open: 0, close: 2, eos: 4, response: response, forceOpen: forceOpen, promptHasOpen: promptHasOpen)
+    }
+    @Test func templateOpenedThoughtClosesWithoutAnotherOpenToken() throws {
+        let original = try state(promptHasOpen: true)
+        let copy = original.independentCopy()
+        copy.commit(1); copy.commit(1)
+        #expect(try #require(copy.maskValues(count: 5))[2].isFinite)
+        copy.commit(2); copy.commit(3); copy.commit(4)
+        #expect(copy.succeeded && copy.stats().forcedClose)
+        #expect(!original.succeeded)
+        original.commit(2); original.commit(3); original.commit(4)
+        #expect(original.succeeded && !original.stats().forcedClose)
+    }
+    @Test func unboundedThinkingDoesNotForceClose() throws {
+        let tokenizer = try GrammarTokenizer(vocab: ["<think>", "thought", "</think>", "{}", "<eos>"], vocabType: .raw, eosTokenId: 4)
+        let factory: @Sendable () throws -> GrammarConstraint = { try GrammarConstraint(tokenizer: tokenizer, jsonSchema: "{\"type\":\"object\",\"additionalProperties\":false}", fastForward: false) }
+        let response = GrammarSamplingState(constraint: try factory(), vocabSize: 5, eos: 4, factory: factory)
+        let state = NativeThoughtBudgetState(limit: nil, open: 0, close: 2, eos: 4, response: response, promptHasOpen: true)
+        for _ in 0..<2048 { state.commit(1) }
+        #expect(state.maskValues(count: 5) == nil)
+        let copy = state.independentCopy()
+        copy.commit(2); copy.commit(3); copy.commit(4)
+        #expect(copy.succeeded && !copy.stats().forcedClose)
+        #expect(!state.succeeded)
     }
     @Test func forcesBoundaryThenValidatesResponse() throws {
         let s = try state()
