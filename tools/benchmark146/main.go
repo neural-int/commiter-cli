@@ -59,6 +59,7 @@ type observation struct {
 // window-level type/text would incorrectly make windows commit boundaries.
 type capture struct {
 	Backend llm.OptionsBackend
+	Files   []contextinput.File
 	Truth   map[string]string
 	Metrics []callMetric
 	Groups  [][]string
@@ -73,14 +74,14 @@ func (c *capture) ChatWithOptions(ctx context.Context, m []llm.Message, s json.R
 	if o.GenerationProfile == "bounded-category" {
 		var payload struct {
 			Groups []struct {
-				FileIDs []string `json:"file_ids"`
+				Files []contextinput.File `json:"files"`
 			} `json:"groups"`
 		}
 		if err := json.Unmarshal([]byte(m[1].Content), &payload); err != nil {
 			return llm.Response{}, err
 		}
 		for _, g := range payload.Groups {
-			c.Groups = append(c.Groups, g.FileIDs)
+			c.Groups = append(c.Groups, restoreFileIDs(g.Files, c.Files))
 		}
 		c.Reached = true
 		return llm.Response{}, errors.New("experiment stops before local metadata")
@@ -152,7 +153,7 @@ func local(ctx context.Context, f fixture, w []string, backend llm.OptionsBacken
 			}
 		}
 	}
-	c := &capture{Backend: backend, Truth: truth, Window: w}
+	c := &capture{Backend: backend, Truth: truth, Window: w, Files: d.Files}
 	_, err = (planning.ThreePhaseGenerator{Client: c}).Generate(ctx, p, planning.English, planning.SensitiveValues{})
 	if !c.Reached {
 		return windowResult{}, c.Metrics, err

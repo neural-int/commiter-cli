@@ -46,6 +46,7 @@ func runCollectionCycle(opts options, root string, values config.Values, reader 
 	started := time.Now()
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
+	ctx = context.WithValue(ctx, codexCycleKey{}, &codexCycle{started: started})
 	var approvalWait time.Duration
 	snapshot, err := collectSnapshot(ctx, root, values, opts.pathspecs, func(candidates []gitstate.Candidate) (bool, error) {
 		lines := []string{

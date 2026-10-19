@@ -32,6 +32,8 @@ graph の ID 集合と selected files の ID 集合が一致しない場合は�
 
 metadata の source-first path 順と group の first-seen canonicalization は現行 generator と一致させ、4ファイルの実 request を比較するテストで確認する。
 
+Issue #175 の入力契約変更後は、グループの `file_ids` を LLM に送らず、ハーネス内で `files[].id` の path ID から元の ID を復元する。Text には検証済みの Category の type を渡す。これ以降の再測定は変更後の prompt 契約による結果として扱い、過去の固定 fixture・Gold・測定結果を変更しない。
+
 category / summary の system instruction と schema の prototype は既存 generator の検証済み1ファイル経路から取得し、変更しない。空の host evidence pool は互換性の証明と扱わず、`unresolved` は停止する。packet の duplicate / unknown group ID、未知 field、過長 scope / summary、不正な最終 plan も拒否する。
 
 ## 指標の定義

@@ -7,7 +7,8 @@ import (
 )
 
 // groupingFile contains only the LLM projection, never Git identities or AST
-// coordinates. Original files still supply Category/Text and validation.
+// coordinates. Category/Text use raw diffs and Git metadata without syntax
+// context; original Git identities remain available to host validation.
 type groupingFile struct {
 	ID            string                  `json:"id"`
 	Status        string                  `json:"status"`

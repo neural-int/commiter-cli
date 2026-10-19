@@ -49,15 +49,28 @@ type Counts struct {
 }
 
 type Record struct {
-	SchemaVersion      int       `json:"schema_version"`
-	RecordedAt         time.Time `json:"recorded_at"`
-	Durations          Durations `json:"durations_ns"`
-	Counts             Counts    `json:"counts"`
-	Model              string    `json:"model,omitempty"`
-	Context            string    `json:"context,omitempty"`
-	ContextCeiling     string    `json:"context_ceiling,omitempty"`
-	CompressionProfile string    `json:"compression_profile,omitempty"`
-	Exit               string    `json:"exit"`
+	SchemaVersion       int       `json:"schema_version"`
+	RecordedAt          time.Time `json:"recorded_at"`
+	Durations           Durations `json:"durations_ns"`
+	Counts              Counts    `json:"counts"`
+	Model               string    `json:"model,omitempty"`
+	Context             string    `json:"context,omitempty"`
+	ContextCeiling      string    `json:"context_ceiling,omitempty"`
+	CompressionProfile  string    `json:"compression_profile,omitempty"`
+	Exit                string    `json:"exit"`
+	CodexContextStatus  string    `json:"codex_context_status,omitempty"`
+	CodexContextRecords int       `json:"codex_context_records,omitempty"`
+}
+
+// SetCodexContext records only acquisition outcome/count, never log contents.
+func (r *Recorder) SetCodexContext(status string, records int) {
+	if r == nil {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.record.CodexContextStatus = status
+	r.record.CodexContextRecords = records
 }
 
 type Recorder struct {

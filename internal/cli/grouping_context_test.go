@@ -93,7 +93,11 @@ func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
 			if err := attachGroupingSyntaxContext(context.Background(), root, &document, sources); err != nil {
 				t.Fatal(err)
 			}
-			prepared, err := contextinput.Prepare(context.Background(), document, contextinput.BudgetConfig{Context: "16k"}, planning.Renderer(planning.English), nil)
+			document, err = contextinput.RawDiffProjection(document)
+			if err != nil {
+				t.Fatal(err)
+			}
+			prepared, err := contextinput.Prepare(context.Background(), document, contextinput.BudgetConfig{RequireUncompressed: true, Context: "16k"}, planning.Renderer(planning.English), nil)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -132,6 +136,24 @@ func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
 				}
 			} else if len(input.Files[0].SyntaxContext) != 1 || input.Files[0].SyntaxContext[0].EnclosingDeclaration != "Value" {
 				t.Fatalf("context lost: %+v", input.Files[0])
+			}
+			for phase := 1; phase <= 2; phase++ {
+				var metadata struct {
+					Groups []struct {
+						Files []contextinput.File `json:"files"`
+						Type  string              `json:"type"`
+					} `json:"groups"`
+				}
+				if err := json.Unmarshal([]byte(client.messages[phase][1].Content), &metadata); err != nil {
+					t.Fatal(err)
+				}
+				file := metadata.Groups[0].Files[0]
+				if file.Mode != "raw_diff" || file.RawDiff != document.Files[0].GroupingRawDiff || len(file.Evidence) != 0 || strings.Contains(client.messages[phase][1].Content, `"syntax_context"`) {
+					t.Fatalf("phase %d violated raw-diff contract", phase)
+				}
+				if phase == 2 && metadata.Groups[0].Type != "fix" {
+					t.Fatal("Text lost finalized category")
+				}
 			}
 			final, err := gitstate.Collect(root, gitstate.Options{})
 			if err != nil {
