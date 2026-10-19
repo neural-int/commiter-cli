@@ -12,6 +12,12 @@ directory containing the original `c01-fixture.json` and `c02-fixture.json`.
 Captured requests, responses, logs, and other run artifacts must remain outside
 Git or in CI Artifacts.
 
+The historical repository snapshots can be materialized with
+`prepare.py --out <outside-repo-dir> --fixture-dir <local-only-fixtures> --source-c01 <local-source-checkout> --source-c02 <commiter-cli-checkout>`.
+The original fixtures and repository paths are deliberately not included in
+this repository. The public synthetic context examples do not contain the
+source diffs needed for the historical snapshot preparation.
+
 `native_helper.py` forwards the production helper protocol unchanged and records elapsed time, stop state and child-process maximum RSS on macOS. It does not export thought tokens or helper stderr. RSS is not a GPU/Metal or system memory measurement. Each subprocess uses a cold helper lifecycle matching production. A shared per-cycle 120-second timeout and three calls per cycle are enforced by the generator/adapter. No retry or repair inference is performed.
 
 Example preparation/capture (all paths must be explicit):
