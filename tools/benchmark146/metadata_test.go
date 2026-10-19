@@ -65,7 +65,7 @@ func (b *fixtureBackend) ChatWithOptions(ctx context.Context, m []llm.Message, s
 	answers := map[string]any{}
 	for _, g := range payload.Groups {
 		if o.GenerationProfile == "bounded-category" {
-			b.MetadataGroups = append(b.MetadataGroups, g.FileIDs)
+			b.MetadataGroups = append(b.MetadataGroups, restoreFileIDs(g.Files, b.Fixture.Files))
 			kind := "fix"
 			testOnly := true
 			for _, file := range g.Files {

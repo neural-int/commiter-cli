@@ -1,0 +1,25 @@
+## 要約
+
+Textの文字数超過は、生成時にgrammarを接続していない設計と事後検証の組合せで発生していた。これは#143の選定記録に明記された当初の構成であり、偶発的な接続漏れとは扱わない。#178ではTextにも既存のresponse grammarを接続する候補を実装し、生成後のホスト検証は維持した。scope=docsと意味不一致はこの変更だけで解決したとは扱わない。
+
+## 検証結果
+
+- 保存済みのsummary51>48、scope38>16、scope=docsの3件をThreePhaseGeneratorの実経路に再入力し、対応するinvalid_schema/invalid_scopeと返却commit0を再現した。モデル推論は使っていない。
+- base helperのgenerateBoundedはnativeLimit>0だけでGrammarSamplingStateを生成していた。TextはnativeLimit=0で空のGenerationComponentsのまま生成され、ホストのRuneCountInStringで初めて超過を拒否していた。設計記録の3段目もJSON grammarなし・事後の厳密検証となっている。
+- Text候補では同じGrammarSamplingStateを生成し、GrammarSamplingProcessorを接続し、terminal matcherの成功も検証する。native thoughtなし、出力予算768、temperature0、seed144、停止時のfail-closedは維持する。Grouping/Categoryのnative thoughtとschemaは変更しない。
+- 固定した依存のconverterはmaxLengthを処理する。一方notは未対応keywordとして警告され、patternとmaxLengthの併用では長さ制約を無視する実装だった。そのためscope名を除外するためだけに未対応schemaを追加する変更は行っていない。
+- SwiftのGrammarSamplingTests11件が成功。実際の51文字要約・38文字scopeと、48/49日本語文字・16/17文字scopeの境界を同じnested Text objectで検証した。正しい長さはEOSまで受理され、超過はtoken候補から除外された。
+- Goの全test/vet/buildは成功。既存のsingle-pass・native thought・terminal/copyテストは現行経路に必要なため維持した。追加は保存済み不合格の実経路とText特有の長さ境界に限定し、プロンプト文字列そのものを検査するテストは追加していない。
+- SwiftのXcodeビルド方式はPACKAGE-TARGET:CudaBuild/MLXHuggingFaceMacrosの解決で失敗した。同じPackage.resolvedの標準ビルド方式でテストを実行した。新規依存追加・固定revision変更はない。release buildは別ログへ保存して実行中で、モデル推論はまだ0回。
+
+## 考察
+
+grammarを接続しても、意味の正しさやdocsというscope名の許可は保証されない。既存Validatorは全Conventional Commit typeと同名のscopeを拒否するため、maxLengthだけが満たされても別の不合格が残り得る。出力を切り詰める、scopeを事後置換する、再生成で救済する変更はしない。
+
+今回の単体検証はgrammarが必要な長さ境界を表現できることを示す。実際のモデル生成でmatcherが接続され、予算内で完了して最終Validatorを通ることは実モデル比較で確認する必要がある。既知2ケースの探索的Goldを独立評価・holdout・一般的なproduction品質の証明へ置き換えない。
+
+## Next Steps
+
+- release helperのビルド完了とMetal runtimeを確認し、実行ファイル・ソース・元fixture/Gold・prompt・予算・停止枝を推論前に固定する。別の実行ファイルで計測した結果を取り違えないため。
+- #177の360秒評価条件と同じ2ケース×A/B×1、最大12要求、retry/repair/追加judgeなしで比較する。C02のTextまで到達させ、変更対象である生成時の長さ制約を評価するため。共有360秒は評価用overlayのままとし、本番120秒の採用変更と混同しない。
+- scope名とGrouping/Category/Textの意味不一致は独立に採点する。長さ違反の改善だけを#178全体の成功としないため。

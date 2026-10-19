@@ -89,7 +89,7 @@ func TestThreePhaseRestoresIDsAndUsesSharedBoundedProfiles(t *testing.T) {
 		t.Fatal("generated category fed back into text phase")
 	}
 }
-func TestThreePhaseScalesGroupingContextWithinConfiguredCeiling(t *testing.T) {
+func TestThreePhaseScalesRawDiffContextWithinConfiguredCeiling(t *testing.T) {
 	p := candidatePrepared(t)
 	p.Budget.ContextTokens = contextinput.Context32K
 	p.Document.Files[0].GroupingRawDiff = strings.Repeat("+ some changed code\n", 1000)
@@ -98,7 +98,7 @@ func TestThreePhaseScalesGroupingContextWithinConfiguredCeiling(t *testing.T) {
 	if err != nil || result.Calls != 3 {
 		t.Fatalf("adaptive grouping: result=%+v err=%v", result, err)
 	}
-	for i, expected := range []int{contextinput.Context32K, contextinput.Context16K, contextinput.Context16K} {
+	for i, expected := range []int{contextinput.Context32K, contextinput.Context32K, contextinput.Context32K} {
 		if c.options[i].ContextTokens != expected {
 			t.Fatalf("phase %d context=%d, want %d", i, c.options[i].ContextTokens, expected)
 		}
@@ -204,5 +204,28 @@ func TestThreePhaseDoesNotRetryTransportOrLeakSensitiveOutput(t *testing.T) {
 		if err == nil || strings.Contains(err.Error(), "fixture-secret") || c.calls != 1 || len(r.Plan.Commits) != 0 {
 			t.Fatalf("result=%#v error=%v", r, err)
 		}
+	}
+}
+
+// Saved failures remain rejected even after generation-side grammar is enabled.
+func TestThreePhaseRejectsHistoricalTextContractViolations(t *testing.T) {
+	for _, tc := range []struct{ name, scope, summary, violation string }{
+		{"summary_length", "Asset Loading", "静的アセットのインポートを文字列URLに正規化するヘルパーを導入し、画像表示の404エラーを修正した。", "invalid_schema"},
+		{"scope_length", "docs/decisions/issue-167-file-first.md", "構造検証を追加", "invalid_schema"},
+		{"scope_type_name", "docs", "構造検証を追加", "invalid_scope"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			responses := candidateResponses()
+			raw, err := json.Marshal(map[string]any{"G001": map[string]string{"scope": tc.scope, "summary": tc.summary}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			responses[2] = string(raw)
+			client := &candidateClient{responses: responses}
+			result, err := (ThreePhaseGenerator{Client: client}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
+			if err == nil || !strings.Contains(err.Error(), tc.violation) || result.Calls != 3 || len(result.Plan.Commits) != 0 {
+				t.Fatalf("historical failure must not return a plan: calls=%d result=%+v err=%v", result.Calls, result.Plan, err)
+			}
+		})
 	}
 }

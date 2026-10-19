@@ -19,6 +19,9 @@ const (
 var ErrTooLarge = errors.New("planning input exceeds the allowed context")
 
 type BudgetConfig struct {
+	// RequireUncompressed uses the configured ceiling without summary/reduction.
+	// Callers whose planner cannot consume compressed inputs must set this.
+	RequireUncompressed bool
 	Context             string
 	MaxContextTokens    int
 	PromptOverheadBytes int

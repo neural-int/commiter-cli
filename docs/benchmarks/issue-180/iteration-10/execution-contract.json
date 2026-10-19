@@ -1,0 +1,108 @@
+{
+  "fixture": {
+    "C01": {
+      "head": "fa6c65785d62d4c92a2a3525e50ef9a12828dada",
+      "index": "5433a97e39e1eda338bae58cfd49abb3a6a282380423795d08069011473c0a66",
+      "files": {
+        "src/components/common/progressiveimage/ProgressiveImage.jsx": "e50e13caea086b622a381b78dd30c601f786d4a40b43bac327a0d7a5da5c5c92",
+        "src/components/common/svg/AISummaryBadge.jsx": "abfa9bd48df226a3ac1b7fc677e536396a84494113497cdf056455ba9dfb2b98",
+        "src/lib/staticAsset.js": "e6468ea51e5c6fc6608dfa804e79f8d9da6c26c4c55ac1dc3be2bdbbbfa419bf"
+      }
+    },
+    "C02": {
+      "head": "83924a3ff65582567e0d2b745a50603043d35dbc",
+      "index": "36cad387b969b03dd3a2b9252fd3c1f3483efe1b1f0f83ee17716496b6c2d9c6",
+      "files": {
+        "docs/decisions/issue-167-file-first.md": "f6fcd5c4b37410f2d724ad9816629c39e1b7f14e0eb783e5cf540a345bbc1f70",
+        "internal/gitstate/collect.go": "a56e5143b2e00b313f27d17316a2158f8622599a8085271629cc668447b65900",
+        "internal/gitstate/file_first.go": "0379367b6ddb3d5f600b0cdc56468e0561aa48027f313aa0210993033cf3ffc2",
+        "internal/gitstate/file_first_test.go": "312fcc39be68b1f4bca8adb81044c05cb224b0e20f43020883f34f15977a4092"
+      }
+    }
+  },
+  "reference_hashes": {
+    "docs/benchmarks/issue-180/iteration-02/prefix-audit.json": "7e3929cbc23004ac77289ba0a25aed521954c77698513eb8b89cba7b5125499c",
+    "docs/benchmarks/issue-180/iteration-01/frozen/gold-frozen.json": "94cfc6fb6eeafc145e3981619c320d353153ebdaead5fdd900e0c5a6428c61d2",
+    "docs/benchmarks/issue-178/iteration-03/gold-frozen.json": "94cfc6fb6eeafc145e3981619c320d353153ebdaead5fdd900e0c5a6428c61d2",
+    "mlx-helper/Package.resolved": "b62d4f3b6f7df30d7f8c955eb5fe02deb067dda9ce24afc9a0c04abf1b0286cc"
+  },
+  "request_contract": "same model/revision, seed 144, temperature 0, topP 1, topK 0, schema/output/context/fixed partition as iteration03 D-T",
+  "binary_sha256": "c4aa5bcdabd56acbf1244662fcc2ec7c66d3be0832992beb6121b588b4db4aab",
+  "metal_sha256": "0214ad23cc2fa1df961eb7e2118881bd4b2bdb0183546ef537fff1a2a61e2ada",
+  "created_utc": "2026-10-19T03:12:31.328316+00:00",
+  "harness_id": "H180-004/H180-005",
+  "baseline_harness_id": "H180-003",
+  "baseline_measurement": "iteration-09 latest same harness historical saved results; no baseline rerun",
+  "source_sha256": "71e6d85b471cfb3c33c5861d6856e3f1c9f4d0cbd17e4a776970295ae2f91f2a",
+  "helper_sha256": "d134b651cde53552c217d83e44e077bad74f63475f22459e2af2707e1147370e",
+  "driver_sha256": "dc423c724c2884903556f08e4852e16f353d83be027779307aff58883fd67f9f",
+  "baseline_source_sha256": "6c744b2c895ef612c92199526c2bca578643fdec80d2a9d2550f051e585cc94a",
+  "baseline_helper_sha256": "578456320b2ad2d23a4a13187bf4c42c0c2a22ff8395bbed136a705d2e39ce25",
+  "head": "315ba56c3de7c8fca8d70f304b0ba06e6ace768a",
+  "order": [
+    "C01-KV8",
+    "C02-KV8",
+    "C01-KV4",
+    "C02-KV4"
+  ],
+  "per_cell_repetitions": 1,
+  "max_requests": 12,
+  "timeout": "no experimental wall timeout; production unchanged",
+  "retry": 0,
+  "repair": 0,
+  "extra_judge": 0,
+  "thinking_budgets": [
+    512,
+    384,
+    384
+  ],
+  "chunk_size": 512,
+  "reclaim_interval_chunks": 4,
+  "expected_chunk_counts": {
+    "C01": 5,
+    "C02": 36
+  },
+  "expected_reclaim_counts": {
+    "C01": 2,
+    "C02": 9
+  },
+  "change": "affine KV from first prefill token, K/V same bits, group64, 4 global layers compressed and 20 native rotating layers BF16; preserve H180-003 chunk512 and explicit sync/clear every4+final",
+  "candidate_ids": {
+    "8": "H180-004",
+    "4": "H180-005"
+  },
+  "kv_bits": [
+    8,
+    4
+  ],
+  "quantized_layers_expected": 4,
+  "rotating_layers_expected": 20,
+  "instrumentation": "retain H180-003 memory snapshots/counters and add per-layer dtype/shape/bytes snapshots at prefix end before copy and phase end; nbytes includes allocation capacity, quantized scales and biases; baseline KV bytes were not recorded",
+  "reuse_expected": [
+    false,
+    true,
+    true
+  ],
+  "telemetry_interval_ms": 2000,
+  "telemetry_start_offset": 18490845,
+  "telemetry_available": [
+    "OS vm_stat / memory_pressure -Q / swap usage every complete sample",
+    "helper RSS every complete sample",
+    "per-process CPU",
+    "system GPU idle ratio",
+    "thermal pressure"
+  ],
+  "telemetry_unavailable_expected": [
+    "degrees Celsius",
+    "per-process GPU"
+  ],
+  "stop": "helper/validator/reuse/count/realized quantization or input mismatch stops remaining cases of that candidate; next candidate still runs in frozen order. Output changes are results, not stop/retry. Telemetry missing10s or OS monitor failure or OS free<5% or helper RSS>=12GiB cancels all; no retry",
+  "limitations": [
+    "n=1 per case",
+    "saved historical baseline and different build",
+    "additional memory instrumentation and observer cost",
+    "no baseline per-layer KV bytes series",
+    "C02 downstream uses fixed reference grouping",
+    "no model judge or calibration; frozen exploratory non-human-approved reference; deterministic grouping/category score plus analyst text rubric"
+  ]
+}

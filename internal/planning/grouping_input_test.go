@@ -11,7 +11,7 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
 )
 
-func TestThreePhaseProjectsOnlyGroupingAndPreservesOriginalInput(t *testing.T) {
+func TestThreePhaseUsesRawDiffInAllPhasesAndPreservesHostInput(t *testing.T) {
 	p := candidatePrepared(t)
 	file := &p.Document.Files[0]
 	identity, mode := "host-identity", "100644"
@@ -61,7 +61,7 @@ func TestThreePhaseProjectsOnlyGroupingAndPreservesOriginalInput(t *testing.T) {
 			t.Fatal(err)
 		}
 		originalFile := metadata.Groups[0].Files[1]
-		if originalFile.Mode != syntax.ModeStructural || originalFile.RawDiff != "" || originalFile.HeadIdentity == nil || *originalFile.HeadIdentity != identity || !reflect.DeepEqual(originalFile.Evidence, file.Evidence) {
+		if originalFile.Mode != syntax.ModeRawDiff || originalFile.RawDiff != file.GroupingRawDiff || originalFile.HeadIdentity == nil || *originalFile.HeadIdentity != identity || len(originalFile.Evidence) != 0 {
 			t.Fatalf("phase %d lost original data: %+v", phase, originalFile)
 		}
 		if strings.Contains(c.messages[phase][1].Content, `"syntax_context"`) {
