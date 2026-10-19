@@ -1,0 +1,64 @@
+{
+  "created_utc": "2026-10-18T15:52:33.864204+00:00",
+  "path": "verification only, not missing uncommitted production adoption",
+  "order": [
+    "C01-D-T",
+    "C02-D-T"
+  ],
+  "max_requests": 6,
+  "per_cell_repetitions": 1,
+  "timeout": "none in experiment; production unchanged",
+  "retry": 0,
+  "repair": 0,
+  "extra_judge": 0,
+  "thinking_budgets": [
+    512,
+    384,
+    384
+  ],
+  "chunk_size": 512,
+  "fixture": {
+    "C01": {
+      "head": "fa6c65785d62d4c92a2a3525e50ef9a12828dada",
+      "index": "5433a97e39e1eda338bae58cfd49abb3a6a282380423795d08069011473c0a66",
+      "files": {
+        "src/components/common/progressiveimage/ProgressiveImage.jsx": "e50e13caea086b622a381b78dd30c601f786d4a40b43bac327a0d7a5da5c5c92",
+        "src/components/common/svg/AISummaryBadge.jsx": "abfa9bd48df226a3ac1b7fc677e536396a84494113497cdf056455ba9dfb2b98",
+        "src/lib/staticAsset.js": "e6468ea51e5c6fc6608dfa804e79f8d9da6c26c4c55ac1dc3be2bdbbbfa419bf"
+      }
+    },
+    "C02": {
+      "head": "83924a3ff65582567e0d2b745a50603043d35dbc",
+      "index": "36cad387b969b03dd3a2b9252fd3c1f3483efe1b1f0f83ee17716496b6c2d9c6",
+      "files": {
+        "docs/decisions/issue-167-file-first.md": "f6fcd5c4b37410f2d724ad9816629c39e1b7f14e0eb783e5cf540a345bbc1f70",
+        "internal/gitstate/collect.go": "a56e5143b2e00b313f27d17316a2158f8622599a8085271629cc668447b65900",
+        "internal/gitstate/file_first.go": "0379367b6ddb3d5f600b0cdc56468e0561aa48027f313aa0210993033cf3ffc2",
+        "internal/gitstate/file_first_test.go": "312fcc39be68b1f4bca8adb81044c05cb224b0e20f43020883f34f15977a4092"
+      }
+    }
+  },
+  "source_sha256": "49e5b85c1b0309ed314d6dbcb2bf4de07230bf80c2e8594a47403f5b6a08849e",
+  "binary_sha256": "c4aa5bcdabd56acbf1244662fcc2ec7c66d3be0832992beb6121b588b4db4aab",
+  "helper_sha256": "53c284230f5ac72ff2b2debeafc7c89b0765a9e72e8b9ebadcee7ad7d3b5a9dd",
+  "metal_sha256": "0214ad23cc2fa1df961eb7e2118881bd4b2bdb0183546ef537fff1a2a61e2ada",
+  "baseline_helper_sha256": "53c284230f5ac72ff2b2debeafc7c89b0765a9e72e8b9ebadcee7ad7d3b5a9dd",
+  "request_contract": "same model/revision, seed 144, temperature 0, topP 1, topK 0, schema/output/context/fixed partition as iteration03 D-T",
+  "stop": "helper or validator failure stops remaining cells; output difference is recorded, no repair or further generation",
+  "success": "record latency and memory; verify input/final JSON equivalence and KV reuse; no tuning or automatic adoption",
+  "driver_core_sha256": "df17cb0c6d1e55e7512d48de0dc9b6b0868d31b254f7c9eded8dbc04e1d96add",
+  "reference_hashes": {
+    "docs/benchmarks/issue-180/iteration-02/prefix-audit.json": "7e3929cbc23004ac77289ba0a25aed521954c77698513eb8b89cba7b5125499c",
+    "docs/benchmarks/issue-180/iteration-01/frozen/gold-frozen.json": "94cfc6fb6eeafc145e3981619c320d353153ebdaead5fdd900e0c5a6428c61d2",
+    "docs/benchmarks/issue-178/iteration-03/gold-frozen.json": "94cfc6fb6eeafc145e3981619c320d353153ebdaead5fdd900e0c5a6428c61d2",
+    "mlx-helper/Package.resolved": "b62d4f3b6f7df30d7f8c955eb5fe02deb067dda9ce24afc9a0c04abf1b0286cc"
+  },
+  "authorization": "User explicitly requested original-method baseline rerun on 2026-10-19 JST",
+  "condition": "iteration03 original D-T: per-layer eval(entry.state), unused logits evaluation already removed",
+  "helper_path": "LOCAL_TMP/issue180-iteration03-runtime/commiter-mlx-helper",
+  "source_path": "LOCAL_WORKTREES/issue-180-batch-eval/commiter-cli/docs/benchmarks/issue-180/iteration-03/helper-source.swift.txt",
+  "candidate_workspace_source_sha256": "6c8c2cd51979ad34d9887957ffbbc9eca105443fda851121214e66a3a8a3af49",
+  "driver_sha256": "e903dcac051a7525a515ce0e731c8c937ec33365515ce65852c784f4c39c1041",
+  "comparison": "compare new original-method baseline to candidate iteration05 and archived baseline iteration03",
+  "comparison_limit": "one run per cell, sequential separate measurements, original and candidate helper build times differ; not repeated randomized paired design"
+}

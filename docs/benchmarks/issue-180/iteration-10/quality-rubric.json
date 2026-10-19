@@ -1,0 +1,101 @@
+{
+  "reference_sha256": "94cfc6fb6eeafc145e3981619c320d353153ebdaead5fdd900e0c5a6428c61d2",
+  "reference_human_approved": false,
+  "scoring": {
+    "grouping": "ファイルを分割・重複せず、順序とgroup IDを無視したpartition一致",
+    "category": "正しい所属のグループについてtypeとbreaking_evidence_refを比較。所属が異なればGoldのtype比較はnot_scorableとする",
+    "text": "schema/長さ制約とは別にrequired_meaningsを満たしforbidden_claimsがないか人が判定。例文との完全一致は要求しない",
+    "end_to_end": "実際のplanning.Validate受理とGoldとの意味一致を別々に記録する"
+  },
+  "cases": [
+    {
+      "case_id": "C01",
+      "fixture_file": "c01-fixture.json",
+      "fixture_sha256": "522c5b9ffe45222f2d83df24a13fd0127b53d4fb2bf930e46e43618dcce243d3",
+      "status": "proposed",
+      "review_status": "pending_human_review",
+      "grouping": {
+        "allowed_partitions": [
+          [
+            [
+              "src/components/common/progressiveimage/ProgressiveImage.jsx",
+              "src/components/common/svg/AISummaryBadge.jsx",
+              "src/lib/staticAsset.js"
+            ]
+          ]
+        ],
+        "reason": "画像ソースの共通正規化とその利用箇所の修正は、既存画像表示の不具合修正を実現する一つの目的。ヘルパー追加だけを独立した機能追加として分離しない。"
+      },
+      "category": {
+        "type": "fix",
+        "breaking_evidence_ref": "none",
+        "reason": "既存の静的画像importがオブジェクトのままsrc/srcSetに渡り404を起こす不具合を修正する。",
+        "breaking_note": "この選択範囲に支持された互換性破壊の証拠はない。全リポジトリの互換性保証ではない。"
+      },
+      "text": {
+        "language": "ja",
+        "exact_match_required": false,
+        "required_meanings": [
+          "静的画像importをURL文字列へ正規化することと、既存画像の表示不具合または404の修正を結び付ける"
+        ],
+        "forbidden_claims": [
+          "画像表示機能そのものを新規導入した",
+          "ブラウザで修正を実証した、または全画像形式の互換性を保証した"
+        ],
+        "scope_policy": "出力契約内で対象コンポーネントを表すscopeを許容する。特定文字列との完全一致は要求しない。",
+        "example_summary": "静的画像のURLを正規化して表示の404を修正"
+      },
+      "limitations": [
+        "編集ログの投影であり、歴史上のcommiter起動時スナップショットの再現ではない。",
+        "事前計画は調査用に保存済みだがLLMへは追加しない。"
+      ]
+    },
+    {
+      "case_id": "C02",
+      "fixture_file": "c02-fixture.json",
+      "fixture_sha256": "e2e9679c998c1900359b462b0ffccc167dfd2e5c59ea90f6abdda7f2d178fe3a",
+      "status": "proposed",
+      "review_status": "pending_human_review",
+      "grouping": {
+        "allowed_partitions": [
+          [
+            [
+              "docs/decisions/issue-167-file-first.md",
+              "internal/gitstate/collect.go",
+              "internal/gitstate/file_first.go",
+              "internal/gitstate/file_first_test.go"
+            ]
+          ]
+        ],
+        "reason": "共有収集処理の抽出、新規構造検証API、受入テスト、同APIの説明は一つの構造検証機能を実現・検証・説明する変更。"
+      },
+      "category": {
+        "type": "feat",
+        "breaking_evidence_ref": "none",
+        "reason": "新規のPreviewFileFirst APIにより、一時index等を使ったファイル単位の構造検証能力を追加する。collectLocked抽出だけを全体の目的とみなさない。",
+        "breaking_note": "この選択範囲に支持された互換性破壊の証拠はない。全リポジトリの互換性保証ではない。"
+      },
+      "text": {
+        "language": "ja",
+        "exact_match_required": false,
+        "required_meanings": [
+          "一時indexを用いたファイル単位の変更の構造検証またはreplay検証を追加する"
+        ],
+        "forbidden_claims": [
+          "CLIや通常コミット実行へ接続済み",
+          "意味品質・速度または本番利用の改善を実証した",
+          "元のHEAD・index・作業ファイルを書き換える機能を追加した"
+        ],
+        "scope_policy": "出力契約内で対象コンポーネントを表すscopeを許容する。特定文字列との完全一致は要求しない。",
+        "example_summary": "一時indexでファイル単位の構造検証を追加"
+      },
+      "limitations": [
+        "既知のIssue研究履歴であり未使用holdoutではない。",
+        "元コミット5ファイルから選択した4ファイルの評価。除外した検証結果JSONはこのGoldの対象外。",
+        "評価用final_responseから既存コミットメッセージの行を除去した。作業内容の説明と元の採取履歴は保持している。"
+      ]
+    }
+  ],
+  "exact_json_match": "recorded but not sole quality gate",
+  "extra_model_judge": false
+}

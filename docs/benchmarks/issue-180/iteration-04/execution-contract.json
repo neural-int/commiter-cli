@@ -1,0 +1,51 @@
+{
+  "created_utc": "2026-10-18T14:59:59.150391+00:00",
+  "baseline": "198d2c2d iteration-03 saved D-T; no baseline rerun",
+  "path": "verification only, not missing uncommitted production adoption",
+  "change": "per-layer eval(entry.state) -> eval(cache); all other source bytes equal",
+  "order": [
+    "C01-D-T",
+    "C02-D-T"
+  ],
+  "max_requests": 6,
+  "per_cell_repetitions": 1,
+  "timeout": "none in experiment; production unchanged",
+  "retry": 0,
+  "repair": 0,
+  "extra_judge": 0,
+  "thinking_budgets": [
+    512,
+    384,
+    384
+  ],
+  "chunk_size": 512,
+  "fixture": {
+    "C01": {
+      "head": "fa6c65785d62d4c92a2a3525e50ef9a12828dada",
+      "index": "5433a97e39e1eda338bae58cfd49abb3a6a282380423795d08069011473c0a66",
+      "files": {
+        "src/components/common/progressiveimage/ProgressiveImage.jsx": "e50e13caea086b622a381b78dd30c601f786d4a40b43bac327a0d7a5da5c5c92",
+        "src/components/common/svg/AISummaryBadge.jsx": "abfa9bd48df226a3ac1b7fc677e536396a84494113497cdf056455ba9dfb2b98",
+        "src/lib/staticAsset.js": "e6468ea51e5c6fc6608dfa804e79f8d9da6c26c4c55ac1dc3be2bdbbbfa419bf"
+      }
+    },
+    "C02": {
+      "head": "83924a3ff65582567e0d2b745a50603043d35dbc",
+      "index": "36cad387b969b03dd3a2b9252fd3c1f3483efe1b1f0f83ee17716496b6c2d9c6",
+      "files": {
+        "docs/decisions/issue-167-file-first.md": "f6fcd5c4b37410f2d724ad9816629c39e1b7f14e0eb783e5cf540a345bbc1f70",
+        "internal/gitstate/collect.go": "a56e5143b2e00b313f27d17316a2158f8622599a8085271629cc668447b65900",
+        "internal/gitstate/file_first.go": "0379367b6ddb3d5f600b0cdc56468e0561aa48027f313aa0210993033cf3ffc2",
+        "internal/gitstate/file_first_test.go": "312fcc39be68b1f4bca8adb81044c05cb224b0e20f43020883f34f15977a4092"
+      }
+    }
+  },
+  "source_sha256": "6c8c2cd51979ad34d9887957ffbbc9eca105443fda851121214e66a3a8a3af49",
+  "binary_sha256": "c4aa5bcdabd56acbf1244662fcc2ec7c66d3be0832992beb6121b588b4db4aab",
+  "helper_sha256": "4bb34724029b49e05498480b6bcab9c4b017a80114d073be3f4de2d66ac77c2a",
+  "metal_sha256": "0214ad23cc2fa1df961eb7e2118881bd4b2bdb0183546ef537fff1a2a61e2ada",
+  "baseline_helper_sha256": "53c284230f5ac72ff2b2debeafc7c89b0765a9e72e8b9ebadcee7ad7d3b5a9dd",
+  "request_contract": "same model/revision, seed 144, temperature 0, topP 1, topK 0, schema/output/context/fixed partition as iteration03 D-T",
+  "stop": "helper or validator failure stops remaining cells; output difference is recorded, no repair or further generation",
+  "success": "all outputs and requests equal baseline, prefix reused; measured speed and memory reported without guaranteed improvement"
+}

@@ -1,0 +1,1 @@
+Before sampling: initial capture preparation attempted before test binary existed (FileNotFoundError); no generation occurred. Existing empty preparation directory reused after successful binary build. Swift initial compile failed because bounded input was let; corrected to var before freeze. All old logs preserved.
