@@ -290,6 +290,77 @@ private struct ModelBenchmarkConfiguration: Decodable {
     }
 }
 
+// Research-only adapter: execute the official Python serializer locally, then
+// feed its token IDs directly into the existing Swift/MLX generation runtime.
+private func officialMistralInput(_ request: Request, reasoning: Bool, tokenizer: any MLXLMCommon.Tokenizer) throws -> LMInput? {
+    let environment = ProcessInfo.processInfo.environment
+    guard let python = environment["COMMITER_182_MISTRAL_PYTHON"] else { return nil }
+    guard let bridge = environment["COMMITER_182_MISTRAL_BRIDGE"],
+          let assets = environment["COMMITER_182_MISTRAL_ASSETS"] else { throw HelperError.malformedRequest }
+    let process = Process()
+    process.executableURL = URL(fileURLWithPath: python)
+    process.arguments = [bridge, "--assets", assets] + (reasoning ? ["--reasoning"] : [])
+    let input = Pipe(), output = Pipe()
+    process.standardInput = input
+    process.standardOutput = output
+    process.standardError = FileHandle.standardError
+    let payload = ["messages": request.messages.map { ["role": $0.role.rawValue, "content": $0.content] }]
+    try process.run()
+    try input.fileHandleForWriting.write(contentsOf: JSONSerialization.data(withJSONObject: payload))
+    try input.fileHandleForWriting.close()
+    let data = output.fileHandleForReading.readDataToEndOfFile()
+    process.waitUntilExit()
+    struct Serialized: Decodable { let tokens: [Int]; let eos: Int; let open: Int?; let close: Int? }
+    guard process.terminationStatus == 0 else { throw HelperError.malformedRequest }
+    let serialized = try JSONDecoder().decode(Serialized.self, from: data)
+    guard serialized.eos == tokenizer.eosTokenId, serialized.tokens.first == 1,
+          serialized.tokens.last == 4, !serialized.tokens.contains(serialized.eos),
+          serialized.tokens.allSatisfy({ $0 >= 0 && $0 < 131072 }) else { throw HelperError.malformedRequest }
+    if reasoning {
+        guard serialized.open == tokenizer.convertTokenToId("[THINK]"),
+              serialized.close == tokenizer.convertTokenToId("[/THINK]") else { throw HelperError.malformedRequest }
+    }
+    return LMInput(tokens: MLXArray(serialized.tokens))
+}
+
+private final class BenchmarkTokenProgress: @unchecked Sendable {
+    let native: NativeThoughtBudgetState?
+    let response: GrammarSamplingState
+    let started = ProcessInfo.processInfo.systemUptime
+    var count = 0
+    init(native: NativeThoughtBudgetState?, response: GrammarSamplingState) {
+        self.native = native; self.response = response
+    }
+    func sampled(_ token: Int) {
+        if let native { native.commit(token) } else { response.commit(token) }
+        count += 1
+        if count == 1 || count % 64 == 0 {
+            let elapsed = ProcessInfo.processInfo.systemUptime - started
+            let entry: [String: Any] = ["event": "generation_progress", "tokens": count,
+                "seconds_including_prefill": elapsed, "thinking_tokens": native?.stats().prefixTokens ?? 0]
+            if let data = try? JSONSerialization.data(withJSONObject: entry, options: [.sortedKeys]) {
+                FileHandle.standardError.write(data + Data([10]))
+            }
+        }
+    }
+}
+
+private struct BenchmarkProgressProcessor: LogitProcessor {
+    let progress: BenchmarkTokenProgress
+    mutating func prompt(_ prompt: MLXArray) {}
+    func process(logits: MLXArray) -> MLXArray {
+        let mask: [Float]?
+        if let native = progress.native { mask = native.maskValues(count: logits.dim(-1)) }
+        else { mask = progress.response.maskValues(count: logits.dim(-1)) }
+        if let mask { return logits + MLXArray(mask) }
+        return logits
+    }
+    mutating func didSample(token: MLXArray) { progress.sampled(token.item(Int.self)) }
+    func copy() -> Self {
+        Self(progress: BenchmarkTokenProgress(native: progress.native?.independentCopy(), response: progress.response.independentCopy()))
+    }
+}
+
 private struct BenchmarkMetrics: Encodable {
     var loadSeconds = 0.0
     var prepareSeconds = 0.0
@@ -539,7 +610,11 @@ struct CommiterMLXHelper {
         // Candidate chat templates choose their own default thinking behavior.
         // Gemma preserves the established bounded-profile behavior.
         let templateContext: [String: any Sendable]? = research != nil ? ["enable_thinking": research!.thinking] : (otherDefault ? nil : ["enable_thinking": nativeLimit > 0])
-        var input = try await context.processor.prepare(input: UserInput(chat: chat, additionalContext: templateContext))
+        let officialInput = research?.family == "ministral"
+            ? try officialMistralInput(request, reasoning: ministralThinking, tokenizer: context.tokenizer) : nil
+        var input: LMInput
+        if let officialInput { input = officialInput }
+        else { input = try await context.processor.prepare(input: UserInput(chat: chat, additionalContext: templateContext)) }
         benchmark?.metrics.prepareSeconds = ProcessInfo.processInfo.systemUptime - prepareStart
         benchmark?.metrics.inputTokens = input.text.tokens.size
         if benchmark?.auditOnly == true {
@@ -554,7 +629,7 @@ struct CommiterMLXHelper {
         let grammarStart = ProcessInfo.processInfo.systemUptime
         do { try TokenBudget.validate(context: request.contextTokens, prompt: input.text.tokens.size, output: budget) }
         catch { throw HelperError.inputTooLarge }
-        let components: GenerationComponents
+        var components: GenerationComponents
         var nativeState: NativeThoughtBudgetState?
         let preparationStart = ProcessInfo.processInfo.systemUptime
         let preparation: GrammarPreparation
@@ -588,11 +663,15 @@ struct CommiterMLXHelper {
                       context.tokenizer.convertTokenToId("<channel|>") == 101 else { throw HelperError.grammarFailure }
                 open = 100; close = 101
             }
-            let state = NativeThoughtBudgetState(limit: research != nil ? nil : nativeLimit, open: open, close: close, eos: context.tokenizer.eosTokenId ?? 0, response: response, forceOpen: !qwenThinking, promptHasOpen: qwenThinking)
+            let state = NativeThoughtBudgetState(limit: research != nil ? nil : nativeLimit, open: open, close: close, eos: context.tokenizer.eosTokenId ?? 0, response: response, forceOpen: !qwenThinking && officialInput == nil, promptHasOpen: qwenThinking)
             nativeState = state
             components = GenerationComponents(logitProcessorFactory: { NativeThoughtBudgetProcessor(state: state) })
         } else {
             components = GenerationComponents(logitProcessorFactory: { GrammarSamplingProcessor(state: response) })
+        }
+        if officialInput != nil {
+            let progress = BenchmarkTokenProgress(native: nativeState, response: response)
+            components = GenerationComponents(logitProcessorFactory: { BenchmarkProgressProcessor(progress: progress) })
         }
         var parameters = GenerateParameters(maxTokens: research != nil ? nil : budget, temperature: research?.temperature ?? 0, topP: research?.topP ?? 1, topK: research?.topK ?? 0, seed: 144)
         var kvBits: Int? = nil

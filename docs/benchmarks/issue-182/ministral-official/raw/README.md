@@ -1,0 +1,11 @@
+# 公開用の実行記録
+
+- initial/: Instructの完了記録と、Reasoningがfixture消失で推論前に停止した記録。
+- recovered/: 同一要求を確認した復元fixtureでのReasoningの記録。
+- provenance/: 公式asset revision/hash、公式system prompt原文、fixture復旧一致audit、復旧repo対応表、ダウンロード時の補助スクリプト。
+
+メール形式文字列はredacted@example.invalid、絶対ホームパスは$HOMEへ置換した。計測値とmodelの最終JSONは保持する。生のThinking文章は保存しておらず、Thinkingのtoken数と数値進捗を保存している。実行ファイル、weight、venv、ビルドキャッシュ、Git管理directoryは含めない。
+
+SHA256SUMS.txtは公開コピーのchecksum。実行契約内のhashは実行時原本を指す。source snapshotも公開時のパス置換があるため、実行時原本hashと同一であるとは扱わない。実行後のrunner改善前のsourceもそれぞれ保存している。
+
+provenance/download_assets.pyは取得時点の履歴で、再現時にmainの最新assetを再取得するための指示ではない。再現時はmanifest.jsonにある固定revisionから取得し、同manifestのSHA256を確認する。

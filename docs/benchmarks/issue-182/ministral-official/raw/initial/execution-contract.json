@@ -1,0 +1,143 @@
+{
+  "harness_id": "H182-003-ministral-official",
+  "baseline": "H182-002",
+  "cells": [
+    {
+      "kind": "instruct",
+      "case": "C01",
+      "model_path": "$HOME/Library/Caches/commiter/mlx-models/d3a59d531fc3a5f486072eaf1bc199943abe0df9f290b18ca3d29ff71e899230",
+      "config": "$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli/docs/benchmarks/issue-182/suite-v2/ministral-instruct.json",
+      "prefix_tokens": 2148
+    },
+    {
+      "kind": "instruct",
+      "case": "C02",
+      "model_path": "$HOME/Library/Caches/commiter/mlx-models/d3a59d531fc3a5f486072eaf1bc199943abe0df9f290b18ca3d29ff71e899230",
+      "config": "$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli/docs/benchmarks/issue-182/suite-v2/ministral-instruct.json",
+      "prefix_tokens": 17228
+    },
+    {
+      "kind": "reasoning",
+      "case": "C01",
+      "model_path": "$HOME/Library/Caches/commiter/mlx-models/5254a062953a4616c8b2b5ee1d02d5a4e940da55646111d86ee5e1109ad1edb7",
+      "config": "$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli/docs/benchmarks/issue-182/suite-v2/ministral-reasoning.json",
+      "prefix_tokens": 2292
+    },
+    {
+      "kind": "reasoning",
+      "case": "C02",
+      "model_path": "$HOME/Library/Caches/commiter/mlx-models/5254a062953a4616c8b2b5ee1d02d5a4e940da55646111d86ee5e1109ad1edb7",
+      "config": "$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli/docs/benchmarks/issue-182/suite-v2/ministral-reasoning.json",
+      "prefix_tokens": 17372
+    }
+  ],
+  "maximum_calls": 12,
+  "repeats": 1,
+  "retry": 0,
+  "repair": 0,
+  "output_budget": null,
+  "thinking_budget": null,
+  "cycle_timeout": null,
+  "changes": [
+    "official mistral-common serialization",
+    "official Reasoning system prompt with final JSON override",
+    "natural THINK opening rather than forced opening",
+    "numeric progress logging"
+  ],
+  "unchanged": [
+    "weight revisions",
+    "sampling",
+    "seed144",
+    "KV8/group64",
+    "C01/C02",
+    "original task prompts",
+    "schema/validator",
+    "fixed partition injection downstream"
+  ],
+  "safety_stop": "monitor failure or RSS >=12GiB; helper no progress for 300s; process group killed, recorded as interruption",
+  "hashes": {
+    "$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli/tools/benchmark182/mistral_retest.py": "1141490cbf4d3cebb3757e2b6e831c32a973208b41fc52aa80f46d7176be42ee",
+    "$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli/tools/benchmark182/mistral_tokenize.py": "2efad71fcadb9f5ef4215053631bdf1baa75458fb9c7d41703ff7a4900651528",
+    "$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli/tools/benchmark182/mistral_audit.py": "c481f8dede951536d990d5f0522318660a98abd36d7b0fd22d37f0491c0a399b",
+    "$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli/tools/benchmark182/monitor_v2.py": "bc09b3bc4982e1ebc3071bf40024ac01c0de5d77b2da9f99dbf8f64e72266533",
+    "$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli/mlx-helper/Sources/commiter-mlx-helper/CommiterMLXHelper.swift": "5fd9958615aa3d458de050d37ec91007e4fcfb52c055289e4e111fd64142d46c",
+    "/private/tmp/issue182-ministral-runtime/commiter-mlx-helper": "4985548a2a3fcfd55c259d26b97d9e199ce320aeb2b2f2531cbec19e398371cb",
+    "/private/tmp/issue182-ministral-runtime/mlx.metallib": "0214ad23cc2fa1df961eb7e2118881bd4b2bdb0183546ef537fff1a2a61e2ada",
+    "/private/tmp/issue182-suite-v3/evaluation.test": "a58c480071989c29ccc9c14065c643a3eb249c19d22dce42dde3d3801452e4ad",
+    "/private/tmp/issue182-suite-v3/evaluation.go": "02f0f46eb5223a9e05ff2c4c9ac241513de605a615f3bb71ab06abb7dbb406ba",
+    "/private/tmp/issue182-suite-v3/three_phase.go": "46387ead8c2c32458c3e716f94bd370b8cdfc75c0853dda79ca64607c1aa55e9",
+    "/private/tmp/issue182-ministral-runtime/assets/manifest.json": "fecb1b97908a7b7519caf199014f05fc0ac645ff55ea95437f0d3b5739ede971",
+    "$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli/docs/benchmarks/issue-182/suite-v2/ministral-instruct.json": "ecbaa063c7bfbf0d9c79b4b3dc8278578d55094ce4c0c8571b9f1635bedb789e",
+    "$HOME/Library/Caches/commiter/mlx-models/d3a59d531fc3a5f486072eaf1bc199943abe0df9f290b18ca3d29ff71e899230/model.safetensors": "69a68c0a961a64bb1145a697a83cf6cec45220d425c77a6c0a3568924078c3b4",
+    "$HOME/Library/Caches/commiter/mlx-models/d3a59d531fc3a5f486072eaf1bc199943abe0df9f290b18ca3d29ff71e899230/tokenizer.json": "286acad9b0e27fce778ac429763536accf618ccb6ed72963b6f94685e531c5c7",
+    "$HOME/Library/Caches/commiter/mlx-models/d3a59d531fc3a5f486072eaf1bc199943abe0df9f290b18ca3d29ff71e899230/tokenizer_config.json": "54b6ee53caf87c338527472386b6adcc4253bf48b93cc9c27fe1d25db4ff36fc",
+    "$HOME/Library/Caches/commiter/mlx-models/d3a59d531fc3a5f486072eaf1bc199943abe0df9f290b18ca3d29ff71e899230/config.json": "cdd4bfa0a702d0241faaa3b80d15d481d7f8abf2659fba0958b1e7f24a28055f",
+    "/private/tmp/issue182-ministral-runtime/assets/instruct/tekken.json": "600bb27946565481ecf51ba8aee252e49b9a68507866080ac9c30185bb312843",
+    "/private/tmp/issue182-ministral-runtime/assets/instruct/SYSTEM_PROMPT.txt": "c6a46ef1b8017c5aef362480636b8c0046a9951acf338d3d8931bc1a3620315e",
+    "$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli/docs/benchmarks/issue-182/suite-v2/ministral-reasoning.json": "ac3c6e26d5b357315ab2263671d2570f52a50e273d2b415e48fbb34856e5f341",
+    "$HOME/Library/Caches/commiter/mlx-models/5254a062953a4616c8b2b5ee1d02d5a4e940da55646111d86ee5e1109ad1edb7/model.safetensors": "cec815b6db8d87d2a059d0ba91309adb58e8bfba7bfdcb814e5fb13a728a5b8a",
+    "$HOME/Library/Caches/commiter/mlx-models/5254a062953a4616c8b2b5ee1d02d5a4e940da55646111d86ee5e1109ad1edb7/tokenizer.json": "577575622324b2e099e2648be26bdeb5e5815ffe66d7004e9e3ddbf421db6bf1",
+    "$HOME/Library/Caches/commiter/mlx-models/5254a062953a4616c8b2b5ee1d02d5a4e940da55646111d86ee5e1109ad1edb7/tokenizer_config.json": "6bf23af5b7797936ca67a9bf1d8bf06e9424b74e86ddfc9ace8e3e43bc531adf",
+    "$HOME/Library/Caches/commiter/mlx-models/5254a062953a4616c8b2b5ee1d02d5a4e940da55646111d86ee5e1109ad1edb7/config.json": "8631962f37c0e73e9906f43cabe0f937c3261a6503769c749a8baa4f4ccfa539",
+    "/private/tmp/issue182-ministral-runtime/assets/reasoning/tekken.json": "e29d19ea32eb7e26e6c0572d57cb7f9eca0f4420e0e0fe6ae1cf3be94da1c0d6",
+    "/private/tmp/issue182-ministral-runtime/assets/reasoning/SYSTEM_PROMPT.txt": "aba1efaff0bdc73f4a864139e2c07dce8fc1e3df7b5d5c2b2623df6816697156"
+  },
+  "official_assets": [
+    {
+      "repo": "mistralai/Ministral-3-3B-Instruct-2512",
+      "revision": "b35d4dfe56c142746f54dbd64f579faab2744308",
+      "file": "README.md",
+      "sha256": "57623b9703d4fe40fe752b4a63f920c65ffd30cd7c281c8bccab7ee784460b67",
+      "bytes": 20363
+    },
+    {
+      "repo": "mistralai/Ministral-3-3B-Instruct-2512",
+      "revision": "b35d4dfe56c142746f54dbd64f579faab2744308",
+      "file": "SYSTEM_PROMPT.txt",
+      "sha256": "c6a46ef1b8017c5aef362480636b8c0046a9951acf338d3d8931bc1a3620315e",
+      "bytes": 2361
+    },
+    {
+      "repo": "mistralai/Ministral-3-3B-Instruct-2512",
+      "revision": "b35d4dfe56c142746f54dbd64f579faab2744308",
+      "file": "params.json",
+      "sha256": "184afbdca12f4075121650335d65ada27b471b8b2952c8f2b699c16516306459",
+      "bytes": 1183
+    },
+    {
+      "repo": "mistralai/Ministral-3-3B-Instruct-2512",
+      "revision": "b35d4dfe56c142746f54dbd64f579faab2744308",
+      "file": "tekken.json",
+      "sha256": "600bb27946565481ecf51ba8aee252e49b9a68507866080ac9c30185bb312843",
+      "bytes": 16753784
+    },
+    {
+      "repo": "mistralai/Ministral-3-3B-Reasoning-2512",
+      "revision": "4a36357c811bf511a7b625d132e12f22408aac91",
+      "file": "README.md",
+      "sha256": "f05058e9b5849ab7ff0a5ad92234f6482c7519c471a19d4d4324b66f48a067fa",
+      "bytes": 16800
+    },
+    {
+      "repo": "mistralai/Ministral-3-3B-Reasoning-2512",
+      "revision": "4a36357c811bf511a7b625d132e12f22408aac91",
+      "file": "SYSTEM_PROMPT.txt",
+      "sha256": "aba1efaff0bdc73f4a864139e2c07dce8fc1e3df7b5d5c2b2623df6816697156",
+      "bytes": 565
+    },
+    {
+      "repo": "mistralai/Ministral-3-3B-Reasoning-2512",
+      "revision": "4a36357c811bf511a7b625d132e12f22408aac91",
+      "file": "params.json",
+      "sha256": "d15587c57574d2a92c66ff2552c6db5173d4c440ad47f7454dc51bad0ecaeb59",
+      "bytes": 1096
+    },
+    {
+      "repo": "mistralai/Ministral-3-3B-Reasoning-2512",
+      "revision": "4a36357c811bf511a7b625d132e12f22408aac91",
+      "file": "tekken.json",
+      "sha256": "e29d19ea32eb7e26e6c0572d57cb7f9eca0f4420e0e0fe6ae1cf3be94da1c0d6",
+      "bytes": 16753777
+    }
+  ]
+}

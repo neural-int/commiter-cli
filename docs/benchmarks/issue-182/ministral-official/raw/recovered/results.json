@@ -1,0 +1,107 @@
+[
+  {
+    "cell": "ministral-reasoning-C01",
+    "exit": 0,
+    "interrupted": null,
+    "result": {
+      "calls": 3,
+      "case": "C01",
+      "condition": "D",
+      "error": "",
+      "fixed_membership": {
+        "path:src/components/common/progressiveimage/ProgressiveImage.jsx": "G001",
+        "path:src/components/common/svg/AISummaryBadge.jsx": "G001",
+        "path:src/lib/staticAsset.js": "G001"
+      },
+      "grouping_injected_for_downstream_comparison": true,
+      "mode": "run",
+      "result": {
+        "Plan": {
+          "schema_version": 1,
+          "commits": [
+            {
+              "type": "fix",
+              "scope": "ProgressiveImage",
+              "breaking": false,
+              "summary": "修正:静的 import の URL を Next.js で正規化し、2つの component",
+              "file_ids": [
+                "F001",
+                "F002",
+                "F003"
+              ]
+            }
+          ]
+        },
+        "Calls": 3,
+        "Repaired": false,
+        "Telemetry": {
+          "ContextTokens": 16384,
+          "Backend": "mlx",
+          "Model": "mlx-community/Ministral-3-3B-Reasoning-2512-4bit@2cd2087aad40c28747f8ede17851de6035f12b16",
+          "TotalDuration": 0,
+          "LoadDuration": 0,
+          "PromptEvalDuration": 0,
+          "EvalDuration": 0,
+          "PromptEvalCount": 0,
+          "EvalCount": 0,
+          "Availability": {
+            "TotalDuration": false,
+            "LoadDuration": false,
+            "PromptEvalCount": false,
+            "PromptEvalDuration": false,
+            "EvalCount": false,
+            "EvalDuration": false
+          }
+        }
+      },
+      "wall_seconds": 986.411795792
+    }
+  },
+  {
+    "cell": "ministral-reasoning-C02",
+    "exit": 0,
+    "interrupted": null,
+    "result": {
+      "calls": 2,
+      "case": "C02",
+      "condition": "D",
+      "error": "three-phase planner stopped: unresolved_breaking_evidence",
+      "fixed_membership": {
+        "path:docs/decisions/issue-167-file-first.md": "G001",
+        "path:internal/gitstate/collect.go": "G001",
+        "path:internal/gitstate/file_first.go": "G001",
+        "path:internal/gitstate/file_first_test.go": "G001"
+      },
+      "grouping_injected_for_downstream_comparison": true,
+      "mode": "run",
+      "result": {
+        "Plan": {
+          "schema_version": 0,
+          "commits": null
+        },
+        "Calls": 2,
+        "Repaired": false,
+        "Telemetry": {
+          "ContextTokens": 65536,
+          "Backend": "mlx",
+          "Model": "mlx-community/Ministral-3-3B-Reasoning-2512-4bit@2cd2087aad40c28747f8ede17851de6035f12b16",
+          "TotalDuration": 0,
+          "LoadDuration": 0,
+          "PromptEvalDuration": 0,
+          "EvalDuration": 0,
+          "PromptEvalCount": 0,
+          "EvalCount": 0,
+          "Availability": {
+            "TotalDuration": false,
+            "LoadDuration": false,
+            "PromptEvalCount": false,
+            "PromptEvalDuration": false,
+            "EvalCount": false,
+            "EvalDuration": false
+          }
+        }
+      },
+      "wall_seconds": 1645.484620584
+    }
+  }
+]
