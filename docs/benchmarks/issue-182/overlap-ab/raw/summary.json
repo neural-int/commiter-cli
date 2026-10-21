@@ -1,0 +1,261 @@
+{
+  "id": "H182-007",
+  "completion": {
+    "cells": 8,
+    "seconds": 1982.794767125044,
+    "monitor_failed": false
+  },
+  "audited_requests": 24,
+  "monitor_samples": 397,
+  "all_pairs_outputs_and_counts_equal": true,
+  "pairs": [
+    {
+      "case": "gemma-on-C01-compact-thinking1024",
+      "A": {
+        "cell": "gemma-on-C01-compact-thinking1024-A",
+        "wall_seconds": 88.257005875,
+        "tokens": 1817,
+        "tps": 24.937832508303163,
+        "phases": [
+          {
+            "content": "{\"path:src/components/common/progressiveimage/ProgressiveImage.jsx\":\"G001\",\"path:src/components/common/svg/AISummaryBadge.jsx\":\"G001\",\"path:src/lib/staticAsset.js\":\"G001\"}",
+            "tokens": 422,
+            "thinking": 360,
+            "forced": false,
+            "decode_seconds": 16.84676194190979
+          },
+          {
+            "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }",
+            "tokens": 678,
+            "thinking": 651,
+            "forced": false,
+            "decode_seconds": 27.22856593132019
+          },
+          {
+            "content": "{ \"G001\": { \"scope\": \"ImageAssetFix\", \"summary\": \"静的アセット参照を正規化し、[object Object]エラーを解消。\" } }",
+            "tokens": 717,
+            "thinking": 676,
+            "forced": false,
+            "decode_seconds": 28.785856008529663
+          }
+        ]
+      },
+      "B": {
+        "cell": "gemma-on-C01-compact-thinking1024-B",
+        "wall_seconds": 83.164925542,
+        "tokens": 1817,
+        "tps": 26.284413850675723,
+        "phases": [
+          {
+            "content": "{\"path:src/components/common/progressiveimage/ProgressiveImage.jsx\":\"G001\",\"path:src/components/common/svg/AISummaryBadge.jsx\":\"G001\",\"path:src/lib/staticAsset.js\":\"G001\"}",
+            "tokens": 422,
+            "thinking": 360,
+            "forced": false,
+            "decode_seconds": 15.235766053199768
+          },
+          {
+            "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }",
+            "tokens": 678,
+            "thinking": 651,
+            "forced": false,
+            "decode_seconds": 24.30182194709778
+          },
+          {
+            "content": "{ \"G001\": { \"scope\": \"ImageAssetFix\", \"summary\": \"静的アセット参照を正規化し、[object Object]エラーを解消。\" } }",
+            "tokens": 717,
+            "thinking": 676,
+            "forced": false,
+            "decode_seconds": 29.590831995010376
+          }
+        ]
+      },
+      "tps_change_percent": 5.399752933316115
+    },
+    {
+      "case": "gemma-on-C02-compact-thinking1024",
+      "A": {
+        "cell": "gemma-on-C02-compact-thinking1024-A",
+        "wall_seconds": 318.566036416,
+        "tokens": 2511,
+        "tps": 12.178530803304005,
+        "phases": [
+          {
+            "content": "{ \"path:docs/decisions/issue-167-file-first.md\": \"G001\", \"path:internal/gitstate/collect.go\": \"G001\", \"path:internal/gitstate/file_first_test.go\": \"G001\", \"path:internal/gitstate/file_first.go\": \"G001\" }",
+            "tokens": 652,
+            "thinking": 563,
+            "forced": false,
+            "decode_seconds": 57.93053996562958
+          },
+          {
+            "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"feat\" } }",
+            "tokens": 1049,
+            "thinking": 1022,
+            "forced": false,
+            "decode_seconds": 90.79009997844696
+          },
+          {
+            "content": "{ \"G001\": { \"scope\": \"FileFirst\", \"summary\": \"Issue #167 Phase.1「ファイル優先構造」を実装・検証完了。\" } }",
+            "tokens": 810,
+            "thinking": 769,
+            "forced": false,
+            "decode_seconds": 57.46186602115631
+          }
+        ]
+      },
+      "B": {
+        "cell": "gemma-on-C02-compact-thinking1024-B",
+        "wall_seconds": 306.700320292,
+        "tokens": 2511,
+        "tps": 13.196148043677765,
+        "phases": [
+          {
+            "content": "{ \"path:docs/decisions/issue-167-file-first.md\": \"G001\", \"path:internal/gitstate/collect.go\": \"G001\", \"path:internal/gitstate/file_first_test.go\": \"G001\", \"path:internal/gitstate/file_first.go\": \"G001\" }",
+            "tokens": 652,
+            "thinking": 563,
+            "forced": false,
+            "decode_seconds": 54.55102503299713
+          },
+          {
+            "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"feat\" } }",
+            "tokens": 1049,
+            "thinking": 1022,
+            "forced": false,
+            "decode_seconds": 83.6549540758133
+          },
+          {
+            "content": "{ \"G001\": { \"scope\": \"FileFirst\", \"summary\": \"Issue #167 Phase.1「ファイル優先構造」を実装・検証完了。\" } }",
+            "tokens": 810,
+            "thinking": 769,
+            "forced": false,
+            "decode_seconds": 52.076820969581604
+          }
+        ]
+      },
+      "tps_change_percent": 8.35582926060081
+    },
+    {
+      "case": "qwen4-on-C01-current-thinking1024",
+      "A": {
+        "cell": "qwen4-on-C01-current-thinking1024-A",
+        "wall_seconds": 144.417920834,
+        "tokens": 2449,
+        "tps": 19.961682681473206,
+        "phases": [
+          {
+            "content": "{ \"path:src/components/common/progressiveimage/ProgressiveImage.jsx\": \"G001\", \"path:src/components/common/svg/AISummaryBadge.jsx\": \"G001\", \"path:src/lib/staticAsset.js\": \"G001\" }",
+            "tokens": 575,
+            "thinking": 515,
+            "forced": false,
+            "decode_seconds": 28.347758054733276
+          },
+          {
+            "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }",
+            "tokens": 1050,
+            "thinking": 1024,
+            "forced": true,
+            "decode_seconds": 56.78242599964142
+          },
+          {
+            "content": "{ \"G001\": { \"scope\": \"画像コンポーネント\", \"summary\": \"静的アセットの正規化で画像描画の404エラーを修正\" } }",
+            "tokens": 824,
+            "thinking": 781,
+            "forced": false,
+            "decode_seconds": 37.554864048957825
+          }
+        ]
+      },
+      "B": {
+        "cell": "qwen4-on-C01-current-thinking1024-B",
+        "wall_seconds": 145.564166541,
+        "tokens": 2449,
+        "tps": 19.745992836092977,
+        "phases": [
+          {
+            "content": "{ \"path:src/components/common/progressiveimage/ProgressiveImage.jsx\": \"G001\", \"path:src/components/common/svg/AISummaryBadge.jsx\": \"G001\", \"path:src/lib/staticAsset.js\": \"G001\" }",
+            "tokens": 575,
+            "thinking": 515,
+            "forced": false,
+            "decode_seconds": 29.28165304660797
+          },
+          {
+            "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }",
+            "tokens": 1050,
+            "thinking": 1024,
+            "forced": true,
+            "decode_seconds": 57.060248017311096
+          },
+          {
+            "content": "{ \"G001\": { \"scope\": \"画像コンポーネント\", \"summary\": \"静的アセットの正規化で画像描画の404エラーを修正\" } }",
+            "tokens": 824,
+            "thinking": 781,
+            "forced": false,
+            "decode_seconds": 37.6832629442215
+          }
+        ]
+      },
+      "tps_change_percent": -1.080519357120202
+    },
+    {
+      "case": "qwen4-on-C02-current-thinking1024",
+      "A": {
+        "cell": "qwen4-on-C02-current-thinking1024-A",
+        "wall_seconds": 446.015166542,
+        "tokens": 2706,
+        "tps": 11.570663733264425,
+        "phases": [
+          {
+            "content": "{\"path:docs/decisions/issue-167-file-first.md\": \"G001\", \"path:internal/gitstate/collect.go\": \"G001\", \"path:internal/gitstate/file_first_test.go\": \"G001\", \"path:internal/gitstate/file_first.go\": \"G001\"}",
+            "tokens": 1097,
+            "thinking": 1024,
+            "forced": true,
+            "decode_seconds": 92.60871195793152
+          },
+          {
+            "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"feat\" } }",
+            "tokens": 1050,
+            "thinking": 1024,
+            "forced": true,
+            "decode_seconds": 95.53000092506409
+          },
+          {
+            "content": "{ \"G001\": { \"scope\": \"internal/gitstat\", \"summary\": \"Issue#167のPhase1で、一時indexとobjectを保持した構造経路の検証\" } }",
+            "tokens": 559,
+            "thinking": 513,
+            "forced": false,
+            "decode_seconds": 45.728596925735474
+          }
+        ]
+      },
+      "B": {
+        "cell": "qwen4-on-C02-current-thinking1024-B",
+        "wall_seconds": 382.260616167,
+        "tokens": 2706,
+        "tps": 13.319763776014751,
+        "phases": [
+          {
+            "content": "{\"path:docs/decisions/issue-167-file-first.md\": \"G001\", \"path:internal/gitstate/collect.go\": \"G001\", \"path:internal/gitstate/file_first_test.go\": \"G001\", \"path:internal/gitstate/file_first.go\": \"G001\"}",
+            "tokens": 1097,
+            "thinking": 1024,
+            "forced": true,
+            "decode_seconds": 83.35469198226929
+          },
+          {
+            "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"feat\" } }",
+            "tokens": 1050,
+            "thinking": 1024,
+            "forced": true,
+            "decode_seconds": 82.64749503135681
+          },
+          {
+            "content": "{ \"G001\": { \"scope\": \"internal/gitstat\", \"summary\": \"Issue#167のPhase1で、一時indexとobjectを保持した構造経路の検証\" } }",
+            "tokens": 559,
+            "thinking": 513,
+            "forced": false,
+            "decode_seconds": 37.154569029808044
+          }
+        ]
+      },
+      "tps_change_percent": 15.116678550789175
+    }
+  ]
+}
