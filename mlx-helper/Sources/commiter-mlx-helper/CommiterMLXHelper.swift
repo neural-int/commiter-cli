@@ -669,7 +669,7 @@ struct CommiterMLXHelper {
         } else {
             components = GenerationComponents(logitProcessorFactory: { GrammarSamplingProcessor(state: response) })
         }
-        if officialInput != nil {
+        if officialInput != nil || (research != nil && ProcessInfo.processInfo.environment["COMMITER_182_PROGRESS"] == "1") {
             let progress = BenchmarkTokenProgress(native: nativeState, response: response)
             components = GenerationComponents(logitProcessorFactory: { BenchmarkProgressProcessor(progress: progress) })
         }
