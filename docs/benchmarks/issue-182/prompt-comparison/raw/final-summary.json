@@ -1,0 +1,657 @@
+{
+  "id": "H182-004",
+  "status": "all_registered_cells_accounted_for",
+  "counts": {
+    "plan_accepted": 8,
+    "user_interrupted": 2,
+    "validator_rejected": 2
+  },
+  "actual_wire_requests_audited": 34,
+  "monitor": {
+    "original": {
+      "samples": 2829,
+      "invalid_samples": 0
+    },
+    "qwen2_resume": {
+      "samples": 48,
+      "invalid_samples": 0
+    }
+  },
+  "cells": [
+    {
+      "cell": "gemma-on-C01-current",
+      "status": "plan_accepted",
+      "wall_seconds": 228.075877333,
+      "error": "",
+      "actual_grouping_reference_match": true,
+      "actual_group_count": 1,
+      "completed_response_tokens": 2913,
+      "decode_tokens_per_second": 14.647914677165408,
+      "interruption": null,
+      "phases": [
+        {
+          "phase": 1,
+          "metrics": {
+            "generatedTokens": 828,
+            "nativeThoughtTokens": 766,
+            "runtimeGenerationSeconds": 55.64955198764801,
+            "runtimePromptSeconds": 5.958868980407715,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{\"path:src/components/common/progressiveimage/ProgressiveImage.jsx\":\"G001\",\"path:src/components/common/svg/AISummaryBadge.jsx\":\"G001\",\"path:src/lib/staticAsset.js\":\"G001\"}"
+        },
+        {
+          "phase": 2,
+          "metrics": {
+            "generatedTokens": 1062,
+            "nativeThoughtTokens": 1035,
+            "runtimeGenerationSeconds": 73.07868993282318,
+            "runtimePromptSeconds": 1.7064800262451172,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }"
+        },
+        {
+          "phase": 3,
+          "metrics": {
+            "generatedTokens": 1023,
+            "nativeThoughtTokens": 980,
+            "runtimeGenerationSeconds": 70.13965594768524,
+            "runtimePromptSeconds": 1.346087098121643,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"scope\": \"Common Assets\", \"summary\": \"静的アセットのパス解決を修正し、画像の[object Object]エラーを解消しました。\" } }"
+        }
+      ]
+    },
+    {
+      "cell": "gemma-on-C01-compact",
+      "status": "plan_accepted",
+      "wall_seconds": 144.634930875,
+      "error": "",
+      "actual_grouping_reference_match": true,
+      "actual_group_count": 1,
+      "completed_response_tokens": 1817,
+      "decode_tokens_per_second": 15.355984107816052,
+      "interruption": null,
+      "phases": [
+        {
+          "phase": 1,
+          "metrics": {
+            "generatedTokens": 422,
+            "nativeThoughtTokens": 360,
+            "runtimeGenerationSeconds": 21.259751081466675,
+            "runtimePromptSeconds": 3.879931926727295,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{\"path:src/components/common/progressiveimage/ProgressiveImage.jsx\":\"G001\",\"path:src/components/common/svg/AISummaryBadge.jsx\":\"G001\",\"path:src/lib/staticAsset.js\":\"G001\"}"
+        },
+        {
+          "phase": 2,
+          "metrics": {
+            "generatedTokens": 678,
+            "nativeThoughtTokens": 651,
+            "runtimeGenerationSeconds": 42.627864956855774,
+            "runtimePromptSeconds": 1.2172549962997437,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }"
+        },
+        {
+          "phase": 3,
+          "metrics": {
+            "generatedTokens": 717,
+            "nativeThoughtTokens": 676,
+            "runtimeGenerationSeconds": 54.43759107589722,
+            "runtimePromptSeconds": 1.1687979698181152,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"scope\": \"ImageAssetFix\", \"summary\": \"静的アセット参照を正規化し、[object Object]エラーを解消。\" } }"
+        }
+      ]
+    },
+    {
+      "cell": "gemma-on-C02-compact",
+      "status": "plan_accepted",
+      "wall_seconds": 400.717878625,
+      "error": "",
+      "actual_grouping_reference_match": true,
+      "actual_group_count": 1,
+      "completed_response_tokens": 2511,
+      "decode_tokens_per_second": 9.838179196576013,
+      "interruption": null,
+      "phases": [
+        {
+          "phase": 1,
+          "metrics": {
+            "generatedTokens": 652,
+            "nativeThoughtTokens": 563,
+            "runtimeGenerationSeconds": 69.67277991771698,
+            "runtimePromptSeconds": 65.8405179977417,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"path:docs/decisions/issue-167-file-first.md\": \"G001\", \"path:internal/gitstate/collect.go\": \"G001\", \"path:internal/gitstate/file_first_test.go\": \"G001\", \"path:internal/gitstate/file_first.go\": \"G001\" }"
+        },
+        {
+          "phase": 2,
+          "metrics": {
+            "generatedTokens": 1049,
+            "nativeThoughtTokens": 1022,
+            "runtimeGenerationSeconds": 111.55144894123077,
+            "runtimePromptSeconds": 2.8299111127853394,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"feat\" } }"
+        },
+        {
+          "phase": 3,
+          "metrics": {
+            "generatedTokens": 810,
+            "nativeThoughtTokens": 769,
+            "runtimeGenerationSeconds": 74.00592601299286,
+            "runtimePromptSeconds": 1.3110488653182983,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"scope\": \"FileFirst\", \"summary\": \"Issue #167 Phase.1「ファイル優先構造」を実装・検証完了。\" } }"
+        }
+      ]
+    },
+    {
+      "cell": "gemma-on-C02-current",
+      "status": "plan_accepted",
+      "wall_seconds": 453.604841292,
+      "error": "",
+      "actual_grouping_reference_match": true,
+      "actual_group_count": 1,
+      "completed_response_tokens": 2724,
+      "decode_tokens_per_second": 9.438501631199566,
+      "interruption": null,
+      "phases": [
+        {
+          "phase": 1,
+          "metrics": {
+            "generatedTokens": 1027,
+            "nativeThoughtTokens": 947,
+            "runtimeGenerationSeconds": 109.78512799739838,
+            "runtimePromptSeconds": 84.640291929245,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{\"path:docs/decisions/issue-167-file-first.md\":\"G001\",\"path:internal/gitstate/collect.go\":\"G001\",\"path:internal/gitstate/file_first_test.go\":\"G001\",\"path:internal/gitstate/file_first.go\":\"G001\"}"
+        },
+        {
+          "phase": 2,
+          "metrics": {
+            "generatedTokens": 844,
+            "nativeThoughtTokens": 817,
+            "runtimeGenerationSeconds": 95.34531104564667,
+            "runtimePromptSeconds": 5.358148097991943,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"feat\" } }"
+        },
+        {
+          "phase": 3,
+          "metrics": {
+            "generatedTokens": 853,
+            "nativeThoughtTokens": 812,
+            "runtimeGenerationSeconds": 83.47469198703766,
+            "runtimePromptSeconds": 2.0167369842529297,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"scope\": \"file-first\", \"summary\": \"ファイルベースの変更所有権付けの構造検証（Phase1）を実装しました。\" } }"
+        }
+      ]
+    },
+    {
+      "cell": "qwen4-on-C01-current",
+      "status": "plan_accepted",
+      "wall_seconds": 267.115178,
+      "error": "",
+      "actual_grouping_reference_match": true,
+      "actual_group_count": 1,
+      "completed_response_tokens": 3082,
+      "decode_tokens_per_second": 13.312585280395705,
+      "interruption": null,
+      "phases": [
+        {
+          "phase": 1,
+          "metrics": {
+            "generatedTokens": 575,
+            "nativeThoughtTokens": 515,
+            "runtimeGenerationSeconds": 46.59872305393219,
+            "runtimePromptSeconds": 6.932525992393494,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"path:src/components/common/progressiveimage/ProgressiveImage.jsx\": \"G001\", \"path:src/components/common/svg/AISummaryBadge.jsx\": \"G001\", \"path:src/lib/staticAsset.js\": \"G001\" }"
+        },
+        {
+          "phase": 2,
+          "metrics": {
+            "generatedTokens": 1683,
+            "nativeThoughtTokens": 1657,
+            "runtimeGenerationSeconds": 133.36714506149292,
+            "runtimePromptSeconds": 2.263530969619751,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }"
+        },
+        {
+          "phase": 3,
+          "metrics": {
+            "generatedTokens": 824,
+            "nativeThoughtTokens": 781,
+            "runtimeGenerationSeconds": 51.54438591003418,
+            "runtimePromptSeconds": 1.35709810256958,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"scope\": \"画像コンポーネント\", \"summary\": \"静的アセットの正規化で画像描画の404エラーを修正\" } }"
+        }
+      ]
+    },
+    {
+      "cell": "qwen4-on-C01-compact",
+      "status": "user_interrupted",
+      "wall_seconds": 2694.21589625,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan",
+      "actual_grouping_reference_match": true,
+      "actual_group_count": 1,
+      "completed_response_tokens": 797,
+      "decode_tokens_per_second": 11.488870569585593,
+      "interruption": {
+        "reason": "user_requested_interruption_continue_next_case",
+        "utc": "2026-10-21T00:55:42.763282+00:00",
+        "phase": "Text",
+        "latest_progress": {
+          "event": "generation_progress",
+          "seconds_including_prefill": 2583.6260595833883,
+          "thinking_tokens": 27776,
+          "tokens": 27776
+        },
+        "success": false
+      },
+      "phases": [
+        {
+          "phase": 1,
+          "metrics": {
+            "generatedTokens": 457,
+            "nativeThoughtTokens": 397,
+            "runtimeGenerationSeconds": 40.63715398311615,
+            "runtimePromptSeconds": 5.721786975860596,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"path:src/components/common/progressiveimage/ProgressiveImage.jsx\": \"G001\", \"path:src/components/common/svg/AISummaryBadge.jsx\": \"G001\", \"path:src/lib/staticAsset.js\": \"G001\" }"
+        },
+        {
+          "phase": 2,
+          "metrics": {
+            "generatedTokens": 340,
+            "nativeThoughtTokens": 322,
+            "runtimeGenerationSeconds": 28.73432993888855,
+            "runtimePromptSeconds": 2.045459032058716,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{\"G001\":{\"breaking_evidence_ref\":\"none\",\"type\":\"fix\"}}"
+        },
+        {
+          "phase": 3,
+          "metrics": {
+            "generatedTokens": null,
+            "nativeThoughtTokens": null,
+            "runtimeGenerationSeconds": null,
+            "runtimePromptSeconds": null,
+            "nativeThoughtForcedClose": null
+          },
+          "native_ok": null,
+          "stop_reason": null,
+          "content": ""
+        }
+      ]
+    },
+    {
+      "cell": "qwen4-on-C02-compact",
+      "status": "plan_accepted",
+      "wall_seconds": 865.687322667,
+      "error": "",
+      "actual_grouping_reference_match": false,
+      "actual_group_count": 3,
+      "completed_response_tokens": 5913,
+      "decode_tokens_per_second": 8.687307072911585,
+      "interruption": null,
+      "phases": [
+        {
+          "phase": 1,
+          "metrics": {
+            "generatedTokens": 5259,
+            "nativeThoughtTokens": 5184,
+            "runtimeGenerationSeconds": 606.1119339466095,
+            "runtimePromptSeconds": 101.40776896476746,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"path:docs/decisions/issue-167-file-first.md\": \"G001\", \"path:internal/gitstate/collect.go\": \"G002\", \"path:internal/gitstate/file_first_test.go\": \"G003\", \"path:internal/gitstate/file_first.go\": \"G003\" }"
+        },
+        {
+          "phase": 2,
+          "metrics": {
+            "generatedTokens": 359,
+            "nativeThoughtTokens": 333,
+            "runtimeGenerationSeconds": 52.5127090215683,
+            "runtimePromptSeconds": 3.2005159854888916,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"feat\" } }"
+        },
+        {
+          "phase": 3,
+          "metrics": {
+            "generatedTokens": 295,
+            "nativeThoughtTokens": 261,
+            "runtimeGenerationSeconds": 22.023566007614136,
+            "runtimePromptSeconds": 1.046397089958191,
+            "nativeThoughtForcedClose": false
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"scope\": \"gitstate\", \"summary\": \"問題#167 の Phase1 を実装\" } }"
+        }
+      ]
+    },
+    {
+      "cell": "qwen4-on-C02-current",
+      "status": "user_interrupted",
+      "wall_seconds": 9045.986768959,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan",
+      "actual_grouping_reference_match": null,
+      "actual_group_count": null,
+      "completed_response_tokens": 0,
+      "decode_tokens_per_second": null,
+      "interruption": {
+        "reason": "user_requested_suite_interruption",
+        "utc": "2026-10-21T03:41:12.458354+00:00",
+        "cell": "qwen4-on-C02-current",
+        "phase": "Grouping",
+        "progress": [
+          {
+            "file": "01-helper-stderr.log",
+            "latest_progress": {
+              "event": "generation_progress",
+              "seconds_including_prefill": 9037.528124792036,
+              "thinking_tokens": 57984,
+              "tokens": 57984
+            }
+          }
+        ],
+        "completed_cells": 7,
+        "pending_cells_not_started": 4,
+        "success": false
+      },
+      "phases": [
+        {
+          "phase": 1,
+          "metrics": {
+            "generatedTokens": null,
+            "nativeThoughtTokens": null,
+            "runtimeGenerationSeconds": null,
+            "runtimePromptSeconds": null,
+            "nativeThoughtForcedClose": null
+          },
+          "native_ok": null,
+          "stop_reason": null,
+          "content": ""
+        }
+      ]
+    },
+    {
+      "cell": "qwen2-off-C01-current",
+      "status": "validator_rejected",
+      "wall_seconds": 27.647366792,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_summary_language)",
+      "actual_grouping_reference_match": true,
+      "actual_group_count": 1,
+      "completed_response_tokens": 116,
+      "decode_tokens_per_second": 16.04649063289557,
+      "interruption": null,
+      "phases": [
+        {
+          "phase": 1,
+          "metrics": {
+            "generatedTokens": 59,
+            "nativeThoughtTokens": null,
+            "runtimeGenerationSeconds": 3.133497953414917,
+            "runtimePromptSeconds": 2.6694380044937134,
+            "nativeThoughtForcedClose": null
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"path:src/components/common/progressiveimage/ProgressiveImage.jsx\": \"G001\", \"path:src/components/common/svg/AISummaryBadge.jsx\": \"G001\", \"path:src/lib/staticAsset.js\": \"G001\" }"
+        },
+        {
+          "phase": 2,
+          "metrics": {
+            "generatedTokens": 25,
+            "nativeThoughtTokens": null,
+            "runtimeGenerationSeconds": 1.2484229803085327,
+            "runtimePromptSeconds": 0.7175978422164917,
+            "nativeThoughtForcedClose": null
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }"
+        },
+        {
+          "phase": 3,
+          "metrics": {
+            "generatedTokens": 32,
+            "nativeThoughtTokens": null,
+            "runtimeGenerationSeconds": 2.847074031829834,
+            "runtimePromptSeconds": 0.6418160200119019,
+            "nativeThoughtForcedClose": null
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"scope\": \"ProgressiveImage\", \"summary\": \"Static asset URL normalization for AVIF/WebP/JPG\"}}"
+        }
+      ]
+    },
+    {
+      "cell": "qwen2-off-C01-compact",
+      "status": "validator_rejected",
+      "wall_seconds": 26.129746792,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_summary_language)",
+      "actual_grouping_reference_match": true,
+      "actual_group_count": 1,
+      "completed_response_tokens": 114,
+      "decode_tokens_per_second": 17.379606895748946,
+      "interruption": null,
+      "phases": [
+        {
+          "phase": 1,
+          "metrics": {
+            "generatedTokens": 59,
+            "nativeThoughtTokens": null,
+            "runtimeGenerationSeconds": 3.12465500831604,
+            "runtimePromptSeconds": 2.310278058052063,
+            "nativeThoughtForcedClose": null
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"path:src/components/common/progressiveimage/ProgressiveImage.jsx\": \"G001\", \"path:src/components/common/svg/AISummaryBadge.jsx\": \"G001\", \"path:src/lib/staticAsset.js\": \"G001\" }"
+        },
+        {
+          "phase": 2,
+          "metrics": {
+            "generatedTokens": 25,
+            "nativeThoughtTokens": null,
+            "runtimeGenerationSeconds": 1.2662749290466309,
+            "runtimePromptSeconds": 0.5719050168991089,
+            "nativeThoughtForcedClose": null
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }"
+        },
+        {
+          "phase": 3,
+          "metrics": {
+            "generatedTokens": 30,
+            "nativeThoughtTokens": null,
+            "runtimeGenerationSeconds": 2.168481945991516,
+            "runtimePromptSeconds": 0.44025707244873047,
+            "nativeThoughtForcedClose": null
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"scope\": \"progressiveimage\", \"summary\": \"Static asset URL normalization for progressive,4\"} }"
+        }
+      ]
+    },
+    {
+      "cell": "qwen2-off-C02-compact",
+      "status": "plan_accepted",
+      "wall_seconds": 69.398945916,
+      "error": "",
+      "actual_grouping_reference_match": false,
+      "actual_group_count": 2,
+      "completed_response_tokens": 136,
+      "decode_tokens_per_second": 16.75697579107941,
+      "interruption": null,
+      "phases": [
+        {
+          "phase": 1,
+          "metrics": {
+            "generatedTokens": 67,
+            "nativeThoughtTokens": null,
+            "runtimeGenerationSeconds": 3.6564459800720215,
+            "runtimePromptSeconds": 22.329334020614624,
+            "nativeThoughtForcedClose": null
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{\"path:docs/decisions/issue-167-file-first.md\":\"G003\",\"path:internal/gitstate/collect.go\":\"G004\",\"path:internal/gitstate/file_first_test.go\":\"G003\",\"path:internal/gitstate/file_first.go\":\"G004\"}"
+        },
+        {
+          "phase": 2,
+          "metrics": {
+            "generatedTokens": 25,
+            "nativeThoughtTokens": null,
+            "runtimeGenerationSeconds": 1.3660659790039062,
+            "runtimePromptSeconds": 0.7213499546051025,
+            "nativeThoughtForcedClose": null
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"test\" } }"
+        },
+        {
+          "phase": 3,
+          "metrics": {
+            "generatedTokens": 44,
+            "nativeThoughtTokens": null,
+            "runtimeGenerationSeconds": 3.0935109853744507,
+            "runtimePromptSeconds": 0.5350539684295654,
+            "nativeThoughtForcedClose": null
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"scope\": \"file_first\", \"summary\": \"1〜16 ファイルの所有権保持とバイナリ再構築の構造経路の検証\" } }"
+        }
+      ]
+    },
+    {
+      "cell": "qwen2-off-C02-current",
+      "status": "plan_accepted",
+      "wall_seconds": 81.269521792,
+      "error": "",
+      "actual_grouping_reference_match": true,
+      "actual_group_count": 1,
+      "completed_response_tokens": 148,
+      "decode_tokens_per_second": 14.493070318336033,
+      "interruption": null,
+      "phases": [
+        {
+          "phase": 1,
+          "metrics": {
+            "generatedTokens": 74,
+            "nativeThoughtTokens": null,
+            "runtimeGenerationSeconds": 4.166237950325012,
+            "runtimePromptSeconds": 23.241106033325195,
+            "nativeThoughtForcedClose": null
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"path:docs/decisions/issue-167-file-first.md\": \"G001\", \"path:internal/gitstate/collect.go\": \"G001\", \"path:internal/gitstate/file_first_test.go\": \"G001\", \"path:internal/gitstate/file_first.go\": \"G001\" }"
+        },
+        {
+          "phase": 2,
+          "metrics": {
+            "generatedTokens": 25,
+            "nativeThoughtTokens": null,
+            "runtimeGenerationSeconds": 1.3280919790267944,
+            "runtimePromptSeconds": 1.0878239870071411,
+            "nativeThoughtForcedClose": null
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"test\" } }"
+        },
+        {
+          "phase": 3,
+          "metrics": {
+            "generatedTokens": 49,
+            "nativeThoughtTokens": null,
+            "runtimeGenerationSeconds": 4.71744692325592,
+            "runtimePromptSeconds": 0.883963942527771,
+            "nativeThoughtForcedClose": null
+          },
+          "native_ok": true,
+          "stop_reason": "completed",
+          "content": "{ \"G001\": { \"scope\": \"file_first\", \"summary\": \"1〜16 ファイルの所有権を保持し、バイナリ復元、一時 index を用いた正逆 replay、\" }}"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "single repetition per arm and fixture",
+    "downstream fixed partition; not end-to-end success",
+    "reference not independently human approved",
+    "nativeThoughtTokens absent for OFF; progress logs report zero thinking",
+    "token counts and decode rates for interrupted cells cover only completed responses; partial thinking recorded separately"
+  ]
+}

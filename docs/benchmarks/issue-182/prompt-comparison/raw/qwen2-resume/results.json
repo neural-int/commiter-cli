@@ -1,0 +1,214 @@
+[
+  {
+    "cell": "qwen2-off-C01-current",
+    "exit": 0,
+    "interrupted": null,
+    "result": {
+      "calls": 3,
+      "case": "C01",
+      "condition": "D",
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_summary_language)",
+      "fixed_membership": {
+        "path:src/components/common/progressiveimage/ProgressiveImage.jsx": "G001",
+        "path:src/components/common/svg/AISummaryBadge.jsx": "G001",
+        "path:src/lib/staticAsset.js": "G001"
+      },
+      "grouping_injected_for_downstream_comparison": true,
+      "mode": "run",
+      "result": {
+        "Plan": {
+          "schema_version": 0,
+          "commits": null
+        },
+        "Calls": 3,
+        "Repaired": false,
+        "Telemetry": {
+          "ContextTokens": 16384,
+          "Backend": "mlx",
+          "Model": "mlx-community/Qwen3.5-2B-4bit@674aaa7240b91e8012fcad5d791b7dfe5ba90207",
+          "TotalDuration": 0,
+          "LoadDuration": 0,
+          "PromptEvalDuration": 0,
+          "EvalDuration": 0,
+          "PromptEvalCount": 0,
+          "EvalCount": 0,
+          "Availability": {
+            "TotalDuration": false,
+            "LoadDuration": false,
+            "PromptEvalCount": false,
+            "PromptEvalDuration": false,
+            "EvalCount": false,
+            "EvalDuration": false
+          }
+        }
+      },
+      "wall_seconds": 27.647366792
+    }
+  },
+  {
+    "cell": "qwen2-off-C01-compact",
+    "exit": 0,
+    "interrupted": null,
+    "result": {
+      "calls": 3,
+      "case": "C01",
+      "condition": "D",
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_summary_language)",
+      "fixed_membership": {
+        "path:src/components/common/progressiveimage/ProgressiveImage.jsx": "G001",
+        "path:src/components/common/svg/AISummaryBadge.jsx": "G001",
+        "path:src/lib/staticAsset.js": "G001"
+      },
+      "grouping_injected_for_downstream_comparison": true,
+      "mode": "run",
+      "result": {
+        "Plan": {
+          "schema_version": 0,
+          "commits": null
+        },
+        "Calls": 3,
+        "Repaired": false,
+        "Telemetry": {
+          "ContextTokens": 16384,
+          "Backend": "mlx",
+          "Model": "mlx-community/Qwen3.5-2B-4bit@674aaa7240b91e8012fcad5d791b7dfe5ba90207",
+          "TotalDuration": 0,
+          "LoadDuration": 0,
+          "PromptEvalDuration": 0,
+          "EvalDuration": 0,
+          "PromptEvalCount": 0,
+          "EvalCount": 0,
+          "Availability": {
+            "TotalDuration": false,
+            "LoadDuration": false,
+            "PromptEvalCount": false,
+            "PromptEvalDuration": false,
+            "EvalCount": false,
+            "EvalDuration": false
+          }
+        }
+      },
+      "wall_seconds": 26.129746792
+    }
+  },
+  {
+    "cell": "qwen2-off-C02-compact",
+    "exit": 0,
+    "interrupted": null,
+    "result": {
+      "calls": 3,
+      "case": "C02",
+      "condition": "D",
+      "error": "",
+      "fixed_membership": {
+        "path:docs/decisions/issue-167-file-first.md": "G001",
+        "path:internal/gitstate/collect.go": "G001",
+        "path:internal/gitstate/file_first.go": "G001",
+        "path:internal/gitstate/file_first_test.go": "G001"
+      },
+      "grouping_injected_for_downstream_comparison": true,
+      "mode": "run",
+      "result": {
+        "Plan": {
+          "schema_version": 1,
+          "commits": [
+            {
+              "type": "test",
+              "scope": "file_first",
+              "breaking": false,
+              "summary": "1〜16 ファイルの所有権保持とバイナリ再構築の構造経路の検証",
+              "file_ids": [
+                "F001",
+                "F002",
+                "F003",
+                "F004"
+              ]
+            }
+          ]
+        },
+        "Calls": 3,
+        "Repaired": false,
+        "Telemetry": {
+          "ContextTokens": 65536,
+          "Backend": "mlx",
+          "Model": "mlx-community/Qwen3.5-2B-4bit@674aaa7240b91e8012fcad5d791b7dfe5ba90207",
+          "TotalDuration": 0,
+          "LoadDuration": 0,
+          "PromptEvalDuration": 0,
+          "EvalDuration": 0,
+          "PromptEvalCount": 0,
+          "EvalCount": 0,
+          "Availability": {
+            "TotalDuration": false,
+            "LoadDuration": false,
+            "PromptEvalCount": false,
+            "PromptEvalDuration": false,
+            "EvalCount": false,
+            "EvalDuration": false
+          }
+        }
+      },
+      "wall_seconds": 69.398945916
+    }
+  },
+  {
+    "cell": "qwen2-off-C02-current",
+    "exit": 0,
+    "interrupted": null,
+    "result": {
+      "calls": 3,
+      "case": "C02",
+      "condition": "D",
+      "error": "",
+      "fixed_membership": {
+        "path:docs/decisions/issue-167-file-first.md": "G001",
+        "path:internal/gitstate/collect.go": "G001",
+        "path:internal/gitstate/file_first.go": "G001",
+        "path:internal/gitstate/file_first_test.go": "G001"
+      },
+      "grouping_injected_for_downstream_comparison": true,
+      "mode": "run",
+      "result": {
+        "Plan": {
+          "schema_version": 1,
+          "commits": [
+            {
+              "type": "test",
+              "scope": "file_first",
+              "breaking": false,
+              "summary": "1〜16 ファイルの所有権を保持し、バイナリ復元、一時 index を用いた正逆 replay、",
+              "file_ids": [
+                "F001",
+                "F002",
+                "F003",
+                "F004"
+              ]
+            }
+          ]
+        },
+        "Calls": 3,
+        "Repaired": false,
+        "Telemetry": {
+          "ContextTokens": 65536,
+          "Backend": "mlx",
+          "Model": "mlx-community/Qwen3.5-2B-4bit@674aaa7240b91e8012fcad5d791b7dfe5ba90207",
+          "TotalDuration": 0,
+          "LoadDuration": 0,
+          "PromptEvalDuration": 0,
+          "EvalDuration": 0,
+          "PromptEvalCount": 0,
+          "EvalCount": 0,
+          "Availability": {
+            "TotalDuration": false,
+            "LoadDuration": false,
+            "PromptEvalCount": false,
+            "PromptEvalDuration": false,
+            "EvalCount": false,
+            "EvalDuration": false
+          }
+        }
+      },
+      "wall_seconds": 81.269521792
+    }
+  }
+]
