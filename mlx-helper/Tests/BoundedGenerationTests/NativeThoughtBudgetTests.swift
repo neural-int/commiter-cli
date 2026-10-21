@@ -22,6 +22,23 @@ struct NativeThoughtBudgetTests {
         original.commit(2); original.commit(3); original.commit(4)
         #expect(original.succeeded && !original.stats().forcedClose)
     }
+    @Test func qwenPromptOpenedThoughtStopsAt1024AndContinuesJSON() throws {
+        let tokenizer = try GrammarTokenizer(vocab: ["<think>", "thought", "</think>", "{}", "<eos>"], vocabType: .raw, eosTokenId: 4)
+        let factory: @Sendable () throws -> GrammarConstraint = { try GrammarConstraint(tokenizer: tokenizer, jsonSchema: "{\"type\":\"object\",\"additionalProperties\":false}", fastForward: false) }
+        let response = GrammarSamplingState(constraint: try factory(), vocabSize: 5, eos: 4, factory: factory)
+        let state = NativeThoughtBudgetState(limit: 1024, open: 0, close: 2, eos: 4, response: response, promptHasOpen: true)
+        for _ in 0..<1024 {
+            #expect(state.maskValues(count: 5) == nil)
+            state.commit(1)
+        }
+        let mask = try #require(state.maskValues(count: 5))
+        #expect(mask[2].isFinite && !mask[1].isFinite && !mask[4].isFinite)
+        state.commit(2)
+        #expect(!state.succeeded && state.stats().prefixTokens == 1024 && state.stats().forcedClose)
+        state.commit(3); state.commit(4)
+        #expect(state.succeeded && state.stats().responseSamples == 2)
+    }
+
     @Test func unboundedThinkingDoesNotForceClose() throws {
         let tokenizer = try GrammarTokenizer(vocab: ["<think>", "thought", "</think>", "{}", "<eos>"], vocabType: .raw, eosTokenId: 4)
         let factory: @Sendable () throws -> GrammarConstraint = { try GrammarConstraint(tokenizer: tokenizer, jsonSchema: "{\"type\":\"object\",\"additionalProperties\":false}", fastForward: false) }

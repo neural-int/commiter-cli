@@ -275,6 +275,7 @@ private struct ModelBenchmarkConfiguration: Decodable {
     let model: String
     let family: String
     let thinking: Bool
+    let thinkingBudget: Int?
     let temperature: Float
     let topP: Float
     let topK: Int
@@ -285,7 +286,8 @@ private struct ModelBenchmarkConfiguration: Decodable {
               let path = ProcessInfo.processInfo.environment["COMMITER_182_CASE_CONFIG"] else { return nil }
         let value = try JSONDecoder().decode(Self.self, from: Data(contentsOf: URL(fileURLWithPath: path)))
         guard ["gemma", "qwen", "ministral"].contains(value.family), value.temperature > 0,
-              value.topP > 0, value.topP <= 1, value.topK > 0 else { throw HelperError.malformedRequest }
+              value.topP > 0, value.topP <= 1, value.topK > 0,
+              value.thinkingBudget.map({ $0 > 0 && value.thinking }) ?? true else { throw HelperError.malformedRequest }
         return value
     }
 }
@@ -663,7 +665,7 @@ struct CommiterMLXHelper {
                       context.tokenizer.convertTokenToId("<channel|>") == 101 else { throw HelperError.grammarFailure }
                 open = 100; close = 101
             }
-            let state = NativeThoughtBudgetState(limit: research != nil ? nil : nativeLimit, open: open, close: close, eos: context.tokenizer.eosTokenId ?? 0, response: response, forceOpen: !qwenThinking && officialInput == nil, promptHasOpen: qwenThinking)
+            let state = NativeThoughtBudgetState(limit: research != nil ? research?.thinkingBudget : nativeLimit, open: open, close: close, eos: context.tokenizer.eosTokenId ?? 0, response: response, forceOpen: !qwenThinking && officialInput == nil, promptHasOpen: qwenThinking)
             nativeState = state
             components = GenerationComponents(logitProcessorFactory: { NativeThoughtBudgetProcessor(state: state) })
         } else {
