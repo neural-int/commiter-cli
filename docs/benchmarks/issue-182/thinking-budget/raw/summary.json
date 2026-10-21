@@ -1,0 +1,419 @@
+{
+  "id": "H182-005-thinking1024",
+  "cells": [
+    {
+      "cell": "gemma-on-C01-compact-thinking1024",
+      "error": "",
+      "wall_seconds": 135.464431125,
+      "actual_grouping_reference_match": true,
+      "output_tokens": 1817,
+      "thought_tokens": 1687,
+      "forced_closes": 0,
+      "decode_tokens_per_second": 16.95048307300828,
+      "phases": [
+        {
+          "phase": 1,
+          "content": "{\"path:src/components/common/progressiveimage/ProgressiveImage.jsx\":\"G001\",\"path:src/components/common/svg/AISummaryBadge.jsx\":\"G001\",\"path:src/lib/staticAsset.js\":\"G001\"}",
+          "ok": true,
+          "stop_reason": "completed",
+          "metrics": {
+            "generatedTokens": 422,
+            "nativeThoughtTokens": 360,
+            "nativeThoughtForcedClose": false,
+            "runtimeGenerationSeconds": 22.158454060554504,
+            "runtimePromptSeconds": 5.4858009815216064
+          }
+        },
+        {
+          "phase": 2,
+          "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }",
+          "ok": true,
+          "stop_reason": "completed",
+          "metrics": {
+            "generatedTokens": 678,
+            "nativeThoughtTokens": 651,
+            "nativeThoughtForcedClose": false,
+            "runtimeGenerationSeconds": 40.76562702655792,
+            "runtimePromptSeconds": 1.273263931274414
+          }
+        },
+        {
+          "phase": 3,
+          "content": "{ \"G001\": { \"scope\": \"ImageAssetFix\", \"summary\": \"静的アセット参照を正規化し、[object Object]エラーを解消。\" } }",
+          "ok": true,
+          "stop_reason": "completed",
+          "metrics": {
+            "generatedTokens": 717,
+            "nativeThoughtTokens": 676,
+            "nativeThoughtForcedClose": false,
+            "runtimeGenerationSeconds": 44.270503997802734,
+            "runtimePromptSeconds": 0.9910030364990234
+          }
+        }
+      ],
+      "unlimited_reference": {
+        "cell": "gemma-on-C01-compact",
+        "status": "plan_accepted",
+        "wall_seconds": 144.634930875,
+        "error": "",
+        "actual_grouping_reference_match": true,
+        "actual_group_count": 1,
+        "completed_response_tokens": 1817,
+        "decode_tokens_per_second": 15.355984107816052,
+        "interruption": null,
+        "phases": [
+          {
+            "phase": 1,
+            "metrics": {
+              "generatedTokens": 422,
+              "nativeThoughtTokens": 360,
+              "runtimeGenerationSeconds": 21.259751081466675,
+              "runtimePromptSeconds": 3.879931926727295,
+              "nativeThoughtForcedClose": false
+            },
+            "native_ok": true,
+            "stop_reason": "completed",
+            "content": "{\"path:src/components/common/progressiveimage/ProgressiveImage.jsx\":\"G001\",\"path:src/components/common/svg/AISummaryBadge.jsx\":\"G001\",\"path:src/lib/staticAsset.js\":\"G001\"}"
+          },
+          {
+            "phase": 2,
+            "metrics": {
+              "generatedTokens": 678,
+              "nativeThoughtTokens": 651,
+              "runtimeGenerationSeconds": 42.627864956855774,
+              "runtimePromptSeconds": 1.2172549962997437,
+              "nativeThoughtForcedClose": false
+            },
+            "native_ok": true,
+            "stop_reason": "completed",
+            "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }"
+          },
+          {
+            "phase": 3,
+            "metrics": {
+              "generatedTokens": 717,
+              "nativeThoughtTokens": 676,
+              "runtimeGenerationSeconds": 54.43759107589722,
+              "runtimePromptSeconds": 1.1687979698181152,
+              "nativeThoughtForcedClose": false
+            },
+            "native_ok": true,
+            "stop_reason": "completed",
+            "content": "{ \"G001\": { \"scope\": \"ImageAssetFix\", \"summary\": \"静的アセット参照を正規化し、[object Object]エラーを解消。\" } }"
+          }
+        ]
+      }
+    },
+    {
+      "cell": "gemma-on-C02-compact-thinking1024",
+      "error": "",
+      "wall_seconds": 350.886275916,
+      "actual_grouping_reference_match": true,
+      "output_tokens": 2511,
+      "thought_tokens": 2354,
+      "forced_closes": 0,
+      "decode_tokens_per_second": 10.379403531355258,
+      "phases": [
+        {
+          "phase": 1,
+          "content": "{ \"path:docs/decisions/issue-167-file-first.md\": \"G001\", \"path:internal/gitstate/collect.go\": \"G001\", \"path:internal/gitstate/file_first_test.go\": \"G001\", \"path:internal/gitstate/file_first.go\": \"G001\" }",
+          "ok": true,
+          "stop_reason": "completed",
+          "metrics": {
+            "generatedTokens": 652,
+            "nativeThoughtTokens": 563,
+            "nativeThoughtForcedClose": false,
+            "runtimeGenerationSeconds": 59.50020706653595,
+            "runtimePromptSeconds": 42.07348299026489
+          }
+        },
+        {
+          "phase": 2,
+          "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"feat\" } }",
+          "ok": true,
+          "stop_reason": "completed",
+          "metrics": {
+            "generatedTokens": 1049,
+            "nativeThoughtTokens": 1022,
+            "nativeThoughtForcedClose": false,
+            "runtimeGenerationSeconds": 112.60693895816803,
+            "runtimePromptSeconds": 2.514248013496399
+          }
+        },
+        {
+          "phase": 3,
+          "content": "{ \"G001\": { \"scope\": \"FileFirst\", \"summary\": \"Issue #167 Phase.1「ファイル優先構造」を実装・検証完了。\" } }",
+          "ok": true,
+          "stop_reason": "completed",
+          "metrics": {
+            "generatedTokens": 810,
+            "nativeThoughtTokens": 769,
+            "nativeThoughtForcedClose": false,
+            "runtimeGenerationSeconds": 69.81427001953125,
+            "runtimePromptSeconds": 1.2646859884262085
+          }
+        }
+      ],
+      "unlimited_reference": {
+        "cell": "gemma-on-C02-compact",
+        "status": "plan_accepted",
+        "wall_seconds": 400.717878625,
+        "error": "",
+        "actual_grouping_reference_match": true,
+        "actual_group_count": 1,
+        "completed_response_tokens": 2511,
+        "decode_tokens_per_second": 9.838179196576013,
+        "interruption": null,
+        "phases": [
+          {
+            "phase": 1,
+            "metrics": {
+              "generatedTokens": 652,
+              "nativeThoughtTokens": 563,
+              "runtimeGenerationSeconds": 69.67277991771698,
+              "runtimePromptSeconds": 65.8405179977417,
+              "nativeThoughtForcedClose": false
+            },
+            "native_ok": true,
+            "stop_reason": "completed",
+            "content": "{ \"path:docs/decisions/issue-167-file-first.md\": \"G001\", \"path:internal/gitstate/collect.go\": \"G001\", \"path:internal/gitstate/file_first_test.go\": \"G001\", \"path:internal/gitstate/file_first.go\": \"G001\" }"
+          },
+          {
+            "phase": 2,
+            "metrics": {
+              "generatedTokens": 1049,
+              "nativeThoughtTokens": 1022,
+              "runtimeGenerationSeconds": 111.55144894123077,
+              "runtimePromptSeconds": 2.8299111127853394,
+              "nativeThoughtForcedClose": false
+            },
+            "native_ok": true,
+            "stop_reason": "completed",
+            "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"feat\" } }"
+          },
+          {
+            "phase": 3,
+            "metrics": {
+              "generatedTokens": 810,
+              "nativeThoughtTokens": 769,
+              "runtimeGenerationSeconds": 74.00592601299286,
+              "runtimePromptSeconds": 1.3110488653182983,
+              "nativeThoughtForcedClose": false
+            },
+            "native_ok": true,
+            "stop_reason": "completed",
+            "content": "{ \"G001\": { \"scope\": \"FileFirst\", \"summary\": \"Issue #167 Phase.1「ファイル優先構造」を実装・検証完了。\" } }"
+          }
+        ]
+      }
+    },
+    {
+      "cell": "qwen4-on-C01-current-thinking1024",
+      "error": "",
+      "wall_seconds": 189.59062775,
+      "actual_grouping_reference_match": true,
+      "output_tokens": 2449,
+      "thought_tokens": 2320,
+      "forced_closes": 1,
+      "decode_tokens_per_second": 15.703901945928592,
+      "phases": [
+        {
+          "phase": 1,
+          "content": "{ \"path:src/components/common/progressiveimage/ProgressiveImage.jsx\": \"G001\", \"path:src/components/common/svg/AISummaryBadge.jsx\": \"G001\", \"path:src/lib/staticAsset.js\": \"G001\" }",
+          "ok": true,
+          "stop_reason": "completed",
+          "metrics": {
+            "generatedTokens": 575,
+            "nativeThoughtTokens": 515,
+            "nativeThoughtForcedClose": false,
+            "runtimeGenerationSeconds": 29.4875990152359,
+            "runtimePromptSeconds": 6.852845072746277
+          }
+        },
+        {
+          "phase": 2,
+          "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }",
+          "ok": true,
+          "stop_reason": "completed",
+          "metrics": {
+            "generatedTokens": 1050,
+            "nativeThoughtTokens": 1024,
+            "nativeThoughtForcedClose": true,
+            "runtimeGenerationSeconds": 75.32202196121216,
+            "runtimePromptSeconds": 1.4859100580215454
+          }
+        },
+        {
+          "phase": 3,
+          "content": "{ \"G001\": { \"scope\": \"画像コンポーネント\", \"summary\": \"静的アセットの正規化で画像描画の404エラーを修正\" } }",
+          "ok": true,
+          "stop_reason": "completed",
+          "metrics": {
+            "generatedTokens": 824,
+            "nativeThoughtTokens": 781,
+            "nativeThoughtForcedClose": false,
+            "runtimeGenerationSeconds": 51.13888204097748,
+            "runtimePromptSeconds": 1.3873759508132935
+          }
+        }
+      ],
+      "unlimited_reference": {
+        "cell": "qwen4-on-C01-current",
+        "status": "plan_accepted",
+        "wall_seconds": 267.115178,
+        "error": "",
+        "actual_grouping_reference_match": true,
+        "actual_group_count": 1,
+        "completed_response_tokens": 3082,
+        "decode_tokens_per_second": 13.312585280395705,
+        "interruption": null,
+        "phases": [
+          {
+            "phase": 1,
+            "metrics": {
+              "generatedTokens": 575,
+              "nativeThoughtTokens": 515,
+              "runtimeGenerationSeconds": 46.59872305393219,
+              "runtimePromptSeconds": 6.932525992393494,
+              "nativeThoughtForcedClose": false
+            },
+            "native_ok": true,
+            "stop_reason": "completed",
+            "content": "{ \"path:src/components/common/progressiveimage/ProgressiveImage.jsx\": \"G001\", \"path:src/components/common/svg/AISummaryBadge.jsx\": \"G001\", \"path:src/lib/staticAsset.js\": \"G001\" }"
+          },
+          {
+            "phase": 2,
+            "metrics": {
+              "generatedTokens": 1683,
+              "nativeThoughtTokens": 1657,
+              "runtimeGenerationSeconds": 133.36714506149292,
+              "runtimePromptSeconds": 2.263530969619751,
+              "nativeThoughtForcedClose": false
+            },
+            "native_ok": true,
+            "stop_reason": "completed",
+            "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }"
+          },
+          {
+            "phase": 3,
+            "metrics": {
+              "generatedTokens": 824,
+              "nativeThoughtTokens": 781,
+              "runtimeGenerationSeconds": 51.54438591003418,
+              "runtimePromptSeconds": 1.35709810256958,
+              "nativeThoughtForcedClose": false
+            },
+            "native_ok": true,
+            "stop_reason": "completed",
+            "content": "{ \"G001\": { \"scope\": \"画像コンポーネント\", \"summary\": \"静的アセットの正規化で画像描画の404エラーを修正\" } }"
+          }
+        ]
+      }
+    },
+    {
+      "cell": "qwen4-on-C02-current-thinking1024",
+      "error": "",
+      "wall_seconds": 458.453061333,
+      "actual_grouping_reference_match": true,
+      "output_tokens": 2706,
+      "thought_tokens": 2561,
+      "forced_closes": 2,
+      "decode_tokens_per_second": 11.12762558767842,
+      "phases": [
+        {
+          "phase": 1,
+          "content": "{\"path:docs/decisions/issue-167-file-first.md\": \"G001\", \"path:internal/gitstate/collect.go\": \"G001\", \"path:internal/gitstate/file_first_test.go\": \"G001\", \"path:internal/gitstate/file_first.go\": \"G001\"}",
+          "ok": true,
+          "stop_reason": "completed",
+          "metrics": {
+            "generatedTokens": 1097,
+            "nativeThoughtTokens": 1024,
+            "nativeThoughtForcedClose": true,
+            "runtimeGenerationSeconds": 105.0808140039444,
+            "runtimePromptSeconds": 101.59557294845581
+          }
+        },
+        {
+          "phase": 2,
+          "content": "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"feat\" } }",
+          "ok": true,
+          "stop_reason": "completed",
+          "metrics": {
+            "generatedTokens": 1050,
+            "nativeThoughtTokens": 1024,
+            "nativeThoughtForcedClose": true,
+            "runtimeGenerationSeconds": 96.51830196380615,
+            "runtimePromptSeconds": 3.8803540468215942
+          }
+        },
+        {
+          "phase": 3,
+          "content": "{ \"G001\": { \"scope\": \"internal/gitstat\", \"summary\": \"Issue#167のPhase1で、一時indexとobjectを保持した構造経路の検証\" } }",
+          "ok": true,
+          "stop_reason": "completed",
+          "metrics": {
+            "generatedTokens": 559,
+            "nativeThoughtTokens": 513,
+            "nativeThoughtForcedClose": false,
+            "runtimeGenerationSeconds": 41.57944703102112,
+            "runtimePromptSeconds": 1.6397160291671753
+          }
+        }
+      ],
+      "unlimited_reference": {
+        "cell": "qwen4-on-C02-current",
+        "status": "user_interrupted",
+        "wall_seconds": 9045.986768959,
+        "error": "LLM backend could not produce a safe, completely assigned commit plan",
+        "actual_grouping_reference_match": null,
+        "actual_group_count": null,
+        "completed_response_tokens": 0,
+        "decode_tokens_per_second": null,
+        "interruption": {
+          "reason": "user_requested_suite_interruption",
+          "utc": "2026-10-21T03:41:12.458354+00:00",
+          "cell": "qwen4-on-C02-current",
+          "phase": "Grouping",
+          "progress": [
+            {
+              "file": "01-helper-stderr.log",
+              "latest_progress": {
+                "event": "generation_progress",
+                "seconds_including_prefill": 9037.528124792036,
+                "thinking_tokens": 57984,
+                "tokens": 57984
+              }
+            }
+          ],
+          "completed_cells": 7,
+          "pending_cells_not_started": 4,
+          "success": false
+        },
+        "phases": [
+          {
+            "phase": 1,
+            "metrics": {
+              "generatedTokens": null,
+              "nativeThoughtTokens": null,
+              "runtimeGenerationSeconds": null,
+              "runtimePromptSeconds": null,
+              "nativeThoughtForcedClose": null
+            },
+            "native_ok": null,
+            "stop_reason": null,
+            "content": ""
+          }
+        ]
+      }
+    }
+  ],
+  "audited_requests": 12,
+  "monitor_samples": 233,
+  "invalid_monitor_samples": 0,
+  "completion": {
+    "cells": 4,
+    "seconds": 1166.9376110001467,
+    "monitor_failed": false
+  },
+  "limitations": "single finite-budget repeat; historical unlimited reference uses earlier binary and time; model source change only connects optional budget; Qwen4 C02 unlimited was user-interrupted; no end-to-end quality claim"
+}
