@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "<LOCAL_PATH>", line 90, in <module>
+    if mode=='prepare':prepare()
+                       ~~~~~~~^^
+  File "<LOCAL_PATH>", line 36, in prepare
+    r=json.loads((OUT/capture['label']/f'{i:02}-request.json').read_text());assert r==json.loads((PARENT/old['label']/f'{i:02}-request.json').read_text())
+                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

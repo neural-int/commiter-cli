@@ -1,0 +1,27 @@
+import pathlib,json,hashlib,re,collections
+P=pathlib.Path('/private/tmp/issue182-path-comparison');D=pathlib.Path('<LOCAL_PATH>');c=json.loads((P/'contract.json').read_text());assert all(hashlib.sha256(pathlib.Path(f).read_bytes()).hexdigest()==v for f,v in c['hashes'].items());assert json.loads((P/'stage1/pair-checks.json').read_text())['passed']
+summary={};lines=['# H182-009 生成経路比較結果','','## Goal','','Go経由の実行経路とSwift内の独自processorが生成速度に与える影響を切り分ける。固定条件はgoal.md。','','## Result / Decision','','段階1・2の全16セル・48phaseが正常終了。段階1の12要求・応答・生成tokens一致を確認。段階1はGoを省いても全ケースが速くなる結果ではなく、Go側が速度低下の主因という根拠は得られなかった。段階2の標準構成は3組でdecode速度が上昇、Qwen C02では低下。大幅な高速化を一律に示さず、独自processorの影響と生成内容・環境の影響を分離し切れていない。各arm1回のため因果と安定性は未確定。採用設定は変更しない。']
+for stage in ['stage1','stage2']:
+ done=json.loads((P/stage/'completion.json').read_text());rows=json.loads((P/stage/'results.json').read_text());assert done['cells']==len(rows)==8 and not done['monitor_failed'];mon=[json.loads(s) for s in (P/stage/'monitor.jsonl').read_text().splitlines()];assert all(m['valid'] for m in mon)
+ cells=[]
+ for row in rows:
+  assert row['valid'] and row['exit']==0 and not row['interrupted']
+  rs=row.get('responses') or [json.loads((P/row['cell']/f'{i:02}-response.json').read_text())['native'] for i in [1,2,3]];ms=[r['benchmark_metrics'] for r in rs];assert all(r['ok'] for r in rs)
+  if stage=='stage2':assert all(m['comparisonPath']==next(x['path_mode'] for x in c['cells'] if x['label']==row['cell']) for m in ms)
+  cell={'cell':row['cell'],'driver_wall_seconds':row['driver_wall_seconds'],'generated_tokens':sum(m['generatedTokens'] for m in ms),'decode_tps':sum(m['generatedTokens'] for m in ms)/sum(m['runtimeGenerationSeconds'] for m in ms),'phase_metrics':ms,'stop_reasons':[m.get('comparisonStopReason',r['stop_reason']) for m,r in zip(ms,rs)],'phase_outputs':[r['generated_json'] for r in rs]};cells.append(cell)
+ summary[stage]={'completion':done,'cells':cells,'monitor_samples':len(mon),'swap_start_end':[mon[0]['swap']['stdout'],mon[-1]['swap']['stdout']],'pressure_free_percent_range':[min(int(re.search(r'percentage: (\d+)',m['pressure']['stdout'])[1]) for m in mon),max(int(re.search(r'percentage: (\d+)',m['pressure']['stdout'])[1]) for m in mon)],'max_helper_rss_GiB':max(r['rss_kib']/2**20 for m in mon for r in m['helper_processes'])}
+ lines+=['',f'## {stage}','','| セル | driver秒 | tokens | decode token/s | 終了 G/C/T |','| --- | ---: | ---: | ---: | --- |']
+ for x in cells:lines.append(f"| {x['cell']} | {x['driver_wall_seconds']:.2f} | {x['generated_tokens']} | {x['decode_tps']:.2f} | {' / '.join(x['stop_reasons'])} |")
+ lines+=['','| セル | load合計秒 | input prepare合計秒 | grammar setup合計秒 | prefix prefill合計秒 | runtime prompt合計秒 | runtime decode合計秒 | generation wall合計秒 | MLX peak GiB | phase末KV最大MiB |','| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |']
+ for x in cells:
+  ms=x['phase_metrics'];vals=[sum(m.get(k,0) for m in ms) for k in ['loadSeconds','prepareSeconds','grammarSetupSeconds','prefixPrefillSeconds','runtimePromptSeconds','runtimeGenerationSeconds','generationWallSeconds']];lines.append('| '+x['cell']+' | '+' | '.join(f'{v:.3f}' for v in vals)+f" | {max(m['peakMemoryBytes'] for m in ms)/2**30:.3f} | {max(sum(l['bytes'] for l in m['phaseEndKVLayers']) for m in ms)/2**20:.1f} |")
+ z=summary[stage];lines+=['',f"監視{len(mon)}件すべて有効。helper RSS最大{z['max_helper_rss_GiB']:.3f}GiB、system-wide free percentage {z['pressure_free_percent_range']}。swap開始/終了: {z['swap_start_end']}。swapはシステム全体でありhelperへの帰属はできない。"]
+lines+=['','## Interpretation / Limits','','段階1のGo/direct全体時間はGemma C01 88.58/96.37秒、C02 307.40/305.93秒、Qwen C01 137.14/133.59秒、C02 361.92/355.14秒。Goが速い観測もあり、この差をそのまま固定オーバーヘッドとしない。fixture・proxy・planner/validator・起動・通信と時間変動を含む経路比較。','','段階2は共通maxTokens=1024。lengthは診断上の正常終了でtask完了ではない。標準側はJSON制約・独自Thinking制御・token単位progressなし。ThinkingやJSONの出力・生成量は変わり、同一token列の処理時間比較ではない。全体時間に占めるprefix/prefillをdecodeと分ける。load/grammar/prefix/generation計測は一部包含関係があり、表の列をすべて足して全体時間を再構成しない。KVとMLX peakとRSSも異なる対象。','','本比較の標準構成は同一helper内の公式generate/TokenIteratorと空GenerationComponentsであり、独立した公式CLIや最高速度ではない。共通の独自prefix処理、KV8、AsyncStream consumerは残る。C02のprefix/prefillとメモリ状況も候補に残り、特定の同期・grammar mask・MLX kernel単独が主因とは未特定。追加生成・再試行・条件変更は行っていない（初回の推論前mkdir競合修正は別記）。','','## Preparation corrections / Verification','','生成前にcapture stub fixと実C02 featの差を検出し、実要求を再生するよう修正した。さらに初回起動でGoとPythonのmkdir競合を検出、推論前に停止し修正した。初回契約・停止証跡を保持。Release45テスト成功、Python構文成功、最終source/asset hash一致、段階1の12要求/応答/token一致、全48phase ok、全監視有効を確認。rawのホームpath・メール等を除去し公開、原本はローカル保持。次段階や本番変更は未実行。']
+(P/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');(D/'report.md').write_text('\n'.join(lines)+'\n')
+# Preserve frozen preregistration; record final status separately.
+(D/'status.md').write_text('# H182-009 実行状態\n\n段階1・2完了。全16セル・48phase。段階1同一要求/応答/token確認。詳細はreport.md。goal.mdは測定前の固定計画として保持。\n')
+fs=[f for f in P.rglob('*') if f.is_file() and f.suffix in ['.json','.jsonl','.log','.py'] and 'runtime' not in f.parts]
+for f in fs:
+ t=f.read_text();t=re.sub(r'<LOCAL_PATH>','<LOCAL_PATH>',t);t=re.sub(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}','REDACTED_EMAIL',t);out=D/'raw'/f.relative_to(P);out.parent.mkdir(parents=True,exist_ok=True);out.write_text(t)
+raw=D/'raw';manifest=raw/'SHA256SUMS.txt';manifest.write_text(''.join(f'{hashlib.sha256(f.read_bytes()).hexdigest()}  {f.relative_to(raw)}\n' for f in sorted(raw.rglob('*')) if f.is_file() and f!=manifest))
+print('report and artifacts saved',len(fs))

@@ -1,0 +1,1318 @@
+{
+  "error": "",
+  "native": {
+    "runtime": "mlx",
+    "generated_json": "{ \"G001\": { \"scope\": \"internal\/gitstat\", \"summary\": \"Issue#167のPhase1で、一時indexとobjectを保持した構造経路の検証\" } }",
+    "model": "mlx-community\/Qwen3.5-4B-4bit@0e7ffd5c629ef7719d4cbc04069232580bfa9d9c",
+    "ok": true,
+    "stop_reason": "completed",
+    "generation_profile": "bounded-text",
+    "benchmark_metrics": {
+      "grammarPreparationReused": true,
+      "requestedKVBits": 8,
+      "phaseEndKVLayers": [
+        {
+          "index": 0,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 1,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 2,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 3,
+          "offset": 16892,
+          "arrays": [
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            }
+          ],
+          "nativeType": "QuantizedKVCache",
+          "bits": 8,
+          "bytes": 37102976,
+          "kind": "affine"
+        },
+        {
+          "index": 4,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 5,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 6,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 7,
+          "offset": 16892,
+          "arrays": [
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            }
+          ],
+          "nativeType": "QuantizedKVCache",
+          "bits": 8,
+          "bytes": 37102976,
+          "kind": "affine"
+        },
+        {
+          "index": 8,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 9,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 10,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 11,
+          "offset": 16892,
+          "arrays": [
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            }
+          ],
+          "nativeType": "QuantizedKVCache",
+          "bits": 8,
+          "bytes": 37102976,
+          "kind": "affine"
+        },
+        {
+          "index": 12,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 13,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 14,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 15,
+          "offset": 16892,
+          "arrays": [
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            }
+          ],
+          "nativeType": "QuantizedKVCache",
+          "bits": 8,
+          "bytes": 37102976,
+          "kind": "affine"
+        },
+        {
+          "index": 16,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 17,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 18,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 19,
+          "offset": 16892,
+          "arrays": [
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            }
+          ],
+          "nativeType": "QuantizedKVCache",
+          "bits": 8,
+          "bytes": 37102976,
+          "kind": "affine"
+        },
+        {
+          "index": 20,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 21,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 22,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 23,
+          "offset": 16892,
+          "arrays": [
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            }
+          ],
+          "nativeType": "QuantizedKVCache",
+          "bits": 8,
+          "bytes": 37102976,
+          "kind": "affine"
+        },
+        {
+          "index": 24,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 25,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 26,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 27,
+          "offset": 16892,
+          "arrays": [
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            }
+          ],
+          "nativeType": "QuantizedKVCache",
+          "bits": 8,
+          "bytes": 37102976,
+          "kind": "affine"
+        },
+        {
+          "index": 28,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 29,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 30,
+          "offset": 0,
+          "arrays": [
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                3,
+                8192
+              ],
+              "bytes": 49152
+            },
+            {
+              "dtype": "float32",
+              "shape": [
+                1,
+                32,
+                128,
+                128
+              ],
+              "bytes": 2097152
+            }
+          ],
+          "nativeType": "MambaCache",
+          "bits": 32,
+          "bytes": 2146304,
+          "kind": "simple"
+        },
+        {
+          "index": 31,
+          "offset": 16892,
+          "arrays": [
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "uint32",
+              "shape": [
+                1,
+                4,
+                17051,
+                64
+              ],
+              "bytes": 17460224
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            },
+            {
+              "dtype": "bfloat16",
+              "shape": [
+                1,
+                4,
+                17051,
+                4
+              ],
+              "bytes": 545632
+            }
+          ],
+          "nativeType": "QuantizedKVCache",
+          "bits": 8,
+          "bytes": 37102976,
+          "kind": "affine"
+        }
+      ],
+      "prefixKVLayers": [],
+      "grammarPreparationSeconds": 3.3294782042503357e-07,
+      "nativeThoughtTokens": 513,
+      "runtimeGenerationSeconds": 34.821942925453186,
+      "grammarSetupSeconds": 0.6328260414302349,
+      "peakMemoryBytes": 4062755572,
+      "modelReused": true,
+      "generatedTokens": 559,
+      "prepareSeconds": 0.15908916667103767,
+      "benchmarkCacheMode": "8",
+      "prefixSynchronizeSeconds": 0,
+      "loadSeconds": 5.00120222568512e-07,
+      "prefixPrefillSeconds": 0,
+      "generationWallSeconds": 36.67979745846242,
+      "prefixChunkCount": 0,
+      "nativeThoughtForcedClose": false,
+      "inputTokens": 16332,
+      "prefixMemorySamples": [],
+      "cacheReusedTokens": 16027,
+      "runtimePromptSeconds": 1.8556010723114014,
+      "cacheMemoryBytes": 60814250,
+      "activeMemoryBytes": 2716464244,
+      "prefixClearCacheSeconds": 0,
+      "prefixReclaimCount": 0
+    }
+  },
+  "response": {
+    "Backend": "mlx",
+    "Model": "mlx-community/Qwen3.5-4B-4bit@0e7ffd5c629ef7719d4cbc04069232580bfa9d9c",
+    "Content": "{ \"G001\": { \"scope\": \"internal/gitstat\", \"summary\": \"Issue#167のPhase1で、一時indexとobjectを保持した構造経路の検証\" } }",
+    "StopReason": "completed",
+    "TotalDuration": 0,
+    "LoadDuration": 0,
+    "PromptEvalCount": 0,
+    "PromptEvalDuration": 0,
+    "EvalCount": 0,
+    "EvalDuration": 0,
+    "Availability": {
+      "TotalDuration": false,
+      "LoadDuration": false,
+      "PromptEvalCount": false,
+      "PromptEvalDuration": false,
+      "EvalCount": false,
+      "EvalDuration": false
+    }
+  },
+  "wall_seconds": 37.477917625
+}

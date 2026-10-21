@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "case_id": "C01",
+  "source_file": "internal/codexcontext/testdata/history_candidates/image-static-import-fix.json",
+  "source_sha256": "78026ba32be7652816842303724e0637e51cf2bb029db12496b8a9ac5b14a25d",
+  "snapshot": {
+    "kind": "logged_patch_projection",
+    "limitation": "Git HEAD/index/worktree を復元したものではない"
+  },
+  "transforms": [
+    {
+      "path": "src/lib/staticAsset.js",
+      "change": "Correct the projected add hunk line count; changed lines are unmodified."
+    }
+  ],
+  "files": [
+    {
+      "path": "src/components/common/progressiveimage/ProgressiveImage.jsx",
+      "diff": "@@ -1,2 +1,3 @@\n import clsx from 'clsx';\n+import { resolveStaticAssetSrc } from \"../../../lib/staticAsset\";\n \n@@ -9,3 +10,3 @@\n       const byWidth = responsiveSources[width];\n-      const src = byWidth?.[format];\n+      const src = resolveStaticAssetSrc(byWidth?.[format]);\n       return src ? `${src} ${width}w` : null;\n@@ -53,2 +54,5 @@\n   const jpgSrcSet = buildResponsiveSrcSet(responsive, 'jpg');\n+  const avifSrc = resolveStaticAssetSrc(sources.avif);\n+  const webpSrc = resolveStaticAssetSrc(sources.webp);\n+  const jpgSrc = resolveStaticAssetSrc(sources.jpg);\n \n@@ -56,5 +60,5 @@\n     <picture className={clsx('block pointer-events-none', pictureClassName)}>\n-      {sources.avif && (\n+      {avifSrc && (\n         <source\n-          srcSet={avifSrcSet || sources.avif}\n+          srcSet={avifSrcSet || avifSrc}\n           sizes={avifSrcSet ? sizes : undefined}\n@@ -63,5 +67,5 @@\n       )}\n-      {sources.webp && (\n+      {webpSrc && (\n         <source\n-          srcSet={webpSrcSet || sources.webp}\n+          srcSet={webpSrcSet || webpSrc}\n           sizes={webpSrcSet ? sizes : undefined}\n@@ -71,3 +75,3 @@\n       <img\n-        src={sources.jpg}\n+        src={jpgSrc}\n         srcSet={jpgSrcSet}\n"
+    },
+    {
+      "path": "src/components/common/svg/AISummaryBadge.jsx",
+      "diff": "@@ -2,2 +2,3 @@\n import iconSrc from \"../../../aisummary-icon-latest.svg\";\n+import { resolveStaticAssetSrc } from \"../../../lib/staticAsset\";\n \n@@ -5,3 +6,3 @@\n   <img\n-    src={iconSrc}\n+    src={resolveStaticAssetSrc(iconSrc)}\n     alt=\"要約を表すロボットのアイコン\"\n"
+    },
+    {
+      "path": "src/lib/staticAsset.js",
+      "diff": "@@ -0,0 +1,11 @@\n+export const resolveStaticAssetSrc = (asset) => {\n+  if (typeof asset === \"string\") {\n+    return asset;\n+  }\n+\n+  if (asset && typeof asset === \"object\" && typeof asset.src === \"string\") {\n+    return asset.src;\n+  }\n+\n+  return \"\";\n+};\n"
+    }
+  ],
+  "codex_context": [
+    {
+      "paths": [
+        "src/components/common/progressiveimage/ProgressiveImage.jsx",
+        "src/components/common/svg/AISummaryBadge.jsx",
+        "src/lib/staticAsset.js"
+      ],
+      "user_request": "Implement the plan.",
+      "final_response": "結論：修正しました。`[object Object]` 404 はヒーロー画像の静的 import が Next.js でオブジェクト化され、そのまま `src` / `srcSet` に渡っていたのが原因でした。\n\n手順：\n- [src/lib/staticAsset.js](<WORKTREE>/src/lib/staticAsset.js) を追加し、静的 import を文字列URLへ正規化する共通ヘルパーを作成\n- [src/components/common/progressiveimage/ProgressiveImage.jsx](<WORKTREE>/src/components/common/progressiveimage/ProgressiveImage.jsx) で `avif/webp/jpg` と `srcSet` を正規化してから描画するよう修正\n- [src/components/common/svg/AISummaryBadge.jsx](<WORKTREE>/src/components/common/svg/AISummaryBadge.jsx) も同じヘルパーを使うよう修正し、同種の事故を予防\n\n確認結果：\n- `npm run test:run` 成功\n- `npm run lint` 成功\n- `npm run build` 成功\n- `build` の AVIF 警告は残りますが、これは「最適化非対応」の警告で、今回の 404 とは別件です\n\n注意点：\n- まだブラウザ上での再確認はしていませんが、原因のコード経路は塞いでいます\n- `dia-text-reveal.jsx` の既存 hook 警告は未対応のままです\n\n必要なら次に、ブラウザの Network タブで `[object Object]` が消えたかまで一緒に確認します。"
+    }
+  ]
+}

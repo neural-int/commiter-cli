@@ -1,0 +1,130 @@
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+warning: 'mlx-swift-lm': found 1 file(s) which are unhandled; explicitly declare them as resources or exclude from the target
+    /private/tmp/issue182-ministral-runtime/swift-build/checkouts/mlx-swift-lm/Libraries/MLXGuidedGeneration/README.md
+warning: 'mlx-swift-lm': found 1 file(s) which are unhandled; explicitly declare them as resources or exclude from the target
+    /private/tmp/issue182-ministral-runtime/swift-build/checkouts/mlx-swift-lm/Libraries/MLXFoundationModels/README.md
+[0/1] Planning build
+[1/1] Compiling plugin CudaBuild
+[2/2] Compiling plugin GenerateManual
+[3/3] Compiling plugin GenerateDoccReference
+Building for production...
+[3/8] Write sources
+[4/8] Write swift-version--58304C5D6DBC2206.txt
+[6/7] Compiling commiter_mlx_helper CommiterMLXHelper.swift
+[6/8] Write Objects.LinkFileList
+[7/8] Linking commiter-mlx-helper
+Build complete! (17.80s)
+Test Suite 'All tests' started at 2026-10-22 01:57:54.596.
+Test Suite 'All tests' passed at 2026-10-22 01:57:54.597.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+􀟈  Test run started.
+􀄵  Testing Library Version: 2084
+􀄵  Target Platform: arm64e-apple-macos14.0
+􀟈  Suite "IPC framing" started.
+􀟈  Suite "Three-phase host/helper context contract" started.
+􀟈  Suite "Bounded native thought transition" started.
+􀟈  Suite "Full prompt and output reservation" started.
+􀟈  Suite "Overlapped token state updates" started.
+􀟈  Suite BenchmarkLineReaderTests started.
+􀟈  Test copiesDoNotSharePhaseState() started.
+􀟈  Test forcesBoundaryThenValidatesResponse() started.
+􀟈  Suite "Sampling grammar state" started.
+􀟈  Suite "Candidate final-channel boundary" started.
+􀟈  Test unboundedThinkingDoesNotForceClose() started.
+􀟈  Test ministralMarkersCloseBeforeStrictBooleanResponse() started.
+􀟈  Test naturalBoundaryIsNotForced() started.
+􀟈  Test qwenPromptOpenedThoughtStopsAt1024AndContinuesJSON() started.
+􀟈  Test diagnosticPhaseSwitchesAtCommittedClose() started.
+􀟈  Test forcedOpenAndCopiedBoundaryRemainIndependent() started.
+􀟈  Test oneTokenOverFails() started.
+􀟈  Test promptExceedsContextFails() started.
+􀟈  Test measuredA136RequiresLargerContext() started.
+􀟈  Test diagnosticSeparatesNativeTransitionsAndResponseFailure() started.
+􀟈  Test earlyEOSAndMissingChannelFailClosed() started.
+􀟈  Test maximumCountsAvoidOverflow() started.
+􀟈  Test negativeCountsFail() started.
+􀟈  Test hostTiersAcceptedForEveryProfile() started.
+􀟈  Test invalidContextAndOutputRemainRejected() started.
+􀟈  Test unspecifiedContextRetainsLegacyBehavior() started.
+􀟈  Test templateOpenedThoughtClosesWithoutAnotherOpenToken() started.
+􀟈  Test exactBoundaryFits() started.
+􀟈  Test retainsFollowingLineAndHandlesEOF() started.
+􀟈  Test rejectsOversizedAndUnterminatedLines() started.
+􀟈  Test "rejects a line that exceeds the bound" started.
+􀟈  Test "rejects trailing bytes in a later chunk" started.
+􀟈  Test "rejects trailing bytes in the same chunk" started.
+􀟈  Test "accepts one bounded line followed by EOF" started.
+􀟈  Test "rejects a non-empty line without a delimiter" started.
+􀟈  Test bothBooleanValuesAreAllowed() started.
+􀟈  Test copyHasIndependentMatcher() started.
+􀟈  Test runtimeStopCountsDistinguishAllowedWhitespaceFromEOS() started.
+􀟈  Test rejectsEarlyStop() started.
+􀟈  Test topLevelBooleanIsStrictAndTerminal() started.
+􀟈  Test sharedTokenizerKeepsSchemaMatchersIndependent() started.
+􀟈  Test diagnosticMarksUnterminatedAndUnavailableStates() started.
+􀟈  Test textObjectRejectsHistoricalLengthOverflows() started.
+􀟈  Test diagnosticSeparatesBoundsCommitAndPrefetchFailures() started.
+􀟈  Test alignedRuntimeStopsPreserveJSONAndTerminalEOS() started.
+􀟈  Test enforcesLengthAndStop() started.
+􀟈  Test cancellationDoesNotCommitPendingLookahead() started.
+􀟈  Test naturalCloseAndEarlyEOSRemainDistinct() started.
+􀟈  Test copiesOwnIndependentPendingSlotsAndMatchers() started.
+􀟈  Test budgetBoundaryAndGrammarAreUpdatedBeforeNextSampling() started.
+􀟈  Test rejectsMissingOrRepeatedFinalChannel() started.
+􀟈  Test permitsSingleJSONFenceButNoProseOrPartialOutput() started.
+􀟈  Test discardsNativeContent() started.
+􁁛  Test ministralMarkersCloseBeforeStrictBooleanResponse() passed after 0.003 seconds.
+􁁛  Test oneTokenOverFails() passed after 0.003 seconds.
+􁁛  Test forcesBoundaryThenValidatesResponse() passed after 0.003 seconds.
+􁁛  Test unboundedThinkingDoesNotForceClose() passed after 0.003 seconds.
+􁁛  Test promptExceedsContextFails() passed after 0.003 seconds.
+􁁛  Test measuredA136RequiresLargerContext() passed after 0.003 seconds.
+􁁛  Test naturalBoundaryIsNotForced() passed after 0.003 seconds.
+􁁛  Test diagnosticPhaseSwitchesAtCommittedClose() passed after 0.003 seconds.
+􁁛  Test negativeCountsFail() passed after 0.003 seconds.
+􁁛  Test maximumCountsAvoidOverflow() passed after 0.003warning: '--build-system native' has been deprecated and will be removed in a future release; please report an issue at https://github.com/swiftlang/swift-package-manager/issues if you are unable to adopt the default build system.
+ seconds.
+􁁛  Test hostTiersAcceptedForEveryProfile() passed after 0.004 seconds.
+􁁛  Test unspecifiedContextRetainsLegacyBehavior() passed after 0.006 seconds.
+􁁛  Test exactBoundaryFits() passed after 0.007 seconds.
+􁁛  Test retainsFollowingLineAndHandlesEOF() passed after 0.005 seconds.
+􁁛  Test invalidContextAndOutputRemainRejected() passed after 0.007 seconds.
+􁁛  Test rejectsOversizedAndUnterminatedLines() passed after 0.005 seconds.
+􁁛  Test "rejects trailing bytes in a later chunk" passed after 0.005 seconds.
+􁁛  Test qwenPromptOpenedThoughtStopsAt1024AndContinuesJSON() passed after 0.007 seconds.
+􁁛  Test copiesDoNotSharePhaseState() passed after 0.007 seconds.
+􁁛  Test forcedOpenAndCopiedBoundaryRemainIndependent() passed after 0.007 seconds.
+􁁛  Test earlyEOSAndMissingChannelFailClosed() passed after 0.007 seconds.
+􁁛  Test templateOpenedThoughtClosesWithoutAnotherOpenToken() passed after 0.007 seconds.
+􁁛  Test "rejects a line that exceeds the bound" passed after 0.005 seconds.
+􁁛  Test "rejects a non-empty line without a delimiter" passed after 0.005 seconds.
+􁁛  Test "rejects trailing bytes in the same chunk" passed after 0.005 seconds.
+􁁛  Test copyHasIndependentMatcher() passed after 0.005 seconds.
+􁁛  Test "accepts one bounded line followed by EOF" passed after 0.005 seconds.
+􁁛  Test runtimeStopCountsDistinguishAllowedWhitespaceFromEOS() passed after 0.005 seconds.
+􁁛  Test rejectsEarlyStop() passed after 0.005 seconds.
+􁁛  Test diagnosticMarksUnterminatedAndUnavailableStates() passed after 0.005 seconds.
+􁁛  Test topLevelBooleanIsStrictAndTerminal() passed after 0.005 seconds.
+􁁛  Test sharedTokenizerKeepsSchemaMatchersIndependent() passed after 0.005 seconds.
+􁁛  Test enforcesLengthAndStop() passed after 0.004 seconds.
+􁁛  Test diagnosticSeparatesBoundsCommitAndPrefetchFailures() passed after 0.005 seconds.
+􁁛  Test diagnosticSeparatesNativeTransitionsAndResponseFailure() passed after 0.007 seconds.
+􁁛  Test rejectsMissingOrRepeatedFinalChannel() passed after 0.004 seconds.
+􁁛  Test discardsNativeContent() passed after 0.004 seconds.
+􁁛  Test permitsSingleJSONFenceButNoProseOrPartialOutput() passed after 0.004 seconds.
+􁁛  Test alignedRuntimeStopsPreserveJSONAndTerminalEOS() passed after 0.005 seconds.
+􁁛  Suite "Three-phase host/helper context contract" passed after 0.008 seconds.
+􁁛  Suite BenchmarkLineReaderTests passed after 0.008 seconds.
+􁁛  Suite "Bounded native thought transition" passed after 0.008 seconds.
+􁁛  Suite "IPC framing" passed after 0.008 seconds.
+􁁛  Suite "Candidate final-channel boundary" passed after 0.008 seconds.
+􁁛  Suite "Full prompt and output reservation" passed after 0.008 seconds.
+􁁛  Test textObjectRejectsHistoricalLengthOverflows() passed after 0.008 seconds.
+􁁛  Test bothBooleanValuesAreAllowed() passed after 0.012 seconds.
+􁁛  Suite "Sampling grammar state" passed after 0.015 seconds.
+􁁛  Test cancellationDoesNotCommitPendingLookahead() passed after 0.012 seconds.
+􁁛  Test naturalCloseAndEarlyEOSRemainDistinct() passed after 0.016 seconds.
+􁁛  Test copiesOwnIndependentPendingSlotsAndMatchers() passed after 0.016 seconds.
+􁁛  Test budgetBoundaryAndGrammarAreUpdatedBeforeNextSampling() passed after 0.016 seconds.
+􁁛  Suite "Overlapped token state updates" passed after 0.020 seconds.
+􁁛  Test run with 45 tests in 8 suites passed after 0.020 seconds.
