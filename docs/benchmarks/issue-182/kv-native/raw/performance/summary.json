@@ -1,0 +1,768 @@
+{
+  "id": "H182-008-kv",
+  "completion": {
+    "cells": 8,
+    "seconds": 1824.8003924167715,
+    "monitor_failed": false
+  },
+  "verified_requests": 24,
+  "paired_requests_identical": 12,
+  "monitor": {
+    "samples": 365,
+    "invalid": 0,
+    "pressure_free_percent_range": [
+      30,
+      77
+    ],
+    "swap_used_MiB_start_end": [
+      3239.94,
+      4557.56
+    ],
+    "swap_used_MiB_range": [
+      3239.94,
+      4637.56
+    ],
+    "max_helper_rss_GiB": 1.9231414794921875,
+    "thermal_warning_reported": false
+  },
+  "cells": [
+    {
+      "cell": "gemma-on-C01-compact-thinking1024-kv8",
+      "fixture": "C01",
+      "mode": "8",
+      "wall_seconds": 89.740333292,
+      "generated_tokens": 1817,
+      "decode_tps": 24.240351474312703,
+      "actual_grouping_match": true,
+      "phase_contents": [
+        "{\"path:src/components/common/progressiveimage/ProgressiveImage.jsx\":\"G001\",\"path:src/components/common/svg/AISummaryBadge.jsx\":\"G001\",\"path:src/lib/staticAsset.js\":\"G001\"}",
+        "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }",
+        "{ \"G001\": { \"scope\": \"ImageAssetFix\", \"summary\": \"静的アセット参照を正規化し、[object Object]エラーを解消。\" } }"
+      ],
+      "plan": {
+        "schema_version": 1,
+        "commits": [
+          {
+            "type": "fix",
+            "scope": "ImageAssetFix",
+            "breaking": false,
+            "summary": "静的アセット参照を正規化し、[object Object]エラーを解消。",
+            "file_ids": [
+              "F001",
+              "F002",
+              "F003"
+            ]
+          }
+        ]
+      },
+      "phases": [
+        {
+          "phase": "Grouping",
+          "generated_tokens": 422,
+          "decode_seconds": 17.361098051071167,
+          "decode_tps": 24.307218285306725,
+          "thinking_tokens": 360,
+          "forced_close": false,
+          "kv_bytes": 42339840,
+          "peak_mlx_bytes": 5149225852,
+          "cache_types": {
+            "RotatingKVCache": 20,
+            "QuantizedKVCache": 4
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "uint32"
+          ]
+        },
+        {
+          "phase": "Category",
+          "generated_tokens": 678,
+          "decode_seconds": 27.876744031906128,
+          "decode_tps": 24.321348261619075,
+          "thinking_tokens": 651,
+          "forced_close": false,
+          "kv_bytes": 49590272,
+          "peak_mlx_bytes": 5149225852,
+          "cache_types": {
+            "RotatingKVCache": 20,
+            "QuantizedKVCache": 4
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "uint32"
+          ]
+        },
+        {
+          "phase": "Text",
+          "generated_tokens": 717,
+          "decode_seconds": 29.71981692314148,
+          "decode_tps": 24.12531685017563,
+          "thinking_tokens": 676,
+          "forced_close": false,
+          "kv_bytes": 49590272,
+          "peak_mlx_bytes": 5149225852,
+          "cache_types": {
+            "RotatingKVCache": 20,
+            "QuantizedKVCache": 4
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "uint32"
+          ]
+        }
+      ]
+    },
+    {
+      "cell": "gemma-on-C01-compact-thinking1024-kvnative",
+      "fixture": "C01",
+      "mode": "native",
+      "wall_seconds": 109.367934083,
+      "generated_tokens": 1887,
+      "decode_tps": 20.611713942168986,
+      "actual_grouping_match": true,
+      "phase_contents": [
+        "{\"path:src/components/common/progressiveimage/ProgressiveImage.jsx\":\"G001\",\"path:src/components/common/svg/AISummaryBadge.jsx\":\"G001\",\"path:src/lib/staticAsset.js\":\"G001\"}",
+        "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }",
+        "{ \"G001\": { \"scope\": \"StaticAssetFix\", \"summary\": \"オブジェクト型パスを正規化し、404エラーを解消しました。\" } }"
+      ],
+      "plan": {
+        "schema_version": 1,
+        "commits": [
+          {
+            "type": "fix",
+            "scope": "StaticAssetFix",
+            "breaking": false,
+            "summary": "オブジェクト型パスを正規化し、404エラーを解消しました。",
+            "file_ids": [
+              "F001",
+              "F002",
+              "F003"
+            ]
+          }
+        ]
+      },
+      "phases": [
+        {
+          "phase": "Grouping",
+          "generated_tokens": 470,
+          "decode_seconds": 20.02784502506256,
+          "decode_tps": 23.46732758376394,
+          "thinking_tokens": 408,
+          "forced_close": false,
+          "kv_bytes": 61194240,
+          "peak_mlx_bytes": 5149225852,
+          "cache_types": {
+            "RotatingKVCache": 20,
+            "KVCacheSimple": 4
+          },
+          "cache_dtypes": [
+            "bfloat16"
+          ]
+        },
+        {
+          "phase": "Category",
+          "generated_tokens": 630,
+          "decode_seconds": 30.689218044281006,
+          "decode_tps": 20.528382283673132,
+          "thinking_tokens": 603,
+          "forced_close": false,
+          "kv_bytes": 74842112,
+          "peak_mlx_bytes": 5149225852,
+          "cache_types": {
+            "RotatingKVCache": 20,
+            "KVCacheSimple": 4
+          },
+          "cache_dtypes": [
+            "bfloat16"
+          ]
+        },
+        {
+          "phase": "Text",
+          "generated_tokens": 787,
+          "decode_seconds": 40.83281993865967,
+          "decode_tps": 19.273711714798438,
+          "thinking_tokens": 748,
+          "forced_close": false,
+          "kv_bytes": 74842112,
+          "peak_mlx_bytes": 5149225852,
+          "cache_types": {
+            "RotatingKVCache": 20,
+            "KVCacheSimple": 4
+          },
+          "cache_dtypes": [
+            "bfloat16"
+          ]
+        }
+      ]
+    },
+    {
+      "cell": "gemma-on-C02-compact-thinking1024-kvnative",
+      "fixture": "C02",
+      "mode": "native",
+      "wall_seconds": 280.573374375,
+      "generated_tokens": 2409,
+      "decode_tps": 14.366866505495627,
+      "actual_grouping_match": true,
+      "phase_contents": [
+        "{ \"path:docs/decisions/issue-167-file-first.md\": \"G001\", \"path:internal/gitstate/collect.go\": \"G001\", \"path:internal/gitstate/file_first_test.go\": \"G001\", \"path:internal/gitstate/file_first.go\": \"G001\" }",
+        "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"feat\" } }",
+        "{ \"G001\": { \"scope\": \"FileFirst\", \"summary\": \"Issue #167 の Phase1 の検証が完了し、ファイル優先の構造経路が確認できました。\" } }"
+      ],
+      "plan": {
+        "schema_version": 1,
+        "commits": [
+          {
+            "type": "feat",
+            "scope": "FileFirst",
+            "breaking": false,
+            "summary": "Issue #167 の Phase1 の検証が完了し、ファイル優先の構造経路が確認できました。",
+            "file_ids": [
+              "F001",
+              "F002",
+              "F003",
+              "F004"
+            ]
+          }
+        ]
+      },
+      "phases": [
+        {
+          "phase": "Grouping",
+          "generated_tokens": 688,
+          "decode_seconds": 53.47197198867798,
+          "decode_tps": 12.866553718005301,
+          "thinking_tokens": 599,
+          "forced_close": false,
+          "kv_bytes": 328663040,
+          "peak_mlx_bytes": 5232819816,
+          "cache_types": {
+            "RotatingKVCache": 20,
+            "KVCacheSimple": 4
+          },
+          "cache_dtypes": [
+            "bfloat16"
+          ]
+        },
+        {
+          "phase": "Category",
+          "generated_tokens": 1051,
+          "decode_seconds": 77.42772805690765,
+          "decode_tps": 13.573948588902653,
+          "thinking_tokens": 1024,
+          "forced_close": true,
+          "kv_bytes": 341278720,
+          "peak_mlx_bytes": 5381242480,
+          "cache_types": {
+            "RotatingKVCache": 20,
+            "KVCacheSimple": 4
+          },
+          "cache_dtypes": [
+            "bfloat16"
+          ]
+        },
+        {
+          "phase": "Text",
+          "generated_tokens": 670,
+          "decode_seconds": 36.77778196334839,
+          "decode_tps": 18.21752058532789,
+          "thinking_tokens": 625,
+          "forced_close": false,
+          "kv_bytes": 332890112,
+          "peak_mlx_bytes": 5381242480,
+          "cache_types": {
+            "RotatingKVCache": 20,
+            "KVCacheSimple": 4
+          },
+          "cache_dtypes": [
+            "bfloat16"
+          ]
+        }
+      ]
+    },
+    {
+      "cell": "gemma-on-C02-compact-thinking1024-kv8",
+      "fixture": "C02",
+      "mode": "8",
+      "wall_seconds": 313.435821167,
+      "generated_tokens": 2511,
+      "decode_tps": 12.752791578564773,
+      "actual_grouping_match": true,
+      "phase_contents": [
+        "{ \"path:docs/decisions/issue-167-file-first.md\": \"G001\", \"path:internal/gitstate/collect.go\": \"G001\", \"path:internal/gitstate/file_first_test.go\": \"G001\", \"path:internal/gitstate/file_first.go\": \"G001\" }",
+        "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"feat\" } }",
+        "{ \"G001\": { \"scope\": \"FileFirst\", \"summary\": \"Issue #167 Phase.1「ファイル優先構造」を実装・検証完了。\" } }"
+      ],
+      "plan": {
+        "schema_version": 1,
+        "commits": [
+          {
+            "type": "feat",
+            "scope": "FileFirst",
+            "breaking": false,
+            "summary": "Issue #167 Phase.1「ファイル優先構造」を実装・検証完了。",
+            "file_ids": [
+              "F001",
+              "F002",
+              "F003",
+              "F004"
+            ]
+          }
+        ]
+      },
+      "phases": [
+        {
+          "phase": "Grouping",
+          "generated_tokens": 652,
+          "decode_seconds": 58.218884110450745,
+          "decode_tps": 11.199115372308569,
+          "thinking_tokens": 563,
+          "forced_close": false,
+          "kv_bytes": 184432640,
+          "peak_mlx_bytes": 5149225852,
+          "cache_types": {
+            "RotatingKVCache": 20,
+            "QuantizedKVCache": 4
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "uint32"
+          ]
+        },
+        {
+          "phase": "Category",
+          "generated_tokens": 1049,
+          "decode_seconds": 88.36997604370117,
+          "decode_tps": 11.870547520361928,
+          "thinking_tokens": 1022,
+          "forced_close": false,
+          "kv_bytes": 191134720,
+          "peak_mlx_bytes": 5149225852,
+          "cache_types": {
+            "RotatingKVCache": 20,
+            "QuantizedKVCache": 4
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "uint32"
+          ]
+        },
+        {
+          "phase": "Text",
+          "generated_tokens": 810,
+          "decode_seconds": 50.30920600891113,
+          "decode_tps": 16.100432987483977,
+          "thinking_tokens": 769,
+          "forced_close": false,
+          "kv_bytes": 186678272,
+          "peak_mlx_bytes": 5149225852,
+          "cache_types": {
+            "RotatingKVCache": 20,
+            "QuantizedKVCache": 4
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "uint32"
+          ]
+        }
+      ]
+    },
+    {
+      "cell": "qwen4-on-C01-current-thinking1024-kv8",
+      "fixture": "C01",
+      "mode": "8",
+      "wall_seconds": 140.159427834,
+      "generated_tokens": 2449,
+      "decode_tps": 20.501852528611188,
+      "actual_grouping_match": true,
+      "phase_contents": [
+        "{ \"path:src/components/common/progressiveimage/ProgressiveImage.jsx\": \"G001\", \"path:src/components/common/svg/AISummaryBadge.jsx\": \"G001\", \"path:src/lib/staticAsset.js\": \"G001\" }",
+        "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }",
+        "{ \"G001\": { \"scope\": \"画像コンポーネント\", \"summary\": \"静的アセットの正規化で画像描画の404エラーを修正\" } }"
+      ],
+      "plan": {
+        "schema_version": 1,
+        "commits": [
+          {
+            "type": "fix",
+            "scope": "画像コンポーネント",
+            "breaking": false,
+            "summary": "静的アセットの正規化で画像描画の404エラーを修正",
+            "file_ids": [
+              "F001",
+              "F002",
+              "F003"
+            ]
+          }
+        ]
+      },
+      "phases": [
+        {
+          "phase": "Grouping",
+          "generated_tokens": 575,
+          "decode_seconds": 25.9690580368042,
+          "decode_tps": 22.141734951845045,
+          "thinking_tokens": 515,
+          "forced_close": false,
+          "kv_bytes": 98495488,
+          "peak_mlx_bytes": 3295698840,
+          "cache_types": {
+            "MambaCache": 24,
+            "QuantizedKVCache": 8
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "float32",
+            "uint32"
+          ]
+        },
+        {
+          "phase": "Category",
+          "generated_tokens": 1050,
+          "decode_seconds": 56.34677302837372,
+          "decode_tps": 18.634607512860885,
+          "thinking_tokens": 1024,
+          "forced_close": true,
+          "kv_bytes": 114093056,
+          "peak_mlx_bytes": 3451047064,
+          "cache_types": {
+            "MambaCache": 24,
+            "QuantizedKVCache": 8
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "float32",
+            "uint32"
+          ]
+        },
+        {
+          "phase": "Text",
+          "generated_tokens": 824,
+          "decode_seconds": 37.136788964271545,
+          "decode_tps": 22.18824036705897,
+          "thinking_tokens": 781,
+          "forced_close": false,
+          "kv_bytes": 109636608,
+          "peak_mlx_bytes": 3451047064,
+          "cache_types": {
+            "MambaCache": 24,
+            "QuantizedKVCache": 8
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "float32",
+            "uint32"
+          ]
+        }
+      ]
+    },
+    {
+      "cell": "qwen4-on-C01-current-thinking1024-kvnative",
+      "fixture": "C01",
+      "mode": "native",
+      "wall_seconds": 130.523298916,
+      "generated_tokens": 2296,
+      "decode_tps": 21.010236003867952,
+      "actual_grouping_match": true,
+      "phase_contents": [
+        "{ \"path:src/components/common/progressiveimage/ProgressiveImage.jsx\": \"G001\", \"path:src/components/common/svg/AISummaryBadge.jsx\": \"G001\", \"path:src/lib/staticAsset.js\": \"G001\" }",
+        "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }",
+        "{ \"G001\": { \"scope\": \"StaticAsset\", \"summary\": \"静的アセットのオブジェクト化による404を解消\" } }"
+      ],
+      "plan": {
+        "schema_version": 1,
+        "commits": [
+          {
+            "type": "fix",
+            "scope": "StaticAsset",
+            "breaking": false,
+            "summary": "静的アセットのオブジェクト化による404を解消",
+            "file_ids": [
+              "F001",
+              "F002",
+              "F003"
+            ]
+          }
+        ]
+      },
+      "phases": [
+        {
+          "phase": "Grouping",
+          "generated_tokens": 573,
+          "decode_seconds": 25.0123450756073,
+          "decode_tps": 22.9086876207703,
+          "thinking_tokens": 513,
+          "forced_close": false,
+          "kv_bytes": 139952128,
+          "peak_mlx_bytes": 3331841628,
+          "cache_types": {
+            "MambaCache": 24,
+            "KVCacheSimple": 8
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "float32"
+          ]
+        },
+        {
+          "phase": "Category",
+          "generated_tokens": 1050,
+          "decode_seconds": 54.98668599128723,
+          "decode_tps": 19.095531601347552,
+          "thinking_tokens": 1024,
+          "forced_close": true,
+          "kv_bytes": 169312256,
+          "peak_mlx_bytes": 3527419670,
+          "cache_types": {
+            "MambaCache": 24,
+            "KVCacheSimple": 8
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "float32"
+          ]
+        },
+        {
+          "phase": "Text",
+          "generated_tokens": 673,
+          "decode_seconds": 29.281036019325256,
+          "decode_tps": 22.984159425090876,
+          "thinking_tokens": 637,
+          "forced_close": false,
+          "kv_bytes": 152535040,
+          "peak_mlx_bytes": 3527419670,
+          "cache_types": {
+            "MambaCache": 24,
+            "KVCacheSimple": 8
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "float32"
+          ]
+        }
+      ]
+    },
+    {
+      "cell": "qwen4-on-C02-current-thinking1024-kvnative",
+      "fixture": "C02",
+      "mode": "native",
+      "wall_seconds": 326.975380958,
+      "generated_tokens": 2659,
+      "decode_tps": 17.57387041069413,
+      "actual_grouping_match": false,
+      "phase_contents": [
+        "{\"path:docs/decisions/issue-167-file-first.md\": \"G003\", \"path:internal/gitstate/collect.go\": \"G001\", \"path:internal/gitstate/file_first_test.go\": \"G002\", \"path:internal/gitstate/file_first.go\": \"G001\"}",
+        "{\"G001\":{\"breaking_evidence_ref\":\"none\",\"type\":\"feat\"}}",
+        "{ \"G001\": { \"scope\": \"internal/git\", \"summary\": \"Issue #167 ファイル先フェーズ実装\" } }"
+      ],
+      "plan": {
+        "schema_version": 1,
+        "commits": [
+          {
+            "type": "feat",
+            "scope": "internal/git",
+            "breaking": false,
+            "summary": "Issue #167 ファイル先フェーズ実装",
+            "file_ids": [
+              "F001",
+              "F002",
+              "F003",
+              "F004"
+            ]
+          }
+        ]
+      },
+      "phases": [
+        {
+          "phase": "Grouping",
+          "generated_tokens": 1097,
+          "decode_seconds": 63.891619086265564,
+          "decode_tps": 17.16970106077365,
+          "thinking_tokens": 1024,
+          "forced_close": true,
+          "kv_bytes": 623214592,
+          "peak_mlx_bytes": 4019041834,
+          "cache_types": {
+            "MambaCache": 24,
+            "KVCacheSimple": 8
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "float32"
+          ]
+        },
+        {
+          "phase": "Category",
+          "generated_tokens": 1042,
+          "decode_seconds": 62.32262194156647,
+          "decode_tps": 16.71945061902204,
+          "thinking_tokens": 1024,
+          "forced_close": true,
+          "kv_bytes": 627015680,
+          "peak_mlx_bytes": 4363549358,
+          "cache_types": {
+            "MambaCache": 24,
+            "KVCacheSimple": 8
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "float32"
+          ]
+        },
+        {
+          "phase": "Text",
+          "generated_tokens": 520,
+          "decode_seconds": 25.089936017990112,
+          "decode_tps": 20.72544145298525,
+          "thinking_tokens": 485,
+          "forced_close": false,
+          "kv_bytes": 610238464,
+          "peak_mlx_bytes": 4363549358,
+          "cache_types": {
+            "MambaCache": 24,
+            "KVCacheSimple": 8
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "float32"
+          ]
+        }
+      ]
+    },
+    {
+      "cell": "qwen4-on-C02-current-thinking1024-kv8",
+      "fixture": "C02",
+      "mode": "8",
+      "wall_seconds": 366.952953209,
+      "generated_tokens": 2706,
+      "decode_tps": 14.249448375435831,
+      "actual_grouping_match": true,
+      "phase_contents": [
+        "{\"path:docs/decisions/issue-167-file-first.md\": \"G001\", \"path:internal/gitstate/collect.go\": \"G001\", \"path:internal/gitstate/file_first_test.go\": \"G001\", \"path:internal/gitstate/file_first.go\": \"G001\"}",
+        "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"feat\" } }",
+        "{ \"G001\": { \"scope\": \"internal/gitstat\", \"summary\": \"Issue#167のPhase1で、一時indexとobjectを保持した構造経路の検証\" } }"
+      ],
+      "plan": {
+        "schema_version": 1,
+        "commits": [
+          {
+            "type": "feat",
+            "scope": "internal/gitstat",
+            "breaking": false,
+            "summary": "Issue#167のPhase1で、一時indexとobjectを保持した構造経路の検証",
+            "file_ids": [
+              "F001",
+              "F002",
+              "F003",
+              "F004"
+            ]
+          }
+        ]
+      },
+      "phases": [
+        {
+          "phase": "Grouping",
+          "generated_tokens": 1097,
+          "decode_seconds": 79.36653399467468,
+          "decode_tps": 13.821946666760152,
+          "thinking_tokens": 1024,
+          "forced_close": true,
+          "kv_bytes": 355228672,
+          "peak_mlx_bytes": 3772629220,
+          "cache_types": {
+            "MambaCache": 24,
+            "QuantizedKVCache": 8
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "float32",
+            "uint32"
+          ]
+        },
+        {
+          "phase": "Category",
+          "generated_tokens": 1050,
+          "decode_seconds": 76.39563500881195,
+          "decode_tps": 13.744240752483915,
+          "thinking_tokens": 1024,
+          "forced_close": true,
+          "kv_bytes": 357248000,
+          "peak_mlx_bytes": 4062755572,
+          "cache_types": {
+            "MambaCache": 24,
+            "QuantizedKVCache": 8
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "float32",
+            "uint32"
+          ]
+        },
+        {
+          "phase": "Text",
+          "generated_tokens": 559,
+          "decode_seconds": 34.13991904258728,
+          "decode_tps": 16.373793953719826,
+          "thinking_tokens": 513,
+          "forced_close": false,
+          "kv_bytes": 348335104,
+          "peak_mlx_bytes": 4062755572,
+          "cache_types": {
+            "MambaCache": 24,
+            "QuantizedKVCache": 8
+          },
+          "cache_dtypes": [
+            "bfloat16",
+            "float32",
+            "uint32"
+          ]
+        }
+      ]
+    }
+  ],
+  "pairs": [
+    {
+      "cells": [
+        "gemma-on-C01-compact-thinking1024-kv8",
+        "gemma-on-C01-compact-thinking1024-kvnative"
+      ],
+      "native_decode_change_percent": -14.96940972984222,
+      "native_wall_change_percent": 21.871548801958497,
+      "phase_contents_identical": false
+    },
+    {
+      "cells": [
+        "gemma-on-C02-compact-thinking1024-kvnative",
+        "gemma-on-C02-compact-thinking1024-kv8"
+      ],
+      "native_decode_change_percent": 12.656640053961477,
+      "native_wall_change_percent": -10.484585542789858,
+      "phase_contents_identical": false
+    },
+    {
+      "cells": [
+        "qwen4-on-C01-current-thinking1024-kv8",
+        "qwen4-on-C01-current-thinking1024-kvnative"
+      ],
+      "native_decode_change_percent": 2.4796953082522277,
+      "native_wall_change_percent": -6.875120045019534,
+      "phase_contents_identical": false
+    },
+    {
+      "cells": [
+        "qwen4-on-C02-current-thinking1024-kvnative",
+        "qwen4-on-C02-current-thinking1024-kv8"
+      ],
+      "native_decode_change_percent": 23.330180563264214,
+      "native_wall_change_percent": -10.894468051393646,
+      "phase_contents_identical": false
+    }
+  ],
+  "decision": "NO-GO for blanket native adoption; n=1 mixed speed and one actual Grouping mismatch; keep existing KV8 default",
+  "limitations": [
+    "single observation per arm, no statistical significance",
+    "output and Thinking counts differ so wall time is not pure kernel speed",
+    "fixed downstream partition; plan acceptance does not establish actual Grouping correctness",
+    "system swap grows during suite; cannot attribute system swap to helper or isolate memory pressure effects",
+    "no GPU trace or detailed CPU timers in performance cells"
+  ]
+}

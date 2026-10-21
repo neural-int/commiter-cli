@@ -1,8 +1,8 @@
-# H182-008 診断・KV比較（D1/D2診断完了・KV比較未実行）
+# H182-008 診断・KV比較（D1/D2診断・KV比較完了）
 
 ## 要約
 
-従来A/eagerに固定した診断D1/D2を実行・レビューした。両セルplan受理・実Grouping一致、CPU内訳と対象GPUトレースを取得。D2 traceはTextだけのためQwen ThinkingのGPU/CPU重なりは未確認。KV比較8セルは未実行。詳細はdiagnostic-report.md、固定条件はplan.md。
+従来A/eagerに固定した診断D1/D2を実行・レビューした。両セルplan受理・実Grouping一致、CPU内訳と対象GPUトレースを取得。D2 traceはTextだけのためQwen ThinkingのGPU/CPU重なりは未確認。KV比較8セルは完了。比較結果はcomparison-report.md、診断結果はdiagnostic-report.md、固定条件はplan.mdを参照。
 
 ## ケース一覧
 
@@ -27,7 +27,7 @@ nativeはモデル標準のcacheとdtypeを使い、全層をFP16/BF16へ固定�
 
 Release45テスト成功。Thinking→responseの診断ラベルが終了markerのcommitで切り替わる回帰テストを追加。全8比較セルで再capture要求と入力token列が保存済み基準と一致。KV8側のKV構成は基準と一致、native側は対象attention KVだけがQuantizedKVCacheからKVCacheSimpleへ変わり、rotating/state-space層は不変。空cache時のdtype表示を実生成後のdtypeの証拠とは扱わず、実行時snapshotを確認する。
 
-xctraceの最初のtemplate一覧取得はsandboxからInstrumentsキャッシュへ書けず失敗した。通常の許可された実行環境で再確認し、Metal System Traceの存在を確認した。実attachの権限・trace内容・GPU/CPU重なりは未確認。新しい依存の追加はない。
+xctraceの最初のtemplate一覧取得はsandboxからInstrumentsキャッシュへ書けず失敗した。通常の許可された実行環境で再確認し、Metal System Traceの存在を確認した。実attach・trace採取は診断で成功したが、Qwen ThinkingのGPU/CPU重なりは未確認。新しい依存の追加はない。
 
 ## 評価と安全条件
 
@@ -39,7 +39,7 @@ CPUタイマーは初回token取得を別記し、以後の取得待ち・状態
 
 原本は/private/tmp/issue182-kv-native/。raw/に生成なし監査・契約・capture・source/checksを保存する。公開コピーはメール形式文字列とホーム絶対pathを置換し、SHA256SUMS.txtは公開コピーhash。実行契約のhashは原本の値。binary/weight/metallibはhashで識別する。
 
-diagnoseによる診断2セルの実行とレビューを完了し、diagnostics/review.jsonに判明事項とproceed_to_kv_comparison=trueを記録した。KV比較8セルはまだ実行していない。CPU計測をKV速度比較へ流用せず、比較の実行時には詳細診断をOFFにする。
+diagnoseによる診断2セルの実行とレビューを完了し、diagnostics/review.jsonに判明事項とproceed_to_kv_comparison=trueを記録した。KV比較8セルはユーザー指定の順序で実行した。CPU計測をKV速度比較へ流用せず、比較では詳細診断をOFFにした。
 
 ## 診断の適用範囲
 
@@ -47,4 +47,8 @@ diagnoseによる診断2セルの実行とレビューを完了し、diagnostics
 
 ## D1/D2実行結果
 
-診断2セルは完了し、全6phaseのCPU内訳、有効JSON、plan受理と実Grouping一致を確認した。詳細はdiagnostic-report.md。Thinking状態更新/進捗はGemma0.0456秒、Qwen0.1790秒と小さく、取得待ちは73.28秒/127.77秒。ただしGPU/runtime待ちを含み同期の無駄とは断定しない。D1 traceは31.20秒でGrouping/Category、D2 traceは保存待ちでattachが遅れ19.87秒のTextだけを採取。Qwen ThinkingのGPU/CPU重なりは未確認。レビューを保存し、KV比較8セルは未実行のまま保持。
+診断2セルは完了し、全6phaseのCPU内訳、有効JSON、plan受理と実Grouping一致を確認した。詳細はdiagnostic-report.md。Thinking状態更新/進捗はGemma0.0456秒、Qwen0.1790秒と小さく、取得待ちは73.28秒/127.77秒。ただしGPU/runtime待ちを含み同期の無駄とは断定しない。D1 traceは31.20秒でGrouping/Category、D2 traceは保存待ちでattachが遅れ19.87秒のTextだけを採取。Qwen ThinkingのGPU/CPU重なりは未確認。レビューを保存し、その後KV比較8セルを完了した。
+
+## KV比較実行結果
+
+全8セル・24phaseが正常終了。validator受理8/8、実Grouping参照一致7/8。Qwen C02 nativeのみ3グループに分割。native decode速度差はGemma C01 -15.0%、C02 +12.7%、Qwen C01 +2.5%、C02 +23.3%。全4組で応答・生成量が変化した。nativeのKV容量増加とシステムswap増加を記録。n=1で因果・安定性未確定のため一律native採用はNO-GO、既存KV8を保持。詳細・原文・Thinking境界はcomparison-report.mdとraw/performance/summary.json。
