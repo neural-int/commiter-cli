@@ -1,0 +1,959 @@
+{
+  "error": "",
+  "native": {
+    "ok": true,
+    "stop_reason": "completed",
+    "model": "mlx-community\/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2",
+    "generated_json": "{ \"G001\": { \"scope\": \"ImageAssetFix\", \"summary\": \"静的アセット参照を正規化し、[object Object]エラーを解消。\" } }",
+    "benchmark_metrics": {
+      "requestedKVBits": 8,
+      "prepareSeconds": 0.44123850017786026,
+      "runtimePromptSeconds": 2.7956619262695312,
+      "modelReused": true,
+      "activeMemoryBytes": 4251302228,
+      "prefixChunkCount": 0,
+      "prefixSynchronizeSeconds": 0,
+      "diagnosticFirstReadSeconds": 2.607354875188321,
+      "benchmarkCacheMode": "8",
+      "grammarPreparationSeconds": 2.3329630494117737e-06,
+      "generatedTokens": 717,
+      "nativeThoughtTokens": 676,
+      "grammarSetupSeconds": 0.8062723334878683,
+      "cacheMemoryBytes": 52592816,
+      "prefixPrefillSeconds": 0,
+      "prefixClearCacheSeconds": 0,
+      "diagnosticCPUSeconds": {
+        "thinkingUpdateAndProgressSeconds": 0.022086369805037975,
+        "responseUpdateAndProgressSeconds": 0.0033642081543803215,
+        "thinkingMaskPreparationSeconds": 0.0008678436279296875,
+        "responseMaskPreparationSeconds": 0.16914237570017576,
+        "thinkingReadSeconds": 29.929805795662105,
+        "responseReadSeconds": 1.7594926650635898
+      },
+      "phaseEndKVLayers": [
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 0,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 1,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 2,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 3,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 4,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "affine",
+          "offset": 3178,
+          "index": 5,
+          "bits": 8,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                128
+              ],
+              "dtype": "uint32",
+              "bytes": 3366912
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                128
+              ],
+              "dtype": "uint32",
+              "bytes": 3366912
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            }
+          ],
+          "nativeType": "QuantizedKVCache",
+          "bytes": 7154688
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 6,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 7,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 8,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 9,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 10,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "affine",
+          "offset": 3178,
+          "index": 11,
+          "bits": 8,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                128
+              ],
+              "dtype": "uint32",
+              "bytes": 3366912
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                128
+              ],
+              "dtype": "uint32",
+              "bytes": 3366912
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            }
+          ],
+          "nativeType": "QuantizedKVCache",
+          "bytes": 7154688
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 12,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 13,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 14,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 15,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 16,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "affine",
+          "offset": 3178,
+          "index": 17,
+          "bits": 8,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                128
+              ],
+              "dtype": "uint32",
+              "bytes": 3366912
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                128
+              ],
+              "dtype": "uint32",
+              "bytes": 3366912
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            }
+          ],
+          "nativeType": "QuantizedKVCache",
+          "bytes": 7154688
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 18,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 19,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 20,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 21,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "rotating",
+          "offset": 3178,
+          "index": 22,
+          "bits": 16,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            },
+            {
+              "shape": [
+                1,
+                2,
+                512,
+                256
+              ],
+              "dtype": "bfloat16",
+              "bytes": 524288
+            }
+          ],
+          "nativeType": "RotatingKVCache",
+          "bytes": 1048576
+        },
+        {
+          "kind": "affine",
+          "offset": 3178,
+          "index": 23,
+          "bits": 8,
+          "arrays": [
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                128
+              ],
+              "dtype": "uint32",
+              "bytes": 3366912
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                128
+              ],
+              "dtype": "uint32",
+              "bytes": 3366912
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            },
+            {
+              "shape": [
+                1,
+                2,
+                3288,
+                8
+              ],
+              "dtype": "bfloat16",
+              "bytes": 105216
+            }
+          ],
+          "nativeType": "QuantizedKVCache",
+          "bytes": 7154688
+        }
+      ],
+      "prefixKVLayers": [],
+      "inputTokens": 2460,
+      "generationWallSeconds": 36.89725058339536,
+      "cacheReusedTokens": 2264,
+      "diagnosticEventCounts": {
+        "thinkingUpdateAndProgressSeconds": 677,
+        "responseUpdateAndProgressSeconds": 42,
+        "thinkingMaskPreparationSeconds": 677,
+        "responseReadSeconds": 42,
+        "thinkingReadSeconds": 676,
+        "responseMaskPreparationSeconds": 42
+      },
+      "prefixMemorySamples": [],
+      "loadSeconds": 4.166737198829651e-06,
+      "grammarPreparationReused": true,
+      "peakMemoryBytes": 5149225852,
+      "prefixReclaimCount": 0,
+      "nativeThoughtForcedClose": false,
+      "runtimeGenerationSeconds": 34.08150506019592
+    },
+    "generation_profile": "bounded-text",
+    "runtime": "mlx"
+  },
+  "response": {
+    "Backend": "mlx",
+    "Model": "mlx-community/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2",
+    "Content": "{ \"G001\": { \"scope\": \"ImageAssetFix\", \"summary\": \"静的アセット参照を正規化し、[object Object]エラーを解消。\" } }",
+    "StopReason": "completed",
+    "TotalDuration": 0,
+    "LoadDuration": 0,
+    "PromptEvalCount": 0,
+    "PromptEvalDuration": 0,
+    "EvalCount": 0,
+    "EvalDuration": 0,
+    "Availability": {
+      "TotalDuration": false,
+      "LoadDuration": false,
+      "PromptEvalCount": false,
+      "PromptEvalDuration": false,
+      "EvalCount": false,
+      "EvalDuration": false
+    }
+  },
+  "wall_seconds": 38.234641375
+}

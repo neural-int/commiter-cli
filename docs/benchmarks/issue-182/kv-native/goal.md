@@ -1,8 +1,8 @@
-# H182-008 診断・KV比較（準備完了、未実行）
+# H182-008 診断・KV比較（D1/D2診断完了・KV比較未実行）
 
 ## 要約
 
-従来A/eagerに固定した診断2セルとKV比較8セルを用意した。モデル生成とtrace採取は未実行で、性能・品質の結果は未確定。詳細条件はplan.md。
+従来A/eagerに固定した診断D1/D2を実行・レビューした。両セルplan受理・実Grouping一致、CPU内訳と対象GPUトレースを取得。D2 traceはTextだけのためQwen ThinkingのGPU/CPU重なりは未確認。KV比較8セルは未実行。詳細はdiagnostic-report.md、固定条件はplan.md。
 
 ## ケース一覧
 
@@ -23,7 +23,7 @@
 
 nativeはモデル標準のcacheとdtypeを使い、全層をFP16/BF16へ固定しない。重み4bitは両群とも同じ。変更するのはKV量子化で、メモリ増加・転送量増加・数値差による出力変化の可能性がある。
 
-## 準備結果
+## 準備時点の確認結果
 
 Release45テスト成功。Thinking→responseの診断ラベルが終了markerのcommitで切り替わる回帰テストを追加。全8比較セルで再capture要求と入力token列が保存済み基準と一致。KV8側のKV構成は基準と一致、native側は対象attention KVだけがQuantizedKVCacheからKVCacheSimpleへ変わり、rotating/state-space層は不変。空cache時のdtype表示を実生成後のdtypeの証拠とは扱わず、実行時snapshotを確認する。
 
@@ -39,8 +39,12 @@ CPUタイマーは初回token取得を別記し、以後の取得待ち・状態
 
 原本は/private/tmp/issue182-kv-native/。raw/に生成なし監査・契約・capture・source/checksを保存する。公開コピーはメール形式文字列とホーム絶対pathを置換し、SHA256SUMS.txtは公開コピーhash。実行契約のhashは原本の値。binary/weight/metallibはhashで識別する。
 
-次はdiagnoseで診断2セルだけを実行し、traceとCPU内訳をレビューする。その後に比較8セルを実行するか決める。runにはdiagnostics/review.jsonの判明事項とproceed_to_kv_comparison=trueが必要。今回の作業は準備までであり、診断・比較の結果や速度改善はまだない。
+diagnoseによる診断2セルの実行とレビューを完了し、diagnostics/review.jsonに判明事項とproceed_to_kv_comparison=trueを記録した。KV比較8セルはまだ実行していない。CPU計測をKV速度比較へ流用せず、比較の実行時には詳細診断をOFFにする。
 
 ## 診断の適用範囲
 
 使用revisionの標準generateはTokenIteratorへfactory生成のprocessorを直接渡し、今回の非speculative/eager経路ではprocessor.copyを呼ばないことを確認した。診断集計はそのprocessorと同じprogressオブジェクトを参照する。SpeculativeTokenIteratorのcopy分岐には対応を拡張せず、将来利用する場合は試行tokenの誤加算を避ける別設計が必要。実際の診断結果でCPU計測値・event countが保存されていることもレビューで確認する。
+
+## D1/D2実行結果
+
+診断2セルは完了し、全6phaseのCPU内訳、有効JSON、plan受理と実Grouping一致を確認した。詳細はdiagnostic-report.md。Thinking状態更新/進捗はGemma0.0456秒、Qwen0.1790秒と小さく、取得待ちは73.28秒/127.77秒。ただしGPU/runtime待ちを含み同期の無駄とは断定しない。D1 traceは31.20秒でGrouping/Category、D2 traceは保存待ちでattachが遅れ19.87秒のTextだけを採取。Qwen ThinkingのGPU/CPU重なりは未確認。レビューを保存し、KV比較8セルは未実行のまま保持。

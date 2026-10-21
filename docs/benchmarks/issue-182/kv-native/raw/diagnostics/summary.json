@@ -1,0 +1,99 @@
+{
+  "id": "H182-008-diagnostic",
+  "completion": {
+    "cells": 2,
+    "seconds": 305.4077898748219,
+    "monitor_failed": false
+  },
+  "audited_requests": 6,
+  "monitor_samples": 62,
+  "cells": [
+    {
+      "cell": "gemma-on-C01-compact-thinking1024-diagnostic",
+      "wall_seconds": 102.876763459,
+      "generated_tokens": 1817,
+      "thinking_tokens": [
+        360,
+        651,
+        676
+      ],
+      "forced_closes": [
+        false,
+        false,
+        false
+      ],
+      "cpu_seconds": {
+        "thinkingUpdateAndProgressSeconds": 0.04563953913748264,
+        "responseUpdateAndProgressSeconds": 0.010964499320834875,
+        "thinkingMaskPreparationSeconds": 0.0028751306235790253,
+        "responseReadSeconds": 5.957923415582627,
+        "thinkingReadSeconds": 73.28175105014816,
+        "responseMaskPreparationSeconds": 0.2352859596721828
+      },
+      "first_read_seconds": [
+        0.23655666690319777,
+        1.1437804163433611,
+        2.607354875188321
+      ],
+      "phase_contents": [
+        "{\"path:src/components/common/progressiveimage/ProgressiveImage.jsx\":\"G001\",\"path:src/components/common/svg/AISummaryBadge.jsx\":\"G001\",\"path:src/lib/staticAsset.js\":\"G001\"}",
+        "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }",
+        "{ \"G001\": { \"scope\": \"ImageAssetFix\", \"summary\": \"静的アセット参照を正規化し、[object Object]エラーを解消。\" } }"
+      ],
+      "trace": {
+        "duration_seconds": 31.199463,
+        "end_reason": "Time limit reached",
+        "scope": "Grouping and Category",
+        "gpu_interval_rows": 38971,
+        "target_gpu_interval_rows": 24010
+      }
+    },
+    {
+      "cell": "qwen4-on-C01-current-thinking1024-diagnostic",
+      "wall_seconds": 182.606821792,
+      "generated_tokens": 2449,
+      "thinking_tokens": [
+        515,
+        1024,
+        781
+      ],
+      "forced_closes": [
+        false,
+        true,
+        false
+      ],
+      "cpu_seconds": {
+        "thinkingUpdateAndProgressSeconds": 0.17903158394619823,
+        "responseReadSeconds": 8.281398834194988,
+        "thinkingMaskPreparationSeconds": 0.010524829849600792,
+        "responseMaskPreparationSeconds": 0.3376289173029363,
+        "responseUpdateAndProgressSeconds": 0.005773669574409723,
+        "thinkingReadSeconds": 127.76634620549157
+      },
+      "first_read_seconds": [
+        0.6060615833848715,
+        2.3959844587370753,
+        1.4017656249925494
+      ],
+      "phase_contents": [
+        "{ \"path:src/components/common/progressiveimage/ProgressiveImage.jsx\": \"G001\", \"path:src/components/common/svg/AISummaryBadge.jsx\": \"G001\", \"path:src/lib/staticAsset.js\": \"G001\" }",
+        "{ \"G001\": { \"breaking_evidence_ref\": \"none\", \"type\": \"fix\" } }",
+        "{ \"G001\": { \"scope\": \"画像コンポーネント\", \"summary\": \"静的アセットの正規化で画像描画の404エラーを修正\" } }"
+      ],
+      "trace": {
+        "duration_seconds": 19.869023,
+        "end_reason": "Target app exited",
+        "scope": "Text only",
+        "gpu_interval_rows": 19004,
+        "target_gpu_interval_rows": 9343
+      }
+    }
+  ],
+  "limitations": [
+    "instrumented run, not performance baseline",
+    "read wait includes GPU/runtime wait, not pure synchronization overhead",
+    "Qwen trace Text only; no Qwen Thinking GPU timeline",
+    "GPU interval row count not occupancy or overlap ratio",
+    "no direct causal attribution of model/KV/synchronization bottleneck"
+  ]
+}
