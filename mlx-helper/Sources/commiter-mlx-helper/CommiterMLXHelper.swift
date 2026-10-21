@@ -389,6 +389,8 @@ private struct BenchmarkProgressProcessor: LogitProcessor {
 }
 
 private struct BenchmarkMetrics: Encodable {
+    var comparisonPath: String?
+    var comparisonStopReason: String?
     var loadSeconds = 0.0
     var prepareSeconds = 0.0
     var grammarSetupSeconds = 0.0
@@ -667,62 +669,74 @@ struct CommiterMLXHelper {
             let data = try JSONSerialization.data(withJSONObject: audit, options: [.sortedKeys])
             return String(decoding: data, as: UTF8.self)
         }
+        // Research-only path comparison; ordinary generation is unchanged.
+        let pathMode = ProcessInfo.processInfo.environment["COMMITER_182_PATH"] ?? "full"
+        guard ["full", "bounded-cap", "standard-cap"].contains(pathMode),
+              pathMode == "full" || (benchmark != nil && research != nil && pipeline == "eager") else {
+            throw HelperError.malformedRequest
+        }
+        let cappedComparison = pathMode != "full"
+        if cappedComparison { benchmark?.metrics.comparisonPath = pathMode }
+        var progressMetrics: BenchmarkTokenProgress?
+        var responseState: GrammarSamplingState?
         let grammarStart = ProcessInfo.processInfo.systemUptime
         do { try TokenBudget.validate(context: request.contextTokens, prompt: input.text.tokens.size, output: budget) }
         catch { throw HelperError.inputTooLarge }
-        var components: GenerationComponents
         var nativeState: NativeThoughtBudgetState?
-        let preparationStart = ProcessInfo.processInfo.systemUptime
-        let preparation: GrammarPreparation
-        if let retained = benchmark?.grammarPreparation {
-            preparation = retained
-            benchmark?.metrics.grammarPreparationReused = true
-        } else {
-            preparation = try GrammarPreparation(context: context)
-            if benchmark?.retainModel == true {
-                benchmark?.grammarPreparation = preparation
-            }
-        }
-        benchmark?.metrics.grammarPreparationSeconds = ProcessInfo.processInfo.systemUptime - preparationStart
-        let tokenizer = preparation.tokenizer
-        let factory: @Sendable () throws -> GrammarConstraint = { try GrammarConstraint(tokenizer: tokenizer, jsonSchema: schema, fastForward: false) }
-        let response = GrammarSamplingState(constraint: try factory(), vocabSize: tokenizer.vocabSize,
-            eos: preparation.eosTokenID, whitespace: preparation.whitespaceTokenIDs,
-            runtimeStopIDs: preparation.runtimeStopIDs, unknownID: preparation.unknownTokenID,
-            alignRuntimeStops: true, factory: factory)
-        if nativeLimit > 0 {
-            let open: Int
-            let close: Int
-            if qwenThinking || ministralThinking {
-                guard let opening = context.tokenizer.convertTokenToId(ministralThinking ? "[THINK]" : "<think>"),
-                      let closing = context.tokenizer.convertTokenToId(ministralThinking ? "[/THINK]" : "</think>"), opening != closing,
-                      context.tokenizer.decode(tokenIds: [opening]) == (ministralThinking ? "[THINK]" : "<think>"),
-                      context.tokenizer.decode(tokenIds: [closing]) == (ministralThinking ? "[/THINK]" : "</think>") else { throw HelperError.grammarFailure }
-                open = opening; close = closing
+        var components = GenerationComponents()
+        if pathMode != "standard-cap" {
+            let preparationStart = ProcessInfo.processInfo.systemUptime
+            let preparation: GrammarPreparation
+            if let retained = benchmark?.grammarPreparation {
+                preparation = retained
+                benchmark?.metrics.grammarPreparationReused = true
             } else {
-                guard context.tokenizer.convertTokenToId("<|channel>") == 100,
-                      context.tokenizer.convertTokenToId("<channel|>") == 101 else { throw HelperError.grammarFailure }
-                open = 100; close = 101
+                preparation = try GrammarPreparation(context: context)
+                if benchmark?.retainModel == true {
+                    benchmark?.grammarPreparation = preparation
+                }
             }
-            let state = NativeThoughtBudgetState(limit: research != nil ? research?.thinkingBudget : nativeLimit, open: open, close: close, eos: context.tokenizer.eosTokenId ?? 0, response: response, forceOpen: !qwenThinking && officialInput == nil, promptHasOpen: qwenThinking)
-            nativeState = state
-            components = GenerationComponents(logitProcessorFactory: { NativeThoughtBudgetProcessor(state: state) })
-        } else {
-            components = GenerationComponents(logitProcessorFactory: { GrammarSamplingProcessor(state: response) })
-        }
-        var progressMetrics: BenchmarkTokenProgress?
-        if officialInput != nil || (research != nil && ProcessInfo.processInfo.environment["COMMITER_182_PROGRESS"] == "1") {
-            let progress = BenchmarkTokenProgress(native: nativeState, response: response)
-            progressMetrics = progress
-            if pipeline == "overlap" {
-                components = GenerationComponents(logitProcessorFactory: {
-                    OverlappedTokenProcessor(BenchmarkProgressProcessor(progress: progress))
-                })
+            benchmark?.metrics.grammarPreparationSeconds = ProcessInfo.processInfo.systemUptime - preparationStart
+            let tokenizer = preparation.tokenizer
+            let factory: @Sendable () throws -> GrammarConstraint = { try GrammarConstraint(tokenizer: tokenizer, jsonSchema: schema, fastForward: false) }
+            let response = GrammarSamplingState(constraint: try factory(), vocabSize: tokenizer.vocabSize,
+                eos: preparation.eosTokenID, whitespace: preparation.whitespaceTokenIDs,
+                runtimeStopIDs: preparation.runtimeStopIDs, unknownID: preparation.unknownTokenID,
+                alignRuntimeStops: true, factory: factory)
+            responseState = response
+            if nativeLimit > 0 {
+                let open: Int
+                let close: Int
+                if qwenThinking || ministralThinking {
+                    guard let opening = context.tokenizer.convertTokenToId(ministralThinking ? "[THINK]" : "<think>"),
+                          let closing = context.tokenizer.convertTokenToId(ministralThinking ? "[/THINK]" : "</think>"), opening != closing,
+                          context.tokenizer.decode(tokenIds: [opening]) == (ministralThinking ? "[THINK]" : "<think>"),
+                          context.tokenizer.decode(tokenIds: [closing]) == (ministralThinking ? "[/THINK]" : "</think>") else { throw HelperError.grammarFailure }
+                    open = opening; close = closing
+                } else {
+                    guard context.tokenizer.convertTokenToId("<|channel>") == 100,
+                          context.tokenizer.convertTokenToId("<channel|>") == 101 else { throw HelperError.grammarFailure }
+                    open = 100; close = 101
+                }
+                let state = NativeThoughtBudgetState(limit: research != nil ? research?.thinkingBudget : nativeLimit, open: open, close: close, eos: context.tokenizer.eosTokenId ?? 0, response: response, forceOpen: !qwenThinking && officialInput == nil, promptHasOpen: qwenThinking)
+                nativeState = state
+                components = GenerationComponents(logitProcessorFactory: { NativeThoughtBudgetProcessor(state: state) })
             } else {
-                components = GenerationComponents(logitProcessorFactory: { BenchmarkProgressProcessor(progress: progress) })
+                components = GenerationComponents(logitProcessorFactory: { GrammarSamplingProcessor(state: response) })
+            }
+            if officialInput != nil || (research != nil && ProcessInfo.processInfo.environment["COMMITER_182_PROGRESS"] == "1") {
+                let progress = BenchmarkTokenProgress(native: nativeState, response: response)
+                progressMetrics = progress
+                if pipeline == "overlap" {
+                    components = GenerationComponents(logitProcessorFactory: {
+                        OverlappedTokenProcessor(BenchmarkProgressProcessor(progress: progress))
+                    })
+                } else {
+                    components = GenerationComponents(logitProcessorFactory: { BenchmarkProgressProcessor(progress: progress) })
+                }
             }
         }
-        var parameters = GenerateParameters(maxTokens: research != nil ? nil : budget, temperature: research?.temperature ?? 0, topP: research?.topP ?? 1, topK: research?.topK ?? 0, seed: 144)
+        var parameters = GenerateParameters(maxTokens: cappedComparison ? 1024 : (research != nil ? nil : budget), temperature: research?.temperature ?? 0, topP: research?.topP ?? 1, topK: research?.topK ?? 0, seed: 144)
         var kvBits: Int? = nil
         if benchmark != nil, CommandLine.arguments.contains("--benchmark-cache"),
            let value = ProcessInfo.processInfo.environment["COMMITER_180_KV_BITS"] {
@@ -812,10 +826,16 @@ struct CommiterMLXHelper {
             context: context, components: components)
         var output = ""
         var completed = false
+        var lastPathProgress = generationStart
         for await event in stream {
             try Task.checkCancellation()
             switch event {
-            case .chunk(let chunk): output += chunk
+            case .chunk(let chunk):
+                output += chunk
+                if cappedComparison, ProcessInfo.processInfo.systemUptime - lastPathProgress >= 5 {
+                    lastPathProgress = ProcessInfo.processInfo.systemUptime
+                    FileHandle.standardError.write(Data("path_comparison_progress bytes=\(output.utf8.count)\n".utf8))
+                }
             case .info(let info):
                 benchmark?.metrics.runtimePromptSeconds = info.promptTime
                 benchmark?.metrics.runtimeGenerationSeconds = info.generateTime
@@ -829,9 +849,11 @@ struct CommiterMLXHelper {
                     benchmark?.metrics.nativeThoughtTokens = nativeState.stats().prefixTokens
                     benchmark?.metrics.nativeThoughtForcedClose = nativeState.stats().forcedClose
                 }
+                if cappedComparison { benchmark?.metrics.comparisonStopReason = String(describing: info.stopReason) }
                 switch info.stopReason {
                 case .stop: completed = true
-                case .length: throw HelperError.maxTokens
+                case .length:
+                    if cappedComparison { completed = true } else { throw HelperError.maxTokens }
                 case .cancelled: throw HelperError.cancelled
                 }
             default: break
@@ -846,11 +868,12 @@ struct CommiterMLXHelper {
             benchmark?.metrics.phaseEndKVLayers = kvLayerSnapshots(workingCache)
         }
         guard completed else { throw HelperError.cancelled }
+        if cappedComparison { return output }
         if let nativeState, !nativeState.succeeded {
             FileHandle.standardError.write(Data("candidate_native_failure code=\(nativeState.diagnostic)\n".utf8))
             throw HelperError.grammarFailure
         }
-        if nativeLimit == 0, !response.succeeded {
+        if nativeLimit == 0, let response = responseState, !response.succeeded {
             FileHandle.standardError.write(Data("candidate_text_failure code=\(response.diagnostic)\n".utf8))
             throw HelperError.grammarFailure
         }
