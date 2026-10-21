@@ -584,6 +584,11 @@ struct CommiterMLXHelper {
 
     private static func generateBounded(_ request: Request, profile: String, schema: String, context: ModelContext, benchmark: BenchmarkState? = nil) async throws -> String {
         let research = try ModelBenchmarkConfiguration.load()
+        let pipeline = research == nil ? "eager" : (ProcessInfo.processInfo.environment["COMMITER_182_PIPELINE"] ?? "eager")
+        guard ["eager", "overlap"].contains(pipeline),
+              pipeline != "overlap" || (benchmark != nil && ProcessInfo.processInfo.environment["COMMITER_182_PROGRESS"] == "1") else {
+            throw HelperError.malformedRequest
+        }
         let configuredMode = benchmark == nil ? nil : ProcessInfo.processInfo.environment["COMMITER_180_THINKING"]
         let modelDefaults = CommandLine.arguments.contains("--benchmark-model-defaults")
         let modelName = request.model?.split(separator: "@").first.map(String.init) ?? ""
@@ -673,7 +678,13 @@ struct CommiterMLXHelper {
         }
         if officialInput != nil || (research != nil && ProcessInfo.processInfo.environment["COMMITER_182_PROGRESS"] == "1") {
             let progress = BenchmarkTokenProgress(native: nativeState, response: response)
-            components = GenerationComponents(logitProcessorFactory: { BenchmarkProgressProcessor(progress: progress) })
+            if pipeline == "overlap" {
+                components = GenerationComponents(logitProcessorFactory: {
+                    OverlappedTokenProcessor(BenchmarkProgressProcessor(progress: progress))
+                })
+            } else {
+                components = GenerationComponents(logitProcessorFactory: { BenchmarkProgressProcessor(progress: progress) })
+            }
         }
         var parameters = GenerateParameters(maxTokens: research != nil ? nil : budget, temperature: research?.temperature ?? 0, topP: research?.topP ?? 1, topK: research?.topK ?? 0, seed: 144)
         var kvBits: Int? = nil
