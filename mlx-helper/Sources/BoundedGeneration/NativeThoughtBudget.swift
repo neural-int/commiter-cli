@@ -33,6 +33,10 @@ public final class NativeThoughtBudgetState: @unchecked Sendable {
         self.failed = limit.map { $0 < 1 } ?? false
         self.firstFailure = (limit.map { $0 < 1 } ?? false) ? "native_invalid_budget" : nil
     }
+    public var isResponsePhase: Bool {
+        lock.lock(); defer { lock.unlock() }
+        return inResponse
+    }
     public var succeeded: Bool {
         lock.lock(); defer { lock.unlock() }
         return !failed && inResponse && response.succeeded

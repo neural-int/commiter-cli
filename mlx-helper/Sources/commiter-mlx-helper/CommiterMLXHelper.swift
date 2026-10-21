@@ -330,6 +330,26 @@ private final class BenchmarkTokenProgress: @unchecked Sendable {
     let response: GrammarSamplingState
     let started = ProcessInfo.processInfo.systemUptime
     var count = 0
+    let diagnostic = ProcessInfo.processInfo.environment["COMMITER_182_DIAGNOSTICS"] == "1"
+    var diagnosticTotals: [String: Double] = [:]
+    var diagnosticCounts: [String: Int] = [:]
+    var firstReadSeconds = 0.0
+    func phase() -> String { native?.isResponsePhase == false ? "thinking" : "response" }
+    func record(_ name: String, seconds: Double) {
+        diagnosticTotals[name, default: 0] += seconds
+        diagnosticCounts[name, default: 0] += 1
+    }
+    func consume(_ token: MLXArray) {
+        guard diagnostic else { sampled(token.item(Int.self)); return }
+        let name = phase()
+        let begin = ProcessInfo.processInfo.systemUptime
+        let value = token.item(Int.self)
+        let read = ProcessInfo.processInfo.systemUptime
+        if count == 0 { firstReadSeconds = read - begin }
+        else { record(name + "ReadSeconds", seconds: read - begin) }
+        sampled(value)
+        record(name + "UpdateAndProgressSeconds", seconds: ProcessInfo.processInfo.systemUptime - read)
+    }
     init(native: NativeThoughtBudgetState?, response: GrammarSamplingState) {
         self.native = native; self.response = response
     }
@@ -351,13 +371,18 @@ private struct BenchmarkProgressProcessor: LogitProcessor {
     let progress: BenchmarkTokenProgress
     mutating func prompt(_ prompt: MLXArray) {}
     func process(logits: MLXArray) -> MLXArray {
+        let begin = progress.diagnostic ? ProcessInfo.processInfo.systemUptime : 0
+        let phase = progress.diagnostic ? progress.phase() : ""
         let mask: [Float]?
         if let native = progress.native { mask = native.maskValues(count: logits.dim(-1)) }
         else { mask = progress.response.maskValues(count: logits.dim(-1)) }
-        if let mask { return logits + MLXArray(mask) }
-        return logits
+        let result = mask.map { logits + MLXArray($0) } ?? logits
+        if progress.diagnostic {
+            progress.record(phase + "MaskPreparationSeconds", seconds: ProcessInfo.processInfo.systemUptime - begin)
+        }
+        return result
     }
-    mutating func didSample(token: MLXArray) { progress.sampled(token.item(Int.self)) }
+    mutating func didSample(token: MLXArray) { progress.consume(token) }
     func copy() -> Self {
         Self(progress: BenchmarkTokenProgress(native: progress.native?.independentCopy(), response: progress.response.independentCopy()))
     }
@@ -387,6 +412,10 @@ private struct BenchmarkMetrics: Encodable {
     var prefixSynchronizeSeconds = 0.0
     var prefixClearCacheSeconds = 0.0
     var prefixMemorySamples: [PrefixMemorySample] = []
+    var diagnosticCPUSeconds: [String: Double]?
+    var diagnosticEventCounts: [String: Int]?
+    var diagnosticFirstReadSeconds: Double?
+    var benchmarkCacheMode: String?
     var requestedKVBits: Int? = nil
     var prefixKVLayers: [KVLayerSnapshot] = []
     var phaseEndKVLayers: [KVLayerSnapshot] = []
@@ -589,6 +618,11 @@ struct CommiterMLXHelper {
               pipeline != "overlap" || (benchmark != nil && ProcessInfo.processInfo.environment["COMMITER_182_PROGRESS"] == "1") else {
             throw HelperError.malformedRequest
         }
+        let cacheMode = ProcessInfo.processInfo.environment["COMMITER_180_KV_BITS"] ?? "8"
+        if research != nil {
+            guard ["4", "8", "native"].contains(cacheMode) else { throw HelperError.malformedRequest }
+            benchmark?.metrics.benchmarkCacheMode = cacheMode
+        }
         let configuredMode = benchmark == nil ? nil : ProcessInfo.processInfo.environment["COMMITER_180_THINKING"]
         let modelDefaults = CommandLine.arguments.contains("--benchmark-model-defaults")
         let modelName = request.model?.split(separator: "@").first.map(String.init) ?? ""
@@ -627,7 +661,7 @@ struct CommiterMLXHelper {
         if benchmark?.auditOnly == true {
             var audit: [String: Any] = ["token_ids": input.text.tokens.asArray(Int.self), "enable_thinking": nativeLimit > 0]
             if let research {
-                let cache = try benchmarkKVCache(model: context.model, parameters: GenerateParameters(), bits: 8, configuration: research)
+                let cache = try benchmarkKVCache(model: context.model, parameters: GenerateParameters(), bits: cacheMode == "native" ? nil : Int(cacheMode), configuration: research)
                 audit["planned_cache"] = try JSONSerialization.jsonObject(with: JSONEncoder().encode(kvLayerSnapshots(cache)))
             }
             let data = try JSONSerialization.data(withJSONObject: audit, options: [.sortedKeys])
@@ -676,8 +710,10 @@ struct CommiterMLXHelper {
         } else {
             components = GenerationComponents(logitProcessorFactory: { GrammarSamplingProcessor(state: response) })
         }
+        var progressMetrics: BenchmarkTokenProgress?
         if officialInput != nil || (research != nil && ProcessInfo.processInfo.environment["COMMITER_182_PROGRESS"] == "1") {
             let progress = BenchmarkTokenProgress(native: nativeState, response: response)
+            progressMetrics = progress
             if pipeline == "overlap" {
                 components = GenerationComponents(logitProcessorFactory: {
                     OverlappedTokenProcessor(BenchmarkProgressProcessor(progress: progress))
@@ -690,12 +726,16 @@ struct CommiterMLXHelper {
         var kvBits: Int? = nil
         if benchmark != nil, CommandLine.arguments.contains("--benchmark-cache"),
            let value = ProcessInfo.processInfo.environment["COMMITER_180_KV_BITS"] {
-            guard let bits = Int(value), [4, 8].contains(bits) else { throw HelperError.malformedRequest }
-            kvBits = bits
-            parameters.kvCache = KVCacheConfiguration(
-                strategy: .affine(try AffineKVCacheConfiguration(bits: bits, groupSize: 64)),
-                compatibility: .requireAtLeastOneLayer)
-            benchmark?.metrics.requestedKVBits = bits
+            if value == "native", research != nil {
+                kvBits = nil
+            } else {
+                guard let bits = Int(value), [4, 8].contains(bits) else { throw HelperError.malformedRequest }
+                kvBits = bits
+                parameters.kvCache = KVCacheConfiguration(
+                    strategy: .affine(try AffineKVCacheConfiguration(bits: bits, groupSize: 64)),
+                    compatibility: .requireAtLeastOneLayer)
+                benchmark?.metrics.requestedKVBits = bits
+            }
         }
         if request.contextTokens > 16384 {
             // The dependency submits prefill chunks asynchronously. At long
@@ -761,7 +801,7 @@ struct CommiterMLXHelper {
             }
             input = LMInput(tokens: MLXArray(Array(tokens.dropFirst(length))))
         }
-        if kvBits != nil, workingCache == nil {
+        if (kvBits != nil || (research != nil && CommandLine.arguments.contains("--benchmark-cache"))), workingCache == nil {
             workingCache = try benchmarkKVCache(model: context.model, parameters: parameters, bits: kvBits, configuration: research)
         }
         if modelDefaults, workingCache == nil {
@@ -780,6 +820,11 @@ struct CommiterMLXHelper {
                 benchmark?.metrics.runtimePromptSeconds = info.promptTime
                 benchmark?.metrics.runtimeGenerationSeconds = info.generateTime
                 benchmark?.metrics.generatedTokens = info.generationTokenCount
+                if let progress = progressMetrics, progress.diagnostic {
+                    benchmark?.metrics.diagnosticCPUSeconds = progress.diagnosticTotals
+                    benchmark?.metrics.diagnosticEventCounts = progress.diagnosticCounts
+                    benchmark?.metrics.diagnosticFirstReadSeconds = progress.firstReadSeconds
+                }
                 if let nativeState {
                     benchmark?.metrics.nativeThoughtTokens = nativeState.stats().prefixTokens
                     benchmark?.metrics.nativeThoughtForcedClose = nativeState.stats().forcedClose

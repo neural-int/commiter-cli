@@ -65,6 +65,18 @@ struct NativeThoughtBudgetTests {
         s.commit(4) // Terminal prefetch is absorbed by response grammar.
         #expect(s.succeeded && s.stats().responseSamples == 2)
     }
+    @Test func diagnosticPhaseSwitchesAtCommittedClose() throws {
+        let s = try state()
+        #expect(!s.isResponsePhase)
+        s.commit(0); s.commit(1)
+        #expect(!s.isResponsePhase)
+        _ = s.maskValues(count: 5)
+        s.commit(2)
+        #expect(s.isResponsePhase)
+        s.commit(3); s.commit(4)
+        #expect(s.isResponsePhase && s.succeeded)
+    }
+
     @Test func naturalBoundaryIsNotForced() throws {
         let s = try state(); s.commit(0); s.commit(2)
         #expect(!s.stats().forcedClose && s.stats().prefixTokens == 1)
