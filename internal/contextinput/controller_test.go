@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -321,5 +322,33 @@ func TestPrepareFallsBackWhenRelationContextIsInvalid(t *testing.T) {
 	status := prompt.RelationContextStatus
 	if status == nil || !status.Omitted || status.Reason != "invalid" || status.ObservationCount != 2 || len(status.ObservationsByOutcome) != 1 || status.ObservationsByOutcome[relation.Unsupported] != 2 {
 		t.Fatalf("invalid graph fallback status=%#v", status)
+	}
+}
+
+func TestPrepareRequiredUncompressedUsesConfiguredCeilingAndNeverSummarizes(t *testing.T) {
+	for _, size := range []int{40000, 70000} {
+		t.Run(fmt.Sprint(size), func(t *testing.T) {
+			document := testDocument()
+			document.Files[0].Mode = syntax.ModeRawDiff
+			document.Files[0].Evidence = nil
+			document.Files[0].RawDiff = strings.Repeat("+changed\n", size/9)
+			original := cloneDocument(document)
+			calls := 0
+			summarizer := summarizeFunc(func(context.Context, SummaryStage, Document) (Document, error) {
+				calls++
+				return Document{}, errors.New("must not summarize")
+			})
+			prepared, err := Prepare(context.Background(), document, BudgetConfig{Context: "auto", MaxContextTokens: Context64K, RequireUncompressed: true}, JSONRenderer, summarizer)
+			if calls != 0 || !reflect.DeepEqual(original, document) {
+				t.Fatal("input changed or summarization attempted")
+			}
+			if size < Context64K {
+				if err != nil || prepared.Budget.ContextTokens != Context64K || prepared.SummaryCount != 0 || prepared.CompressionProfile != CompressionNone || prepared.EvidenceReductionCount != 0 || !reflect.DeepEqual(prepared.Document, original) {
+					t.Fatalf("uncompressed input rejected/changed: %v", err)
+				}
+			} else if !errors.Is(err, ErrTooLarge) {
+				t.Fatalf("oversized input accepted: %v", err)
+			}
+		})
 	}
 }

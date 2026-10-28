@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "failed-file-edit",
+  "status": "synthetic",
+  "semantic_case_candidates": [],
+  "gold_status": "undetermined",
+  "limitations": [
+    "Synthetic collector test data; not semantic Gold."
+  ],
+  "provenance": {
+    "type": "synthetic",
+    "source": "authored for collector unit tests"
+  },
+  "supporting_context": [],
+  "snapshot": {
+    "head": "synthetic",
+    "selected_paths": [
+      "src/example.go"
+    ]
+  },
+  "turns": [
+    {
+      "id": "turn-01",
+      "started_at": 125,
+      "items": [
+        {
+          "turnId": "turn-01",
+          "item": {
+            "id": "request-01",
+            "type": "userMessage",
+            "content": [
+              {
+                "type": "text",
+                "text": "Update the sample project."
+              }
+            ]
+          }
+        },
+        {
+          "turnId": "turn-01",
+          "item": {
+            "id": "edit-01",
+            "type": "fileChange",
+            "status": "failed",
+            "changes": [
+              {
+                "path": "src/example.go",
+                "kind": {
+                  "type": "update"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "turnId": "turn-01",
+          "item": {
+            "id": "answer-01",
+            "type": "agentMessage",
+            "phase": "final_answer",
+            "text": "Updated the sample project."
+          }
+        }
+      ]
+    }
+  ],
+  "window": {
+    "start": 100,
+    "end": 200
+  },
+  "targets": [
+    {
+      "path": "src/example.go",
+      "diff": "@@ synthetic @@\n+sample\n",
+      "final_diff": "@@ synthetic @@\n+sample\n"
+    }
+  ]
+}

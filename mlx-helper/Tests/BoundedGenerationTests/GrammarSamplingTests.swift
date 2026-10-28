@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 import MLXGuidedGeneration
 @testable import BoundedGeneration
@@ -146,6 +147,31 @@ struct GrammarSamplingTests {
             #expect(s.succeeded && s.diagnostic == "none")
             #expect(s.runtimeStopCounts()[1] == 0 && s.runtimeStopCounts()[2] == 0)
         }
+    }
+
+    @Test func textObjectRejectsHistoricalLengthOverflows() throws {
+        let schema = #"{"type":"object","properties":{"G001":{"type":"object","properties":{"scope":{"type":"string","minLength":1,"maxLength":16},"summary":{"type":"string","minLength":1,"maxLength":48}},"required":["scope","summary"],"additionalProperties":false}},"required":["G001"],"additionalProperties":false}"#
+        func object(scope: String, summary: String) throws -> String {
+            let data = try JSONSerialization.data(withJSONObject: ["G001": ["scope": scope, "summary": summary]], options: [.sortedKeys])
+            return String(decoding: data, as: UTF8.self)
+        }
+        let historicalSummary = "静的アセットのインポートを文字列URLに正規化するヘルパーを導入し、画像表示の404エラーを修正した。"
+        let valid = try object(scope: String(repeating: "s", count: 16), summary: String(repeating: "画", count: 48))
+        let vocab = [valid,
+            try object(scope: "gitstate", summary: historicalSummary),
+            try object(scope: "docs/decisions/issue-167-file-first.md", summary: "構造検証を追加"),
+            try object(scope: String(repeating: "s", count: 17), summary: "構造検証を追加"),
+            try object(scope: "gitstate", summary: String(repeating: "画", count: 49)), "<eos>"]
+        let tokenizer = try GrammarTokenizer(vocab: vocab, vocabType: .raw, eosTokenId: 5)
+        let factory: @Sendable () throws -> GrammarConstraint = { try GrammarConstraint(tokenizer: tokenizer, jsonSchema: schema, fastForward: false) }
+        let state = GrammarSamplingState(constraint: try factory(), vocabSize: 6, eos: 5, factory: factory)
+        let mask = state.maskValues(count: 6)
+        #expect(mask[0].isFinite)
+        for index in 1...5 { #expect(!mask[index].isFinite) }
+        state.commit(0)
+        #expect(!state.succeeded && state.maskValues(count: 6)[5].isFinite)
+        state.commit(5)
+        #expect(state.succeeded)
     }
 
 }

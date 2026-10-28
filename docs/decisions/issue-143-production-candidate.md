@@ -55,3 +55,7 @@ Swift helper は固定したモデルと段階別 generation profile を確認�
 - 実機 smoke は `COMMITER_CANDIDATE_SMOKE_HELPER` と `COMMITER_CANDIDATE_SMOKE_CACHE` を指定した `go test ./internal/cli -run TestGemmaThreePhaseDefaultPlanning -count=1 -v` で再実行できる。指定がない通常テストは隔離した mock helper とモデル metadata を使う。モデルの取得処理は含めない。
 
 ローカル検証とリリースは別の状態である。この選定記録は、production の精度保証やリリース完了を意味しない。
+
+## Issue #178の検証候補
+
+上表の「3段目JSON grammarなし」は当初の選定構成を示す。実履歴ではsummary51文字とscopeの16文字超過が事後検証で拒否されたため、#178でTextにも既存response grammarを接続する候補を検証する。生成時の制約に加えて、従来のホスト検証と最終Validatorを維持する。単体テストの成功を実モデルの最終plan成功や意味品質の改善と扱わず、結果と採否をIssue #178へ記録する。

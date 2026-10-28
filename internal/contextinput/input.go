@@ -42,7 +42,12 @@ type File struct {
 	EvidenceReduction *EvidenceReduction `json:"evidence_reduction,omitempty"`
 	RawDiff           string             `json:"raw_diff,omitempty"`
 	Summary           string             `json:"summary,omitempty"`
-	summaryLines      []summaryLine
+	// Host-only sources for Grouping. Three-phase serializes complete raw
+	// diffs in all phases and adds minimal syntax context only to Grouping.
+	// Single-pass retains its original structural/raw_diff contract.
+	GroupingRawDiff       string                  `json:"-"`
+	GroupingSyntaxContext []syntax.MinimalContext `json:"-"`
+	summaryLines          []summaryLine
 }
 
 type RelationContext struct {
@@ -114,7 +119,7 @@ func Build(snapshot gitstate.Snapshot, results []syntax.ChangeResult) (Document,
 			Language: change.Language, ChangeHash: change.ChangeHash, Size: change.Size,
 			Binary: change.Binary, Vendor: change.Vendor, Opaque: change.Opaque,
 			Staged: change.Staged, Unstaged: change.Unstaged, Mode: result.Mode,
-			Evidence: append([]syntax.Evidence(nil), result.Evidence...), RawDiff: result.RawDiff,
+			Evidence: append([]syntax.Evidence(nil), result.Evidence...), RawDiff: result.RawDiff, GroupingRawDiff: result.GroupingRawDiff,
 		})
 	}
 	return document, nil

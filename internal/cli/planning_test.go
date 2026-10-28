@@ -10,9 +10,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/natsuki0413/commiter-cli/internal/codexcontext"
+
 	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/contextinput"
 	"github.com/natsuki0413/commiter-cli/internal/gitstate"
+	runmetrics "github.com/natsuki0413/commiter-cli/internal/metrics"
 	"github.com/natsuki0413/commiter-cli/internal/mlx"
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 	"github.com/natsuki0413/commiter-cli/internal/planning"
@@ -254,6 +257,16 @@ func TestWorktreeDiffTreatsCollectedPathsLiterally(t *testing.T) {
 
 // The optional smoke path reuses an installed pin; it never downloads a model.
 func TestGemmaThreePhaseDefaultPlanning(t *testing.T) {
+	// Normal tests never read the user's Codex history. Exercise the real CLI
+	// wiring with a synthetic record; preserve the opt-in model smoke baseline.
+	oldCollect := collectCodexContext
+	t.Cleanup(func() { collectCodexContext = oldCollect })
+	collectCodexContext = func(context.Context, codexcontext.Request) codexcontext.Result {
+		if os.Getenv("COMMITER_CANDIDATE_SMOKE_HELPER") != "" {
+			return codexcontext.Result{Status: "absent"}
+		}
+		return codexcontext.Result{Status: "available", Records: []codexcontext.Record{{Paths: []string{"sample.go"}, UserRequest: "Correct the existing value", FinalResponse: "Corrected the value"}}}
+	}
 	repo := cliRepository(t)
 	cliWrite(t, repo, "sample.go", "package sample\nfunc value() int { return 1 }\n", 0o644)
 	cliGit(t, repo, "add", "sample.go")
@@ -314,12 +327,22 @@ printf '{"ok":true,"stop_reason":"completed","generation_profile":"%s","generate
 		mlxHelperPath = func() (string, error) { return helper, nil }
 	}
 	started := time.Now()
-	plan, err := generateCommitPlan(context.Background(), repo, snapshot, values, "")
+	recorder := runmetrics.New()
+	plan, err := generateCommitPlan(runmetrics.WithRecorder(context.Background(), recorder), repo, snapshot, values, "")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(plan.Commits) != 1 || strings.Join(plan.Commits[0].FileIDs, ",") != "F001" {
 		t.Fatalf("invalid assignment: %#v", plan)
+	}
+	if record := recorder.Finish("success"); record.Context != "16k" || record.ContextCeiling != "64k" {
+		t.Fatalf("context metrics=%s ceiling=%s", record.Context, record.ContextCeiling)
+	}
+	if realHelper == "" {
+		record := recorder.Finish("success")
+		if record.CodexContextStatus != "available" || record.CodexContextRecords != 1 {
+			t.Fatal("CLI did not acquire optional context")
+		}
 	}
 	t.Logf("three-phase installed helper=%t elapsed=%s commits=%d", realHelper != "", time.Since(started).Round(time.Millisecond), len(plan.Commits))
 	status := cliGitOutput(t, repo, "status", "--porcelain")
@@ -339,4 +362,14 @@ printf '{"ok":true,"stop_reason":"completed","generation_profile":"%s","generate
 		t.Fatalf("candidate setup/doctor probe: ok=%t error=%v", ok, err)
 	}
 	t.Logf("candidate setup/doctor probe elapsed=%s", time.Since(started).Round(time.Millisecond))
+}
+
+func TestRecordGeneratedContextWithoutBackendTiming(t *testing.T) {
+	recorder := runmetrics.New()
+	recorder.SetContextCeiling("64k")
+	recordGeneratedTelemetry(recorder, planning.Result{Telemetry: planning.Telemetry{ContextTokens: contextinput.Context32K}})
+	record := recorder.Finish("llm_failure")
+	if record.Context != "32k" || record.ContextCeiling != "64k" || record.Durations.Generation != nil {
+		t.Fatalf("context metrics=%+v", record)
+	}
 }
