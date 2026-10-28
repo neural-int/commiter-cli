@@ -1,9 +1,11 @@
 """H182-005: finite thought budget with model-specific adopted prompts."""
+import os, tempfile
 import json,pathlib,shutil,subprocess,sys
 import prompt_compare as harness
 ROOT=harness.ROOT
-PARENT=pathlib.Path('/private/tmp/issue182-prompt-comparison')
-OUT=pathlib.Path('/private/tmp/issue182-thinking-budget')
+BENCHMARK_ROOT=pathlib.Path(os.environ.get('COMMITER_BENCHMARK_ROOT', tempfile.gettempdir()))
+PARENT=pathlib.Path(str(BENCHMARK_ROOT / 'issue182-prompt-comparison'))
+OUT=pathlib.Path(str(BENCHMARK_ROOT / 'issue182-thinking-budget'))
 RUNTIME=OUT/'runtime'
 harness.OUT=OUT
 harness.RUNTIME=RUNTIME
@@ -14,7 +16,7 @@ def prepare():
  changed=ROOT/'mlx-helper/Sources/commiter-mlx-helper/CommiterMLXHelper.swift'
  assert all(harness.sha(p)==h for p,h in parent['hashes'].items() if p!=str(changed)), 'parent frozen drift'
  RUNTIME.mkdir(parents=True,exist_ok=True)
- shutil.copyfile('/private/tmp/issue182-ministral-runtime/swift-build/debug/commiter-mlx-helper',RUNTIME/'commiter-mlx-helper')
+ shutil.copyfile(str(BENCHMARK_ROOT / 'issue182-ministral-runtime/swift-build/debug/commiter-mlx-helper'),RUNTIME/'commiter-mlx-helper')
  (RUNTIME/'commiter-mlx-helper').chmod(0o755)
  shutil.copyfile(PARENT/'runtime/mlx.metallib',RUNTIME/'mlx.metallib')
  (RUNTIME/'proxy').write_text('#!/bin/sh\nexec /opt/homebrew/bin/python3 '+str(pathlib.Path(__file__).resolve())+' proxy "$@"\n')

@@ -23,10 +23,10 @@ source diffs needed for the historical snapshot preparation.
 Example preparation/capture (all paths must be explicit):
 
 ```sh
-python3 tools/benchmark175/prepare.py --out /private/tmp/issue175-fixtures-NEW
+python3 tools/benchmark175/prepare.py --out <PRIVATE_TMP>/issue175-fixtures-NEW
 COMMITER_175_MODE=capture \
-COMMITER_175_REPOS=/private/tmp/issue175-fixtures-NEW/repos.json \
-COMMITER_175_OUT=/private/tmp/issue175-capture-NEW \
+COMMITER_175_REPOS=<PRIVATE_TMP>/issue175-fixtures-NEW/repos.json \
+COMMITER_175_OUT=<PRIVATE_TMP>/issue175-capture-NEW \
 COMMITER_175_HELPER=/absolute/path/to/production-helper \
 go test ./internal/cli -run '^TestIssue175Evaluation$' -v -count=1
 ```

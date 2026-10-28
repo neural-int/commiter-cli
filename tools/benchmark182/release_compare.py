@@ -1,9 +1,11 @@
 """H182-006: Release helper, otherwise H182-005 conditions unchanged."""
+import os, tempfile
 import json,pathlib,shutil,subprocess,sys
 import prompt_compare as harness
 ROOT=harness.ROOT
-PARENT=pathlib.Path('/private/tmp/issue182-thinking-budget')
-OUT=pathlib.Path('/private/tmp/issue182-release-comparison')
+BENCHMARK_ROOT=pathlib.Path(os.environ.get('COMMITER_BENCHMARK_ROOT', tempfile.gettempdir()))
+PARENT=pathlib.Path(str(BENCHMARK_ROOT / 'issue182-thinking-budget'))
+OUT=pathlib.Path(str(BENCHMARK_ROOT / 'issue182-release-comparison'))
 RUNTIME=OUT/'runtime'
 harness.OUT=OUT;harness.RUNTIME=RUNTIME
 
@@ -12,7 +14,7 @@ def prepare():
  parent=json.loads((PARENT/'contract.json').read_text())
  assert all(harness.sha(p)==h for p,h in parent['hashes'].items()),'Debug reference drift'
  RUNTIME.mkdir(parents=True,exist_ok=True)
- shutil.copyfile('/private/tmp/issue182-ministral-runtime/swift-build/release/commiter-mlx-helper',RUNTIME/'commiter-mlx-helper')
+ shutil.copyfile(str(BENCHMARK_ROOT / 'issue182-ministral-runtime/swift-build/release/commiter-mlx-helper'),RUNTIME/'commiter-mlx-helper')
  (RUNTIME/'commiter-mlx-helper').chmod(0o755)
  # Keep the same GPU shader library; change host Swift compilation only.
  shutil.copyfile(PARENT/'runtime/mlx.metallib',RUNTIME/'mlx.metallib')

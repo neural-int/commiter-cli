@@ -1,6 +1,6 @@
 import hashlib,json,urllib.request
 from pathlib import Path
-root=Path('/private/tmp/issue182-ministral-runtime/assets');root.mkdir(exist_ok=True)
+root=Path('<PRIVATE_TMP>/issue182-ministral-runtime/assets');root.mkdir(exist_ok=True)
 records=[]
 for kind in ['Instruct','Reasoning']:
  repo=f'mistralai/Ministral-3-3B-{kind}-2512'

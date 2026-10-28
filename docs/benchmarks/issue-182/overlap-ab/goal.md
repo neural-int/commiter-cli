@@ -28,7 +28,7 @@ Releaseで44テスト成功。新規4テストは予算境界とJSON制約、自
 
 ## 成果物と再現
 
-原本は/private/tmp/issue182-overlap-ab/。prepareが8セル契約とauditを生成し、runで登録セルを測定する。既存成果物を上書きしない。
+原本は<PRIVATE_TMP>/issue182-overlap-ab/。prepareが8セル契約とauditを生成し、runで登録セルを測定する。既存成果物を上書きしない。
 
 - tools/benchmark182/overlap_compare.py prepare：生成なし準備（完了済み）
 - tools/benchmark182/overlap_compare.py run：A/B生成測定（未実行）

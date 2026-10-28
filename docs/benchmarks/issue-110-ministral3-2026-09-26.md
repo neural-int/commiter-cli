@@ -59,9 +59,9 @@ Ollama の 24 ファイルは 2048 token なら単発で完走したため、115
 ## 再現
 
 ```sh
-GOCACHE=/tmp/commiter-issue110-gocache go run ./tools/benchmark110 -describe -fixture all
-GOCACHE=/tmp/commiter-issue110-gocache go run ./tools/benchmark110 -backend ollama -ollama-model ministral-3:3b-instruct-2512-q4_K_M -fixture normal -repeats 5
-GOCACHE=/tmp/commiter-issue110-gocache go run ./tools/benchmark110 -backend mlx -mlx-repo mlx-community/Ministral-3-3B-Instruct-2512-4bit -mlx-revision a962dcb09eee4169c890e544c9eb938f1113fdee -helper mlx-helper/.build/release/commiter-mlx-helper -fixture normal -repeats 5
+GOCACHE=<PRIVATE_TMP>/commiter-issue110-gocache go run ./tools/benchmark110 -describe -fixture all
+GOCACHE=<PRIVATE_TMP>/commiter-issue110-gocache go run ./tools/benchmark110 -backend ollama -ollama-model ministral-3:3b-instruct-2512-q4_K_M -fixture normal -repeats 5
+GOCACHE=<PRIVATE_TMP>/commiter-issue110-gocache go run ./tools/benchmark110 -backend mlx -mlx-repo mlx-community/Ministral-3-3B-Instruct-2512-4bit -mlx-revision a962dcb09eee4169c890e544c9eb938f1113fdee -helper mlx-helper/.build/release/commiter-mlx-helper -fixture normal -repeats 5
 ```
 
 MLX モデルは取得前に明示確認を受け、上記 revision に固定して `-prepare-mlx-model` で検証・インストールした。Ollama モデルも同じ確認後に取得した。推論はローカルで実行した。

@@ -1,5 +1,5 @@
 import collections,hashlib,importlib.util,json,pathlib,sys
-base=pathlib.Path('/private/tmp/issue182-prompt-comparison')
+base=pathlib.Path('<PRIVATE_TMP>/issue182-prompt-comparison')
 source=pathlib.Path('$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli/tools/benchmark182/prompt_compare.py')
 spec=importlib.util.spec_from_file_location('harness',source);h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h)
 contract=json.loads((base/'contract.json').read_text());rows=[];wire_count=0

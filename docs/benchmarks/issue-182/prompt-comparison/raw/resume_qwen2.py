@@ -1,7 +1,7 @@
 """Resume only the four preregistered, unstarted Qwen2 OFF cells."""
 import hashlib,importlib.util,json,pathlib,shutil,subprocess,sys
 from datetime import datetime,timezone
-parent=pathlib.Path('/private/tmp/issue182-prompt-comparison')
+parent=pathlib.Path('<PRIVATE_TMP>/issue182-prompt-comparison')
 source=pathlib.Path('$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli/tools/benchmark182/prompt_compare.py')
 sys.path.insert(0,str(source.parent))
 spec=importlib.util.spec_from_file_location('prompt_comparison',source)

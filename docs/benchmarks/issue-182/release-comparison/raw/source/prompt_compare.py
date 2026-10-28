@@ -1,8 +1,8 @@
 """H182-004 prompt-only comparison; prepare audits before any generation."""
 import argparse,copy,hashlib,json,os,pathlib,re,signal,subprocess,sys,time
 ROOT=pathlib.Path(__file__).resolve().parents[2]
-OUT=pathlib.Path('/private/tmp/issue182-prompt-comparison')
-PREV=pathlib.Path('/private/tmp/issue182-suite-v3')
+OUT=pathlib.Path('<PRIVATE_TMP>/issue182-prompt-comparison')
+PREV=pathlib.Path('<PRIVATE_TMP>/issue182-suite-v3')
 RUNTIME=OUT/'runtime'
 def save(p,d):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
 def sha(p):return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
@@ -61,8 +61,8 @@ def prepare():
  (OUT/'fixtures').mkdir(exist_ok=True)
  import shutil
  for case in ['c01','c02']:shutil.copyfile(fixtures/(case+'-fixture.json'),OUT/'fixtures'/(case+'-fixture.json'))
- shutil.copyfile('/private/tmp/issue182-ministral-runtime/recovered-fixtures-v2/repos.json',OUT/'repos.json')
- models=[('gemma-on',pathlib.Path.home()/'Library/Caches/commiter/mlx-models/2e02664365a6210fcdc0d0960b37cf2d5bb7cef3c7536ad35c582e3aee047b47'),('qwen4-on',pathlib.Path('/private/tmp/issue182-models/Qwen3.5-4B-4bit')),('qwen2-off',pathlib.Path('/private/tmp/issue182-models/Qwen3.5-2B-4bit'))]
+ shutil.copyfile('<PRIVATE_TMP>/issue182-ministral-runtime/recovered-fixtures-v2/repos.json',OUT/'repos.json')
+ models=[('gemma-on',pathlib.Path.home()/'Library/Caches/commiter/mlx-models/2e02664365a6210fcdc0d0960b37cf2d5bb7cef3c7536ad35c582e3aee047b47'),('qwen4-on',pathlib.Path('<PRIVATE_TMP>/issue182-models/Qwen3.5-4B-4bit')),('qwen2-off',pathlib.Path('<PRIVATE_TMP>/issue182-models/Qwen3.5-2B-4bit'))]
  cells=[];files=[pathlib.Path(__file__),ROOT/'docs/benchmarks/issue-182/prompt-candidate.md',ROOT/'mlx-helper/Sources/commiter-mlx-helper/CommiterMLXHelper.swift',RUNTIME/'commiter-mlx-helper',RUNTIME/'mlx.metallib',RUNTIME/'proxy',PREV/'evaluation.test',OUT/'repos.json']
  for model,path in models:
   cfg=ROOT/f'docs/benchmarks/issue-182/suite-v2/{model}.json';config=json.loads(cfg.read_text());files.append(cfg)

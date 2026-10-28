@@ -37,7 +37,7 @@ CPUタイマーは初回token取得を別記し、以後の取得待ち・状態
 
 ## 保存と次の手順
 
-原本は/private/tmp/issue182-kv-native/。raw/に生成なし監査・契約・capture・source/checksを保存する。公開コピーはメール形式文字列とホーム絶対pathを置換し、SHA256SUMS.txtは公開コピーhash。実行契約のhashは原本の値。binary/weight/metallibはhashで識別する。
+原本は<PRIVATE_TMP>/issue182-kv-native/。raw/に生成なし監査・契約・capture・source/checksを保存する。公開コピーはメール形式文字列とホーム絶対pathを置換し、SHA256SUMS.txtは公開コピーhash。実行契約のhashは原本の値。binary/weight/metallibはhashで識別する。
 
 diagnoseによる診断2セルの実行とレビューを完了し、diagnostics/review.jsonに判明事項とproceed_to_kv_comparison=trueを記録した。KV比較8セルはユーザー指定の順序で実行した。CPU計測をKV速度比較へ流用せず、比較では詳細診断をOFFにした。
 

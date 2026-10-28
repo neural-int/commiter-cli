@@ -1,5 +1,5 @@
 import collections,hashlib,importlib.util,json,pathlib,xml.etree.ElementTree as E
-root=pathlib.Path('$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli');p=pathlib.Path('/private/tmp/issue182-kv-native/diagnostics')
+root=pathlib.Path('$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli');p=pathlib.Path('<PRIVATE_TMP>/issue182-kv-native/diagnostics')
 spec=importlib.util.spec_from_file_location('h',root/'tools/benchmark182/prompt_compare.py');h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h)
 contract=json.loads((p/'contract.json').read_text())
 for n,d in contract['hashes'].items():assert h.sha(n)==d,n

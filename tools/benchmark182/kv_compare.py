@@ -1,9 +1,11 @@
 """H182-008: eager pipeline, diagnostic gate then KV8/native comparison."""
+import os, tempfile
 import json,pathlib,shutil,subprocess,sys,threading,time
 import prompt_compare as harness
 ROOT=harness.ROOT
-PARENT=pathlib.Path('/private/tmp/issue182-release-comparison')
-OUT=pathlib.Path('/private/tmp/issue182-kv-native')
+BENCHMARK_ROOT=pathlib.Path(os.environ.get('COMMITER_BENCHMARK_ROOT', tempfile.gettempdir()))
+PARENT=pathlib.Path(str(BENCHMARK_ROOT / 'issue182-release-comparison'))
+OUT=pathlib.Path(str(BENCHMARK_ROOT / 'issue182-kv-native'))
 RUNTIME=OUT/'runtime'
 harness.OUT=OUT;harness.RUNTIME=RUNTIME
 original_environment=harness.environment
@@ -21,7 +23,7 @@ def prepare():
  changed=ROOT/'mlx-helper/Sources/commiter-mlx-helper/CommiterMLXHelper.swift'
  assert all(harness.sha(p)==h for p,h in parent['hashes'].items() if p!=str(changed)),'reference asset drift'
  RUNTIME.mkdir(parents=True,exist_ok=True)
- shutil.copyfile('/private/tmp/issue182-ministral-runtime/swift-build/release/commiter-mlx-helper',RUNTIME/'commiter-mlx-helper');(RUNTIME/'commiter-mlx-helper').chmod(0o755)
+ shutil.copyfile(str(BENCHMARK_ROOT / 'issue182-ministral-runtime/swift-build/release/commiter-mlx-helper'),RUNTIME/'commiter-mlx-helper');(RUNTIME/'commiter-mlx-helper').chmod(0o755)
  shutil.copyfile(PARENT/'runtime/mlx.metallib',RUNTIME/'mlx.metallib')
  (RUNTIME/'proxy').write_text('#!/bin/sh\nexec /opt/homebrew/bin/python3 '+str(pathlib.Path(__file__).resolve())+' proxy "$@"\n');(RUNTIME/'proxy').chmod(0o755)
  shutil.copyfile(PARENT/'repos.json',OUT/'repos.json');shutil.copytree(PARENT/'fixtures',OUT/'fixtures')

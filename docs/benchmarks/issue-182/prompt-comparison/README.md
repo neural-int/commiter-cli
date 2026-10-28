@@ -4,7 +4,7 @@
 
 ## 保存範囲
 
-`raw/`には元実行とQwen2B再開の全テキスト成果物を保存する。モデルweight、実行binary、Metal library、build cacheは含めず、実行契約のSHA256で識別する。原本は実行端末の`/private/tmp/issue182-prompt-comparison/`に残す。
+`raw/`には元実行とQwen2B再開の全テキスト成果物を保存する。モデルweight、実行binary、Metal library、build cacheは含めず、実行契約のSHA256で識別する。原本は実行端末の`<PRIVATE_TMP>/issue182-prompt-comparison/`に残す。
 
 - `contract.json`：元12セルの凍結契約、資産・source hash
 - `audit/`：実際のtoken列、prefix長、KV構成と実送信予定要求

@@ -56,6 +56,6 @@ C02現行のsummaryは「1〜16 ファイルの所有権を保持し、バイナ
 
 ## 成果物と限界
 
-原本は/private/tmp/issue182-prompt-comparison/、Qwen2B再開は同qwen2-resume/に保存。公開コピーはprompt-comparison/raw/、実行時source snapshot・Swiftテストログも含む。公開コピーではメール形式文字列と絶対ホームパスを置換し、raw/SHA256SUMS.txtに公開ファイルのchecksumを記録する。実行契約内hashは置換前の原本の値であり、公開コピーhashとは区別する。
+原本は<PRIVATE_TMP>/issue182-prompt-comparison/、Qwen2B再開は同qwen2-resume/に保存。公開コピーはprompt-comparison/raw/、実行時source snapshot・Swiftテストログも含む。公開コピーではメール形式文字列と絶対ホームパスを置換し、raw/SHA256SUMS.txtに公開ファイルのchecksumを記録する。実行契約内hashは置換前の原本の値であり、公開コピーhashとは区別する。
 
 各1回の小規模探索比較であり、安定した改善率や16ファイル性能は未検証。後段は固定partitionを使用し、end-to-end成功と区別する。探索Goldは独立人手承認なし。今回は全登録セルを実行または明示的中断として記録し、追加生成・再試行・モデル採用は行っていない。Issue #182全体のGoalは未完了。

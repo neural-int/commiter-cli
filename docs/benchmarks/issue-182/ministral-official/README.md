@@ -30,11 +30,11 @@ weightはH182-002と同じMLX量子化revisionを維持する。公式assetはwe
 前提: 上記revisionのtekken.json / SYSTEM_PROMPT.txt / manifest.json、固定済みMLX weight、専用Python環境、新規ビルドしたSwift helperと対応metallibをruntime directoryへ用意する。外部通信はダウンロード時のみで、推論はローカル実行する。
 
 ```sh
-PYTHONDONTWRITEBYTECODE=1 /private/tmp/issue182-ministral-runtime/venv/bin/python \
+PYTHONDONTWRITEBYTECODE=1 <PRIVATE_TMP>/issue182-ministral-runtime/venv/bin/python \
   tools/benchmark182/mistral_retest.py \
-  --runtime /private/tmp/issue182-ministral-runtime \
-  --previous /private/tmp/issue182-suite-v3 \
-  --out /private/tmp/issue182-ministral-retest
+  --runtime <PRIVATE_TMP>/issue182-ministral-runtime \
+  --previous <PRIVATE_TMP>/issue182-suite-v3 \
+  --out <PRIVATE_TMP>/issue182-ministral-retest
 ```
 
 再実行時は新しいout directoryが必要。同じsuiteを上書き・再試行しない。

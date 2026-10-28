@@ -1,5 +1,5 @@
 import pathlib,json,hashlib,re,collections
-P=pathlib.Path('/private/tmp/issue182-path-comparison');D=pathlib.Path('<LOCAL_PATH>');c=json.loads((P/'contract.json').read_text());assert all(hashlib.sha256(pathlib.Path(f).read_bytes()).hexdigest()==v for f,v in c['hashes'].items());assert json.loads((P/'stage1/pair-checks.json').read_text())['passed']
+P=pathlib.Path('<PRIVATE_TMP>/issue182-path-comparison');D=pathlib.Path('<LOCAL_PATH>');c=json.loads((P/'contract.json').read_text());assert all(hashlib.sha256(pathlib.Path(f).read_bytes()).hexdigest()==v for f,v in c['hashes'].items());assert json.loads((P/'stage1/pair-checks.json').read_text())['passed']
 summary={};lines=['# H182-009 生成経路比較結果','','## Goal','','Go経由の実行経路とSwift内の独自processorが生成速度に与える影響を切り分ける。固定条件はgoal.md。','','## Result / Decision','','段階1・2の全16セル・48phaseが正常終了。段階1の12要求・応答・生成tokens一致を確認。段階1はGoを省いても全ケースが速くなる結果ではなく、Go側が速度低下の主因という根拠は得られなかった。段階2の標準構成は3組でdecode速度が上昇、Qwen C02では低下。大幅な高速化を一律に示さず、独自processorの影響と生成内容・環境の影響を分離し切れていない。各arm1回のため因果と安定性は未確定。採用設定は変更しない。']
 for stage in ['stage1','stage2']:
  done=json.loads((P/stage/'completion.json').read_text());rows=json.loads((P/stage/'results.json').read_text());assert done['cells']==len(rows)==8 and not done['monitor_failed'];mon=[json.loads(s) for s in (P/stage/'monitor.jsonl').read_text().splitlines()];assert all(m['valid'] for m in mon)

@@ -45,8 +45,8 @@ prepareで直前KV8実行の入力要求と一致を確認し、token/cache audi
 - `python3 tools/benchmark182/path_compare.py stage1`：8セルの経路比較。未実行
 - `python3 tools/benchmark182/path_compare.py stage2`：8セルのprocessor比較。未実行
 
-原本は/private/tmp/issue182-path-comparison/。raw requestやmodel pathを含む契約はローカル保持。公開時は既存のsecret/path除去とmanifest検証を行う。過去の時間値を今回のbaselineへ流用しない。
+原本は<PRIVATE_TMP>/issue182-path-comparison/。raw requestやmodel pathを含む契約はローカル保持。公開時は既存のsecret/path除去とmanifest検証を行う。過去の時間値を今回のbaselineへ流用しない。
 
 ## Preparation correction
 
-初回prepareのC02 Text要求比較で、captureのCategory stub=fixと保存実生成のfeatの差を検出し停止。生成は行っていない。初回監査は/private/tmp/issue182-path-comparison-prepare-attempt1/へ保持。captureは過去のcaptureと照合し、直接再生には保存actual-requestを使用するよう修正した。新旧helperに同じactual-requestを入力した生成なしtoken/cache監査で一致を確認する。
+初回prepareのC02 Text要求比較で、captureのCategory stub=fixと保存実生成のfeatの差を検出し停止。生成は行っていない。初回監査は<PRIVATE_TMP>/issue182-path-comparison-prepare-attempt1/へ保持。captureは過去のcaptureと照合し、直接再生には保存actual-requestを使用するよう修正した。新旧helperに同じactual-requestを入力した生成なしtoken/cache監査で一致を確認する。

@@ -63,9 +63,9 @@ Instruct終了後、元の一時fixtureのrepos.jsonとGit管理情報が失わ�
 
 ## 成果物
 
-- 元run: `/private/tmp/issue182-ministral-retest/`
-- 復旧後Reasoning: `/private/tmp/issue182-ministral-reasoning-recovered/`
-- 専用runtime・asset manifest・復旧一致audit: `/private/tmp/issue182-ministral-runtime/`
+- 元run: `<PRIVATE_TMP>/issue182-ministral-retest/`
+- 復旧後Reasoning: `<PRIVATE_TMP>/issue182-ministral-reasoning-recovered/`
+- 専用runtime・asset manifest・復旧一致audit: `<PRIVATE_TMP>/issue182-ministral-runtime/`
 - ハーネス適合性と再現手順: `README.md`
 - 公開用の全テキスト実行ログ・要求/応答・監査・実行契約・source snapshot: `raw/`。元ログは保持し、公開コピーではメール形式文字列と絶対ホームパスを置換した。`raw/SHA256SUMS.txt` は公開コピーのchecksumであり、実行契約内の実行時原本hashとは区別する。
 

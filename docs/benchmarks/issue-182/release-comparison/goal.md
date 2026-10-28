@@ -41,6 +41,6 @@ ReleaseビルドのSwift40テスト成功。生成前に全要求・実token列�
 
 OS監視215サンプル全件有効、monitor_failed=false。4セルのdriver時間は1075.24秒。
 
-原本は/private/tmp/issue182-release-comparison/。公開用全テキスト証跡はraw/。source snapshot、Releaseビルド・テストログ、準備ログ、監査、要求/応答、進捗、OS監視、summary/completionを含む。weight/binary/metallib/build cacheは含めずhashで識別する。公開コピーはメール形式文字列とホーム絶対pathを置換し、raw/SHA256SUMS.txtに公開コピーhashを保存する。契約内のhashは置換前原本の値。
+原本は<PRIVATE_TMP>/issue182-release-comparison/。公開用全テキスト証跡はraw/。source snapshot、Releaseビルド・テストログ、準備ログ、監査、要求/応答、進捗、OS監視、summary/completionを含む。weight/binary/metallib/build cacheは含めずhashで識別する。公開コピーはメール形式文字列とホーム絶対pathを置換し、raw/SHA256SUMS.txtに公開コピーhashを保存する。契約内のhashは置換前原本の値。
 
 登録した4ケースは完了。採用promptとThinking条件を変更せず、追加測定・最適化は行っていない。Issue #182全体のGoalは未完了。

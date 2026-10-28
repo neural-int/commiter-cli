@@ -2,7 +2,7 @@
 import importlib.util,json,pathlib
 source=pathlib.Path('$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli/tools/benchmark182/prompt_compare.py')
 spec=importlib.util.spec_from_file_location('harness',source);h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h)
-p=pathlib.Path('/private/tmp/issue182-thinking-budget');baseline=pathlib.Path('/private/tmp/issue182-prompt-comparison')
+p=pathlib.Path('<PRIVATE_TMP>/issue182-thinking-budget');baseline=pathlib.Path('<PRIVATE_TMP>/issue182-prompt-comparison')
 contract=json.loads((p/'contract.json').read_text());before={r['cell']:r for r in json.loads((baseline/'final-summary.json').read_text())['cells']}
 results=json.loads((p/'results.json').read_text());out=[];wire_count=0
 for row in results:

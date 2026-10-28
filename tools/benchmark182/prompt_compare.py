@@ -1,8 +1,10 @@
 """H182-004 prompt-only comparison; prepare audits before any generation."""
+import os, tempfile
 import argparse,copy,hashlib,json,os,pathlib,re,signal,subprocess,sys,time
 ROOT=pathlib.Path(__file__).resolve().parents[2]
-OUT=pathlib.Path('/private/tmp/issue182-prompt-comparison')
-PREV=pathlib.Path('/private/tmp/issue182-suite-v3')
+BENCHMARK_ROOT=pathlib.Path(os.environ.get('COMMITER_BENCHMARK_ROOT', tempfile.gettempdir()))
+OUT=pathlib.Path(str(BENCHMARK_ROOT / 'issue182-prompt-comparison'))
+PREV=pathlib.Path(str(BENCHMARK_ROOT / 'issue182-suite-v3'))
 RUNTIME=OUT/'runtime'
 def save(p,d):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
 def sha(p):return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
@@ -57,12 +59,12 @@ def prepare():
  assert not (OUT/'contract.json').exists()
  OUT.mkdir(parents=True,exist_ok=True);RUNTIME.mkdir(exist_ok=True)
  (RUNTIME/'proxy').write_text('#!/bin/sh\nexec /opt/homebrew/bin/python3 '+str(pathlib.Path(__file__).resolve())+' proxy "$@"\n');(RUNTIME/'proxy').chmod(0o755)
- fixtures=pathlib.Path('/Users/Natsuki/.codex/worktrees/issue-180-batch-eval/commiter-cli/docs/benchmarks/issue-175/semantic-evaluation')
+ fixtures=pathlib.Path(os.environ.get('COMMITER_182_REFERENCE_FIXTURES', str(ROOT/'docs/benchmarks/issue-175/semantic-evaluation')))
  (OUT/'fixtures').mkdir(exist_ok=True)
  import shutil
  for case in ['c01','c02']:shutil.copyfile(fixtures/(case+'-fixture.json'),OUT/'fixtures'/(case+'-fixture.json'))
- shutil.copyfile('/private/tmp/issue182-ministral-runtime/recovered-fixtures-v2/repos.json',OUT/'repos.json')
- models=[('gemma-on',pathlib.Path.home()/'Library/Caches/commiter/mlx-models/2e02664365a6210fcdc0d0960b37cf2d5bb7cef3c7536ad35c582e3aee047b47'),('qwen4-on',pathlib.Path('/private/tmp/issue182-models/Qwen3.5-4B-4bit')),('qwen2-off',pathlib.Path('/private/tmp/issue182-models/Qwen3.5-2B-4bit'))]
+ shutil.copyfile(str(BENCHMARK_ROOT / 'issue182-ministral-runtime/recovered-fixtures-v2/repos.json'),OUT/'repos.json')
+ models=[('gemma-on',pathlib.Path(os.environ['COMMITER_182_GEMMA_MODEL'])),('qwen4-on',pathlib.Path(str(BENCHMARK_ROOT / 'issue182-models/Qwen3.5-4B-4bit'))),('qwen2-off',pathlib.Path(str(BENCHMARK_ROOT / 'issue182-models/Qwen3.5-2B-4bit')))]
  cells=[];files=[pathlib.Path(__file__),ROOT/'docs/benchmarks/issue-182/prompt-candidate.md',ROOT/'mlx-helper/Sources/commiter-mlx-helper/CommiterMLXHelper.swift',RUNTIME/'commiter-mlx-helper',RUNTIME/'mlx.metallib',RUNTIME/'proxy',PREV/'evaluation.test',OUT/'repos.json']
  for model,path in models:
   cfg=ROOT/f'docs/benchmarks/issue-182/suite-v2/{model}.json';config=json.loads(cfg.read_text());files.append(cfg)

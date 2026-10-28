@@ -1,6 +1,6 @@
 import hashlib,importlib.util,json,pathlib,re
 root=pathlib.Path('$HOME/.codex/worktrees/issue-182-model-comparison/commiter-cli')
-p=pathlib.Path('/private/tmp/issue182-overlap-ab');spec=importlib.util.spec_from_file_location('h',root/'tools/benchmark182/prompt_compare.py');h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h)
+p=pathlib.Path('<PRIVATE_TMP>/issue182-overlap-ab');spec=importlib.util.spec_from_file_location('h',root/'tools/benchmark182/prompt_compare.py');h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h)
 contract=json.loads((p/'contract.json').read_text());rows=json.loads((p/'results.json').read_text());completion=json.loads((p/'completion.json').read_text());assert len(rows)==completion['cells']==8 and not completion['monitor_failed']
 for n,d in contract['hashes'].items():assert h.sha(n)==d,n
 out=[];audited=0

@@ -35,7 +35,7 @@ QwenのMamba/GDN cacheは、固定長の再帰状態を持ちますが、使用�
 
 `tools/benchmark182/suite_v2.py prepare`は専用Go overlay/binaryと非推論captureを作る。`audit`はモデルを読み込みtemplate/tokenizer・prefix・計画cache型と量子化層数を検査するが、出力tokenのsamplingやprefix prefillは行わない。`run`のみ生成する。
 
-今回の準備artifact: `/private/tmp/issue182-suite-v2/`。native helper: `/private/tmp/issue182-suite-v2-runtime/commiter-mlx-helper`。
+今回の準備artifact: `<PRIVATE_TMP>/issue182-suite-v2/`。native helper: `<PRIVATE_TMP>/issue182-suite-v2-runtime/commiter-mlx-helper`。
 
 実行時にモデル・helper・overlay・設定のハッシュを固定する。C01/C02各1回、計14cycle/最大42phase要求、retry/repair/judgeなし。Gemma ON/OFFも新規に測定し、過去スコアを実測baselineとして流用しない。監視はMach API CPU、既存のGPU/メモリ/swap/電源等を5秒ごとに収集し、15秒の有効監視途絶またはhelper RSS12GiB以上で停止する。温度・消費電力・プロセス別GPUは未取得と明示する。
 

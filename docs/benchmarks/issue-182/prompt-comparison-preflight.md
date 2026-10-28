@@ -22,4 +22,4 @@ Groupingの実出力を保存した後、前回と同じ固定partitionでCatego
 
 ## 成果物
 
-実行契約、全12セルの実token列・実送信予定要求、入力不変条件の監査は `/private/tmp/issue182-prompt-comparison/` に保存。実行は `tools/benchmark182/prompt_compare.py run`。同じ実行契約の再実行・上書きはしない。モデル採否、簡潔化案の採用は結果を確認するまで保留する。
+実行契約、全12セルの実token列・実送信予定要求、入力不変条件の監査は `<PRIVATE_TMP>/issue182-prompt-comparison/` に保存。実行は `tools/benchmark182/prompt_compare.py run`。同じ実行契約の再実行・上書きはしない。モデル採否、簡潔化案の採用は結果を確認するまで保留する。

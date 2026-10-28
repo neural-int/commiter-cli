@@ -61,21 +61,21 @@ go run ./tools/benchmark146 -suite contract -mode oracle -metadata
 実 token 数の取得には計測専用 helper を使用する。既存 helper のコピーに `input.text.tokens.size` と `info.generationTokenCount` の数値だけを加える。native thought、prompt、生成テキストは測定 artifact に保存しない。output tokens は runtime が報告した生成数で、native thought と channel の token を含む。visible JSON の token 数ではない。
 
 ```sh
-python3 tools/benchmark146/prepare_helper.py mlx-helper /tmp/commiter-issue146-helper-new
+python3 tools/benchmark146/prepare_helper.py mlx-helper <PRIVATE_TMP>/commiter-issue146-helper-new
 # 必要なら既存の .build を APFS clone して、固定済み依存の再取得を避ける。
 # clone は上の計測専用ディレクトリ内の .build に作成する。
-swift build --package-path /tmp/commiter-issue146-helper-new -c release --disable-automatic-resolution
+swift build --package-path <PRIVATE_TMP>/commiter-issue146-helper-new -c release --disable-automatic-resolution
 ```
 
 固定モデルを既に保存した cache と、上で build した helper を明示する。モデルは取得しない。
 
 ```sh
 go run ./tools/benchmark146 -mode mlx -fixture baseline-4 -strategy baseline \
-  -helper /tmp/commiter-issue146-helper-new/.build/release/commiter-mlx-helper \
+  -helper <PRIVATE_TMP>/commiter-issue146-helper-new/.build/release/commiter-mlx-helper \
   -cache /path/to/existing/commiter/mlx-models
 
 go run ./tools/benchmark146 -mode mlx -strategy bridge -metadata \
-  -helper /tmp/commiter-issue146-helper-new/.build/release/commiter-mlx-helper \
+  -helper <PRIVATE_TMP>/commiter-issue146-helper-new/.build/release/commiter-mlx-helper \
   -cache /path/to/existing/commiter/mlx-models
 ```
 

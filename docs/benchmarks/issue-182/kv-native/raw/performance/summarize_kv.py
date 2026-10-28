@@ -1,5 +1,5 @@
 import collections,hashlib,importlib.util,json,pathlib,re
-P=pathlib.Path('/private/tmp/issue182-kv-native');ROOT=pathlib.Path('<LOCAL_PATH>')
+P=pathlib.Path('<PRIVATE_TMP>/issue182-kv-native');ROOT=pathlib.Path('<LOCAL_PATH>')
 spec=importlib.util.spec_from_file_location('h',ROOT/'tools/benchmark182/prompt_compare.py');h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h)
 c=json.loads((P/'contract.json').read_text());done=json.loads((P/'completion.json').read_text());rows=json.loads((P/'results.json').read_text())
 assert done['cells']==len(rows)==8 and not done['monitor_failed']

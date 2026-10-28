@@ -13,7 +13,7 @@ Category/Textは実Groupingを検証した後に固定参照partitionを注入�
 - 出力token予算・thinking予算は無制限（helper内で `maxTokens=nil`、native thought limitなし）。120秒timeoutなし、warmupなし、各fixture一回、retry/repair/judgeなし。14セルの上限42 phase要求に対し36要求を実行した。
 - 引き継いだH180-004のC01（3ファイル）/C02（4ファイル）fixtureを使用した。16ファイルfixtureには置き換えていない。Grouping後にCategory/Textへ固定参照partitionを注入する方式も維持した。
 - 64K input context ceilingとIPCの要求/応答サイズ制限は保持した。したがって「無制限」は生成予算・thought予算・120秒timeoutについての設定であり、入力・通信容量まで無制限ではない。
-- 実行契約、個別request/response、cell結果、OS監視ログは `/private/tmp/issue182-suite-v3/` に保存した。テキスト形式の実行ログと再現補助ソースを `docs/benchmarks/issue-182/suite-v2/raw/` に収録し、公開用コピーではメール形式文字列を `redacted@example.invalid`、絶対ホームディレクトリパスを `$HOME` に置換した。計測値・モデル応答はそのまま残し、環境依存の `evaluation.test` 実行ファイルだけを除外した。
+- 実行契約、個別request/response、cell結果、OS監視ログは `<PRIVATE_TMP>/issue182-suite-v3/` に保存した。テキスト形式の実行ログと再現補助ソースを `docs/benchmarks/issue-182/suite-v2/raw/` に収録し、公開用コピーではメール形式文字列を `redacted@example.invalid`、絶対ホームディレクトリパスを `$HOME` に置換した。計測値・モデル応答はそのまま残し、環境依存の `evaluation.test` 実行ファイルだけを除外した。
 
 ## 検証結果
 

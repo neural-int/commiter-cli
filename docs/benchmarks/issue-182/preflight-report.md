@@ -49,4 +49,4 @@
 - `go vet ./tools/benchmark182`: 成功
 - `git diff --check`: 成功
 
-生の実行出力・buildログは`/private/tmp/issue182-preflight/`および`/private/tmp/issue182-*.log`に保持し、Gitへ追加していない。初回の検証コマンドbuildは存在しないClientフィールドを指定して失敗したため、既存の`mlx.NewClient`へ修正してbuildを通した。失敗ログも保持した。公開可能なモデルmetadata、再現コード、条件、要約だけを本ディレクトリに残す。
+生の実行出力・buildログは`<PRIVATE_TMP>/issue182-preflight/`および`<PRIVATE_TMP>/issue182-*.log`に保持し、Gitへ追加していない。初回の検証コマンドbuildは存在しないClientフィールドを指定して失敗したため、既存の`mlx.NewClient`へ修正してbuildを通した。失敗ログも保持した。公開可能なモデルmetadata、再現コード、条件、要約だけを本ディレクトリに残す。

@@ -50,7 +50,7 @@ Qwen4B C02のscopeはinternal/gitstatで、実ディレクトリinternal/gitstat
 
 全12実送信要求で予定どおりのprompt変換と他入力の不変を再確認。全完了応答のThinkingカウンタは1024以下。OS監視233サンプルは全件有効。driverは4セル・1166.94秒、monitor_failed=falseで自然終了した。監視・driver時間をモデルの生成区間時間と混同しない。
 
-原本は/private/tmp/issue182-thinking-budget/。公開用全テキスト成果物とsource/checksはraw/。メール形式文字列とホーム絶対pathを公開コピーで置換し、raw/SHA256SUMS.txtで公開コピーのhashを記録する。実行契約内hashは原本の値。前回の無制限群と中断ログはH182-004の保存資料を参照し、上書きしない。
+原本は<PRIVATE_TMP>/issue182-thinking-budget/。公開用全テキスト成果物とsource/checksはraw/。メール形式文字列とホーム絶対pathを公開コピーで置換し、raw/SHA256SUMS.txtで公開コピーのhashを記録する。実行契約内hashは原本の値。前回の無制限群と中断ログはH182-004の保存資料を参照し、上書きしない。
 
 ## 限界と次の判断
 

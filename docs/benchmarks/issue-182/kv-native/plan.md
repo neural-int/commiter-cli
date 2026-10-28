@@ -32,4 +32,4 @@ Gemmaはtemperature=1.0/top_p=0.95/top_k=64、Qwen4Bは0.6/0.95/20。両方Think
 - kv_compare.py diagnose：CPU診断と専用PIDの短いMetal trace。未実行
 - kv_compare.py run：診断結果レビューの後に行う8セル比較。未実行
 
-保存先は/private/tmp/issue182-kv-native/。既存原本は上書きしない。追加依存なし。InstrumentsはXcode付属xctraceを利用する。
+保存先は<PRIVATE_TMP>/issue182-kv-native/。既存原本は上書きしない。追加依存なし。InstrumentsはXcode付属xctraceを利用する。
