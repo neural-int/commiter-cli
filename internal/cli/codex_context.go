@@ -13,6 +13,7 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/codexcontext"
 	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/gitstate"
+	"github.com/natsuki0413/commiter-cli/internal/historyattribution"
 	runmetrics "github.com/natsuki0413/commiter-cli/internal/metrics"
 	"github.com/natsuki0413/commiter-cli/internal/planning"
 	"github.com/natsuki0413/commiter-cli/internal/relation"
@@ -20,9 +21,12 @@ import (
 
 type codexCycleKey struct{}
 type codexCycle struct {
-	started   time.Time
-	collected bool
-	result    codexcontext.Result
+	attributionCollected bool
+	attributionKey       [32]byte
+	attribution          historyattribution.Result
+	started              time.Time
+	collected            bool
+	result               codexcontext.Result
 }
 
 var collectCodexContext = codexcontext.Collect

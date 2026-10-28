@@ -59,7 +59,7 @@ func candidatePrepared(t *testing.T) contextinput.Prepared {
 }
 func candidateResponses() []string {
 	return []string{
-		`{"path:one.go":"G002","path:asset.bin":"G002"}`,
+		`{"F2":"G002","F1":"G002"}`,
 		`{"G001":{"type":"fix","breaking_evidence_ref":"none"}}`,
 		`{"G001":{"scope":"planner","summary":"correct planning"}}`,
 	}
@@ -92,7 +92,7 @@ func TestThreePhaseRestoresIDsAndUsesSharedBoundedProfiles(t *testing.T) {
 func TestThreePhaseScalesRawDiffContextWithinConfiguredCeiling(t *testing.T) {
 	p := candidatePrepared(t)
 	p.Budget.ContextTokens = contextinput.Context32K
-	p.Document.Files[0].GroupingRawDiff = strings.Repeat("+ some changed code\n", 1000)
+	p.Document.Files[0].GroupingRawDiff = "@@ -0,0 +1,1000 @@\n" + strings.Repeat("+ some changed code\n", 1000)
 	c := &candidateClient{responses: candidateResponses()}
 	result, err := (ThreePhaseGenerator{Client: c}).Generate(context.Background(), p, English, SensitiveValues{})
 	if err != nil || result.Calls != 3 {
@@ -119,11 +119,11 @@ func TestThreePhaseStopsWithoutRepairOrPartialPlan(t *testing.T) {
 		phase          int
 		response, stop string
 	}{
-		{"unknown path", 0, `{"path:unknown.go":"G001","path:one.go":"G001"}`, ""},
-		{"duplicate path", 0, `{"path:one.go":"G001","path:one.go":"G002","path:asset.bin":"G001"}`, ""},
-		{"missing path", 0, `{"path:one.go":"G001"}`, ""},
-		{"unknown label", 0, `{"path:one.go":"G999","path:asset.bin":"G999"}`, ""},
-		{"incomplete output", 0, `{"path:one.go":"G002","path:asset.bin":"G002"}`, "max_tokens"},
+		{"unknown path", 0, `{"F999":"G001","F2":"G001"}`, ""},
+		{"duplicate path", 0, `{"F2":"G001","F2":"G002","F1":"G001"}`, ""},
+		{"missing path", 0, `{"F2":"G001"}`, ""},
+		{"unknown label", 0, `{"F2":"G999","F1":"G999"}`, ""},
+		{"incomplete output", 0, `{"F2":"G002","F1":"G002"}`, "max_tokens"},
 		{"unresolved evidence", 1, `{"G001":{"type":"fix","breaking_evidence_ref":"unresolved"}}`, ""},
 		{"invented evidence", 1, `{"G001":{"type":"fix","breaking_evidence_ref":"invented"}}`, ""},
 		{"unknown category property", 1, `{"G001":{"type":"fix","breaking_evidence_ref":"none","reasoning":"unsafe"}}`, ""},
@@ -196,7 +196,7 @@ func TestThreePhaseRejectsUnsupportedInputBeforeGeneration(t *testing.T) {
 }
 func TestThreePhaseDoesNotRetryTransportOrLeakSensitiveOutput(t *testing.T) {
 	for _, transport := range []bool{true, false} {
-		c := &candidateClient{responses: []string{`{"path:one.go":"fixture-secret","path:asset.bin":"G001"}`}}
+		c := &candidateClient{responses: []string{`{"F2":"fixture-secret","F1":"G001"}`}}
 		if transport {
 			c.err = errors.New("transport failed with fixture-secret")
 		}

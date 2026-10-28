@@ -28,7 +28,7 @@ func (c *recordingClient) ChatWithOptions(ctx context.Context, m []llm.Message, 
 	if o.GenerationProfile == "bounded-category" {
 		var payload struct {
 			Groups []struct {
-				Files []contextinput.File `json:"files"`
+				Files []planning.MetadataFile `json:"files"`
 			} `json:"groups"`
 		}
 		if json.Unmarshal([]byte(m[1].Content), &payload) == nil {

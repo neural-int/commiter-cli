@@ -26,7 +26,7 @@ func (c *groupingFlowClient) ChatWithOptions(_ context.Context, m []llm.Message,
 	case "bounded-grouping":
 		var input struct {
 			Files []struct {
-				ID string `json:"id"`
+				ID string `json:"file_id"`
 			} `json:"files"`
 		}
 		if err := json.Unmarshal([]byte(m[1].Content), &input); err != nil {
@@ -112,7 +112,7 @@ func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
 			}
 			var input struct {
 				Files []struct {
-					ID            string `json:"id"`
+					ID            string `json:"file_id"`
 					Mode          string `json:"mode"`
 					RawDiff       string `json:"raw_diff"`
 					SyntaxContext []struct {
@@ -127,15 +127,11 @@ func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
 			if input.Files[0].RawDiff != document.Files[0].GroupingRawDiff {
 				t.Fatal("grouping changed the complete raw diff")
 			}
-			if input.Files[0].RawDiff == "" || input.Files[0].Mode != "raw_diff" || input.Files[0].ID != "path:"+path {
+			if input.Files[0].RawDiff == "" || input.Files[0].ID != "F1" {
 				t.Fatalf("bad grouping input: %s", client.messages[0][1].Content)
 			}
-			if kind == "unsupported" || kind == "split rename" {
-				if len(input.Files[0].SyntaxContext) != 0 {
-					t.Fatal("unsupported context guessed")
-				}
-			} else if len(input.Files[0].SyntaxContext) != 1 || input.Files[0].SyntaxContext[0].EnclosingDeclaration != "Value" {
-				t.Fatalf("context lost: %+v", input.Files[0])
+			if len(input.Files[0].SyntaxContext) != 0 {
+				t.Fatal("hunk context was copied into block schema")
 			}
 			for phase := 1; phase <= 2; phase++ {
 				var metadata struct {
@@ -148,7 +144,7 @@ func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
 					t.Fatal(err)
 				}
 				file := metadata.Groups[0].Files[0]
-				if file.Mode != "raw_diff" || file.RawDiff != document.Files[0].GroupingRawDiff || len(file.Evidence) != 0 || strings.Contains(client.messages[phase][1].Content, `"syntax_context"`) {
+				if file.RawDiff != document.Files[0].GroupingRawDiff || len(file.Evidence) != 0 || strings.Contains(client.messages[phase][1].Content, `"syntax_context"`) {
 					t.Fatalf("phase %d violated raw-diff contract", phase)
 				}
 				if phase == 2 && metadata.Groups[0].Type != "fix" {

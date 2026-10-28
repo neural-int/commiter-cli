@@ -39,7 +39,7 @@ func (c *templateClient) ChatWithOptions(_ context.Context, m []llm.Message, s j
 	switch o.GenerationProfile {
 	case "bounded-grouping":
 		files := payload["files"].([]any)
-		id := files[0].(map[string]any)["id"].(string)
+		id := files[0].(map[string]any)["file_id"].(string)
 		encoded, _ := json.Marshal(map[string]string{id: "G001"})
 		content = string(encoded)
 	case "bounded-category":
@@ -49,7 +49,6 @@ func (c *templateClient) ChatWithOptions(_ context.Context, m []llm.Message, s j
 }
 func metadataTemplates() (map[string]phaseTemplate, error) {
 	prototype := fixtures()[0].Files[0]
-	prototype.RawDiff = ""
 	d := contextinput.Document{SchemaVersion: 1, Files: []contextinput.File{prototype}}
 	prompt, err := planning.Renderer(planning.English)(d)
 	if err != nil {
@@ -121,13 +120,13 @@ type finalizedGroup struct {
 	Type    string              `json:"type,omitempty"`
 }
 
-// Restore host identities from visible path IDs; group file_ids are no longer
+// Restore host identities using the preserved file paths; group file_ids are no longer
 // serialized in production prompts. This does not change fixture partitions.
-func restoreFileIDs(visible, original []contextinput.File) []string {
+func restoreFileIDs(visible []planning.MetadataFile, original []contextinput.File) []string {
 	var ids []string
 	for _, file := range visible {
 		for _, source := range original {
-			if source.NewPath != nil && file.ID == "path:"+*source.NewPath {
+			if source.NewPath != nil && file.NewPath != nil && *file.NewPath == *source.NewPath {
 				ids = append(ids, source.ID)
 				break
 			}
@@ -171,7 +170,7 @@ func finalMetadata(ctx context.Context, f fixture, p partition, backend llm.Opti
 	})
 	groups := []finalizedGroup{}
 	indices := map[int]int{}
-	for _, file := range files {
+	for fileIndex, file := range files {
 		for membership, ids := range p.Groups {
 			if !contains(ids, file.ID) {
 				continue
@@ -183,7 +182,7 @@ func finalMetadata(ctx context.Context, f fixture, p partition, backend llm.Opti
 				groups = append(groups, finalizedGroup{ID: groupID(index)})
 			}
 			groups[index].FileIDs = append(groups[index].FileIDs, file.ID)
-			file.ID = "path:" + *file.NewPath
+			file.ID = fmt.Sprintf("F%d", fileIndex+1)
 			groups[index].Files = append(groups[index].Files, file)
 			break
 		}
@@ -228,7 +227,29 @@ func finalMetadata(ctx context.Context, f fixture, p partition, backend llm.Opti
 			for k, v := range template.Payload {
 				payload[k] = v
 			}
-			payload["groups"] = batch
+			type wireGroup struct {
+				ID       string                  `json:"group_id"`
+				Files    []planning.MetadataFile `json:"files"`
+				Type     string                  `json:"type,omitempty"`
+				Breaking *bool                   `json:"breaking,omitempty"`
+			}
+			wireGroups := make([]wireGroup, 0, len(batch))
+			for _, group := range batch {
+				wire := wireGroup{ID: group.ID, Type: group.Type, Files: make([]planning.MetadataFile, 0, len(group.Files))}
+				if profile == "bounded-text" {
+					breaking := categories[group.ID].Reference != "none"
+					wire.Breaking = &breaking
+				}
+				for _, file := range group.Files {
+					item, projectionError := planning.ProjectMetadataFile(file)
+					if projectionError != nil {
+						return planning.Plan{}, recorder.Calls, "metadata_source_contract"
+					}
+					wire.Files = append(wire.Files, item)
+				}
+				wireGroups = append(wireGroups, wire)
+			}
+			payload["groups"] = wireGroups
 			encoded, _ := json.Marshal(payload)
 			system := template.System + string(shape)
 			budget := 768

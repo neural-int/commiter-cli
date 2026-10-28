@@ -1,0 +1,253 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 2
+    },
+    "projection": {
+      "const": "attribution"
+    },
+    "threads": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/thread"
+      }
+    },
+    "next_cursor": {
+      "type": "null"
+    },
+    "coverage": {
+      "$ref": "#/$defs/coverage"
+    }
+  },
+  "required": [
+    "schema_version",
+    "projection",
+    "threads",
+    "next_cursor",
+    "coverage"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Commiter research attribution history projection v2 (local completed snapshot)",
+  "$defs": {
+    "message": {
+      "type": "object",
+      "properties": {
+        "item_id": {
+          "type": "string"
+        },
+        "item_order": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_id",
+        "item_order",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "change": {
+      "type": "object",
+      "properties": {
+        "change_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "path": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "add",
+            "update",
+            "delete"
+          ]
+        },
+        "move_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "diff": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "change_index",
+        "path",
+        "kind",
+        "move_path",
+        "diff"
+      ],
+      "additionalProperties": false
+    },
+    "edit": {
+      "type": "object",
+      "properties": {
+        "item_id": {
+          "type": "string"
+        },
+        "item_order": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "const": "completed"
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/change"
+          }
+        }
+      },
+      "required": [
+        "item_id",
+        "item_order",
+        "status",
+        "changes"
+      ],
+      "additionalProperties": false
+    },
+    "turn": {
+      "type": "object",
+      "properties": {
+        "turn_id": {
+          "type": "string"
+        },
+        "started_at": {
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "interrupted",
+            "failed",
+            "inProgress"
+          ]
+        },
+        "user_messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/message"
+          }
+        },
+        "file_changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/edit"
+          }
+        },
+        "final_messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/message"
+          }
+        }
+      },
+      "required": [
+        "turn_id",
+        "started_at",
+        "status",
+        "user_messages",
+        "file_changes",
+        "final_messages"
+      ],
+      "additionalProperties": false
+    },
+    "thread": {
+      "type": "object",
+      "properties": {
+        "thread_id": {
+          "type": "string"
+        },
+        "turns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/turn"
+          }
+        }
+      },
+      "required": [
+        "thread_id",
+        "turns"
+      ],
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "enum": [
+            "error",
+            "ambiguous"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "stage": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "cause": {
+          "$ref": "#/$defs/error"
+        }
+      },
+      "required": [
+        "category",
+        "reason",
+        "stage",
+        "code"
+      ],
+      "additionalProperties": false
+    },
+    "coverage": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "unavailable"
+          ]
+        },
+        "dropped": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/error"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "dropped",
+        "reasons",
+        "errors"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

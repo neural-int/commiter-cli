@@ -39,10 +39,11 @@ func (commit Commit) Subject() string {
 }
 
 type Result struct {
-	Plan      Plan
-	Calls     int
-	Repaired  bool
-	Telemetry Telemetry
+	CommandOmissions []CommandProjectionOmission `json:"-"`
+	Plan             Plan
+	Calls            int
+	Repaired         bool
+	Telemetry        Telemetry
 }
 
 // Telemetry contains only backend model metadata and numeric timings/counts.

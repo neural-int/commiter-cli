@@ -74,7 +74,7 @@ func (c *capture) ChatWithOptions(ctx context.Context, m []llm.Message, s json.R
 	if o.GenerationProfile == "bounded-category" {
 		var payload struct {
 			Groups []struct {
-				Files []contextinput.File `json:"files"`
+				Files []planning.MetadataFile `json:"files"`
 			} `json:"groups"`
 		}
 		if err := json.Unmarshal([]byte(m[1].Content), &payload); err != nil {
@@ -96,13 +96,16 @@ func (c *capture) ChatWithOptions(ctx context.Context, m []llm.Message, s json.R
 		r, err = c.Backend.ChatWithOptions(ctx, m, s, o)
 	} else {
 		var payload struct {
-			Files []contextinput.File `json:"files"`
+			Files []struct {
+				ID      string  `json:"file_id"`
+				NewPath *string `json:"new_path"`
+			} `json:"files"`
 		}
 		if err = json.Unmarshal([]byte(m[1].Content), &payload); err == nil {
 			labels := map[string]string{}
 			membership := map[string]string{}
 			for _, f := range payload.Files {
-				truth, ok := c.Truth[f.ID]
+				truth, ok := c.Truth["path:"+*f.NewPath]
 				if !ok {
 					return r, errors.New("oracle missing file")
 				}

@@ -45,10 +45,10 @@ func TestThreePhaseUsesRawDiffInAllPhasesAndPreservesHostInput(t *testing.T) {
 		}
 	}
 	changed, opaque := payload.Files[1], payload.Files[0]
-	if string(changed["mode"]) != `"raw_diff"` || len(changed["raw_diff"]) == 0 || len(changed["syntax_context"]) == 0 {
+	if len(changed["raw_diff"]) == 0 || string(changed["change_blocks"]) == "[]" || len(changed["file_id"]) == 0 {
 		t.Fatalf("raw/context projection missing: %v", changed)
 	}
-	if string(opaque["mode"]) != `"metadata_only"` || len(opaque["raw_diff"])+len(opaque["syntax_context"]) != 0 {
+	if string(opaque["raw_diff"]) != `""` || string(opaque["change_blocks"]) != "[]" {
 		t.Fatal("opaque content leaked")
 	}
 	var metadata struct {
@@ -61,7 +61,7 @@ func TestThreePhaseUsesRawDiffInAllPhasesAndPreservesHostInput(t *testing.T) {
 			t.Fatal(err)
 		}
 		originalFile := metadata.Groups[0].Files[1]
-		if originalFile.Mode != syntax.ModeRawDiff || originalFile.RawDiff != file.GroupingRawDiff || originalFile.HeadIdentity == nil || *originalFile.HeadIdentity != identity || len(originalFile.Evidence) != 0 {
+		if originalFile.RawDiff != file.GroupingRawDiff || originalFile.HeadIdentity != nil || originalFile.WorktreeIdentity != nil || originalFile.ChangeHash != "" || len(originalFile.Evidence) != 0 {
 			t.Fatalf("phase %d lost original data: %+v", phase, originalFile)
 		}
 		if strings.Contains(c.messages[phase][1].Content, `"syntax_context"`) {

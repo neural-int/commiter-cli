@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/natsuki0413/commiter-cli/internal/codexcontext"
+	"github.com/natsuki0413/commiter-cli/internal/historyattribution"
 
 	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/contextinput"
@@ -259,13 +259,22 @@ func TestWorktreeDiffTreatsCollectedPathsLiterally(t *testing.T) {
 func TestGemmaThreePhaseDefaultPlanning(t *testing.T) {
 	// Normal tests never read the user's Codex history. Exercise the real CLI
 	// wiring with a synthetic record; preserve the opt-in model smoke baseline.
-	oldCollect := collectCodexContext
-	t.Cleanup(func() { collectCodexContext = oldCollect })
-	collectCodexContext = func(context.Context, codexcontext.Request) codexcontext.Result {
-		if os.Getenv("COMMITER_CANDIDATE_SMOKE_HELPER") != "" {
-			return codexcontext.Result{Status: "absent"}
+	oldCollect := collectAttributedHistory
+	t.Cleanup(func() { collectAttributedHistory = oldCollect })
+	collectAttributedHistory = func(ctx context.Context, request historyattribution.Request) (historyattribution.Result, error) {
+		h := &planning.GroupingHistory{Contexts: []planning.AgentHistoryContext{{ContextRef: "H1", UserRequests: []string{"Correct the existing value"}, FinalResponses: []string{"Corrected the value"}}}, Acquisition: planning.AgentHistoryAcquisition{Status: "complete"}}
+		for _, file := range request.Files {
+			wire, e := planning.ProjectMetadataFile(file)
+			if e != nil {
+				return historyattribution.Result{}, e
+			}
+			entry := planning.AttributedFileHistory{FileID: file.ID, RawDiff: wire.RawDiff}
+			for _, block := range wire.ChangeBlocks {
+				entry.Blocks = append(entry.Blocks, planning.AttributedBlockHistory{BlockID: block.BlockID, DiffRange: block.DiffRange, Status: "matched", Candidates: []planning.AgentHistoryCandidate{{ContextRef: "H1", Match: "exact"}}})
+			}
+			h.Files = append(h.Files, entry)
 		}
-		return codexcontext.Result{Status: "available", Records: []codexcontext.Record{{Paths: []string{"sample.go"}, UserRequest: "Correct the existing value", FinalResponse: "Corrected the value"}}}
+		return historyattribution.Result{History: h, Status: "available", Contexts: 1}, nil
 	}
 	repo := cliRepository(t)
 	cliWrite(t, repo, "sample.go", "package sample\nfunc value() int { return 1 }\n", 0o644)
@@ -313,7 +322,7 @@ case "$request" in
  *) exit 1 ;;
 esac
 case "$request" in
- *'"generation_profile":"bounded-grouping"'*) profile=bounded-grouping; result='{"path:sample.go":"G001"}' ;;
+ *'"generation_profile":"bounded-grouping"'*) profile=bounded-grouping; result='{"F1":"G001"}' ;;
  *'"generation_profile":"bounded-category"'*) profile=bounded-category; result='{"G001":{"type":"fix","breaking_evidence_ref":"none"}}' ;;
  *'"generation_profile":"bounded-text"'*) profile=bounded-text; result='{"G001":{"scope":"sample","summary":"correct value"}}' ;;
  *) exit 1 ;;

@@ -121,8 +121,16 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 	}
 	var generated planning.Result
 	if values.Planner == config.CandidatePlanner {
-		codexRecords := optionalCodexContext(ctx, root, snapshot, values, relationFiles, sensitive)
-		generated, err = (planning.ThreePhaseGenerator{Client: client, CodexContext: codexRecords}).Generate(ctx, prepared, language, sensitive)
+		history, historyError := attributedHistoryForPlan(ctx, root, snapshot, values, prepared.Document, sensitive)
+		if historyError != nil {
+			return planning.Plan{}, historyError
+		}
+		generated, err = (planning.ThreePhaseGenerator{Client: client, GroupingHistory: history}).Generate(ctx, prepared, language, sensitive)
+		if err == nil {
+			if verifyErr := verifyAttributionSnapshot(ctx, root, snapshot, values); verifyErr != nil {
+				return planning.Plan{}, verifyErr
+			}
+		}
 	} else {
 		generated, err = (planning.Generator{Client: client}).Generate(ctx, prepared, language, sensitive)
 	}

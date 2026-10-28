@@ -57,7 +57,10 @@ func (b *fixtureBackend) ChatWithOptions(ctx context.Context, m []llm.Message, s
 		return llm.Response{Content: b.Invalid, StopReason: "completed"}, nil
 	}
 	var payload struct {
-		Groups []finalizedGroup `json:"groups"`
+		Groups []struct {
+			ID    string                  `json:"group_id"`
+			Files []planning.MetadataFile `json:"files"`
+		} `json:"groups"`
 	}
 	if err := json.Unmarshal([]byte(m[1].Content), &payload); err != nil {
 		return llm.Response{}, err
@@ -138,7 +141,7 @@ func TestMetadataFailureNeverReturnsPartialPlan(t *testing.T) {
 }
 func TestOverflowAndCancellationStopBeforeBackend(t *testing.T) {
 	f := fixtures()[0]
-	f.Files[0].RawDiff = strings.Repeat("x", 16384)
+	f.Files[0].RawDiff = "@@ -0,0 +1 @@\n+" + strings.Repeat("x", 16384) + "\n"
 	b := &fixtureBackend{Fixture: f}
 	o := run(context.Background(), f, "bridge", "mock", b, 48, time.Second, true)
 	if !o.Unresolved || len(b.Profiles) > 0 || o.PlanSucceeded {
@@ -153,7 +156,7 @@ func TestOverflowAndCancellationStopBeforeBackend(t *testing.T) {
 		t.Fatalf("cancel not closed: %+v", o)
 	}
 	p := partition{Groups: f.Expected}
-	f.Files[0].RawDiff = strings.Repeat("x", 16384)
+	f.Files[0].RawDiff = "@@ -0,0 +1 @@\n+" + strings.Repeat("x", 16384) + "\n"
 	plan, _, failure := finalMetadata(context.Background(), f, p, nil, "oracle")
 	if failure != "context_overflow" || len(plan.Commits) > 0 {
 		t.Fatalf("metadata overflow: %s %+v", failure, plan)
@@ -219,7 +222,9 @@ func (b *auditConflictBackend) ChatWithOptions(ctx context.Context, m []llm.Mess
 		b.GroupingCalls++
 		if b.GroupingCalls == 4 {
 			var payload struct {
-				Files []contextinput.File `json:"files"`
+				Files []struct {
+					ID string `json:"file_id"`
+				} `json:"files"`
 			}
 			if err := json.Unmarshal([]byte(m[1].Content), &payload); err != nil {
 				return llm.Response{}, err

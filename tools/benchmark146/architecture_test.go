@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/natsuki0413/commiter-cli/internal/llm"
 	"reflect"
 	"testing"
@@ -112,23 +113,23 @@ func TestProductionStageOneRejectsMalformedMembershipBeforeReconciliation(t *tes
 	f := fixtures()[0]
 	w := idsFor(f.Graph)
 	valid := map[string]string{}
-	for _, file := range f.Files {
-		valid["path:"+*file.NewPath] = "G001"
+	for i := range f.Files {
+		valid[fmt.Sprintf("F%d", i+1)] = "G001"
 	}
 	missing := map[string]string{}
 	for k, v := range valid {
 		missing[k] = v
 	}
-	delete(missing, "path:"+*f.Files[0].NewPath)
+	delete(missing, "F1")
 	unknown := map[string]string{}
 	for k, v := range valid {
 		unknown[k] = v
 	}
-	delete(unknown, "path:"+*f.Files[0].NewPath)
-	unknown["path:unknown.go"] = "G001"
+	delete(unknown, "F1")
+	unknown["F999"] = "G001"
 	a, _ := json.Marshal(missing)
 	b, _ := json.Marshal(unknown)
-	duplicate := `{"path:settings/setting00.go":"G001","path:settings/setting00.go":"G002"}`
+	duplicate := `{"F1":"G001","F1":"G002"}`
 	for _, response := range []string{string(a), string(b), duplicate} {
 		backend := &invalidMembershipBackend{Response: response}
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
