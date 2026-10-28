@@ -1,0 +1,54 @@
+# Phase timing
+
+| セル / phase | load秒 | prepare秒 | grammar秒 | prompt秒 | decode秒 | generation wall秒 | tokens | thinking | JSON / Schema |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| qwen25-05-json_schema / bounded-grouping | 0.402793 | 0.029663 | 0.329139 | 2.175844 | 0.486359 | 2.662679 | 48 | 0 | True / True |
+| qwen25-05-json_schema / bounded-category | 0.390329 | 0.026014 | 0.347049 | 1.851290 | 0.214997 | 2.066518 | 24 | 0 | True / True |
+| qwen25-05-json_schema / bounded-text | 0.336754 | 0.025401 | 0.673883 | 1.844101 | 0.217960 | 2.062350 | 22 | 0 | True / True |
+| qwen25-05-none / bounded-grouping | 0.330587 | 0.027890 | 0.327203 | 2.167684 | 0.511938 | 2.679950 | 58 | 0 | True / False |
+| qwen25-15-none / bounded-grouping | 0.359042 | 0.028334 | 0.331339 | 5.659704 | 1.103529 | 6.763461 | 57 | 0 | True / True |
+| qwen25-15-none / bounded-category | 0.409556 | 0.026739 | 0.377879 | 5.076254 | 0.502258 | 5.578859 | 29 | 0 | True / True |
+| qwen25-15-none / bounded-text | 0.362185 | 0.025128 | 0.330637 | 4.962462 | 1.276555 | 6.239245 | 75 | 0 | True / False |
+| qwen25-15-json_schema / bounded-grouping | 0.352390 | 0.028015 | 0.328992 | 5.801689 | 0.715648 | 6.517601 | 42 | 0 | True / True |
+| qwen25-15-json_schema / bounded-category | 0.372277 | 0.029770 | 0.351501 | 6.396050 | 1.137314 | 7.533575 | 65 | 0 | True / True |
+| qwen25-15-json_schema / bounded-text | 0.388110 | 0.029603 | 0.773019 | 6.100956 | 2.701820 | 8.802963 | 131 | 0 | True / True |
+| qwen25-3-json_schema / bounded-grouping | 0.606003 | 0.027932 | 0.331980 | 12.514058 | 1.219072 | 13.733346 | 41 | 0 | True / True |
+| qwen25-3-json_schema / bounded-category | 0.603883 | 0.031934 | 0.362831 | 14.517260 | 2.471076 | 16.988537 | 81 | 0 | True / True |
+| qwen25-3-json_schema / bounded-text | 0.612402 | 0.031072 | 0.753066 | 14.139421 | 5.409339 | 19.548897 | 163 | 0 | True / True |
+| qwen25-3-none / bounded-grouping | 0.608322 | 0.030586 | 0.385039 | 13.296484 | 1.209053 | 14.506078 | 41 | 0 | True / True |
+| qwen25-3-none / bounded-category | 0.610863 | 0.034389 | 0.360112 | 14.979004 | 2.425172 | 17.404466 | 81 | 0 | True / True |
+| qwen25-3-none / bounded-text | 0.605660 | 0.031774 | 0.365680 | 15.690755 | 7.765892 | 23.456925 | 194 | 0 | True / False |
+| coder25-05-none / bounded-grouping | 0.405973 | 0.028517 | 0.341802 | 2.402160 | 0.370501 | 2.772960 | 41 | 0 | True / True |
+| coder25-05-none / bounded-category | 0.417120 | 0.039505 | 0.483879 | 3.693512 | 1.274982 | 4.968807 | 137 | 0 | True / True |
+| coder25-05-none / bounded-text | 0.681867 | 0.072465 | 0.728965 | 3.087881 | 1.591159 | 4.679375 | 164 | 0 | False / False |
+| coder25-05-json_schema / bounded-grouping | 0.443641 | 0.033052 | 0.482244 | 2.989907 | 1.029453 | 4.019812 | 41 | 0 | True / True |
+| coder25-05-json_schema / bounded-category | 0.674421 | 0.044793 | 0.441117 | 3.196504 | 0.758233 | 3.955044 | 81 | 0 | True / True |
+| coder25-05-json_schema / bounded-text | 0.438302 | 0.038073 | 0.974063 | 3.409719 | 3.056921 | 6.467099 | 235 | 0 | True / True |
+| coder25-15-json_schema / bounded-grouping | 0.465427 | 0.038240 | 0.469829 | 7.686457 | 0.957737 | 8.647127 | 41 | 0 | True / True |
+| coder25-15-json_schema / bounded-category | 1.056635 | 0.050508 | 0.642480 | 8.918881 | 0.969601 | 9.889139 | 52 | 0 | True / True |
+| coder25-15-none / bounded-grouping | 0.531005 | 0.047733 | 0.400348 | 8.540056 | 0.732661 | 9.273137 | 41 | 0 | True / True |
+| coder25-15-none / bounded-category | 0.706075 | 0.048950 | 0.623895 | 8.682899 | 0.887012 | 9.570250 | 52 | 0 | True / True |
+| coder25-3-none / bounded-grouping | 0.623041 | 0.031653 | 0.370356 | 15.773826 | 1.730292 | 17.504915 | 57 | 0 | True / True |
+| coder25-3-none / bounded-category | 1.125759 | 0.073563 | 0.588871 | 14.536552 | 0.824521 | 15.361226 | 29 | 0 | True / True |
+| coder25-3-none / bounded-text | 0.615447 | 0.028826 | 0.393518 | 13.999409 | 2.957397 | 16.956936 | 64 | 0 | True / False |
+| coder25-3-json_schema / bounded-grouping | 0.479492 | 0.030218 | 0.350526 | 15.655537 | 1.377616 | 17.033269 | 47 | 0 | True / True |
+| coder25-3-json_schema / bounded-category | 0.641791 | 0.055547 | 0.770044 | 14.165450 | 0.703383 | 14.869038 | 24 | 0 | True / True |
+| coder25-3-json_schema / bounded-text | 0.546541 | 0.031353 | 1.045992 | 14.616221 | 3.168980 | 17.785697 | 52 | 0 | True / True |
+| qwen2-off-json_schema / bounded-grouping | 0.947494 | 0.051187 | 0.680144 | 10.458234 | 0.960993 | 11.419898 | 52 | 0 | True / True |
+| qwen2-off-json_schema / bounded-category | 0.995034 | 0.059314 | 1.519674 | 9.133614 | 0.421707 | 9.555727 | 25 | 0 | True / True |
+| qwen2-off-json_schema / bounded-text | 0.914590 | 0.047882 | 1.314336 | 6.505427 | 0.683452 | 7.189296 | 34 | 0 | True / True |
+| qwen2-off-none / bounded-grouping | 0.932568 | 0.052483 | 0.641974 | 9.070944 | 1.085910 | 10.157231 | 63 | 0 | True / True |
+| qwen2-off-none / bounded-category | 1.170612 | 0.075542 | 1.062976 | 8.883926 | 2.952671 | 11.837649 | 96 | 0 | True / True |
+| qwen2-off-none / bounded-text | 1.626862 | 0.061045 | 0.773410 | 7.231087 | 9.914330 | 17.145861 | 371 | 0 | False / False |
+| qwen4-off-none / bounded-grouping | 1.615223 | 0.062649 | 0.953611 | 21.835461 | 2.936459 | 24.776611 | 46 | 0 | True / True |
+| qwen4-off-none / bounded-category | 1.550503 | 0.059087 | 0.807172 | 21.286830 | 3.277830 | 24.565165 | 55 | 0 | True / True |
+| qwen4-off-none / bounded-text | 1.302254 | 0.063634 | 0.741696 | 18.261543 | 5.816109 | 24.079707 | 97 | 0 | True / False |
+| qwen4-off-json_schema / bounded-grouping | 1.155152 | 0.054522 | 0.723949 | 20.289462 | 3.169551 | 23.459836 | 41 | 0 | True / True |
+| qwen4-off-json_schema / bounded-category | 1.518444 | 0.073364 | 0.995838 | 24.221324 | 3.562234 | 27.783833 | 48 | 0 | True / True |
+| qwen4-off-json_schema / bounded-text | 2.077744 | 0.059492 | 1.599826 | 22.022724 | 4.413178 | 26.436215 | 65 | 0 | True / True |
+| qwen4-on-json_schema / bounded-grouping | 1.295444 | 0.055826 | 0.779830 | 24.016298 | 111.406289 | 135.422112 | 1914 | 1861 | True / True |
+| qwen4-on-json_schema / bounded-category | 1.357251 | 0.059546 | 0.764371 | 18.168367 | 51.099039 | 69.267444 | 859 | 809 | True / True |
+| qwen4-on-json_schema / bounded-text | 1.568854 | 0.058304 | 1.536487 | 19.069015 | 27.691724 | 46.760821 | 478 | 421 | True / True |
+| qwen4-on-none / bounded-grouping | 1.210146 | 0.053048 | 0.739775 | 20.052249 | 104.251906 | 124.304007 | 1911 | 1861 | True / True |
+| qwen4-on-none / bounded-category | 1.562412 | 0.066492 | 0.909071 | 18.981542 | 54.091032 | 73.072615 | 907 | 809 | True / True |
+| qwen4-on-none / bounded-text | 1.324280 | 0.059098 | 0.788557 | 18.473608 | 27.712586 | 46.186214 | 479 | 421 | True / True |

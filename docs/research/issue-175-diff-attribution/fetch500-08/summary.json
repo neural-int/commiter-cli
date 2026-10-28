@@ -1,0 +1,128 @@
+{
+  "date": "2026-10-23",
+  "requested_page_size": 500,
+  "response_limit_bytes": 300000000,
+  "maximum_response_bytes": 1426614,
+  "metrics": {
+    "acquisition_ms": 10638.998,
+    "compare_total_ms": 0.0355,
+    "dropped": 0,
+    "error": null,
+    "items": 15097,
+    "mode": "paged500",
+    "operations": 0,
+    "query": "current",
+    "received_bytes": 42099033,
+    "retained_turns": 0,
+    "rpc_requests": 606,
+    "same_source_and_results": true,
+    "status": "complete",
+    "threads": 87,
+    "turns": 443
+  },
+  "actual_item_limit_probe": [
+    {
+      "requested": 100,
+      "returned": 100,
+      "has_next": true,
+      "error": false
+    },
+    {
+      "requested": 500,
+      "returned": 100,
+      "has_next": true,
+      "error": false
+    }
+  ],
+  "memory": {
+    "samples": [
+      {
+        "elapsed_s": 0.021,
+        "harness_rss_bytes": 32768,
+        "app_server_descendants_rss_bytes": 0,
+        "pressure_level": 1
+      },
+      {
+        "elapsed_s": 1.048,
+        "harness_rss_bytes": 34717696,
+        "app_server_descendants_rss_bytes": 121683968,
+        "pressure_level": 1
+      },
+      {
+        "elapsed_s": 2.077,
+        "harness_rss_bytes": 38912000,
+        "app_server_descendants_rss_bytes": 129908736,
+        "pressure_level": 1
+      },
+      {
+        "elapsed_s": 3.108,
+        "harness_rss_bytes": 41336832,
+        "app_server_descendants_rss_bytes": 132726784,
+        "pressure_level": 1
+      },
+      {
+        "elapsed_s": 4.137,
+        "harness_rss_bytes": 44204032,
+        "app_server_descendants_rss_bytes": 136806400,
+        "pressure_level": 1
+      },
+      {
+        "elapsed_s": 5.167,
+        "harness_rss_bytes": 45760512,
+        "app_server_descendants_rss_bytes": 139214848,
+        "pressure_level": 1
+      },
+      {
+        "elapsed_s": 6.196,
+        "harness_rss_bytes": 47628288,
+        "app_server_descendants_rss_bytes": 143032320,
+        "pressure_level": 1
+      },
+      {
+        "elapsed_s": 7.225,
+        "harness_rss_bytes": 47661056,
+        "app_server_descendants_rss_bytes": 144293888,
+        "pressure_level": 1
+      },
+      {
+        "elapsed_s": 8.25,
+        "harness_rss_bytes": 47841280,
+        "app_server_descendants_rss_bytes": 145653760,
+        "pressure_level": 1
+      },
+      {
+        "elapsed_s": 9.276,
+        "harness_rss_bytes": 47841280,
+        "app_server_descendants_rss_bytes": 144179200,
+        "pressure_level": 1
+      },
+      {
+        "elapsed_s": 10.305,
+        "harness_rss_bytes": 49020928,
+        "app_server_descendants_rss_bytes": 146096128,
+        "pressure_level": 1
+      }
+    ],
+    "before": {
+      "pressure": 1,
+      "vm": {
+        "Pageouts": 4633278,
+        "Swapouts": 75819051
+      }
+    },
+    "after": {
+      "pressure": 1,
+      "vm": {
+        "Pageouts": 4633300,
+        "Swapouts": 75819051
+      }
+    },
+    "stopped_for_pressure": false,
+    "exit_code": 0,
+    "note": "sampled RSS may miss short peaks; server descendants include codex launcher; vm deltas are system-wide"
+  },
+  "sampled_harness_peak_rss_bytes": 49020928,
+  "sampled_server_peak_rss_bytes": 146096128,
+  "same_previous_result": true,
+  "conclusion": "no request reduction: 500 requested but 100 returned with next page; retain paged100"
+}

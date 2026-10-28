@@ -1,0 +1,252 @@
+{
+  "date": "2026-10-22",
+  "scope": "research PoC only; no production integration; no model calls",
+  "acquisitions": {
+    "current_gitignore": {
+      "status": "complete",
+      "received_bytes": 42209601,
+      "threads_scanned": 87,
+      "turns_scanned": 443,
+      "items_scanned": 15072,
+      "dropped": 0,
+      "elapsed_ms": 22572.5,
+      "rpc_requests": 1142,
+      "max_message_bytes": 1156308,
+      "retained_json_bytes": 32
+    },
+    "ten_paths_shared_sweep": {
+      "case_count": 10,
+      "dropped": 1,
+      "elapsed_ms": 10908.729,
+      "history_error": {
+        "stage": "history.filter",
+        "code": "sensitive_evidence_omitted",
+        "category": "ambiguous",
+        "reason": "history_incomplete"
+      },
+      "history_status": "partial",
+      "items": 3088,
+      "max_message_bytes": 213728,
+      "operations": 22,
+      "received_bytes": 7006978,
+      "retained_json_bytes": 56603,
+      "retained_turns": 5,
+      "rows": [
+        {
+          "diff_bytes": 1496,
+          "operations": 1,
+          "path": "docs/benchmarks/issue-182/follow-up-plan.md",
+          "selected_history_json_bytes": 6892,
+          "turns": 1
+        },
+        {
+          "diff_bytes": 10805,
+          "operations": 6,
+          "path": "docs/benchmarks/issue-182/ministral-official/goal.md",
+          "selected_history_json_bytes": 17733,
+          "turns": 1
+        },
+        {
+          "diff_bytes": 1271,
+          "operations": 1,
+          "path": "docs/benchmarks/issue-182/ministral-official/raw/README.md",
+          "selected_history_json_bytes": 6681,
+          "turns": 1
+        },
+        {
+          "diff_bytes": 2397,
+          "operations": 1,
+          "path": "docs/benchmarks/issue-182/prompt-candidate.md",
+          "selected_history_json_bytes": 7846,
+          "turns": 1
+        },
+        {
+          "diff_bytes": 1887,
+          "operations": 1,
+          "path": "docs/benchmarks/issue-182/prompt-comparison-goal.md",
+          "selected_history_json_bytes": 4370,
+          "turns": 1
+        },
+        {
+          "diff_bytes": 2785,
+          "operations": 1,
+          "path": "docs/benchmarks/issue-182/prompt-comparison-preflight.md",
+          "selected_history_json_bytes": 5273,
+          "turns": 1
+        },
+        {
+          "diff_bytes": 1901,
+          "operations": 3,
+          "path": "docs/benchmarks/issue-182/suite-v2/README.md",
+          "selected_history_json_bytes": 8478,
+          "turns": 2
+        },
+        {
+          "diff_bytes": 710,
+          "operations": 1,
+          "path": "docs/benchmarks/issue-182/suite-v2/raw/README.md",
+          "selected_history_json_bytes": 2959,
+          "turns": 1
+        },
+        {
+          "diff_bytes": 13671,
+          "operations": 6,
+          "path": "docs/benchmarks/issue-182/suite-v2/results-report.md",
+          "selected_history_json_bytes": 21968,
+          "turns": 3
+        },
+        {
+          "diff_bytes": 441,
+          "operations": 1,
+          "path": "tools/benchmark182/mistral_audit.py",
+          "selected_history_json_bytes": 5829,
+          "turns": 1
+        }
+      ],
+      "rpc_requests": 332,
+      "shared_sweep": true,
+      "threads": 87,
+      "turns": 80,
+      "wall_ms": 10922.023
+    }
+  },
+  "comparison_rows": [
+    {
+      "case": "R01",
+      "path": "docs/benchmarks/issue-182/follow-up-plan.md",
+      "exit": 0,
+      "elapsed_ms": 493.56608325615525,
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reasons": {
+        "partial_match": 1,
+        "history_incomplete": 1
+      },
+      "fallback": true
+    },
+    {
+      "case": "R02",
+      "path": "docs/benchmarks/issue-182/ministral-official/goal.md",
+      "exit": 0,
+      "elapsed_ms": 28.52562488988042,
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reasons": {
+        "partial_match": 1,
+        "history_incomplete": 1
+      },
+      "fallback": true
+    },
+    {
+      "case": "R03",
+      "path": "docs/benchmarks/issue-182/ministral-official/raw/README.md",
+      "exit": 0,
+      "elapsed_ms": 21.608875133097172,
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reasons": {
+        "history_incomplete": 1
+      },
+      "fallback": true
+    },
+    {
+      "case": "R04",
+      "path": "docs/benchmarks/issue-182/prompt-candidate.md",
+      "exit": 0,
+      "elapsed_ms": 20.863916259258986,
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reasons": {
+        "history_incomplete": 1
+      },
+      "fallback": true
+    },
+    {
+      "case": "R05",
+      "path": "docs/benchmarks/issue-182/prompt-comparison-goal.md",
+      "exit": 0,
+      "elapsed_ms": 20.762416999787092,
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reasons": {
+        "partial_match": 1,
+        "history_incomplete": 1
+      },
+      "fallback": true
+    },
+    {
+      "case": "R06",
+      "path": "docs/benchmarks/issue-182/prompt-comparison-preflight.md",
+      "exit": 0,
+      "elapsed_ms": 19.837624859064817,
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reasons": {
+        "history_incomplete": 1
+      },
+      "fallback": true
+    },
+    {
+      "case": "R07",
+      "path": "docs/benchmarks/issue-182/suite-v2/README.md",
+      "exit": 0,
+      "elapsed_ms": 18.74708291143179,
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reasons": {
+        "partial_match": 1,
+        "history_incomplete": 1
+      },
+      "fallback": true
+    },
+    {
+      "case": "R08",
+      "path": "docs/benchmarks/issue-182/suite-v2/raw/README.md",
+      "exit": 0,
+      "elapsed_ms": 17.521583940833807,
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reasons": {
+        "partial_match": 1,
+        "history_incomplete": 1
+      },
+      "fallback": true
+    },
+    {
+      "case": "R09",
+      "path": "docs/benchmarks/issue-182/suite-v2/results-report.md",
+      "exit": 0,
+      "elapsed_ms": 20.2932502143085,
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reasons": {
+        "partial_match": 1,
+        "history_incomplete": 1
+      },
+      "fallback": true
+    },
+    {
+      "case": "R10",
+      "path": "tools/benchmark182/mistral_audit.py",
+      "exit": 1,
+      "elapsed_ms": 15.411125030368567,
+      "error": {
+        "stage": "input.schema",
+        "code": "sensitive_content",
+        "category": "error",
+        "reason": "input_invalid"
+      }
+    }
+  ],
+  "independent_accuracy_evaluation": false,
+  "timing_note": "diagnostic acquisitions overlapped in execution; not a controlled latency benchmark; go test driver memory differs from CLI driver"
+}

@@ -1,0 +1,369 @@
+{
+  "date": "2026-10-22",
+  "schema_version": 2,
+  "server_side_projection": false,
+  "same_response_for_both_formats": true,
+  "queries": [
+    {
+      "acquisition_ms": 9909.427,
+      "dropped": 1,
+      "history_error": {
+        "stage": "history.filter",
+        "code": "sensitive_evidence_omitted",
+        "category": "ambiguous",
+        "reason": "history_incomplete"
+      },
+      "history_status": "partial",
+      "items": 3115,
+      "legacy_history_json_bytes": 56969,
+      "operations": 22,
+      "projected_history_json_bytes": 56827,
+      "projection_ms": 0.014208,
+      "query": "ten-path",
+      "received_bytes": 7104625,
+      "retained_turns": 5,
+      "rpc_requests": 334,
+      "server_side_projection": false,
+      "threads": 87,
+      "turns": 80,
+      "wire_item_stats": {
+        "items": {
+          "commandExecution": {
+            "count": 1018,
+            "item_json_bytes": 4826970
+          },
+          "fileChange": {
+            "count": 31,
+            "item_json_bytes": 76892
+          },
+          "finalMessage": {
+            "count": 79,
+            "item_json_bytes": 215338
+          },
+          "intermediateMessage": {
+            "count": 360,
+            "item_json_bytes": 176540
+          },
+          "mcpToolCall": {
+            "count": 38,
+            "item_json_bytes": 696624
+          },
+          "other": {
+            "count": 208,
+            "item_json_bytes": 19765
+          },
+          "reasoning": {
+            "count": 1269,
+            "item_json_bytes": 179714
+          },
+          "userMessage": {
+            "count": 82,
+            "item_json_bytes": 73069
+          },
+          "webSearch": {
+            "count": 30,
+            "item_json_bytes": 175578
+          }
+        }
+      },
+      "excluded_item_json_bytes": 6075191,
+      "excluded_item_share_of_received_percent": 85.51036824603692
+    },
+    {
+      "acquisition_ms": 18522.261,
+      "dropped": 0,
+      "history_error": null,
+      "history_status": "complete",
+      "items": 15097,
+      "legacy_history_json_bytes": 278,
+      "operations": 0,
+      "projected_history_json_bytes": 149,
+      "projection_ms": 0.000292,
+      "query": "current",
+      "received_bytes": 42302673,
+      "retained_turns": 0,
+      "rpc_requests": 1144,
+      "server_side_projection": false,
+      "threads": 87,
+      "turns": 443,
+      "wire_item_stats": {
+        "items": {
+          "commandExecution": {
+            "count": 5362,
+            "item_json_bytes": 32584288
+          },
+          "fileChange": {
+            "count": 195,
+            "item_json_bytes": 877727
+          },
+          "finalMessage": {
+            "count": 448,
+            "item_json_bytes": 1237649
+          },
+          "intermediateMessage": {
+            "count": 1513,
+            "item_json_bytes": 779456
+          },
+          "mcpToolCall": {
+            "count": 359,
+            "item_json_bytes": 3552300
+          },
+          "other": {
+            "count": 572,
+            "item_json_bytes": 50488
+          },
+          "reasoning": {
+            "count": 6264,
+            "item_json_bytes": 983893
+          },
+          "userMessage": {
+            "count": 306,
+            "item_json_bytes": 240226
+          },
+          "webSearch": {
+            "count": 78,
+            "item_json_bytes": 380620
+          }
+        }
+      },
+      "excluded_item_json_bytes": 38331045,
+      "excluded_item_share_of_received_percent": 90.6114017901422
+    }
+  ],
+  "cases": [
+    {
+      "case": "R01",
+      "equivalent": true,
+      "legacy_compare_ms": 0.046708,
+      "legacy_decode_validate_ms": 0.702042,
+      "legacy_input_bytes": 8552,
+      "order": "legacy_then_projected",
+      "projected_compare_ms": 0.012042,
+      "projected_decode_validate_ms": 0.671167,
+      "projected_input_bytes": 8633,
+      "query": "ten-path",
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reason_counts": {
+        "partial_match": 1,
+        "history_incomplete": 1
+      }
+    },
+    {
+      "case": "R02",
+      "equivalent": true,
+      "legacy_compare_ms": 1.229583,
+      "legacy_decode_validate_ms": 2.3535,
+      "legacy_input_bytes": 26032,
+      "order": "projected_then_legacy",
+      "projected_compare_ms": 1.715917,
+      "projected_decode_validate_ms": 2.414708,
+      "projected_input_bytes": 25868,
+      "query": "ten-path",
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reason_counts": {
+        "partial_match": 1,
+        "history_incomplete": 1
+      }
+    },
+    {
+      "case": "R03",
+      "equivalent": true,
+      "legacy_compare_ms": 0.020666,
+      "legacy_decode_validate_ms": 0.714792,
+      "legacy_input_bytes": 8715,
+      "order": "legacy_then_projected",
+      "projected_compare_ms": 0.016166,
+      "projected_decode_validate_ms": 0.710625,
+      "projected_input_bytes": 8796,
+      "query": "ten-path",
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reason_counts": {
+        "history_incomplete": 1
+      }
+    },
+    {
+      "case": "R04",
+      "equivalent": true,
+      "legacy_compare_ms": 0.042833,
+      "legacy_decode_validate_ms": 1.247,
+      "legacy_input_bytes": 11058,
+      "order": "projected_then_legacy",
+      "projected_compare_ms": 0.044375,
+      "projected_decode_validate_ms": 1.324667,
+      "projected_input_bytes": 11139,
+      "query": "ten-path",
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reason_counts": {
+        "history_incomplete": 1
+      }
+    },
+    {
+      "case": "R05",
+      "equivalent": true,
+      "legacy_compare_ms": 0.067166,
+      "legacy_decode_validate_ms": 1.1905,
+      "legacy_input_bytes": 13038,
+      "order": "legacy_then_projected",
+      "projected_compare_ms": 0.063875,
+      "projected_decode_validate_ms": 1.191667,
+      "projected_input_bytes": 13198,
+      "query": "ten-path",
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reason_counts": {
+        "partial_match": 1,
+        "history_incomplete": 1
+      }
+    },
+    {
+      "case": "R06",
+      "equivalent": true,
+      "legacy_compare_ms": 0.033292,
+      "legacy_decode_validate_ms": 0.8015,
+      "legacy_input_bytes": 8841,
+      "order": "projected_then_legacy",
+      "projected_compare_ms": 0.03675,
+      "projected_decode_validate_ms": 0.784542,
+      "projected_input_bytes": 9001,
+      "query": "ten-path",
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reason_counts": {
+        "history_incomplete": 1
+      }
+    },
+    {
+      "case": "R07",
+      "equivalent": true,
+      "legacy_compare_ms": 0.091458,
+      "legacy_decode_validate_ms": 1.399,
+      "legacy_input_bytes": 14106,
+      "order": "legacy_then_projected",
+      "projected_compare_ms": 0.085334,
+      "projected_decode_validate_ms": 1.394667,
+      "projected_input_bytes": 14439,
+      "query": "ten-path",
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reason_counts": {
+        "partial_match": 1,
+        "history_incomplete": 1
+      }
+    },
+    {
+      "case": "R08",
+      "equivalent": true,
+      "legacy_compare_ms": 0.010375,
+      "legacy_decode_validate_ms": 0.466458,
+      "legacy_input_bytes": 4232,
+      "order": "projected_then_legacy",
+      "projected_compare_ms": 0.0135,
+      "projected_decode_validate_ms": 0.476875,
+      "projected_input_bytes": 4313,
+      "query": "ten-path",
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reason_counts": {
+        "partial_match": 1,
+        "history_incomplete": 1
+      }
+    },
+    {
+      "case": "R09",
+      "equivalent": true,
+      "legacy_compare_ms": 0.368292,
+      "legacy_decode_validate_ms": 3.636334,
+      "legacy_input_bytes": 31544,
+      "order": "legacy_then_projected",
+      "projected_compare_ms": 0.353125,
+      "projected_decode_validate_ms": 3.4505,
+      "projected_input_bytes": 31922,
+      "query": "ten-path",
+      "status_counts": {
+        "ambiguous": 1
+      },
+      "reason_counts": {
+        "partial_match": 1,
+        "history_incomplete": 1
+      }
+    },
+    {
+      "case": "R10",
+      "equivalent": true,
+      "legacy_compare_ms": 0,
+      "legacy_decode_validate_ms": 0.454667,
+      "legacy_error": {
+        "stage": "input.schema",
+        "code": "sensitive_content",
+        "category": "error",
+        "reason": "input_invalid"
+      },
+      "legacy_input_bytes": 9803,
+      "order": "projected_then_legacy",
+      "projected_compare_ms": 0,
+      "projected_decode_validate_ms": 0.487083,
+      "projected_error": {
+        "stage": "input.schema",
+        "code": "sensitive_content",
+        "category": "error",
+        "reason": "input_invalid"
+      },
+      "projected_input_bytes": 9884,
+      "query": "ten-path"
+    },
+    {
+      "case": "current",
+      "equivalent": true,
+      "legacy_compare_ms": 0.004917,
+      "legacy_decode_validate_ms": 0.066417,
+      "legacy_input_bytes": 924,
+      "order": "legacy_then_projected",
+      "projected_compare_ms": 0.003541,
+      "projected_decode_validate_ms": 0.054,
+      "projected_input_bytes": 772,
+      "query": "current",
+      "status_counts": {
+        "unmatched": 1
+      },
+      "reason_counts": {}
+    }
+  ],
+  "timing": {
+    "legacy_compare_ms": {
+      "total_ms": 1.9152900000000002,
+      "median_ms": 0.044770500000000005,
+      "samples": 10
+    },
+    "projected_compare_ms": {
+      "total_ms": 2.3446249999999997,
+      "median_ms": 0.0405625,
+      "samples": 10
+    },
+    "legacy_decode_validate_ms": {
+      "total_ms": 12.577543,
+      "median_ms": 0.996,
+      "samples": 10
+    },
+    "projected_decode_validate_ms": {
+      "total_ms": 12.473418,
+      "median_ms": 0.9881044999999999,
+      "samples": 10
+    }
+  },
+  "all_11_equivalent": true,
+  "final_cli_all_11_equivalent": true,
+  "accuracy_claim": false,
+  "wire_byte_note": "item_json_bytes measures whole JSON item objects, not decoded body bytes; excludes page envelopes and metadata; images inside user/tool items are not separately counted"
+}

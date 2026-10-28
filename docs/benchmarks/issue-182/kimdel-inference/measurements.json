@@ -1,0 +1,2808 @@
+{
+  "freeze": {
+    "document_build": 4.15e-05,
+    "fixture_write": 0.000241916,
+    "git_collect": 0.349367125,
+    "grouping_syntax": 5.41e-07,
+    "history_acquire_match_and_snapshot_checks": 1.9825540830000001,
+    "prepare": 0.000316917,
+    "raw_diff_projection": 3.75e-07,
+    "relation_extract": 0.021924625,
+    "syntax_and_content_read": 0.067673833,
+    "total": 2.422584042
+  },
+  "history": {
+    "ContentMatchMS": 1.933041,
+    "CommandProjectionMS": 4.039583,
+    "HistoryReadMS": 1334.305542,
+    "Status": "partial",
+    "Contexts": 3,
+    "Operations": 3,
+    "ReceivedBytes": 129717,
+    "Requests": 12
+  },
+  "acquisition": {
+    "status": "partial",
+    "reasons": [
+      "history_incomplete"
+    ]
+  },
+  "rpc_methods": {
+    "initialize": {
+      "count": 5,
+      "total_sum_ms": 1577.548584,
+      "wait_read_sum_ms": 1576.961709,
+      "envelope_decode_sum_ms": 0.135124,
+      "result_decode_sum_ms": 0.062415
+    },
+    "thread/items/list": {
+      "count": 4,
+      "total_sum_ms": 1038.967083,
+      "wait_read_sum_ms": 1038.025458,
+      "envelope_decode_sum_ms": 0.296042,
+      "result_decode_sum_ms": 0.492249
+    },
+    "thread/list": {
+      "count": 2,
+      "total_sum_ms": 18.354874,
+      "wait_read_sum_ms": 18.195458000000002,
+      "envelope_decode_sum_ms": 0.050959000000000004,
+      "result_decode_sum_ms": 0.055875
+    },
+    "thread/turns/list": {
+      "count": 1,
+      "total_sum_ms": 146.825333,
+      "wait_read_sum_ms": 146.731083,
+      "envelope_decode_sum_ms": 0.02225,
+      "result_decode_sum_ms": 0.048333
+    }
+  },
+  "cells": [
+    {
+      "case": "qwen25-05-json_schema",
+      "wall_seconds": 10.743584792129695,
+      "calls": 3,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_summary_language)",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 0,
+        "reference_groups": 3,
+        "predicted_groups": 1,
+        "exact_partition": false,
+        "exact_group_recall": 0.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 8,
+          "fn": 0,
+          "tn": 0,
+          "precision": 0.2,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md",
+            "deadlinewidget/app/ui/widget_view.py",
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/app/ui/test_widget_view.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 0,
+        "breaking_refs_on_exact_groups": []
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.40279325004667044,
+          "prepareSeconds": 0.029662916902452707,
+          "grammarPreparationSeconds": 0.3278315830975771,
+          "grammarSetupSeconds": 0.32913891645148396,
+          "runtimePromptSeconds": 2.1758440732955933,
+          "runtimeGenerationSeconds": 0.48635900020599365,
+          "generationWallSeconds": 2.6626794580370188,
+          "inputTokens": 4658,
+          "generatedTokens": 48,
+          "peakMemoryBytes": 911188168,
+          "activeMemoryBytes": 315013536,
+          "cacheMemoryBytes": 63153204,
+          "diagnosticFirstReadSeconds": 0.02317949989810586,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 0.00686400244012475,
+            "responseUpdateAndProgressSeconds": 0.0005767918191850185,
+            "responseReadSeconds": 0.41784116718918085
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 50,
+            "responseReadSeconds": 49,
+            "responseUpdateAndProgressSeconds": 50
+          },
+          "kv_bytes": 32391936,
+          "decode_tokens_per_second": 98.6925295505377
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.3903294582851231,
+          "prepareSeconds": 0.026013916824012995,
+          "grammarPreparationSeconds": 0.34581279149279,
+          "grammarSetupSeconds": 0.3470489582978189,
+          "runtimePromptSeconds": 1.8512901067733765,
+          "runtimeGenerationSeconds": 0.2149970531463623,
+          "generationWallSeconds": 2.0665184585377574,
+          "inputTokens": 4242,
+          "generatedTokens": 24,
+          "peakMemoryBytes": 939130976,
+          "activeMemoryBytes": 311081376,
+          "cacheMemoryBytes": 22673420,
+          "diagnosticFirstReadSeconds": 0.012686291709542274,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.00023308396339416504,
+            "responseReadSeconds": 0.19064150005578995,
+            "responseMaskPreparationSeconds": 0.003792041912674904
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 25,
+            "responseUpdateAndProgressSeconds": 26,
+            "responseMaskPreparationSeconds": 26
+          },
+          "kv_bytes": 27992064,
+          "decode_tokens_per_second": 111.62943700284886
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.3367536668665707,
+          "prepareSeconds": 0.0254013747908175,
+          "grammarPreparationSeconds": 0.33165916660800576,
+          "grammarSetupSeconds": 0.6738830832764506,
+          "runtimePromptSeconds": 1.844101071357727,
+          "runtimeGenerationSeconds": 0.21796000003814697,
+          "generationWallSeconds": 2.062350374646485,
+          "inputTokens": 4147,
+          "generatedTokens": 22,
+          "peakMemoryBytes": 896190068,
+          "activeMemoryBytes": 310294944,
+          "cacheMemoryBytes": 22678076,
+          "diagnosticFirstReadSeconds": 0.027894875034689903,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.0002587088383734226,
+            "responseReadSeconds": 0.17850716691464186,
+            "responseMaskPreparationSeconds": 0.020155541598796844
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 24,
+            "responseReadSeconds": 23,
+            "responseMaskPreparationSeconds": 24
+          },
+          "kv_bytes": 27417600,
+          "decode_tokens_per_second": 100.93595153307763
+        }
+      ],
+      "total_generated_tokens": 94,
+      "decode_tokens_per_second": 102.24992770801872,
+      "os_samples": 5,
+      "rss_peak_bytes": 439418880,
+      "gpu_utilization_min_max": [
+        7,
+        100
+      ],
+      "thermal_samples": {
+        "nominal": 5
+      },
+      "text_review": {
+        "status": "unsupported",
+        "note": "scope/summaryがExampleのみで現在変更の目的を説明していない",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "qwen25-05-none",
+      "wall_seconds": 4.067444417160004,
+      "calls": 1,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_assignment)",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 0,
+        "reference_groups": 3,
+        "predicted_groups": 2,
+        "exact_partition": false,
+        "exact_group_recall": 0.0,
+        "pairs": {
+          "tp": 1,
+          "fp": 5,
+          "fn": 1,
+          "tn": 3,
+          "precision": 0.16666666666666666,
+          "recall": 0.5
+        },
+        "actual_groups": [
+          [
+            "README.md",
+            "deadlinewidget/app/ui/widget_view.py",
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": false,
+          "loadSeconds": 0.3305871249176562,
+          "prepareSeconds": 0.02789033344015479,
+          "grammarPreparationSeconds": 0.3267747084610164,
+          "grammarSetupSeconds": 0.3272025831975043,
+          "runtimePromptSeconds": 2.1676840782165527,
+          "runtimeGenerationSeconds": 0.5119379758834839,
+          "generationWallSeconds": 2.6799502498470247,
+          "inputTokens": 4658,
+          "generatedTokens": 58,
+          "peakMemoryBytes": 911188168,
+          "activeMemoryBytes": 315013536,
+          "cacheMemoryBytes": 60041812,
+          "diagnosticFirstReadSeconds": 0.030154083389788866,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 1.4623161405324936e-05,
+            "responseUpdateAndProgressSeconds": 0.00030841585248708725,
+            "responseReadSeconds": 0.4509437521919608
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 60,
+            "responseReadSeconds": 59,
+            "responseUpdateAndProgressSeconds": 60
+          },
+          "kv_bytes": 32391936,
+          "decode_tokens_per_second": 113.29497464982104
+        }
+      ],
+      "total_generated_tokens": 58,
+      "decode_tokens_per_second": 113.29497464982104,
+      "os_samples": 2,
+      "rss_peak_bytes": 425426944,
+      "gpu_utilization_min_max": [
+        95,
+        100
+      ],
+      "thermal_samples": {
+        "nominal": 2
+      },
+      "text_review": {
+        "status": "not_reached",
+        "note": "Groupingの形式違反で後段へ進まない",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "qwen25-15-none",
+      "wall_seconds": 21.65486287465319,
+      "calls": 3,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_schema)",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 0,
+        "reference_groups": 3,
+        "predicted_groups": 1,
+        "exact_partition": false,
+        "exact_group_recall": 0.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 8,
+          "fn": 0,
+          "tn": 0,
+          "precision": 0.2,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md",
+            "deadlinewidget/app/ui/widget_view.py",
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/app/ui/test_widget_view.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 0,
+        "breaking_refs_on_exact_groups": []
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.35904216673225164,
+          "prepareSeconds": 0.028333708178251982,
+          "grammarPreparationSeconds": 0.3308841665275395,
+          "grammarSetupSeconds": 0.3313394580036402,
+          "runtimePromptSeconds": 5.659703969955444,
+          "runtimeGenerationSeconds": 1.1035289764404297,
+          "generationWallSeconds": 6.76346050016582,
+          "inputTokens": 4658,
+          "generatedTokens": 57,
+          "peakMemoryBytes": 1523484264,
+          "activeMemoryBytes": 948664444,
+          "cacheMemoryBytes": 85020228,
+          "diagnosticFirstReadSeconds": 0.02284870808944106,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.0004690811038017273,
+            "responseReadSeconds": 1.005250500049442,
+            "responseMaskPreparationSeconds": 3.612600266933441e-05
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 59,
+            "responseMaskPreparationSeconds": 59,
+            "responseReadSeconds": 58
+          },
+          "kv_bytes": 75581184,
+          "decode_tokens_per_second": 51.65247240164061
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.40955604147166014,
+          "prepareSeconds": 0.026739374734461308,
+          "grammarPreparationSeconds": 0.3773188330233097,
+          "grammarSetupSeconds": 0.377878624945879,
+          "runtimePromptSeconds": 5.076253890991211,
+          "runtimeGenerationSeconds": 0.5022580623626709,
+          "generationWallSeconds": 5.57885929197073,
+          "inputTokens": 4242,
+          "generatedTokens": 29,
+          "peakMemoryBytes": 1498500182,
+          "activeMemoryBytes": 938719328,
+          "cacheMemoryBytes": 13935776,
+          "diagnosticFirstReadSeconds": 0.03901237482205033,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 0.46938841650262475,
+            "responseUpdateAndProgressSeconds": 0.0009074164554476738,
+            "responseMaskPreparationSeconds": 2.845795825123787e-05
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 30,
+            "responseUpdateAndProgressSeconds": 31,
+            "responseMaskPreparationSeconds": 31
+          },
+          "kv_bytes": 65314816,
+          "decode_tokens_per_second": 57.739242379865786
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": false,
+          "loadSeconds": 0.362184583209455,
+          "prepareSeconds": 0.02512762462720275,
+          "grammarPreparationSeconds": 0.33020625030621886,
+          "grammarSetupSeconds": 0.330637083388865,
+          "runtimePromptSeconds": 4.962462067604065,
+          "runtimeGenerationSeconds": 1.2765549421310425,
+          "generationWallSeconds": 6.2392446249723434,
+          "inputTokens": 4147,
+          "generatedTokens": 75,
+          "peakMemoryBytes": 1523510582,
+          "activeMemoryBytes": 941324384,
+          "cacheMemoryBytes": 77683296,
+          "diagnosticFirstReadSeconds": 0.018413500394672155,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 1.1480028750374913,
+            "responseUpdateAndProgressSeconds": 0.000417542178183794,
+            "responseMaskPreparationSeconds": 1.2543518096208572e-05
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 76,
+            "responseUpdateAndProgressSeconds": 77,
+            "responseMaskPreparationSeconds": 77
+          },
+          "kv_bytes": 67873792,
+          "decode_tokens_per_second": 58.75187782736343
+        }
+      ],
+      "total_generated_tokens": 161,
+      "decode_tokens_per_second": 55.85735525658244,
+      "os_samples": 11,
+      "rss_peak_bytes": 1018675200,
+      "gpu_utilization_min_max": [
+        86,
+        100
+      ],
+      "thermal_samples": {
+        "nominal": 11
+      },
+      "text_review": {
+        "status": "partial",
+        "note": "READMEとメール正規化を混在して記述し、ツールチップ目的を落とす。summary上限違反",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "qwen25-15-json_schema",
+      "wall_seconds": 26.320490000303835,
+      "calls": 3,
+      "error": "",
+      "evaluation": {
+        "validator_accepted": true,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 0,
+        "reference_groups": 3,
+        "predicted_groups": 4,
+        "exact_partition": false,
+        "exact_group_recall": 0.0,
+        "pairs": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 2,
+          "tn": 7,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "actual_groups": [
+          [
+            "README.md",
+            "deadlinewidget/app/ui/widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py"
+          ],
+          [
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 0,
+        "breaking_refs_on_exact_groups": []
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.3523896662518382,
+          "prepareSeconds": 0.028015208430588245,
+          "grammarPreparationSeconds": 0.32788558350875974,
+          "grammarSetupSeconds": 0.32899170834571123,
+          "runtimePromptSeconds": 5.80168890953064,
+          "runtimeGenerationSeconds": 0.7156480550765991,
+          "generationWallSeconds": 6.517600916326046,
+          "inputTokens": 4658,
+          "generatedTokens": 42,
+          "peakMemoryBytes": 1523484264,
+          "activeMemoryBytes": 944994400,
+          "cacheMemoryBytes": 17048736,
+          "diagnosticFirstReadSeconds": 0.02257779147475958,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 0.008611912839114666,
+            "responseUpdateAndProgressSeconds": 0.00046541728079319,
+            "responseReadSeconds": 0.6481765834614635
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 44,
+            "responseUpdateAndProgressSeconds": 44,
+            "responseReadSeconds": 43
+          },
+          "kv_bytes": 71681792,
+          "decode_tokens_per_second": 58.688065596020586
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.372276958078146,
+          "prepareSeconds": 0.029770124703645706,
+          "grammarPreparationSeconds": 0.3487113332375884,
+          "grammarSetupSeconds": 0.35150112491101027,
+          "runtimePromptSeconds": 6.396049976348877,
+          "runtimeGenerationSeconds": 1.137313961982727,
+          "generationWallSeconds": 7.5335753336548805,
+          "inputTokens": 4929,
+          "generatedTokens": 65,
+          "peakMemoryBytes": 1517594256,
+          "activeMemoryBytes": 952334432,
+          "cacheMemoryBytes": 92114528,
+          "diagnosticFirstReadSeconds": 0.019369333516806364,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.0007158336229622364,
+            "responseMaskPreparationSeconds": 0.012789499014616013,
+            "responseReadSeconds": 1.0147323324345052
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 67,
+            "responseMaskPreparationSeconds": 67,
+            "responseReadSeconds": 66
+          },
+          "kv_bytes": 79282560,
+          "decode_tokens_per_second": 57.15220438047096
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.3881103335879743,
+          "prepareSeconds": 0.029603333678096533,
+          "grammarPreparationSeconds": 0.36576895834878087,
+          "grammarSetupSeconds": 0.7730185417458415,
+          "runtimePromptSeconds": 6.100956082344055,
+          "runtimeGenerationSeconds": 2.7018200159072876,
+          "generationWallSeconds": 8.802962833084166,
+          "inputTokens": 4714,
+          "generatedTokens": 131,
+          "peakMemoryBytes": 1498500182,
+          "activeMemoryBytes": 949581920,
+          "cacheMemoryBytes": 91017824,
+          "diagnosticFirstReadSeconds": 0.01911724964156747,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 0.3427731259725988,
+            "responseReadSeconds": 2.1653004181571305,
+            "responseUpdateAndProgressSeconds": 0.0013619172386825085
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 133,
+            "responseReadSeconds": 132,
+            "responseUpdateAndProgressSeconds": 133
+          },
+          "kv_bytes": 76403712,
+          "decode_tokens_per_second": 48.485835188399626
+        }
+      ],
+      "total_generated_tokens": 238,
+      "decode_tokens_per_second": 52.25277483695223,
+      "os_samples": 13,
+      "rss_peak_bytes": 1035976704,
+      "gpu_utilization_min_max": [
+        0,
+        100
+      ],
+      "thermal_samples": {
+        "nominal": 13
+      },
+      "text_review": {
+        "status": "unsupported",
+        "note": "変更されていない.dev.pyの修正を記述。実ファイル対応と説明がずれる",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "qwen25-3-json_schema",
+      "wall_seconds": 54.50602325005457,
+      "calls": 3,
+      "error": "",
+      "evaluation": {
+        "validator_accepted": true,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 1,
+        "reference_groups": 3,
+        "predicted_groups": 5,
+        "exact_partition": false,
+        "exact_group_recall": 0.3333333333333333,
+        "pairs": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2,
+          "tn": 8,
+          "precision": null,
+          "recall": 0.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py"
+          ],
+          [
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 1,
+        "breaking_refs_on_exact_groups": [
+          "none"
+        ]
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.6060027084313333,
+          "prepareSeconds": 0.02793158357962966,
+          "grammarPreparationSeconds": 0.33083374984562397,
+          "grammarSetupSeconds": 0.3319802498444915,
+          "runtimePromptSeconds": 12.514057993888855,
+          "runtimeGenerationSeconds": 1.2190719842910767,
+          "generationWallSeconds": 13.733345542103052,
+          "inputTokens": 4658,
+          "generatedTokens": 41,
+          "peakMemoryBytes": 2507957264,
+          "activeMemoryBytes": 1830612960,
+          "cacheMemoryBytes": 17715728,
+          "diagnosticFirstReadSeconds": 0.037060041911900043,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 0.0090334159322083,
+            "responseReadSeconds": 1.1260142088867724,
+            "responseUpdateAndProgressSeconds": 0.0005045426078140736
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 43,
+            "responseReadSeconds": 42,
+            "responseUpdateAndProgressSeconds": 43
+          },
+          "kv_bytes": 92162304,
+          "decode_tokens_per_second": 33.63214029058555
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.6038829167373478,
+          "prepareSeconds": 0.03193433349952102,
+          "grammarPreparationSeconds": 0.3592190002091229,
+          "grammarSetupSeconds": 0.3628314998932183,
+          "runtimePromptSeconds": 14.517260074615479,
+          "runtimeGenerationSeconds": 2.4710758924484253,
+          "generationWallSeconds": 16.988536916673183,
+          "inputTokens": 5127,
+          "generatedTokens": 81,
+          "peakMemoryBytes": 2519360528,
+          "activeMemoryBytes": 1843589088,
+          "cacheMemoryBytes": 116773968,
+          "diagnosticFirstReadSeconds": 0.035193582996726036,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.0010691694915294647,
+            "responseMaskPreparationSeconds": 0.01965449843555689,
+            "responseReadSeconds": 2.2268889974802732
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 83,
+            "responseMaskPreparationSeconds": 83,
+            "responseReadSeconds": 82
+          },
+          "kv_bytes": 106301952,
+          "decode_tokens_per_second": 32.779244153340215
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.6124018747359514,
+          "prepareSeconds": 0.03107208339497447,
+          "grammarPreparationSeconds": 0.36574412509799004,
+          "grammarSetupSeconds": 0.7530655832961202,
+          "runtimePromptSeconds": 14.139421105384827,
+          "runtimeGenerationSeconds": 5.40933895111084,
+          "generationWallSeconds": 19.548896541353315,
+          "inputTokens": 4903,
+          "generatedTokens": 163,
+          "peakMemoryBytes": 2517858300,
+          "activeMemoryBytes": 1840050144,
+          "cacheMemoryBytes": 112989264,
+          "diagnosticFirstReadSeconds": 0.03359645837917924,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.00231695594266057,
+            "responseReadSeconds": 4.523678041063249,
+            "responseMaskPreparationSeconds": 0.4627611245959997
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 165,
+            "responseReadSeconds": 164,
+            "responseMaskPreparationSeconds": 165
+          },
+          "kv_bytes": 101582208,
+          "decode_tokens_per_second": 30.133071984059526
+        }
+      ],
+      "total_generated_tokens": 285,
+      "decode_tokens_per_second": 31.320447558395802,
+      "os_samples": 28,
+      "rss_peak_bytes": 1907163136,
+      "gpu_utilization_min_max": [
+        0,
+        100
+      ],
+      "thermal_samples": {
+        "nominal": 24,
+        "fair": 4
+      },
+      "text_review": {
+        "status": "partial",
+        "note": "READMEとMessage-IDの要旨はあるがUI説明が不明瞭でscopeに実在しない表記が混じる",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "qwen25-3-none",
+      "wall_seconds": 59.635455125011504,
+      "calls": 3,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_schema)",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 1,
+        "reference_groups": 3,
+        "predicted_groups": 5,
+        "exact_partition": false,
+        "exact_group_recall": 0.3333333333333333,
+        "pairs": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2,
+          "tn": 8,
+          "precision": null,
+          "recall": 0.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py"
+          ],
+          [
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 1,
+        "breaking_refs_on_exact_groups": [
+          "none"
+        ]
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.6083217081613839,
+          "prepareSeconds": 0.030585583299398422,
+          "grammarPreparationSeconds": 0.38469700003042817,
+          "grammarSetupSeconds": 0.3850388331338763,
+          "runtimePromptSeconds": 13.296483874320984,
+          "runtimeGenerationSeconds": 1.2090530395507812,
+          "generationWallSeconds": 14.506078083068132,
+          "inputTokens": 4658,
+          "generatedTokens": 41,
+          "peakMemoryBytes": 2507957264,
+          "activeMemoryBytes": 1830612976,
+          "cacheMemoryBytes": 14602768,
+          "diagnosticFirstReadSeconds": 0.041568041779100895,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 0.00017087487503886223,
+            "responseUpdateAndProgressSeconds": 0.0007106219418346882,
+            "responseReadSeconds": 1.1192142078652978
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 43,
+            "responseUpdateAndProgressSeconds": 43,
+            "responseReadSeconds": 42
+          },
+          "kv_bytes": 92162304,
+          "decode_tokens_per_second": 33.91083654628864
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.610862874891609,
+          "prepareSeconds": 0.03438874986022711,
+          "grammarPreparationSeconds": 0.35980579163879156,
+          "grammarSetupSeconds": 0.36011229176074266,
+          "runtimePromptSeconds": 14.97900390625,
+          "runtimeGenerationSeconds": 2.425171971321106,
+          "generationWallSeconds": 17.404466416686773,
+          "inputTokens": 5127,
+          "generatedTokens": 81,
+          "peakMemoryBytes": 2519360528,
+          "activeMemoryBytes": 1843589104,
+          "cacheMemoryBytes": 113660992,
+          "diagnosticFirstReadSeconds": 0.045203791465610266,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 3.254273906350136e-05,
+            "responseUpdateAndProgressSeconds": 0.0008202092722058296,
+            "responseReadSeconds": 2.2173328339122236
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 83,
+            "responseUpdateAndProgressSeconds": 83,
+            "responseReadSeconds": 82
+          },
+          "kv_bytes": 106301952,
+          "decode_tokens_per_second": 33.399693282730574
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": false,
+          "loadSeconds": 0.6056597917340696,
+          "prepareSeconds": 0.031773749738931656,
+          "grammarPreparationSeconds": 0.36536870850250125,
+          "grammarSetupSeconds": 0.3656801665201783,
+          "runtimePromptSeconds": 15.690755009651184,
+          "runtimeGenerationSeconds": 7.765891909599304,
+          "generationWallSeconds": 23.456924583297223,
+          "inputTokens": 4903,
+          "generatedTokens": 194,
+          "peakMemoryBytes": 2517858300,
+          "activeMemoryBytes": 1840050144,
+          "cacheMemoryBytes": 109876304,
+          "diagnosticFirstReadSeconds": 0.046768125146627426,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 0.000122955534607172,
+            "responseUpdateAndProgressSeconds": 0.0016382462345063686,
+            "responseReadSeconds": 7.021672922652215
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 196,
+            "responseUpdateAndProgressSeconds": 196,
+            "responseReadSeconds": 195
+          },
+          "kv_bytes": 101582208,
+          "decode_tokens_per_second": 24.981032733690185
+        }
+      ],
+      "total_generated_tokens": 316,
+      "decode_tokens_per_second": 27.719013954370833,
+      "os_samples": 29,
+      "rss_peak_bytes": 1890304000,
+      "gpu_utilization_min_max": [
+        34,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 29
+      },
+      "text_review": {
+        "status": "partial",
+        "note": "個別目的の要旨はあるがUIの名称が不明瞭。scopeに長いパスを使い形式違反",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "coder25-05-none",
+      "wall_seconds": 17.363599667325616,
+      "calls": 3,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 1,
+        "reference_groups": 3,
+        "predicted_groups": 5,
+        "exact_partition": false,
+        "exact_group_recall": 0.3333333333333333,
+        "pairs": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2,
+          "tn": 8,
+          "precision": null,
+          "recall": 0.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py"
+          ],
+          [
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 1,
+        "breaking_refs_on_exact_groups": [
+          "none"
+        ]
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.4059728332795203,
+          "prepareSeconds": 0.028517083264887333,
+          "grammarPreparationSeconds": 0.3415017914958298,
+          "grammarSetupSeconds": 0.34180208342149854,
+          "runtimePromptSeconds": 2.4021600484848022,
+          "runtimeGenerationSeconds": 0.3705010414123535,
+          "generationWallSeconds": 2.772959541529417,
+          "inputTokens": 4658,
+          "generatedTokens": 41,
+          "peakMemoryBytes": 911188168,
+          "activeMemoryBytes": 313440672,
+          "cacheMemoryBytes": 29161532,
+          "diagnosticFirstReadSeconds": 0.025628292001783848,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 1.3127457350492477e-05,
+            "responseUpdateAndProgressSeconds": 0.0002980413846671581,
+            "responseReadSeconds": 0.3254799167625606
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 43,
+            "responseUpdateAndProgressSeconds": 43,
+            "responseReadSeconds": 42
+          },
+          "kv_bytes": 30720768,
+          "decode_tokens_per_second": 110.66095750691444
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.41712037520483136,
+          "prepareSeconds": 0.03950549988076091,
+          "grammarPreparationSeconds": 0.4832166670821607,
+          "grammarSetupSeconds": 0.4838787498883903,
+          "runtimePromptSeconds": 3.693511962890625,
+          "runtimeGenerationSeconds": 1.27498197555542,
+          "generationWallSeconds": 4.968806999735534,
+          "inputTokens": 5127,
+          "generatedTokens": 137,
+          "peakMemoryBytes": 911188168,
+          "activeMemoryBytes": 318159264,
+          "cacheMemoryBytes": 54653172,
+          "diagnosticFirstReadSeconds": 0.019621874671429396,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 1.1077995030209422,
+            "responseMaskPreparationSeconds": 2.4834182113409042e-05,
+            "responseUpdateAndProgressSeconds": 0.0005528726615011692
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 138,
+            "responseMaskPreparationSeconds": 139,
+            "responseUpdateAndProgressSeconds": 139
+          },
+          "kv_bytes": 35433984,
+          "decode_tokens_per_second": 107.4524994287223
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": false,
+          "stop_reason": "grammar_failure",
+          "json_valid": false,
+          "schema_valid": false,
+          "parse_or_schema_error": "Expecting value: line 1 column 1 (char 0)",
+          "loadSeconds": 0.6818670830689371,
+          "prepareSeconds": 0.07246479159221053,
+          "grammarPreparationSeconds": 0.7279984164051712,
+          "grammarSetupSeconds": 0.7289645420387387,
+          "runtimePromptSeconds": 3.0878809690475464,
+          "runtimeGenerationSeconds": 1.5911589860916138,
+          "generationWallSeconds": 4.679374958388507,
+          "inputTokens": 4903,
+          "generatedTokens": 164,
+          "peakMemoryBytes": 907837388,
+          "activeMemoryBytes": 2720,
+          "cacheMemoryBytes": 369661432,
+          "diagnosticFirstReadSeconds": 0.01368204178288579,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.0006243339739739895,
+            "responseReadSeconds": 1.3277285848744214,
+            "responseMaskPreparationSeconds": 3.687804564833641e-05
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 166,
+            "responseReadSeconds": 165,
+            "responseUpdateAndProgressSeconds": 166
+          },
+          "kv_bytes": 33860736,
+          "decode_tokens_per_second": 103.0695244369235
+        }
+      ],
+      "total_generated_tokens": 342,
+      "decode_tokens_per_second": 105.66506882031737,
+      "os_samples": 9,
+      "rss_peak_bytes": 428556288,
+      "gpu_utilization_min_max": [
+        0,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 9
+      },
+      "text_review": {
+        "status": "invalid_output",
+        "note": "Text helperがgrammar_failureで終了し、有効な最終JSONを得ていない",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "coder25-05-json_schema",
+      "wall_seconds": 19.96029704110697,
+      "calls": 3,
+      "error": "",
+      "evaluation": {
+        "validator_accepted": true,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 1,
+        "reference_groups": 3,
+        "predicted_groups": 5,
+        "exact_partition": false,
+        "exact_group_recall": 0.3333333333333333,
+        "pairs": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2,
+          "tn": 8,
+          "precision": null,
+          "recall": 0.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py"
+          ],
+          [
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 1,
+        "breaking_refs_on_exact_groups": [
+          "none"
+        ]
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.44364129193127155,
+          "prepareSeconds": 0.03305224981158972,
+          "grammarPreparationSeconds": 0.4807418333366513,
+          "grammarSetupSeconds": 0.48224350018426776,
+          "runtimePromptSeconds": 2.9899070262908936,
+          "runtimeGenerationSeconds": 1.029452919960022,
+          "generationWallSeconds": 4.019812332931906,
+          "inputTokens": 4658,
+          "generatedTokens": 41,
+          "peakMemoryBytes": 911188168,
+          "activeMemoryBytes": 313440672,
+          "cacheMemoryBytes": 28113176,
+          "diagnosticFirstReadSeconds": 0.03732720855623484,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.0009471247904002666,
+            "responseMaskPreparationSeconds": 0.02254233369603753,
+            "responseReadSeconds": 0.7577039580792189
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 43,
+            "responseMaskPreparationSeconds": 43,
+            "responseReadSeconds": 42
+          },
+          "kv_bytes": 30720768,
+          "decode_tokens_per_second": 39.82697917024919
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.6744214999489486,
+          "prepareSeconds": 0.04479262512177229,
+          "grammarPreparationSeconds": 0.4372072913683951,
+          "grammarSetupSeconds": 0.4411166664212942,
+          "runtimePromptSeconds": 3.1965041160583496,
+          "runtimeGenerationSeconds": 0.7582329511642456,
+          "generationWallSeconds": 3.955043625086546,
+          "inputTokens": 5127,
+          "generatedTokens": 81,
+          "peakMemoryBytes": 911188168,
+          "activeMemoryBytes": 318159264,
+          "cacheMemoryBytes": 57767420,
+          "diagnosticFirstReadSeconds": 0.026998291723430157,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 0.6499380827881396,
+            "responseMaskPreparationSeconds": 0.012891829945147038,
+            "responseUpdateAndProgressSeconds": 0.0005752085708081722
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 82,
+            "responseMaskPreparationSeconds": 83,
+            "responseUpdateAndProgressSeconds": 83
+          },
+          "kv_bytes": 35433984,
+          "decode_tokens_per_second": 106.82732776995086
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.43830225011333823,
+          "prepareSeconds": 0.03807258326560259,
+          "grammarPreparationSeconds": 0.42892275005578995,
+          "grammarSetupSeconds": 0.9740633335895836,
+          "runtimePromptSeconds": 3.409718871116638,
+          "runtimeGenerationSeconds": 3.0569210052490234,
+          "generationWallSeconds": 6.467099083121866,
+          "inputTokens": 4903,
+          "generatedTokens": 235,
+          "peakMemoryBytes": 907837388,
+          "activeMemoryBytes": 316586400,
+          "cacheMemoryBytes": 56198424,
+          "diagnosticFirstReadSeconds": 0.026395291555672884,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 1.9191849152557552,
+            "responseMaskPreparationSeconds": 0.7619158769957721,
+            "responseUpdateAndProgressSeconds": 0.0012263329699635506
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 237,
+            "responseReadSeconds": 236,
+            "responseUpdateAndProgressSeconds": 237
+          },
+          "kv_bytes": 33860736,
+          "decode_tokens_per_second": 76.87473755340184
+        }
+      ],
+      "total_generated_tokens": 357,
+      "decode_tokens_per_second": 73.69018975328146,
+      "os_samples": 10,
+      "rss_peak_bytes": 441729024,
+      "gpu_utilization_min_max": [
+        16,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 10
+      },
+      "text_review": {
+        "status": "unsupported",
+        "note": "全5グループに同じ品質チェック説明を反復し、メール修正・UI機能の説明になっていない。文末も不完全",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "coder25-15-json_schema",
+      "wall_seconds": 22.620693374890834,
+      "calls": 2,
+      "error": "three-phase planner stopped: unresolved_breaking_evidence",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 0,
+        "reference_groups": 3,
+        "predicted_groups": 3,
+        "exact_partition": false,
+        "exact_group_recall": 0.0,
+        "pairs": {
+          "tp": 0,
+          "fp": 2,
+          "fn": 2,
+          "tn": 6,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "actual_groups": [
+          [
+            "README.md",
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 0,
+        "breaking_refs_on_exact_groups": []
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.4654268752783537,
+          "prepareSeconds": 0.03823991632089019,
+          "grammarPreparationSeconds": 0.46849691681563854,
+          "grammarSetupSeconds": 0.4698293749243021,
+          "runtimePromptSeconds": 7.68645703792572,
+          "runtimeGenerationSeconds": 0.9577369689941406,
+          "generationWallSeconds": 8.647127208299935,
+          "inputTokens": 4658,
+          "generatedTokens": 41,
+          "peakMemoryBytes": 1523484264,
+          "activeMemoryBytes": 944994400,
+          "cacheMemoryBytes": 17048736,
+          "diagnosticFirstReadSeconds": 0.04336908319965005,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 0.01947320718318224,
+            "responseUpdateAndProgressSeconds": 0.0009249569848179817,
+            "responseReadSeconds": 0.7783927898854017
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 43,
+            "responseUpdateAndProgressSeconds": 43,
+            "responseReadSeconds": 42
+          },
+          "kv_bytes": 71681792,
+          "decode_tokens_per_second": 42.80924860095991
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.0566352917812765,
+          "prepareSeconds": 0.050507749896496534,
+          "grammarPreparationSeconds": 0.6385325416922569,
+          "grammarSetupSeconds": 0.6424799999222159,
+          "runtimePromptSeconds": 8.918881058692932,
+          "runtimeGenerationSeconds": 0.9696009159088135,
+          "generationWallSeconds": 9.889138500206172,
+          "inputTokens": 4700,
+          "generatedTokens": 52,
+          "peakMemoryBytes": 1495255158,
+          "activeMemoryBytes": 949581920,
+          "cacheMemoryBytes": 89051744,
+          "diagnosticFirstReadSeconds": 0.034860166255384684,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.0008633318357169628,
+            "responseReadSeconds": 0.8590416666120291,
+            "responseMaskPreparationSeconds": 0.012263957876712084
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 53,
+            "responseUpdateAndProgressSeconds": 54,
+            "responseMaskPreparationSeconds": 54
+          },
+          "kv_bytes": 76129536,
+          "decode_tokens_per_second": 53.63031237574693
+        }
+      ],
+      "total_generated_tokens": 93,
+      "decode_tokens_per_second": 48.25308563095192,
+      "os_samples": 11,
+      "rss_peak_bytes": 1019953152,
+      "gpu_utilization_min_max": [
+        7,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 11
+      },
+      "text_review": {
+        "status": "not_reached",
+        "note": "CategoryのunresolvedでTextを実行しない",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "coder25-15-none",
+      "wall_seconds": 22.266967040952295,
+      "calls": 2,
+      "error": "three-phase planner stopped: unresolved_breaking_evidence",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 0,
+        "reference_groups": 3,
+        "predicted_groups": 3,
+        "exact_partition": false,
+        "exact_group_recall": 0.0,
+        "pairs": {
+          "tp": 0,
+          "fp": 2,
+          "fn": 2,
+          "tn": 6,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "actual_groups": [
+          [
+            "README.md",
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 0,
+        "breaking_refs_on_exact_groups": []
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.5310046668164432,
+          "prepareSeconds": 0.047732625156641006,
+          "grammarPreparationSeconds": 0.3998614582233131,
+          "grammarSetupSeconds": 0.40034816693514585,
+          "runtimePromptSeconds": 8.540056109428406,
+          "runtimeGenerationSeconds": 0.7326610088348389,
+          "generationWallSeconds": 9.27313687512651,
+          "inputTokens": 4658,
+          "generatedTokens": 41,
+          "peakMemoryBytes": 1523484264,
+          "activeMemoryBytes": 944994400,
+          "cacheMemoryBytes": 13935264,
+          "diagnosticFirstReadSeconds": 0.02793162502348423,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 0.6662548743188381,
+            "responseMaskPreparationSeconds": 3.1124334782361984e-05,
+            "responseUpdateAndProgressSeconds": 0.0003696661442518234
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 42,
+            "responseMaskPreparationSeconds": 43,
+            "responseUpdateAndProgressSeconds": 43
+          },
+          "kv_bytes": 71681792,
+          "decode_tokens_per_second": 55.960395743186716
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.7060753754340112,
+          "prepareSeconds": 0.048949708230793476,
+          "grammarPreparationSeconds": 0.6230913335457444,
+          "grammarSetupSeconds": 0.6238952917046845,
+          "runtimePromptSeconds": 8.682898998260498,
+          "runtimeGenerationSeconds": 0.8870120048522949,
+          "generationWallSeconds": 9.570250416640192,
+          "inputTokens": 4700,
+          "generatedTokens": 52,
+          "peakMemoryBytes": 1495255158,
+          "activeMemoryBytes": 949581920,
+          "cacheMemoryBytes": 85937760,
+          "diagnosticFirstReadSeconds": 0.03079879144206643,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 0.8040502471849322,
+            "responseMaskPreparationSeconds": 1.720758154988289e-05,
+            "responseUpdateAndProgressSeconds": 0.0003422098234295845
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 53,
+            "responseMaskPreparationSeconds": 54,
+            "responseUpdateAndProgressSeconds": 54
+          },
+          "kv_bytes": 76129536,
+          "decode_tokens_per_second": 58.62378379947522
+        }
+      ],
+      "total_generated_tokens": 93,
+      "decode_tokens_per_second": 57.41899705316968,
+      "os_samples": 12,
+      "rss_peak_bytes": 1019297792,
+      "gpu_utilization_min_max": [
+        0,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 12
+      },
+      "text_review": {
+        "status": "not_reached",
+        "note": "CategoryのunresolvedでTextを実行しない",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "coder25-3-none",
+      "wall_seconds": 54.71505737490952,
+      "calls": 3,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_schema)",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 0,
+        "reference_groups": 3,
+        "predicted_groups": 1,
+        "exact_partition": false,
+        "exact_group_recall": 0.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 8,
+          "fn": 0,
+          "tn": 0,
+          "precision": 0.2,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md",
+            "deadlinewidget/app/ui/widget_view.py",
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/app/ui/test_widget_view.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 0,
+        "breaking_refs_on_exact_groups": []
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.6230410416610539,
+          "prepareSeconds": 0.031653291545808315,
+          "grammarPreparationSeconds": 0.36981991678476334,
+          "grammarSetupSeconds": 0.3703555832616985,
+          "runtimePromptSeconds": 15.773826003074646,
+          "runtimeGenerationSeconds": 1.7302919626235962,
+          "generationWallSeconds": 17.504914917051792,
+          "inputTokens": 4658,
+          "generatedTokens": 57,
+          "peakMemoryBytes": 2507957264,
+          "activeMemoryBytes": 1835331552,
+          "cacheMemoryBytes": 105157712,
+          "diagnosticFirstReadSeconds": 0.048868208192288876,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.0007625008001923561,
+            "responseReadSeconds": 1.5965667073614895,
+            "responseMaskPreparationSeconds": 3.320770338177681e-05
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 58,
+            "responseUpdateAndProgressSeconds": 59,
+            "responseMaskPreparationSeconds": 59
+          },
+          "kv_bytes": 97175808,
+          "decode_tokens_per_second": 32.94241736728199
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.1257589999586344,
+          "prepareSeconds": 0.07356316689401865,
+          "grammarPreparationSeconds": 0.588312666863203,
+          "grammarSetupSeconds": 0.5888714166358113,
+          "runtimePromptSeconds": 14.53655195236206,
+          "runtimeGenerationSeconds": 0.8245210647583008,
+          "generationWallSeconds": 15.36122624995187,
+          "inputTokens": 4242,
+          "generatedTokens": 29,
+          "peakMemoryBytes": 2473450006,
+          "activeMemoryBytes": 1822453728,
+          "cacheMemoryBytes": 14520848,
+          "diagnosticFirstReadSeconds": 0.03330333298072219,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.00027921050786972046,
+            "responseReadSeconds": 0.7873820830136538,
+            "responseMaskPreparationSeconds": 1.1374242603778839e-05
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 31,
+            "responseReadSeconds": 30,
+            "responseMaskPreparationSeconds": 31
+          },
+          "kv_bytes": 83976192,
+          "decode_tokens_per_second": 35.17193342840917
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": false,
+          "loadSeconds": 0.6154466252774,
+          "prepareSeconds": 0.02882570819929242,
+          "grammarPreparationSeconds": 0.39307150011882186,
+          "grammarSetupSeconds": 0.39351816661655903,
+          "runtimePromptSeconds": 13.999408960342407,
+          "runtimeGenerationSeconds": 2.957396984100342,
+          "generationWallSeconds": 16.956935625057667,
+          "inputTokens": 4147,
+          "generatedTokens": 64,
+          "peakMemoryBytes": 2453639594,
+          "activeMemoryBytes": 1825894368,
+          "cacheMemoryBytes": 95638608,
+          "diagnosticFirstReadSeconds": 0.03210195805877447,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 2.7760958317667246,
+            "responseUpdateAndProgressSeconds": 0.0004548756405711174,
+            "responseMaskPreparationSeconds": 2.2249296307563782e-05
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 65,
+            "responseMaskPreparationSeconds": 66,
+            "responseUpdateAndProgressSeconds": 66
+          },
+          "kv_bytes": 87266304,
+          "decode_tokens_per_second": 21.640652352078188
+        }
+      ],
+      "total_generated_tokens": 150,
+      "decode_tokens_per_second": 27.212315874674893,
+      "os_samples": 27,
+      "rss_peak_bytes": 1892974592,
+      "gpu_utilization_min_max": [
+        74,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 27
+      },
+      "text_review": {
+        "status": "partial",
+        "note": "全変更を一群にし、READMEの説明だけを記述。scope上限違反",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "coder25-3-json_schema",
+      "wall_seconds": 54.88936920790002,
+      "calls": 3,
+      "error": "",
+      "evaluation": {
+        "validator_accepted": true,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 0,
+        "reference_groups": 3,
+        "predicted_groups": 1,
+        "exact_partition": false,
+        "exact_group_recall": 0.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 8,
+          "fn": 0,
+          "tn": 0,
+          "precision": 0.2,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md",
+            "deadlinewidget/app/ui/widget_view.py",
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/app/ui/test_widget_view.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 0,
+        "breaking_refs_on_exact_groups": []
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.4794924999587238,
+          "prepareSeconds": 0.030218083411455154,
+          "grammarPreparationSeconds": 0.3493727915920317,
+          "grammarSetupSeconds": 0.35052558360621333,
+          "runtimePromptSeconds": 15.655537009239197,
+          "runtimeGenerationSeconds": 1.377616047859192,
+          "generationWallSeconds": 17.03326866682619,
+          "inputTokens": 4658,
+          "generatedTokens": 47,
+          "peakMemoryBytes": 2507957264,
+          "activeMemoryBytes": 1830612960,
+          "cacheMemoryBytes": 17715728,
+          "diagnosticFirstReadSeconds": 0.03336466662585735,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 1.2690763748250902,
+            "responseUpdateAndProgressSeconds": 0.00032416731119155884,
+            "responseMaskPreparationSeconds": 0.009726788848638535
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 48,
+            "responseUpdateAndProgressSeconds": 49,
+            "responseMaskPreparationSeconds": 49
+          },
+          "kv_bytes": 92162304,
+          "decode_tokens_per_second": 34.116908026033634
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.6417912500910461,
+          "prepareSeconds": 0.055546541698277,
+          "grammarPreparationSeconds": 0.7676739585585892,
+          "grammarSetupSeconds": 0.7700439584441483,
+          "runtimePromptSeconds": 14.165449857711792,
+          "runtimeGenerationSeconds": 0.7033830881118774,
+          "generationWallSeconds": 14.869037916883826,
+          "inputTokens": 4242,
+          "generatedTokens": 24,
+          "peakMemoryBytes": 2473450006,
+          "activeMemoryBytes": 1822453728,
+          "cacheMemoryBytes": 17633808,
+          "diagnosticFirstReadSeconds": 0.031163083389401436,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.0002660416066646576,
+            "responseReadSeconds": 0.647281916346401,
+            "responseMaskPreparationSeconds": 0.006103792227804661
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 26,
+            "responseReadSeconds": 25,
+            "responseMaskPreparationSeconds": 26
+          },
+          "kv_bytes": 83976192,
+          "decode_tokens_per_second": 34.120808995314725
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.5465409164316952,
+          "prepareSeconds": 0.031353124883025885,
+          "grammarPreparationSeconds": 0.42437791638076305,
+          "grammarSetupSeconds": 1.0459916251711547,
+          "runtimePromptSeconds": 14.616220951080322,
+          "runtimeGenerationSeconds": 3.1689800024032593,
+          "generationWallSeconds": 17.78569733351469,
+          "inputTokens": 4147,
+          "generatedTokens": 52,
+          "peakMemoryBytes": 2453639594,
+          "activeMemoryBytes": 1821175776,
+          "cacheMemoryBytes": 17633808,
+          "diagnosticFirstReadSeconds": 0.06595637509599328,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 2.6490987478755414,
+            "responseUpdateAndProgressSeconds": 0.0012543341144919395,
+            "responseMaskPreparationSeconds": 0.3220510412938893
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 53,
+            "responseUpdateAndProgressSeconds": 54,
+            "responseMaskPreparationSeconds": 54
+          },
+          "kv_bytes": 82252800,
+          "decode_tokens_per_second": 16.40906536505903
+        }
+      ],
+      "total_generated_tokens": 123,
+      "decode_tokens_per_second": 23.42866452571987,
+      "os_samples": 27,
+      "rss_peak_bytes": 1909719040,
+      "gpu_utilization_min_max": [
+        63,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 27
+      },
+      "text_review": {
+        "status": "partial",
+        "note": "全変更を一群にし、READMEの説明に偏る。末尾が「個別テストの実行例と」で終わる",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "qwen2-off-json_schema",
+      "wall_seconds": 35.671288958285004,
+      "calls": 3,
+      "error": "",
+      "evaluation": {
+        "validator_accepted": true,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 0,
+        "reference_groups": 3,
+        "predicted_groups": 1,
+        "exact_partition": false,
+        "exact_group_recall": 0.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 8,
+          "fn": 0,
+          "tn": 0,
+          "precision": 0.2,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md",
+            "deadlinewidget/app/ui/widget_view.py",
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/app/ui/test_widget_view.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 0,
+        "breaking_refs_on_exact_groups": []
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.9474937496706843,
+          "prepareSeconds": 0.05118670826777816,
+          "grammarPreparationSeconds": 0.6790250833146274,
+          "grammarSetupSeconds": 0.6801443337462842,
+          "runtimePromptSeconds": 10.458234071731567,
+          "runtimeGenerationSeconds": 0.9609930515289307,
+          "generationWallSeconds": 11.419898083433509,
+          "inputTokens": 4443,
+          "generatedTokens": 52,
+          "peakMemoryBytes": 1891034552,
+          "activeMemoryBytes": 1110691272,
+          "cacheMemoryBytes": 60393006,
+          "diagnosticFirstReadSeconds": 0.6077081253752112,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 0.02080053836107254,
+            "responseUpdateAndProgressSeconds": 0.0006371662020683289,
+            "responseReadSeconds": 0.90307387849316
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 54,
+            "responseUpdateAndProgressSeconds": 54,
+            "responseReadSeconds": 53
+          },
+          "kv_bytes": 50350080,
+          "decode_tokens_per_second": 54.11069301413627
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.9950341251678765,
+          "prepareSeconds": 0.05931362509727478,
+          "grammarPreparationSeconds": 1.5180121250450611,
+          "grammarSetupSeconds": 1.5196737083606422,
+          "runtimePromptSeconds": 9.13361394405365,
+          "runtimeGenerationSeconds": 0.42170703411102295,
+          "generationWallSeconds": 9.555726958438754,
+          "inputTokens": 4017,
+          "generatedTokens": 25,
+          "peakMemoryBytes": 1879199162,
+          "activeMemoryBytes": 1107971528,
+          "cacheMemoryBytes": 57853488,
+          "diagnosticFirstReadSeconds": 0.021843249909579754,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 0.40247029159218073,
+            "responseUpdateAndProgressSeconds": 0.0004817061126232147,
+            "responseMaskPreparationSeconds": 0.008659500163048506
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 26,
+            "responseUpdateAndProgressSeconds": 27,
+            "responseMaskPreparationSeconds": 27
+          },
+          "kv_bytes": 47490816,
+          "decode_tokens_per_second": 59.282862219031045
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.9145895834080875,
+          "prepareSeconds": 0.04788220813497901,
+          "grammarPreparationSeconds": 0.6425930834375322,
+          "grammarSetupSeconds": 1.3143364586867392,
+          "runtimePromptSeconds": 6.50542688369751,
+          "runtimeGenerationSeconds": 0.6834520101547241,
+          "generationWallSeconds": 7.189295791555196,
+          "inputTokens": 3925,
+          "generatedTokens": 34,
+          "peakMemoryBytes": 1862223296,
+          "activeMemoryBytes": 1107545544,
+          "cacheMemoryBytes": 57460272,
+          "diagnosticFirstReadSeconds": 0.023049625102430582,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 0.5376130398362875,
+            "responseMaskPreparationSeconds": 0.13490666868165135,
+            "responseUpdateAndProgressSeconds": 0.0004749177023768425
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 35,
+            "responseMaskPreparationSeconds": 36,
+            "responseUpdateAndProgressSeconds": 36
+          },
+          "kv_bytes": 46988160,
+          "decode_tokens_per_second": 49.74745775098806
+        }
+      ],
+      "total_generated_tokens": 111,
+      "decode_tokens_per_second": 53.72305370254337,
+      "os_samples": 18,
+      "rss_peak_bytes": 2011742208,
+      "gpu_utilization_min_max": [
+        0,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 18
+      },
+      "text_review": {
+        "status": "partial",
+        "note": "全変更を一群にしREADMEの説明に偏る。typecheckの語が途中で終わる",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "qwen2-off-none",
+      "wall_seconds": 46.73727275012061,
+      "calls": 3,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_schema)",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 0,
+        "reference_groups": 3,
+        "predicted_groups": 3,
+        "exact_partition": false,
+        "exact_group_recall": 0.0,
+        "pairs": {
+          "tp": 0,
+          "fp": 2,
+          "fn": 2,
+          "tn": 6,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "actual_groups": [
+          [
+            "README.md",
+            "deadlinewidget/app/ui/widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py"
+          ],
+          [
+            "tests/unit/app/ui/test_widget_view.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 0,
+        "breaking_refs_on_exact_groups": []
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.9325677086599171,
+          "prepareSeconds": 0.05248341662809253,
+          "grammarPreparationSeconds": 0.641333291772753,
+          "grammarSetupSeconds": 0.6419741665013134,
+          "runtimePromptSeconds": 9.07094395160675,
+          "runtimeGenerationSeconds": 1.0859099626541138,
+          "generationWallSeconds": 10.157231083139777,
+          "inputTokens": 4443,
+          "generatedTokens": 63,
+          "peakMemoryBytes": 1891034552,
+          "activeMemoryBytes": 1110691272,
+          "cacheMemoryBytes": 59373102,
+          "diagnosticFirstReadSeconds": 0.02728258352726698,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 1.787487417459488e-05,
+            "responseUpdateAndProgressSeconds": 0.0006119143217802048,
+            "responseReadSeconds": 1.0112836668267846
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 65,
+            "responseUpdateAndProgressSeconds": 65,
+            "responseReadSeconds": 64
+          },
+          "kv_bytes": 50350080,
+          "decode_tokens_per_second": 58.01585966300494
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.1706122914329171,
+          "prepareSeconds": 0.07554154191166162,
+          "grammarPreparationSeconds": 1.0617338749580085,
+          "grammarSetupSeconds": 1.062975833658129,
+          "runtimePromptSeconds": 8.883926033973694,
+          "runtimeGenerationSeconds": 2.9526710510253906,
+          "generationWallSeconds": 11.837649416644126,
+          "inputTokens": 4475,
+          "generatedTokens": 96,
+          "peakMemoryBytes": 1872186810,
+          "activeMemoryBytes": 1110887896,
+          "cacheMemoryBytes": 74499616,
+          "diagnosticFirstReadSeconds": 0.11499016685411334,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 2.690492457244545,
+            "responseUpdateAndProgressSeconds": 0.0014832913875579834,
+            "responseMaskPreparationSeconds": 0.00015770597383379936
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 97,
+            "responseUpdateAndProgressSeconds": 98,
+            "responseMaskPreparationSeconds": 98
+          },
+          "kv_bytes": 50558976,
+          "decode_tokens_per_second": 32.51293433674623
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": false,
+          "schema_valid": false,
+          "parse_or_schema_error": "duplicate_key",
+          "loadSeconds": 1.6268623750656843,
+          "prepareSeconds": 0.06104537518694997,
+          "grammarPreparationSeconds": 0.7727541252970695,
+          "grammarSetupSeconds": 0.7734099999070168,
+          "runtimePromptSeconds": 7.231086850166321,
+          "runtimeGenerationSeconds": 9.914330005645752,
+          "generationWallSeconds": 17.145861249882728,
+          "inputTokens": 4303,
+          "generatedTokens": 371,
+          "peakMemoryBytes": 1873456056,
+          "activeMemoryBytes": 1111477704,
+          "cacheMemoryBytes": 60143150,
+          "diagnosticFirstReadSeconds": 0.02907212497666478,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.002683666069060564,
+            "responseReadSeconds": 9.144016207195818,
+            "responseMaskPreparationSeconds": 0.00020920531824231148
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 373,
+            "responseReadSeconds": 372,
+            "responseMaskPreparationSeconds": 373
+          },
+          "kv_bytes": 51185664,
+          "decode_tokens_per_second": 37.42058210577343
+        }
+      ],
+      "total_generated_tokens": 530,
+      "decode_tokens_per_second": 37.9849050327872,
+      "os_samples": 23,
+      "rss_peak_bytes": 1982070784,
+      "gpu_utilization_min_max": [
+        0,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 23
+      },
+      "text_review": {
+        "status": "unsupported",
+        "note": "Textに重複G003があり、実差分にないNone防止処理をUI変更として記述",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "qwen4-off-none",
+      "wall_seconds": 82.29489295836538,
+      "calls": 3,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_schema)",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 1,
+        "reference_groups": 3,
+        "predicted_groups": 3,
+        "exact_partition": false,
+        "exact_group_recall": 0.3333333333333333,
+        "pairs": {
+          "tp": 1,
+          "fp": 2,
+          "fn": 1,
+          "tn": 6,
+          "precision": 0.3333333333333333,
+          "recall": 0.5
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/app/ui/test_widget_view.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 1,
+        "category_denominator": 1,
+        "breaking_refs_on_exact_groups": [
+          "none"
+        ]
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.6152233332395554,
+          "prepareSeconds": 0.06264925003051758,
+          "grammarPreparationSeconds": 0.9516672915779054,
+          "grammarSetupSeconds": 0.9536112919449806,
+          "runtimePromptSeconds": 21.835461020469666,
+          "runtimeGenerationSeconds": 2.936458945274353,
+          "generationWallSeconds": 24.776610916480422,
+          "inputTokens": 4443,
+          "generatedTokens": 46,
+          "peakMemoryBytes": 3359275264,
+          "activeMemoryBytes": 2501832552,
+          "cacheMemoryBytes": 137363480,
+          "diagnosticFirstReadSeconds": 0.20366991637274623,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 2.76234932243824e-05,
+            "responseUpdateAndProgressSeconds": 0.0005664587952196598,
+            "responseReadSeconds": 2.8680485412478447
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 48,
+            "responseUpdateAndProgressSeconds": 48,
+            "responseReadSeconds": 47
+          },
+          "kv_bytes": 133677056,
+          "decode_tokens_per_second": 15.665126214016325
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.5505033750087023,
+          "prepareSeconds": 0.05908712511882186,
+          "grammarPreparationSeconds": 0.8059404999949038,
+          "grammarSetupSeconds": 0.8071717913262546,
+          "runtimePromptSeconds": 21.286829948425293,
+          "runtimeGenerationSeconds": 3.2778300046920776,
+          "generationWallSeconds": 24.565164625179023,
+          "inputTokens": 4475,
+          "generatedTokens": 55,
+          "peakMemoryBytes": 3338353664,
+          "activeMemoryBytes": 2502340436,
+          "cacheMemoryBytes": 169738280,
+          "diagnosticFirstReadSeconds": 0.058759416453540325,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 5.6290533393621445e-05,
+            "responseUpdateAndProgressSeconds": 0.0010969568975269794,
+            "responseReadSeconds": 3.148185540456325
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 57,
+            "responseUpdateAndProgressSeconds": 57,
+            "responseReadSeconds": 56
+          },
+          "kv_bytes": 134234112,
+          "decode_tokens_per_second": 16.779393660217213
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": false,
+          "loadSeconds": 1.302253750152886,
+          "prepareSeconds": 0.06363387499004602,
+          "grammarPreparationSeconds": 0.7409494165331125,
+          "grammarSetupSeconds": 0.7416960000991821,
+          "runtimePromptSeconds": 18.261543035507202,
+          "runtimeGenerationSeconds": 5.81610894203186,
+          "generationWallSeconds": 24.079706707969308,
+          "inputTokens": 4304,
+          "generatedTokens": 97,
+          "peakMemoryBytes": 3334530456,
+          "activeMemoryBytes": 2499456872,
+          "cacheMemoryBytes": 161726484,
+          "diagnosticFirstReadSeconds": 0.05279729189351201,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 5.519909292459488,
+            "responseUpdateAndProgressSeconds": 0.0015539582818746567,
+            "responseMaskPreparationSeconds": 9.533576667308807e-05
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 98,
+            "responseUpdateAndProgressSeconds": 99,
+            "responseMaskPreparationSeconds": 99
+          },
+          "kv_bytes": 131588096,
+          "decode_tokens_per_second": 16.677816899026826
+        }
+      ],
+      "total_generated_tokens": 198,
+      "decode_tokens_per_second": 16.45830850962083,
+      "os_samples": 42,
+      "rss_peak_bytes": 3266674688,
+      "gpu_utilization_min_max": [
+        0,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 42
+      },
+      "text_review": {
+        "status": "partial",
+        "note": "目的の要旨はあるが、実Groupingの所属にない対応テストまで記述。scope上限違反",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "qwen4-off-json_schema",
+      "wall_seconds": 87.85923474980518,
+      "calls": 3,
+      "error": "",
+      "evaluation": {
+        "validator_accepted": true,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 0,
+        "reference_groups": 3,
+        "predicted_groups": 2,
+        "exact_partition": false,
+        "exact_group_recall": 0.0,
+        "pairs": {
+          "tp": 1,
+          "fp": 3,
+          "fn": 1,
+          "tn": 5,
+          "precision": 0.25,
+          "recall": 0.5
+        },
+        "actual_groups": [
+          [
+            "README.md",
+            "deadlinewidget/app/ui/widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/app/ui/test_widget_view.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 0,
+        "breaking_refs_on_exact_groups": []
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.1551517085172236,
+          "prepareSeconds": 0.05452150013297796,
+          "grammarPreparationSeconds": 0.7219377914443612,
+          "grammarSetupSeconds": 0.7239491250365973,
+          "runtimePromptSeconds": 20.289461970329285,
+          "runtimeGenerationSeconds": 3.1695510149002075,
+          "generationWallSeconds": 23.459835958201438,
+          "inputTokens": 4443,
+          "generatedTokens": 41,
+          "peakMemoryBytes": 3355179264,
+          "activeMemoryBytes": 2501816172,
+          "cacheMemoryBytes": 170016788,
+          "diagnosticFirstReadSeconds": 0.04950529197230935,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 3.0650740009732544,
+            "responseMaskPreparationSeconds": 0.017213832587003708,
+            "responseUpdateAndProgressSeconds": 0.0008277092128992081
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 42,
+            "responseMaskPreparationSeconds": 43,
+            "responseUpdateAndProgressSeconds": 43
+          },
+          "kv_bytes": 133677056,
+          "decode_tokens_per_second": 12.935586083725134
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.5184440831653774,
+          "prepareSeconds": 0.0733636668883264,
+          "grammarPreparationSeconds": 0.9939039582386613,
+          "grammarSetupSeconds": 0.9958379585295916,
+          "runtimePromptSeconds": 24.22132384777069,
+          "runtimeGenerationSeconds": 3.562234044075012,
+          "generationWallSeconds": 27.78383291652426,
+          "inputTokens": 4246,
+          "generatedTokens": 48,
+          "peakMemoryBytes": 3344473752,
+          "activeMemoryBytes": 2498408292,
+          "cacheMemoryBytes": 160021526,
+          "diagnosticFirstReadSeconds": 0.1495225834660232,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 3.4363432936370373,
+            "responseUpdateAndProgressSeconds": 0.0010653724893927574,
+            "responseMaskPreparationSeconds": 0.03637929353863001
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 50,
+            "responseReadSeconds": 49,
+            "responseUpdateAndProgressSeconds": 50
+          },
+          "kv_bytes": 130613248,
+          "decode_tokens_per_second": 13.474690154016516
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 2.0777443749830127,
+          "prepareSeconds": 0.05949204182252288,
+          "grammarPreparationSeconds": 0.8330654581077397,
+          "grammarSetupSeconds": 1.5998259168118238,
+          "runtimePromptSeconds": 22.02272391319275,
+          "runtimeGenerationSeconds": 4.413178086280823,
+          "generationWallSeconds": 26.436214625369757,
+          "inputTokens": 4114,
+          "generatedTokens": 65,
+          "peakMemoryBytes": 3358121284,
+          "activeMemoryBytes": 2496589668,
+          "cacheMemoryBytes": 157270040,
+          "diagnosticFirstReadSeconds": 0.06209541670978069,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 0.4231840390712023,
+            "responseUpdateAndProgressSeconds": 0.0014714980497956276,
+            "responseReadSeconds": 3.875756333116442
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 67,
+            "responseUpdateAndProgressSeconds": 67,
+            "responseReadSeconds": 66
+          },
+          "kv_bytes": 128524288,
+          "decode_tokens_per_second": 14.728614782635779
+        }
+      ],
+      "total_generated_tokens": 154,
+      "decode_tokens_per_second": 13.817901234204758,
+      "os_samples": 43,
+      "rss_peak_bytes": 3249963008,
+      "gpu_utilization_min_max": [
+        9,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 43
+      },
+      "text_review": {
+        "status": "partial",
+        "note": "README・UIを一群にしながらREADME中心に記述。typecheck対象の実処理変更と誤解し得る表現",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "qwen4-on-json_schema",
+      "wall_seconds": 260.43761766701937,
+      "calls": 3,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_scope, invalid_summary_language)",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 3,
+        "reference_groups": 3,
+        "predicted_groups": 3,
+        "exact_partition": true,
+        "exact_group_recall": 1.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "tn": 8,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py",
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 3,
+        "category_denominator": 3,
+        "breaking_refs_on_exact_groups": [
+          "none",
+          "none",
+          "none"
+        ]
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.295444458257407,
+          "prepareSeconds": 0.055826458148658276,
+          "grammarPreparationSeconds": 0.7787080835551023,
+          "grammarSetupSeconds": 0.7798300832509995,
+          "runtimePromptSeconds": 24.016298055648804,
+          "runtimeGenerationSeconds": 111.40628910064697,
+          "generationWallSeconds": 135.42211166676134,
+          "inputTokens": 4441,
+          "generatedTokens": 1914,
+          "nativeThoughtTokens": 1861,
+          "nativeThoughtForcedClose": false,
+          "peakMemoryBytes": 3340874904,
+          "activeMemoryBytes": 2532765548,
+          "cacheMemoryBytes": 166427664,
+          "diagnosticFirstReadSeconds": 0.05249575013294816,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 2.56361741758883,
+            "thinkingUpdateAndProgressSeconds": 0.02695274678990245,
+            "responseUpdateAndProgressSeconds": 0.0009407489560544491,
+            "responseMaskPreparationSeconds": 0.027824498247355223,
+            "thinkingMaskPreparationSeconds": 0.004387633875012398,
+            "thinkingReadSeconds": 96.21274862065911
+          },
+          "diagnosticEventCounts": {
+            "thinkingReadSeconds": 1861,
+            "responseReadSeconds": 54,
+            "responseMaskPreparationSeconds": 54,
+            "responseUpdateAndProgressSeconds": 54,
+            "thinkingUpdateAndProgressSeconds": 1862,
+            "thinkingMaskPreparationSeconds": 1862
+          },
+          "kv_bytes": 164872192,
+          "decode_tokens_per_second": 17.18035862653004
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.3572507500648499,
+          "prepareSeconds": 0.059546458534896374,
+          "grammarPreparationSeconds": 0.7618426666595042,
+          "grammarSetupSeconds": 0.7643709997646511,
+          "runtimePromptSeconds": 18.16836702823639,
+          "runtimeGenerationSeconds": 51.0990389585495,
+          "generationWallSeconds": 69.2674437914975,
+          "inputTokens": 4473,
+          "generatedTokens": 859,
+          "nativeThoughtTokens": 809,
+          "nativeThoughtForcedClose": false,
+          "peakMemoryBytes": 3345234752,
+          "activeMemoryBytes": 2515496820,
+          "cacheMemoryBytes": 149534728,
+          "diagnosticFirstReadSeconds": 0.05418258346617222,
+          "diagnosticCPUSeconds": {
+            "thinkingReadSeconds": 44.65668583335355,
+            "thinkingMaskPreparationSeconds": 0.0018135886639356613,
+            "responseUpdateAndProgressSeconds": 0.0014291265979409218,
+            "responseMaskPreparationSeconds": 0.025167789310216904,
+            "responseReadSeconds": 2.6382299568504095,
+            "thinkingUpdateAndProgressSeconds": 0.009719702880829573
+          },
+          "diagnosticEventCounts": {
+            "thinkingUpdateAndProgressSeconds": 810,
+            "thinkingMaskPreparationSeconds": 810,
+            "responseMaskPreparationSeconds": 51,
+            "thinkingReadSeconds": 809,
+            "responseReadSeconds": 51,
+            "responseUpdateAndProgressSeconds": 51
+          },
+          "kv_bytes": 147464192,
+          "decode_tokens_per_second": 16.810492281406766
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.5688539166003466,
+          "prepareSeconds": 0.05830362485721707,
+          "grammarPreparationSeconds": 0.7791219996288419,
+          "grammarSetupSeconds": 1.53648666664958,
+          "runtimePromptSeconds": 19.06901502609253,
+          "runtimeGenerationSeconds": 27.691723942756653,
+          "generationWallSeconds": 46.760820916388184,
+          "inputTokens": 4301,
+          "generatedTokens": 478,
+          "nativeThoughtTokens": 421,
+          "nativeThoughtForcedClose": false,
+          "peakMemoryBytes": 3357566104,
+          "activeMemoryBytes": 2503978836,
+          "cacheMemoryBytes": 141125672,
+          "diagnosticFirstReadSeconds": 0.052657749969512224,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 3.142639289610088,
+            "responseMaskPreparationSeconds": 0.28642091527581215,
+            "thinkingMaskPreparationSeconds": 0.0009788335300981998,
+            "thinkingUpdateAndProgressSeconds": 0.004907832946628332,
+            "responseUpdateAndProgressSeconds": 0.0013030865229666233,
+            "thinkingReadSeconds": 22.47141133667901
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 58,
+            "thinkingMaskPreparationSeconds": 422,
+            "thinkingUpdateAndProgressSeconds": 422,
+            "responseMaskPreparationSeconds": 58,
+            "responseUpdateAndProgressSeconds": 58,
+            "thinkingReadSeconds": 421
+          },
+          "kv_bytes": 135905280,
+          "decode_tokens_per_second": 17.26147498032642
+        }
+      ],
+      "total_generated_tokens": 3251,
+      "decode_tokens_per_second": 17.092799103776937,
+      "os_samples": 130,
+      "rss_peak_bytes": 3318382592,
+      "gpu_utilization_min_max": [
+        17,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 130
+      },
+      "text_review": {
+        "status": "supported_but_contract_invalid",
+        "note": "3群の目的説明は差分に沿うが全summaryが英語で、scopeにfeat/fixを使用",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    },
+    {
+      "case": "qwen4-on-none",
+      "wall_seconds": 251.64958595810458,
+      "calls": 3,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_scope, invalid_summary_language)",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 3,
+        "reference_groups": 3,
+        "predicted_groups": 3,
+        "exact_partition": true,
+        "exact_group_recall": 1.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "tn": 8,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py",
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 3,
+        "category_denominator": 3,
+        "breaking_refs_on_exact_groups": [
+          "none",
+          "none",
+          "none"
+        ]
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.2101464583538473,
+          "prepareSeconds": 0.05304816644638777,
+          "grammarPreparationSeconds": 0.7386329164728522,
+          "grammarSetupSeconds": 0.7397747915238142,
+          "runtimePromptSeconds": 20.05224895477295,
+          "runtimeGenerationSeconds": 104.25190591812134,
+          "generationWallSeconds": 124.30400720797479,
+          "inputTokens": 4441,
+          "generatedTokens": 1911,
+          "nativeThoughtTokens": 1861,
+          "nativeThoughtForcedClose": false,
+          "peakMemoryBytes": 3340874904,
+          "activeMemoryBytes": 2532749140,
+          "cacheMemoryBytes": 165442600,
+          "diagnosticFirstReadSeconds": 0.04856158373877406,
+          "diagnosticCPUSeconds": {
+            "thinkingReadSeconds": 94.36509411409497,
+            "responseReadSeconds": 2.3767798356711864,
+            "thinkingUpdateAndProgressSeconds": 0.02147363731637597,
+            "thinkingMaskPreparationSeconds": 0.003953289706259966,
+            "responseMaskPreparationSeconds": 9.533250704407692e-05,
+            "responseUpdateAndProgressSeconds": 0.0004237084649503231
+          },
+          "diagnosticEventCounts": {
+            "thinkingReadSeconds": 1861,
+            "responseMaskPreparationSeconds": 51,
+            "thinkingUpdateAndProgressSeconds": 1862,
+            "thinkingMaskPreparationSeconds": 1862,
+            "responseReadSeconds": 51,
+            "responseUpdateAndProgressSeconds": 51
+          },
+          "kv_bytes": 164872192,
+          "decode_tokens_per_second": 18.330600128316934
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.5624122084118426,
+          "prepareSeconds": 0.06649166671559215,
+          "grammarPreparationSeconds": 0.9085214580409229,
+          "grammarSetupSeconds": 0.9090709998272359,
+          "runtimePromptSeconds": 18.981541991233826,
+          "runtimeGenerationSeconds": 54.09103202819824,
+          "generationWallSeconds": 73.07261520810425,
+          "inputTokens": 4473,
+          "generatedTokens": 907,
+          "nativeThoughtTokens": 809,
+          "nativeThoughtForcedClose": false,
+          "peakMemoryBytes": 3345234752,
+          "activeMemoryBytes": 2515447660,
+          "cacheMemoryBytes": 183055376,
+          "diagnosticFirstReadSeconds": 0.054516791831701994,
+          "diagnosticCPUSeconds": {
+            "thinkingUpdateAndProgressSeconds": 0.010412410367280245,
+            "thinkingReadSeconds": 44.846080999821424,
+            "thinkingMaskPreparationSeconds": 0.0017935484647750854,
+            "responseMaskPreparationSeconds": 0.0002368725836277008,
+            "responseReadSeconds": 5.483280416112393,
+            "responseUpdateAndProgressSeconds": 0.001439543440937996
+          },
+          "diagnosticEventCounts": {
+            "thinkingUpdateAndProgressSeconds": 810,
+            "thinkingReadSeconds": 809,
+            "responseMaskPreparationSeconds": 99,
+            "thinkingMaskPreparationSeconds": 810,
+            "responseReadSeconds": 99,
+            "responseUpdateAndProgressSeconds": 99
+          },
+          "kv_bytes": 147464192,
+          "decode_tokens_per_second": 16.76802911667818
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.3242802917957306,
+          "prepareSeconds": 0.05909833312034607,
+          "grammarPreparationSeconds": 0.7876993333920836,
+          "grammarSetupSeconds": 0.7885570414364338,
+          "runtimePromptSeconds": 18.473608016967773,
+          "runtimeGenerationSeconds": 27.712586045265198,
+          "generationWallSeconds": 46.18621425004676,
+          "inputTokens": 4301,
+          "generatedTokens": 479,
+          "nativeThoughtTokens": 421,
+          "nativeThoughtForcedClose": false,
+          "peakMemoryBytes": 3357566104,
+          "activeMemoryBytes": 2503946092,
+          "cacheMemoryBytes": 140311568,
+          "diagnosticFirstReadSeconds": 0.04867845866829157,
+          "diagnosticCPUSeconds": {
+            "thinkingUpdateAndProgressSeconds": 0.005279870238155127,
+            "thinkingReadSeconds": 22.45107667008415,
+            "responseMaskPreparationSeconds": 0.00015191501006484032,
+            "responseReadSeconds": 3.3344514570198953,
+            "responseUpdateAndProgressSeconds": 0.0008650021627545357,
+            "thinkingMaskPreparationSeconds": 0.0009559541940689087
+          },
+          "diagnosticEventCounts": {
+            "thinkingUpdateAndProgressSeconds": 422,
+            "thinkingReadSeconds": 421,
+            "responseMaskPreparationSeconds": 59,
+            "responseReadSeconds": 59,
+            "responseUpdateAndProgressSeconds": 59,
+            "thinkingMaskPreparationSeconds": 422
+          },
+          "kv_bytes": 135905280,
+          "decode_tokens_per_second": 17.28456518700964
+        }
+      ],
+      "total_generated_tokens": 3297,
+      "decode_tokens_per_second": 17.720516592397022,
+      "os_samples": 126,
+      "rss_peak_bytes": 3298672640,
+      "gpu_utilization_min_max": [
+        0,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 126
+      },
+      "text_review": {
+        "status": "supported_but_contract_invalid",
+        "note": "3群の目的説明は差分に沿うが全summaryが英語で、scopeにfeat/fixを使用",
+        "reviewer": "agent qualitative review; not independent human grading"
+      }
+    }
+  ],
+  "monitor_samples": 568,
+  "monitor_valid": 568,
+  "completion": {
+    "state": "complete",
+    "reason": null,
+    "registered_cells": 18,
+    "finished_cells": 18,
+    "calls": 50,
+    "elapsed_seconds": 1137.655319957994,
+    "monitor_samples": 568,
+    "monitor_fatal": [],
+    "sampler_mean_seconds": 0.21034918513155582,
+    "sampler_max_seconds": 1.3253824999555945
+  },
+  "checks": {
+    "registered_and_finished": 18,
+    "grouping_input_unique_hashes": 1,
+    "runtime_source_hashes_unchanged": true,
+    "fixture_hash_unchanged": true,
+    "git_snapshots_unchanged": true,
+    "all_monitor_samples_valid": true,
+    "max_simultaneous_helpers_observed": 1
+  },
+  "privacy": "Only numeric data, repo-relative fixture paths, and qualitative notes; raw conversations/requests/outputs remain private."
+}

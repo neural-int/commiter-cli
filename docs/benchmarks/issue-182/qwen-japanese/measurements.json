@@ -1,0 +1,1175 @@
+{
+  "status": "finished_with_two_unavailable_pairs",
+  "registered_arms": 8,
+  "executed_arms": 6,
+  "skipped_new_arms": 2,
+  "actual_generation_calls": 12,
+  "text_pairs_available": 2,
+  "text_pairs_unavailable": 2,
+  "cells": [
+    {
+      "case": "on-json_schema-old",
+      "arm": "old",
+      "wall_seconds": 215.57378687500022,
+      "host_calls": 2,
+      "actual_generation_calls": 2,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 3,
+        "reference_groups": 3,
+        "predicted_groups": 3,
+        "exact_partition": true,
+        "exact_group_recall": 1.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "tn": 8,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py",
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "evaluation_note": "KeyError"
+      },
+      "text_reached": false,
+      "phases_actual": [
+        {
+          "phase": "grouping",
+          "stop_reason": "completed",
+          "metrics": {
+            "inputTokens": 6040,
+            "grammarSetupSeconds": 0.6773872500016296,
+            "activeMemoryBytes": 2632330850,
+            "prefixPrefillSeconds": 0,
+            "prefixClearCacheSeconds": 0,
+            "generatedTokens": 527,
+            "outputConstraint": "json_schema",
+            "runtimePromptSeconds": 19.139721989631653,
+            "cacheReusedTokens": 0,
+            "phaseEndKVLayers": [],
+            "prefixSynchronizeSeconds": 0,
+            "prefixKVLayers": [],
+            "modelReused": false,
+            "peakMemoryBytes": 3373722960,
+            "diagnosticCPUSeconds": {
+              "responseMaskPreparationSeconds": 0.028117208337789634,
+              "responseUpdateAndProgressSeconds": 0.0006917916543898173,
+              "thinkingReadSeconds": 16.64374954167215,
+              "responseReadSeconds": 1.8776412499973958,
+              "thinkingMaskPreparationSeconds": 0.0006282500216912013,
+              "thinkingUpdateAndProgressSeconds": 0.0035702083368960302
+            },
+            "diagnosticFirstReadSeconds": 0.06182687500040629,
+            "runtimeGenerationSeconds": 19.689390897750854,
+            "prefixMemorySamples": [],
+            "nativeThoughtForcedClose": false,
+            "grammarPreparationReused": false,
+            "prefixChunkCount": 0,
+            "loadSeconds": 1.2112580416687706,
+            "grammarPreparationSeconds": 0.6738017499992566,
+            "cacheMemoryBytes": 62451976,
+            "benchmarkCacheMode": "native",
+            "prepareSeconds": 0.08032308333349647,
+            "nativeThoughtTokens": 474,
+            "prefixReclaimCount": 0,
+            "generationWallSeconds": 38.83180787499805,
+            "diagnosticEventCounts": {
+              "responseMaskPreparationSeconds": 54,
+              "responseUpdateAndProgressSeconds": 54,
+              "thinkingReadSeconds": 474,
+              "thinkingMaskPreparationSeconds": 475,
+              "responseReadSeconds": 54,
+              "thinkingUpdateAndProgressSeconds": 475
+            }
+          }
+        },
+        {
+          "phase": "category",
+          "stop_reason": "max_tokens",
+          "metrics": {
+            "diagnosticEventCounts": {
+              "thinkingMaskPreparationSeconds": 4097,
+              "thinkingUpdateAndProgressSeconds": 4097,
+              "thinkingReadSeconds": 4096
+            },
+            "inputTokens": 4944,
+            "loadSeconds": 1.1251713749988994,
+            "phaseEndKVLayers": [],
+            "nativeThoughtTokens": 4097,
+            "prefixClearCacheSeconds": 0,
+            "outputConstraint": "json_schema",
+            "grammarPreparationSeconds": 0.672669458333985,
+            "runtimePromptSeconds": 15.825477004051208,
+            "generatedTokens": 4096,
+            "benchmarkCacheMode": "native",
+            "cacheMemoryBytes": 2798012014,
+            "prefixReclaimCount": 0,
+            "grammarPreparationReused": false,
+            "peakMemoryBytes": 3370546666,
+            "prefixSynchronizeSeconds": 0,
+            "activeMemoryBytes": 267145232,
+            "prefixChunkCount": 0,
+            "prefixKVLayers": [],
+            "nativeThoughtForcedClose": false,
+            "diagnosticCPUSeconds": {
+              "thinkingMaskPreparationSeconds": 0.005710958306735847,
+              "thinkingUpdateAndProgressSeconds": 0.02985979162986041,
+              "thinkingReadSeconds": 144.02389783336184
+            },
+            "modelReused": false,
+            "diagnosticFirstReadSeconds": 0.053105083330592606,
+            "grammarSetupSeconds": 0.6750585833324294,
+            "prefixMemorySamples": [],
+            "runtimeGenerationSeconds": 154.9453639984131,
+            "generationWallSeconds": 0,
+            "cacheReusedTokens": 0,
+            "prefixPrefillSeconds": 0,
+            "prepareSeconds": 0.05719870833127061
+          }
+        }
+      ],
+      "phase_times": [
+        {
+          "ended_utc": "2026-10-27T05:07:41.420186Z",
+          "helper_system_cpu_seconds": 3.911314,
+          "helper_user_cpu_seconds": 6.785546,
+          "helper_wall_seconds": 41.311459125,
+          "host_since_previous_phase_seconds": 0.000901583,
+          "phase": "bounded-grouping",
+          "request_encode_seconds": 4.6083e-05,
+          "request_write_seconds": 9.4458e-05,
+          "response_bytes": 1722,
+          "response_decode_seconds": 6.1792e-05,
+          "started_utc": "2026-10-27T05:07:00.108855Z"
+        },
+        {
+          "ended_utc": "2026-10-27T05:10:34.26853Z",
+          "helper_system_cpu_seconds": 11.074875,
+          "helper_user_cpu_seconds": 40.354072,
+          "helper_wall_seconds": 172.849461833,
+          "host_since_previous_phase_seconds": 0.000802,
+          "phase": "bounded-category",
+          "request_encode_seconds": 3.2083e-05,
+          "request_write_seconds": 0.000100833,
+          "response_bytes": 1335,
+          "response_decode_seconds": 3.2042e-05,
+          "started_utc": "2026-10-27T05:07:41.421053Z"
+        }
+      ]
+    },
+    {
+      "case": "on-none-old",
+      "arm": "old",
+      "wall_seconds": 216.34508058400024,
+      "host_calls": 2,
+      "actual_generation_calls": 2,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 3,
+        "reference_groups": 3,
+        "predicted_groups": 3,
+        "exact_partition": true,
+        "exact_group_recall": 1.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "tn": 8,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py",
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "evaluation_note": "KeyError"
+      },
+      "text_reached": false,
+      "phases_actual": [
+        {
+          "phase": "grouping",
+          "stop_reason": "completed",
+          "metrics": {
+            "prefixChunkCount": 0,
+            "loadSeconds": 1.2451947083318373,
+            "nativeThoughtTokens": 474,
+            "grammarSetupSeconds": 0.8146076666671433,
+            "peakMemoryBytes": 3373722960,
+            "prefixMemorySamples": [],
+            "nativeThoughtForcedClose": false,
+            "prefixPrefillSeconds": 0,
+            "activeMemoryBytes": 2636492386,
+            "grammarPreparationSeconds": 0.8133244166674558,
+            "prefixKVLayers": [],
+            "diagnosticEventCounts": {
+              "thinkingReadSeconds": 474,
+              "responseUpdateAndProgressSeconds": 56,
+              "thinkingUpdateAndProgressSeconds": 475,
+              "responseMaskPreparationSeconds": 56,
+              "thinkingMaskPreparationSeconds": 475,
+              "responseReadSeconds": 56
+            },
+            "prefixClearCacheSeconds": 0,
+            "cacheReusedTokens": 0,
+            "diagnosticFirstReadSeconds": 0.04455579166824464,
+            "cacheMemoryBytes": 286125346,
+            "runtimePromptSeconds": 18.870325922966003,
+            "outputConstraint": "none",
+            "prefixSynchronizeSeconds": 0,
+            "benchmarkCacheMode": "native",
+            "prefixReclaimCount": 0,
+            "diagnosticCPUSeconds": {
+              "thinkingReadSeconds": 16.289611666685232,
+              "responseUpdateAndProgressSeconds": 0.0004010416814708151,
+              "responseMaskPreparationSeconds": 6.954164928174578e-05,
+              "responseReadSeconds": 1.916052916640183,
+              "thinkingMaskPreparationSeconds": 0.0006772916967747733,
+              "thinkingUpdateAndProgressSeconds": 0.0035217083132010885
+            },
+            "modelReused": false,
+            "grammarPreparationReused": false,
+            "prepareSeconds": 0.07998895833225106,
+            "phaseEndKVLayers": [],
+            "inputTokens": 6040,
+            "runtimeGenerationSeconds": 19.753839015960693,
+            "generatedTokens": 529,
+            "generationWallSeconds": 38.624023291664344
+          }
+        },
+        {
+          "phase": "category",
+          "stop_reason": "max_tokens",
+          "metrics": {
+            "prepareSeconds": 0.06196454166638432,
+            "generatedTokens": 4096,
+            "prefixPrefillSeconds": 0,
+            "prefixClearCacheSeconds": 0,
+            "benchmarkCacheMode": "native",
+            "inputTokens": 4944,
+            "grammarSetupSeconds": 0.7257013749986072,
+            "prefixKVLayers": [],
+            "modelReused": false,
+            "loadSeconds": 1.356201583330403,
+            "prefixSynchronizeSeconds": 0,
+            "prefixReclaimCount": 0,
+            "prefixChunkCount": 0,
+            "runtimePromptSeconds": 15.473343968391418,
+            "cacheReusedTokens": 0,
+            "peakMemoryBytes": 3370546666,
+            "runtimeGenerationSeconds": 155.96997904777527,
+            "activeMemoryBytes": 2716200550,
+            "grammarPreparationReused": false,
+            "diagnosticCPUSeconds": {
+              "thinkingReadSeconds": 142.06505645842844,
+              "thinkingMaskPreparationSeconds": 0.0061830415470467415,
+              "thinkingUpdateAndProgressSeconds": 0.03227337496718974
+            },
+            "phaseEndKVLayers": [],
+            "prefixMemorySamples": [],
+            "nativeThoughtForcedClose": false,
+            "cacheMemoryBytes": 348912664,
+            "grammarPreparationSeconds": 0.7244511249991774,
+            "generationWallSeconds": 0,
+            "nativeThoughtTokens": 4097,
+            "diagnosticFirstReadSeconds": 0.043641000000206986,
+            "diagnosticEventCounts": {
+              "thinkingMaskPreparationSeconds": 4097,
+              "thinkingReadSeconds": 4096,
+              "thinkingUpdateAndProgressSeconds": 4097
+            },
+            "outputConstraint": "none"
+          }
+        }
+      ],
+      "phase_times": [
+        {
+          "ended_utc": "2026-10-27T06:16:11.240501Z",
+          "helper_system_cpu_seconds": 3.758956,
+          "helper_user_cpu_seconds": 7.540596,
+          "helper_wall_seconds": 41.065198916,
+          "host_since_previous_phase_seconds": 0.000876917,
+          "phase": "bounded-grouping",
+          "request_encode_seconds": 5.5208e-05,
+          "request_write_seconds": 0.000129167,
+          "response_bytes": 1724,
+          "response_decode_seconds": 0.000121334,
+          "started_utc": "2026-10-27T06:15:30.174168Z"
+        },
+        {
+          "ended_utc": "2026-10-27T06:19:05.152086Z",
+          "helper_system_cpu_seconds": 13.504188,
+          "helper_user_cpu_seconds": 47.144488,
+          "helper_wall_seconds": 173.907694625,
+          "host_since_previous_phase_seconds": 0.000821416,
+          "phase": "bounded-category",
+          "request_encode_seconds": 3.6459e-05,
+          "request_write_seconds": 9.3583e-05,
+          "response_bytes": 1330,
+          "response_decode_seconds": 6.5292e-05,
+          "started_utc": "2026-10-27T06:16:11.241447Z"
+        }
+      ]
+    },
+    {
+      "case": "off-none-old",
+      "arm": "old",
+      "wall_seconds": 68.88933029100008,
+      "host_calls": 3,
+      "actual_generation_calls": 3,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_scope)",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 3,
+        "reference_groups": 3,
+        "predicted_groups": 3,
+        "exact_partition": true,
+        "exact_group_recall": 1.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "tn": 8,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py",
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 3,
+        "category_denominator": 3,
+        "breaking_refs_on_exact_groups": [
+          "none",
+          "none",
+          "none"
+        ]
+      },
+      "text_reached": true,
+      "phases_actual": [
+        {
+          "phase": "grouping",
+          "stop_reason": "completed",
+          "metrics": {
+            "prefixChunkCount": 0,
+            "prepareSeconds": 0.06459508333500708,
+            "benchmarkCacheMode": "native",
+            "diagnosticCPUSeconds": {
+              "responseUpdateAndProgressSeconds": 0.0003103333328908775,
+              "responseMaskPreparationSeconds": 2.454166315146722e-05,
+              "responseReadSeconds": 1.8371429999933753
+            },
+            "grammarSetupSeconds": 0.6356727083330043,
+            "grammarPreparationReused": false,
+            "activeMemoryBytes": 2619764322,
+            "prefixSynchronizeSeconds": 0,
+            "generationWallSeconds": 21.674630708334007,
+            "prefixClearCacheSeconds": 0,
+            "peakMemoryBytes": 3373722960,
+            "generatedTokens": 53,
+            "cacheReusedTokens": 0,
+            "grammarPreparationSeconds": 0.6346377916670463,
+            "cacheMemoryBytes": 269387042,
+            "prefixMemorySamples": [],
+            "diagnosticFirstReadSeconds": 0.054164125001989305,
+            "prefixPrefillSeconds": 0,
+            "runtimeGenerationSeconds": 1.8717399835586548,
+            "inputTokens": 6042,
+            "phaseEndKVLayers": [],
+            "runtimePromptSeconds": 19.80276310443878,
+            "prefixReclaimCount": 0,
+            "loadSeconds": 1.094427291664033,
+            "diagnosticEventCounts": {
+              "responseUpdateAndProgressSeconds": 55,
+              "responseMaskPreparationSeconds": 55,
+              "responseReadSeconds": 54
+            },
+            "modelReused": false,
+            "outputConstraint": "none",
+            "prefixKVLayers": []
+          }
+        },
+        {
+          "phase": "category",
+          "stop_reason": "completed",
+          "metrics": {
+            "loadSeconds": 2.741762000001472,
+            "generationWallSeconds": 18.657440750001115,
+            "diagnosticFirstReadSeconds": 0.04615758333238773,
+            "diagnosticEventCounts": {
+              "responseMaskPreparationSeconds": 56,
+              "responseReadSeconds": 55,
+              "responseUpdateAndProgressSeconds": 56
+            },
+            "outputConstraint": "none",
+            "prepareSeconds": 0.07176741666626185,
+            "runtimeGenerationSeconds": 1.9541339874267578,
+            "diagnosticCPUSeconds": {
+              "responseUpdateAndProgressSeconds": 0.0004756666603498161,
+              "responseMaskPreparationSeconds": 5.3750016377307475e-05,
+              "responseReadSeconds": 1.8279973333374073
+            },
+            "grammarSetupSeconds": 0.6687659999988682,
+            "peakMemoryBytes": 3374102002,
+            "modelReused": false,
+            "cacheMemoryBytes": 233719074,
+            "prefixChunkCount": 0,
+            "prefixReclaimCount": 0,
+            "phaseEndKVLayers": [],
+            "inputTokens": 4946,
+            "prefixSynchronizeSeconds": 0,
+            "runtimePromptSeconds": 16.70316195487976,
+            "prefixKVLayers": [],
+            "prefixClearCacheSeconds": 0,
+            "prefixMemorySamples": [],
+            "prefixPrefillSeconds": 0,
+            "grammarPreparationReused": false,
+            "cacheReusedTokens": 0,
+            "generatedTokens": 54,
+            "grammarPreparationSeconds": 0.6677453750016866,
+            "activeMemoryBytes": 2584079970,
+            "benchmarkCacheMode": "native"
+          }
+        },
+        {
+          "phase": "text",
+          "stop_reason": "completed",
+          "metrics": {
+            "prepareSeconds": 0.06116266666504089,
+            "cacheMemoryBytes": 230360354,
+            "diagnosticFirstReadSeconds": 0.04599024999697576,
+            "generationWallSeconds": 19.839362750000873,
+            "runtimePromptSeconds": 16.758195996284485,
+            "prefixReclaimCount": 0,
+            "cacheReusedTokens": 0,
+            "diagnosticCPUSeconds": {
+              "responseReadSeconds": 2.7881982500111917,
+              "responseUpdateAndProgressSeconds": 0.0007680416674702428,
+              "responseMaskPreparationSeconds": 7.61666742619127e-05
+            },
+            "grammarPreparationReused": false,
+            "prefixKVLayers": [],
+            "prefixClearCacheSeconds": 0,
+            "loadSeconds": 1.2050901250004245,
+            "generatedTokens": 83,
+            "activeMemoryBytes": 2580590178,
+            "benchmarkCacheMode": "native",
+            "inputTokens": 4830,
+            "prefixChunkCount": 0,
+            "grammarSetupSeconds": 0.7049843749991851,
+            "prefixSynchronizeSeconds": 0,
+            "diagnosticEventCounts": {
+              "responseReadSeconds": 84,
+              "responseUpdateAndProgressSeconds": 85,
+              "responseMaskPreparationSeconds": 85
+            },
+            "modelReused": false,
+            "grammarPreparationSeconds": 0.7032418749986391,
+            "prefixPrefillSeconds": 0,
+            "runtimeGenerationSeconds": 3.053849935531616,
+            "peakMemoryBytes": 3360863784,
+            "prefixMemorySamples": [],
+            "outputConstraint": "none",
+            "phaseEndKVLayers": []
+          }
+        }
+      ],
+      "phase_times": [
+        {
+          "ended_utc": "2026-10-27T06:19:31.324371Z",
+          "helper_system_cpu_seconds": 2.198931,
+          "helper_user_cpu_seconds": 2.228732,
+          "helper_wall_seconds": 23.663368458,
+          "host_since_previous_phase_seconds": 0.00088925,
+          "phase": "bounded-grouping",
+          "request_encode_seconds": 4.4375e-05,
+          "request_write_seconds": 0.000111375,
+          "response_bytes": 1409,
+          "response_decode_seconds": 0.005764625,
+          "started_utc": "2026-10-27T06:19:07.650518Z"
+        },
+        {
+          "ended_utc": "2026-10-27T06:19:53.879183Z",
+          "helper_system_cpu_seconds": 2.151114,
+          "helper_user_cpu_seconds": 2.522943,
+          "helper_wall_seconds": 22.500661416,
+          "host_since_previous_phase_seconds": 0.023890417,
+          "phase": "bounded-category",
+          "request_encode_seconds": 0.022195417,
+          "request_write_seconds": 0.000159833,
+          "response_bytes": 1503,
+          "response_decode_seconds": 4.7125e-05,
+          "started_utc": "2026-10-27T06:19:31.355168Z"
+        },
+        {
+          "ended_utc": "2026-10-27T06:20:15.856609Z",
+          "helper_system_cpu_seconds": 2.228184,
+          "helper_user_cpu_seconds": 3.065258,
+          "helper_wall_seconds": 21.974995708,
+          "host_since_previous_phase_seconds": 0.001318875,
+          "phase": "bounded-text",
+          "request_encode_seconds": 0.000223083,
+          "request_write_seconds": 8.6125e-05,
+          "response_bytes": 1696,
+          "response_decode_seconds": 6.5792e-05,
+          "started_utc": "2026-10-27T06:19:53.880553Z"
+        }
+      ]
+    },
+    {
+      "case": "off-none-new",
+      "arm": "new",
+      "wall_seconds": 22.076224792002904,
+      "host_calls": 3,
+      "actual_generation_calls": 1,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_scope)",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 3,
+        "reference_groups": 3,
+        "predicted_groups": 3,
+        "exact_partition": true,
+        "exact_group_recall": 1.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "tn": 8,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py",
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 3,
+        "category_denominator": 3,
+        "breaking_refs_on_exact_groups": [
+          "none",
+          "none",
+          "none"
+        ]
+      },
+      "text_reached": true,
+      "phases_actual": [
+        {
+          "phase": "text",
+          "stop_reason": "completed",
+          "metrics": {
+            "outputConstraint": "none",
+            "grammarPreparationReused": false,
+            "grammarSetupSeconds": 0.6457181666664837,
+            "inputTokens": 4903,
+            "prefixClearCacheSeconds": 0,
+            "phaseEndKVLayers": [],
+            "modelReused": false,
+            "generationWallSeconds": 19.57925299999988,
+            "prefixPrefillSeconds": 0,
+            "cacheReusedTokens": 0,
+            "prefixSynchronizeSeconds": 0,
+            "loadSeconds": 0.923183708335273,
+            "runtimeGenerationSeconds": 2.9869779348373413,
+            "prefixMemorySamples": [],
+            "activeMemoryBytes": 2585079394,
+            "benchmarkCacheMode": "native",
+            "prefixKVLayers": [],
+            "diagnosticEventCounts": {
+              "responseUpdateAndProgressSeconds": 84,
+              "responseMaskPreparationSeconds": 84,
+              "responseReadSeconds": 83
+            },
+            "peakMemoryBytes": 3360486870,
+            "grammarPreparationSeconds": 0.6452460833352234,
+            "runtimePromptSeconds": 16.592050075531006,
+            "prepareSeconds": 0.057288583335321164,
+            "diagnosticFirstReadSeconds": 0.04304266666804324,
+            "generatedTokens": 82,
+            "diagnosticCPUSeconds": {
+              "responseUpdateAndProgressSeconds": 0.0006836666580056772,
+              "responseMaskPreparationSeconds": 6.649999704677612e-05,
+              "responseReadSeconds": 2.7569328749959823
+            },
+            "prefixChunkCount": 0,
+            "prefixReclaimCount": 0,
+            "cacheMemoryBytes": 230589730
+          }
+        }
+      ],
+      "phase_times": [
+        {
+          "ended_utc": "2026-10-27T06:20:18.150974Z",
+          "helper_system_cpu_seconds": 0.009158,
+          "helper_user_cpu_seconds": 0.021143,
+          "helper_wall_seconds": 0.046163959,
+          "host_since_previous_phase_seconds": 0.000920625,
+          "phase": "bounded-grouping",
+          "request_encode_seconds": 4.5667e-05,
+          "request_write_seconds": 0.000116541,
+          "response_bytes": 1409,
+          "response_decode_seconds": 4.1875e-05,
+          "started_utc": "2026-10-27T06:20:18.104462Z"
+        },
+        {
+          "ended_utc": "2026-10-27T06:20:18.183367Z",
+          "helper_system_cpu_seconds": 0.007074,
+          "helper_user_cpu_seconds": 0.02162,
+          "helper_wall_seconds": 0.031341167,
+          "host_since_previous_phase_seconds": 0.000685792,
+          "phase": "bounded-category",
+          "request_encode_seconds": 3.1166e-05,
+          "request_write_seconds": 9.1292e-05,
+          "response_bytes": 1503,
+          "response_decode_seconds": 3.4833e-05,
+          "started_utc": "2026-10-27T06:20:18.151705Z"
+        },
+        {
+          "ended_utc": "2026-10-27T06:20:39.533005Z",
+          "helper_system_cpu_seconds": 1.799078,
+          "helper_user_cpu_seconds": 2.796102,
+          "helper_wall_seconds": 21.34807525,
+          "host_since_previous_phase_seconds": 0.000803292,
+          "phase": "bounded-text",
+          "request_encode_seconds": 5.3459e-05,
+          "request_write_seconds": 6.6083e-05,
+          "response_bytes": 1685,
+          "response_decode_seconds": 3.6916e-05,
+          "started_utc": "2026-10-27T06:20:18.184208Z"
+        }
+      ]
+    },
+    {
+      "case": "off-json_schema-old",
+      "arm": "old",
+      "wall_seconds": 81.17728804200306,
+      "host_calls": 3,
+      "actual_generation_calls": 3,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_scope)",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 3,
+        "reference_groups": 3,
+        "predicted_groups": 3,
+        "exact_partition": true,
+        "exact_group_recall": 1.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "tn": 8,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py",
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 2,
+        "category_denominator": 3,
+        "breaking_refs_on_exact_groups": [
+          "none",
+          "none",
+          "none"
+        ]
+      },
+      "text_reached": true,
+      "phases_actual": [
+        {
+          "phase": "grouping",
+          "stop_reason": "completed",
+          "metrics": {
+            "diagnosticFirstReadSeconds": 0.050816124999983,
+            "outputConstraint": "json_schema",
+            "prepareSeconds": 0.06820145833262359,
+            "cacheReusedTokens": 0,
+            "modelReused": false,
+            "phaseEndKVLayers": [],
+            "peakMemoryBytes": 3373722960,
+            "runtimePromptSeconds": 20.598037838935852,
+            "diagnosticCPUSeconds": {
+              "responseReadSeconds": 1.825670166665077,
+              "responseMaskPreparationSeconds": 0.026427125008922303,
+              "responseUpdateAndProgressSeconds": 0.0006046666712791193
+            },
+            "cacheMemoryBytes": 268325154,
+            "prefixClearCacheSeconds": 0,
+            "runtimeGenerationSeconds": 1.9202849864959717,
+            "prefixReclaimCount": 0,
+            "inputTokens": 6042,
+            "grammarPreparationSeconds": 0.664340874998743,
+            "diagnosticEventCounts": {
+              "responseUpdateAndProgressSeconds": 54,
+              "responseMaskPreparationSeconds": 54,
+              "responseReadSeconds": 53
+            },
+            "benchmarkCacheMode": "native",
+            "loadSeconds": 0.9327126249991124,
+            "activeMemoryBytes": 2621828706,
+            "prefixSynchronizeSeconds": 0,
+            "prefixChunkCount": 0,
+            "grammarPreparationReused": false,
+            "prefixKVLayers": [],
+            "prefixMemorySamples": [],
+            "generationWallSeconds": 22.53710462500021,
+            "generatedTokens": 52,
+            "prefixPrefillSeconds": 0,
+            "grammarSetupSeconds": 0.6677475833312201
+          }
+        },
+        {
+          "phase": "category",
+          "stop_reason": "completed",
+          "metrics": {
+            "generationWallSeconds": 27.07537979166591,
+            "grammarPreparationSeconds": 0.8046091249998426,
+            "cacheMemoryBytes": 297239842,
+            "diagnosticEventCounts": {
+              "responseUpdateAndProgressSeconds": 73,
+              "responseReadSeconds": 72,
+              "responseMaskPreparationSeconds": 73
+            },
+            "prefixMemorySamples": [],
+            "cacheReusedTokens": 0,
+            "prefixClearCacheSeconds": 0,
+            "diagnosticCPUSeconds": {
+              "responseUpdateAndProgressSeconds": 0.0010420416583656333,
+              "responseReadSeconds": 3.760581833328615,
+              "responseMaskPreparationSeconds": 0.043576291656791
+            },
+            "runtimePromptSeconds": 23.1030250787735,
+            "inputTokens": 4946,
+            "prefixPrefillSeconds": 0,
+            "runtimeGenerationSeconds": 3.972219944000244,
+            "prepareSeconds": 0.07167804166601854,
+            "diagnosticFirstReadSeconds": 0.04730237499825307,
+            "grammarPreparationReused": false,
+            "prefixReclaimCount": 0,
+            "outputConstraint": "json_schema",
+            "grammarSetupSeconds": 0.8071825416664069,
+            "peakMemoryBytes": 3374102002,
+            "prefixSynchronizeSeconds": 0,
+            "benchmarkCacheMode": "native",
+            "prefixKVLayers": [],
+            "generatedTokens": 71,
+            "modelReused": false,
+            "activeMemoryBytes": 2586209890,
+            "loadSeconds": 1.2181256666663103,
+            "phaseEndKVLayers": [],
+            "prefixChunkCount": 0
+          }
+        },
+        {
+          "phase": "text",
+          "stop_reason": "completed",
+          "metrics": {
+            "runtimeGenerationSeconds": 3.507436990737915,
+            "prefixClearCacheSeconds": 0,
+            "cacheReusedTokens": 0,
+            "generationWallSeconds": 23.572618500002136,
+            "loadSeconds": 1.7647408333359635,
+            "inputTokens": 4830,
+            "benchmarkCacheMode": "native",
+            "diagnosticEventCounts": {
+              "responseUpdateAndProgressSeconds": 70,
+              "responseReadSeconds": 69,
+              "responseMaskPreparationSeconds": 70
+            },
+            "prefixSynchronizeSeconds": 0,
+            "diagnosticFirstReadSeconds": 0.04398783333454048,
+            "prefixMemorySamples": [],
+            "prefixChunkCount": 0,
+            "prefixReclaimCount": 0,
+            "grammarSetupSeconds": 1.257512249998399,
+            "cacheMemoryBytes": 231264546,
+            "peakMemoryBytes": 3360863784,
+            "diagnosticCPUSeconds": {
+              "responseUpdateAndProgressSeconds": 0.0007724583228991833,
+              "responseReadSeconds": 3.2516082916663436,
+              "responseMaskPreparationSeconds": 0.21927674999460578
+            },
+            "prefixPrefillSeconds": 0,
+            "phaseEndKVLayers": [],
+            "prepareSeconds": 0.06503529166366206,
+            "runtimePromptSeconds": 20.06505298614502,
+            "modelReused": false,
+            "grammarPreparationReused": false,
+            "generatedTokens": 68,
+            "prefixKVLayers": [],
+            "grammarPreparationSeconds": 0.6713771666654793,
+            "outputConstraint": "json_schema",
+            "activeMemoryBytes": 2580655714
+          }
+        }
+      ],
+      "phase_times": [
+        {
+          "ended_utc": "2026-10-27T06:21:06.052199Z",
+          "helper_system_cpu_seconds": 2.117781,
+          "helper_user_cpu_seconds": 2.486723,
+          "helper_wall_seconds": 24.319581583,
+          "host_since_previous_phase_seconds": 0.00087375,
+          "phase": "bounded-grouping",
+          "request_encode_seconds": 5.5e-05,
+          "request_write_seconds": 0.000126625,
+          "response_bytes": 1405,
+          "response_decode_seconds": 4.9917e-05,
+          "started_utc": "2026-10-27T06:20:41.731771Z"
+        },
+        {
+          "ended_utc": "2026-10-27T06:21:35.404418Z",
+          "helper_system_cpu_seconds": 2.551656,
+          "helper_user_cpu_seconds": 3.2765560000000002,
+          "helper_wall_seconds": 29.349430542,
+          "host_since_previous_phase_seconds": 0.001593833,
+          "phase": "bounded-category",
+          "request_encode_seconds": 4.3417e-05,
+          "request_write_seconds": 0.000194833,
+          "response_bytes": 1525,
+          "response_decode_seconds": 7.125e-05,
+          "started_utc": "2026-10-27T06:21:06.053846Z"
+        },
+        {
+          "ended_utc": "2026-10-27T06:22:02.227716Z",
+          "helper_system_cpu_seconds": 2.729356,
+          "helper_user_cpu_seconds": 7.786871,
+          "helper_wall_seconds": 26.820401833,
+          "host_since_previous_phase_seconds": 0.00181375,
+          "phase": "bounded-text",
+          "request_encode_seconds": 6.3375e-05,
+          "request_write_seconds": 0.000200458,
+          "response_bytes": 1634,
+          "response_decode_seconds": 4.6e-05,
+          "started_utc": "2026-10-27T06:21:35.406312Z"
+        }
+      ]
+    },
+    {
+      "case": "off-json_schema-new",
+      "arm": "new",
+      "wall_seconds": 25.835588083999028,
+      "host_calls": 3,
+      "actual_generation_calls": 1,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_scope)",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 3,
+        "reference_groups": 3,
+        "predicted_groups": 3,
+        "exact_partition": true,
+        "exact_group_recall": 1.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "tn": 8,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py",
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 2,
+        "category_denominator": 3,
+        "breaking_refs_on_exact_groups": [
+          "none",
+          "none",
+          "none"
+        ]
+      },
+      "text_reached": true,
+      "phases_actual": [
+        {
+          "phase": "text",
+          "stop_reason": "completed",
+          "metrics": {
+            "diagnosticCPUSeconds": {
+              "responseMaskPreparationSeconds": 0.29691833332617534,
+              "responseUpdateAndProgressSeconds": 0.0007414166793751065,
+              "responseReadSeconds": 3.67547179167741
+            },
+            "prefixKVLayers": [],
+            "phaseEndKVLayers": [],
+            "generationWallSeconds": 22.880747999999585,
+            "inputTokens": 4903,
+            "runtimePromptSeconds": 18.85809886455536,
+            "generatedTokens": 82,
+            "prefixPrefillSeconds": 0,
+            "modelReused": false,
+            "peakMemoryBytes": 3360486870,
+            "prefixMemorySamples": [],
+            "diagnosticEventCounts": {
+              "responseMaskPreparationSeconds": 84,
+              "responseUpdateAndProgressSeconds": 84,
+              "responseReadSeconds": 83
+            },
+            "prefixChunkCount": 0,
+            "cacheMemoryBytes": 233702690,
+            "activeMemoryBytes": 2582933090,
+            "diagnosticFirstReadSeconds": 0.04251795833260985,
+            "runtimeGenerationSeconds": 4.022567987442017,
+            "cacheReusedTokens": 0,
+            "prepareSeconds": 0.057859874999849126,
+            "prefixSynchronizeSeconds": 0,
+            "outputConstraint": "json_schema",
+            "grammarSetupSeconds": 1.1125500000016473,
+            "grammarPreparationReused": false,
+            "grammarPreparationSeconds": 0.6392772083345335,
+            "prefixClearCacheSeconds": 0,
+            "loadSeconds": 0.8852340000012191,
+            "prefixReclaimCount": 0,
+            "benchmarkCacheMode": "native"
+          }
+        }
+      ],
+      "phase_times": [
+        {
+          "ended_utc": "2026-10-27T06:22:04.555765Z",
+          "helper_system_cpu_seconds": 0.006977,
+          "helper_user_cpu_seconds": 0.020887,
+          "helper_wall_seconds": 0.038707583,
+          "host_since_previous_phase_seconds": 0.000870708,
+          "phase": "bounded-grouping",
+          "request_encode_seconds": 5.0708e-05,
+          "request_write_seconds": 0.000122125,
+          "response_bytes": 1405,
+          "response_decode_seconds": 3.4709e-05,
+          "started_utc": "2026-10-27T06:22:04.516723Z"
+        },
+        {
+          "ended_utc": "2026-10-27T06:22:04.585824Z",
+          "helper_system_cpu_seconds": 0.005918,
+          "helper_user_cpu_seconds": 0.020701,
+          "helper_wall_seconds": 0.029053792,
+          "host_since_previous_phase_seconds": 0.000657292,
+          "phase": "bounded-category",
+          "request_encode_seconds": 2.8958e-05,
+          "request_write_seconds": 8.9792e-05,
+          "response_bytes": 1525,
+          "response_decode_seconds": 1.9125e-05,
+          "started_utc": "2026-10-27T06:22:04.556459Z"
+        },
+        {
+          "ended_utc": "2026-10-27T06:22:29.643053Z",
+          "helper_system_cpu_seconds": 1.9234,
+          "helper_user_cpu_seconds": 6.042888,
+          "helper_wall_seconds": 25.05578375,
+          "host_since_previous_phase_seconds": 0.000648375,
+          "phase": "bounded-text",
+          "request_encode_seconds": 2.95e-05,
+          "request_write_seconds": 7.5542e-05,
+          "response_bytes": 1688,
+          "response_decode_seconds": 3.7417e-05,
+          "started_utc": "2026-10-27T06:22:04.586494Z"
+        }
+      ]
+    }
+  ],
+  "pairs": [
+    {
+      "case": "off-none",
+      "raw_text_input_identical": true,
+      "user_and_schema_identical": true,
+      "system_only_japanese_append": true,
+      "arms": [
+        {
+          "arm": "old",
+          "japanese_script_summaries": 3,
+          "summary_count": 3,
+          "scope_type_word_violations": 3,
+          "generated_tokens": 83,
+          "prefill_seconds": 16.758195996284485,
+          "decode_seconds": 3.053849935531616,
+          "decode_tokens_per_second": 27.17880765334702,
+          "helper_wall_seconds": 21.974995708
+        },
+        {
+          "arm": "new",
+          "japanese_script_summaries": 3,
+          "summary_count": 3,
+          "scope_type_word_violations": 1,
+          "generated_tokens": 82,
+          "prefill_seconds": 16.592050075531006,
+          "decode_seconds": 2.9869779348373413,
+          "decode_tokens_per_second": 27.452496064208585,
+          "helper_wall_seconds": 21.34807525
+        }
+      ]
+    },
+    {
+      "case": "off-json_schema",
+      "raw_text_input_identical": true,
+      "user_and_schema_identical": true,
+      "system_only_japanese_append": true,
+      "arms": [
+        {
+          "arm": "old",
+          "japanese_script_summaries": 3,
+          "summary_count": 3,
+          "scope_type_word_violations": 1,
+          "generated_tokens": 68,
+          "prefill_seconds": 20.06505298614502,
+          "decode_seconds": 3.507436990737915,
+          "decode_tokens_per_second": 19.38737607534149,
+          "helper_wall_seconds": 26.820401833
+        },
+        {
+          "arm": "new",
+          "japanese_script_summaries": 3,
+          "summary_count": 3,
+          "scope_type_word_violations": 1,
+          "generated_tokens": 82,
+          "prefill_seconds": 18.85809886455536,
+          "decode_seconds": 4.022567987442017,
+          "decode_tokens_per_second": 20.384987961917446,
+          "helper_wall_seconds": 25.05578375
+        }
+      ]
+    }
+  ],
+  "resources": {
+    "execution": {
+      "completion": {
+        "state": "stopped",
+        "reason": "RuntimeError: baseline did not reach Text; no synthetic partition injection",
+        "registered_cells": 8,
+        "finished_cells": 1,
+        "actual_generation_calls": 2,
+        "elapsed_seconds": 216.8710550830001,
+        "monitor_samples": 109,
+        "monitor_fatal": []
+      },
+      "samples": 109,
+      "all_valid": true,
+      "cpu_busy_mean": 12.339594518003524,
+      "gpu_mean": 90.39449541284404,
+      "gpu_range": [
+        0,
+        100
+      ],
+      "helper_rss_peak_mib": 1464.5625,
+      "thermal": {
+        "nominal": 109
+      },
+      "swap_start_end_max_mib": [
+        0.0,
+        377.88,
+        377.88
+      ],
+      "helper_count_max": 1
+    },
+    "continuation": {
+      "completion": {
+        "state": "complete",
+        "reason": null,
+        "skipped": [
+          {
+            "case": "on-none-new",
+            "reason": "paired_baseline_did_not_reach_text"
+          }
+        ],
+        "registered_cells": 6,
+        "finished_cells": 5,
+        "actual_generation_calls": 10,
+        "elapsed_seconds": 422.18697166700076,
+        "monitor_samples": 211,
+        "monitor_fatal": []
+      },
+      "samples": 211,
+      "all_valid": true,
+      "cpu_busy_mean": 12.76399626911299,
+      "gpu_mean": 89.11374407582939,
+      "gpu_range": [
+        0,
+        100
+      ],
+      "helper_rss_peak_mib": 3123.046875,
+      "thermal": {
+        "nominal": 128,
+        "fair": 83
+      },
+      "swap_start_end_max_mib": [
+        361.88,
+        551.62,
+        551.62
+      ],
+      "helper_count_max": 1
+    }
+  },
+  "source_hashes_unchanged": true
+}

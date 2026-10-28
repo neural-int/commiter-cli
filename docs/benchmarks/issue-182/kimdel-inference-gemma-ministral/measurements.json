@@ -1,0 +1,1772 @@
+{
+  "freeze": {
+    "document_build": 4.15e-05,
+    "fixture_write": 0.000241916,
+    "git_collect": 0.349367125,
+    "grouping_syntax": 5.41e-07,
+    "history_acquire_match_and_snapshot_checks": 1.9825540830000001,
+    "prepare": 0.000316917,
+    "raw_diff_projection": 3.75e-07,
+    "relation_extract": 0.021924625,
+    "syntax_and_content_read": 0.067673833,
+    "total": 2.422584042
+  },
+  "history": {
+    "ContentMatchMS": 1.933041,
+    "CommandProjectionMS": 4.039583,
+    "HistoryReadMS": 1334.305542,
+    "Status": "partial",
+    "Contexts": 3,
+    "Operations": 3,
+    "ReceivedBytes": 129717,
+    "Requests": 12
+  },
+  "acquisition": {
+    "status": "partial",
+    "reasons": [
+      "history_incomplete"
+    ]
+  },
+  "rpc_methods": {
+    "initialize": {
+      "count": 5,
+      "total_sum_ms": 1577.548584,
+      "wait_read_sum_ms": 1576.961709,
+      "envelope_decode_sum_ms": 0.135124,
+      "result_decode_sum_ms": 0.062415
+    },
+    "thread/items/list": {
+      "count": 4,
+      "total_sum_ms": 1038.967083,
+      "wait_read_sum_ms": 1038.025458,
+      "envelope_decode_sum_ms": 0.296042,
+      "result_decode_sum_ms": 0.492249
+    },
+    "thread/list": {
+      "count": 2,
+      "total_sum_ms": 18.354874,
+      "wait_read_sum_ms": 18.195458000000002,
+      "envelope_decode_sum_ms": 0.050959000000000004,
+      "result_decode_sum_ms": 0.055875
+    },
+    "thread/turns/list": {
+      "count": 1,
+      "total_sum_ms": 146.825333,
+      "wait_read_sum_ms": 146.731083,
+      "envelope_decode_sum_ms": 0.02225,
+      "result_decode_sum_ms": 0.048333
+    }
+  },
+  "cells": [
+    {
+      "case": "gemma-on-json_schema",
+      "wall_seconds": 179.00569770904258,
+      "calls": 3,
+      "error": "",
+      "evaluation": {
+        "validator_accepted": true,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 0,
+        "reference_groups": 3,
+        "predicted_groups": 1,
+        "exact_partition": false,
+        "exact_group_recall": 0.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 8,
+          "fn": 0,
+          "tn": 0,
+          "precision": 0.2,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md",
+            "deadlinewidget/app/ui/widget_view.py",
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/app/ui/test_widget_view.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 0,
+        "breaking_refs_on_exact_groups": []
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 2.543541791383177,
+          "prepareSeconds": 0.04854729166254401,
+          "grammarPreparationSeconds": 0.5065240832045674,
+          "grammarSetupSeconds": 0.5079201250337064,
+          "runtimePromptSeconds": 13.580380082130432,
+          "runtimeGenerationSeconds": 40.33048892021179,
+          "generationWallSeconds": 53.9111781665124,
+          "inputTokens": 6488,
+          "generatedTokens": 974,
+          "nativeThoughtTokens": 932,
+          "nativeThoughtForcedClose": false,
+          "peakMemoryBytes": 5149225852,
+          "activeMemoryBytes": 4288165184,
+          "cacheMemoryBytes": 87777480,
+          "diagnosticFirstReadSeconds": 0.23838945804163814,
+          "diagnosticCPUSeconds": {
+            "thinkingUpdateAndProgressSeconds": 0.007076205685734749,
+            "thinkingReadSeconds": 35.978506464045495,
+            "thinkingMaskPreparationSeconds": 0.001186455599963665,
+            "responseUpdateAndProgressSeconds": 0.0005282913334667683,
+            "responseMaskPreparationSeconds": 0.021614667028188705,
+            "responseReadSeconds": 1.6304487506859004
+          },
+          "diagnosticEventCounts": {
+            "thinkingUpdateAndProgressSeconds": 933,
+            "thinkingReadSeconds": 932,
+            "thinkingMaskPreparationSeconds": 933,
+            "responseUpdateAndProgressSeconds": 43,
+            "responseMaskPreparationSeconds": 43,
+            "responseReadSeconds": 43
+          },
+          "kv_bytes": 86460416,
+          "decode_tokens_per_second": 24.150463485005655,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:40:18.341492Z",
+            "helper_system_cpu_seconds": 4.990151,
+            "helper_user_cpu_seconds": 13.707969,
+            "helper_wall_seconds": 58.025338084,
+            "host_since_previous_phase_seconds": 0.000900916,
+            "phase": "bounded-grouping",
+            "request_encode_seconds": 4.5e-05,
+            "request_write_seconds": 9.7083e-05,
+            "response_bytes": 8119,
+            "response_decode_seconds": 0.000127125,
+            "started_utc": "2026-10-26T12:39:20.315497Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 58.026174917,
+            "history_projection_and_budget_seconds": 0.000688,
+            "response_safety_and_json_validation_seconds": 2.0292e-05,
+            "serialize_and_select_tier_seconds": 7.6708e-05,
+            "total_seconds": 58.026961333
+          },
+          "prefix_metrics": {
+            "prefixChunkCount": 0,
+            "prefixReclaimCount": 0,
+            "prefixSynchronizeSeconds": 0,
+            "prefixClearCacheSeconds": 0,
+            "prefixPrefillSeconds": 0
+          }
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.9646362913772464,
+          "prepareSeconds": 0.04569583339616656,
+          "grammarPreparationSeconds": 0.5484339166432619,
+          "grammarSetupSeconds": 0.5497445417568088,
+          "runtimePromptSeconds": 9.896987915039062,
+          "runtimeGenerationSeconds": 44.5064640045166,
+          "generationWallSeconds": 54.403638042043895,
+          "inputTokens": 4985,
+          "generatedTokens": 1073,
+          "nativeThoughtTokens": 1054,
+          "nativeThoughtForcedClose": false,
+          "peakMemoryBytes": 5149225852,
+          "activeMemoryBytes": 4277417284,
+          "cacheMemoryBytes": 78634184,
+          "diagnosticFirstReadSeconds": 0.1390758752822876,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.00020895712077617645,
+            "thinkingUpdateAndProgressSeconds": 0.006431880407035351,
+            "responseReadSeconds": 0.7920019165612757,
+            "thinkingReadSeconds": 40.45423112716526,
+            "thinkingMaskPreparationSeconds": 0.001657052431255579,
+            "responseMaskPreparationSeconds": 0.00593520887196064
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 20,
+            "thinkingUpdateAndProgressSeconds": 1055,
+            "responseReadSeconds": 20,
+            "responseMaskPreparationSeconds": 20,
+            "thinkingMaskPreparationSeconds": 1055,
+            "thinkingReadSeconds": 1054
+          },
+          "kv_bytes": 75658752,
+          "decode_tokens_per_second": 24.108857533393575,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:41:15.469982Z",
+            "helper_system_cpu_seconds": 4.769943,
+            "helper_user_cpu_seconds": 14.858446,
+            "helper_wall_seconds": 57.126671083,
+            "host_since_previous_phase_seconds": 0.000949291,
+            "phase": "bounded-category",
+            "request_encode_seconds": 3.1166e-05,
+            "request_write_seconds": 7.3125e-05,
+            "response_bytes": 8107,
+            "response_decode_seconds": 5.2917e-05,
+            "started_utc": "2026-10-26T12:40:18.342581Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 57.127457833,
+            "history_projection_and_budget_seconds": 0.000479875,
+            "response_safety_and_json_validation_seconds": 3.4875e-05,
+            "serialize_and_select_tier_seconds": 9.5416e-05,
+            "total_seconds": 57.12807
+          },
+          "prefix_metrics": {
+            "prefixSynchronizeSeconds": 0,
+            "prefixPrefillSeconds": 0,
+            "prefixChunkCount": 0,
+            "prefixClearCacheSeconds": 0,
+            "prefixReclaimCount": 0
+          }
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 2.3231872082687914,
+          "prepareSeconds": 0.04724391642957926,
+          "grammarPreparationSeconds": 0.5534115000627935,
+          "grammarSetupSeconds": 1.1547079998999834,
+          "runtimePromptSeconds": 10.334854006767273,
+          "runtimeGenerationSeconds": 48.33115899562836,
+          "generationWallSeconds": 58.66800270834938,
+          "inputTokens": 4901,
+          "generatedTokens": 1199,
+          "nativeThoughtTokens": 1174,
+          "nativeThoughtForcedClose": false,
+          "peakMemoryBytes": 5149225852,
+          "activeMemoryBytes": 4276761892,
+          "cacheMemoryBytes": 77982954,
+          "diagnosticFirstReadSeconds": 0.14275916665792465,
+          "diagnosticCPUSeconds": {
+            "thinkingUpdateAndProgressSeconds": 0.006455425638705492,
+            "thinkingReadSeconds": 44.42479853751138,
+            "responseUpdateAndProgressSeconds": 0.000181540846824646,
+            "responseMaskPreparationSeconds": 0.08292162604629993,
+            "thinkingMaskPreparationSeconds": 0.0012878789566457272,
+            "responseReadSeconds": 0.9692394989542663
+          },
+          "diagnosticEventCounts": {
+            "thinkingUpdateAndProgressSeconds": 1175,
+            "thinkingReadSeconds": 1174,
+            "responseUpdateAndProgressSeconds": 26,
+            "responseMaskPreparationSeconds": 26,
+            "thinkingMaskPreparationSeconds": 1175,
+            "responseReadSeconds": 26
+          },
+          "kv_bytes": 74953728,
+          "decode_tokens_per_second": 24.80801257235424,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:42:17.775345Z",
+            "helper_system_cpu_seconds": 5.003342,
+            "helper_user_cpu_seconds": 18.523594,
+            "helper_wall_seconds": 62.302684,
+            "host_since_previous_phase_seconds": 0.000820791,
+            "phase": "bounded-text",
+            "request_encode_seconds": 3.2083e-05,
+            "request_write_seconds": 7.7667e-05,
+            "response_bytes": 8160,
+            "response_decode_seconds": 0.001808166,
+            "started_utc": "2026-10-26T12:41:15.470861Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 62.308618,
+            "history_projection_and_budget_seconds": 0.0004205,
+            "response_safety_and_json_validation_seconds": 0.001326,
+            "serialize_and_select_tier_seconds": 7.1583e-05,
+            "total_seconds": 62.311084208
+          },
+          "prefix_metrics": {
+            "prefixSynchronizeSeconds": 0,
+            "prefixPrefillSeconds": 0,
+            "prefixChunkCount": 0,
+            "prefixClearCacheSeconds": 0,
+            "prefixReclaimCount": 0
+          }
+        }
+      ],
+      "total_generated_tokens": 3246,
+      "decode_tokens_per_second": 24.37520479333161,
+      "os_samples": 92,
+      "rss_peak_bytes": 3368714240,
+      "gpu_utilization_min_max": [
+        0,
+        100
+      ],
+      "thermal_samples": {
+        "nominal": 88,
+        "fair": 4
+      },
+      "text_review": {
+        "reviewer": "agent qualitative review; no model judge",
+        "note": "5ファイルを1群に統合し、summaryはUI追加だけを記述。メール修正とREADMEを落としている"
+      }
+    },
+    {
+      "case": "gemma-on-none",
+      "wall_seconds": 191.6163906659931,
+      "calls": 3,
+      "error": "",
+      "evaluation": {
+        "validator_accepted": true,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 0,
+        "reference_groups": 3,
+        "predicted_groups": 1,
+        "exact_partition": false,
+        "exact_group_recall": 0.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 8,
+          "fn": 0,
+          "tn": 0,
+          "precision": 0.2,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md",
+            "deadlinewidget/app/ui/widget_view.py",
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/app/ui/test_widget_view.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 0,
+        "breaking_refs_on_exact_groups": []
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.825754125136882,
+          "prepareSeconds": 0.046872916631400585,
+          "grammarPreparationSeconds": 0.4970486667007208,
+          "grammarSetupSeconds": 0.4980022916570306,
+          "runtimePromptSeconds": 13.3890780210495,
+          "runtimeGenerationSeconds": 40.069920897483826,
+          "generationWallSeconds": 53.459353249985725,
+          "inputTokens": 6488,
+          "generatedTokens": 974,
+          "nativeThoughtTokens": 932,
+          "nativeThoughtForcedClose": false,
+          "peakMemoryBytes": 5149225852,
+          "activeMemoryBytes": 4288165180,
+          "cacheMemoryBytes": 86727888,
+          "diagnosticFirstReadSeconds": 0.14041958330199122,
+          "diagnosticCPUSeconds": {
+            "responseReadSeconds": 1.6366947093047202,
+            "thinkingMaskPreparationSeconds": 0.001221172045916319,
+            "thinkingUpdateAndProgressSeconds": 0.004921128042042255,
+            "thinkingReadSeconds": 35.453392712865025,
+            "responseUpdateAndProgressSeconds": 0.00022783363237977028,
+            "responseMaskPreparationSeconds": 3.27499583363533e-05
+          },
+          "diagnosticEventCounts": {
+            "thinkingMaskPreparationSeconds": 933,
+            "responseReadSeconds": 43,
+            "thinkingUpdateAndProgressSeconds": 933,
+            "thinkingReadSeconds": 932,
+            "responseUpdateAndProgressSeconds": 43,
+            "responseMaskPreparationSeconds": 43
+          },
+          "kv_bytes": 86460416,
+          "decode_tokens_per_second": 24.30750992725723,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:43:19.751745Z",
+            "helper_system_cpu_seconds": 4.754137,
+            "helper_user_cpu_seconds": 14.449079,
+            "helper_wall_seconds": 55.988205709,
+            "host_since_previous_phase_seconds": 0.001876542,
+            "phase": "bounded-grouping",
+            "request_encode_seconds": 4.8083e-05,
+            "request_write_seconds": 0.000103875,
+            "response_bytes": 8115,
+            "response_decode_seconds": 0.000122667,
+            "started_utc": "2026-10-26T12:42:23.762887Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 55.988958625,
+            "history_projection_and_budget_seconds": 0.000870667,
+            "response_safety_and_json_validation_seconds": 1.9125e-05,
+            "serialize_and_select_tier_seconds": 0.000633667,
+            "total_seconds": 55.990484375
+          },
+          "prefix_metrics": {
+            "prefixSynchronizeSeconds": 0,
+            "prefixPrefillSeconds": 0,
+            "prefixReclaimCount": 0,
+            "prefixChunkCount": 0,
+            "prefixClearCacheSeconds": 0
+          }
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.5466891252435744,
+          "prepareSeconds": 0.042787875048816204,
+          "grammarPreparationSeconds": 0.5068939165212214,
+          "grammarSetupSeconds": 0.5080370418727398,
+          "runtimePromptSeconds": 10.418158054351807,
+          "runtimeGenerationSeconds": 45.85728394985199,
+          "generationWallSeconds": 56.27579875010997,
+          "inputTokens": 4985,
+          "generatedTokens": 1073,
+          "nativeThoughtTokens": 1054,
+          "nativeThoughtForcedClose": false,
+          "peakMemoryBytes": 5149225852,
+          "activeMemoryBytes": 4277417272,
+          "cacheMemoryBytes": 77588688,
+          "diagnosticFirstReadSeconds": 0.10417400021106005,
+          "diagnosticCPUSeconds": {
+            "thinkingReadSeconds": 41.30146199837327,
+            "thinkingUpdateAndProgressSeconds": 0.0077016232535243034,
+            "responseUpdateAndProgressSeconds": 0.00018058344721794128,
+            "responseMaskPreparationSeconds": 3.0166003853082657e-05,
+            "responseReadSeconds": 0.8903644178062677,
+            "thinkingMaskPreparationSeconds": 0.0013102046214044094
+          },
+          "diagnosticEventCounts": {
+            "thinkingReadSeconds": 1054,
+            "thinkingUpdateAndProgressSeconds": 1055,
+            "responseMaskPreparationSeconds": 20,
+            "responseUpdateAndProgressSeconds": 20,
+            "responseReadSeconds": 20,
+            "thinkingMaskPreparationSeconds": 1055
+          },
+          "kv_bytes": 75658752,
+          "decode_tokens_per_second": 23.398681901296147,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:44:18.374482Z",
+            "helper_system_cpu_seconds": 4.88731,
+            "helper_user_cpu_seconds": 16.711477,
+            "helper_wall_seconds": 58.621022208,
+            "host_since_previous_phase_seconds": 0.000755167,
+            "phase": "bounded-category",
+            "request_encode_seconds": 2.7834e-05,
+            "request_write_seconds": 0.000247458,
+            "response_bytes": 8108,
+            "response_decode_seconds": 5.2042e-05,
+            "started_utc": "2026-10-26T12:43:19.752631Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 58.62192,
+            "history_projection_and_budget_seconds": 0.000404916,
+            "response_safety_and_json_validation_seconds": 3.3542e-05,
+            "serialize_and_select_tier_seconds": 7.9459e-05,
+            "total_seconds": 58.6224405
+          },
+          "prefix_metrics": {
+            "prefixPrefillSeconds": 0,
+            "prefixReclaimCount": 0,
+            "prefixChunkCount": 0,
+            "prefixClearCacheSeconds": 0,
+            "prefixSynchronizeSeconds": 0
+          }
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.9757563332095742,
+          "prepareSeconds": 0.043883833568543196,
+          "grammarPreparationSeconds": 0.4979956247843802,
+          "grammarSetupSeconds": 0.49924133298918605,
+          "runtimePromptSeconds": 11.156525135040283,
+          "runtimeGenerationSeconds": 62.186407923698425,
+          "generationWallSeconds": 73.34313104208559,
+          "inputTokens": 4901,
+          "generatedTokens": 1199,
+          "nativeThoughtTokens": 1174,
+          "nativeThoughtForcedClose": false,
+          "peakMemoryBytes": 5149225852,
+          "activeMemoryBytes": 4276761892,
+          "cacheMemoryBytes": 76936404,
+          "diagnosticFirstReadSeconds": 0.16313966689631343,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.00012754183262586594,
+            "responseMaskPreparationSeconds": 3.716815263032913e-05,
+            "thinkingReadSeconds": 55.61163811897859,
+            "thinkingUpdateAndProgressSeconds": 0.010754494462162256,
+            "thinkingMaskPreparationSeconds": 0.00256721256300807,
+            "responseReadSeconds": 1.07360729156062
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 26,
+            "responseMaskPreparationSeconds": 26,
+            "thinkingReadSeconds": 1174,
+            "thinkingUpdateAndProgressSeconds": 1175,
+            "thinkingMaskPreparationSeconds": 1175,
+            "responseReadSeconds": 26
+          },
+          "kv_bytes": 74953728,
+          "decode_tokens_per_second": 19.280740599636353,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:45:34.468022Z",
+            "helper_system_cpu_seconds": 7.269704,
+            "helper_user_cpu_seconds": 22.844287,
+            "helper_wall_seconds": 76.091751708,
+            "host_since_previous_phase_seconds": 0.000877917,
+            "phase": "bounded-text",
+            "request_encode_seconds": 3.3958e-05,
+            "request_write_seconds": 9.9459e-05,
+            "response_bytes": 8156,
+            "response_decode_seconds": 0.000120125,
+            "started_utc": "2026-10-26T12:44:18.375419Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 76.092804833,
+            "history_projection_and_budget_seconds": 0.000437917,
+            "response_safety_and_json_validation_seconds": 6.5291e-05,
+            "serialize_and_select_tier_seconds": 8.5125e-05,
+            "total_seconds": 76.093395834
+          },
+          "prefix_metrics": {
+            "prefixSynchronizeSeconds": 0,
+            "prefixClearCacheSeconds": 0,
+            "prefixChunkCount": 0,
+            "prefixReclaimCount": 0,
+            "prefixPrefillSeconds": 0
+          }
+        }
+      ],
+      "total_generated_tokens": 3246,
+      "decode_tokens_per_second": 21.915608830755644,
+      "os_samples": 98,
+      "rss_peak_bytes": 3663773696,
+      "gpu_utilization_min_max": [
+        0,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 98
+      },
+      "text_review": {
+        "reviewer": "agent qualitative review; no model judge",
+        "note": "文法制約ありと同一のGrouping/Category/Text。全統合とUI偏重が残る"
+      }
+    },
+    {
+      "case": "gemma-off-none",
+      "wall_seconds": 66.26851808279753,
+      "calls": 3,
+      "error": "",
+      "evaluation": {
+        "validator_accepted": true,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 3,
+        "reference_groups": 3,
+        "predicted_groups": 3,
+        "exact_partition": true,
+        "exact_group_recall": 1.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "tn": 8,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py",
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 1,
+        "category_denominator": 3,
+        "breaking_refs_on_exact_groups": [
+          "none",
+          "none",
+          "none"
+        ]
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.9838562086224556,
+          "prepareSeconds": 0.04605304170399904,
+          "grammarPreparationSeconds": 0.5747048333287239,
+          "grammarSetupSeconds": 0.5756821250542998,
+          "runtimePromptSeconds": 13.461871027946472,
+          "runtimeGenerationSeconds": 1.8202909231185913,
+          "generationWallSeconds": 15.282534250058234,
+          "inputTokens": 6486,
+          "generatedTokens": 46,
+          "peakMemoryBytes": 5149225852,
+          "activeMemoryBytes": 4281611556,
+          "cacheMemoryBytes": 81829098,
+          "diagnosticFirstReadSeconds": 0.14798195799812675,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.0002489592880010605,
+            "responseMaskPreparationSeconds": 1.4291144907474518e-05,
+            "responseReadSeconds": 1.7751664971001446
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 48,
+            "responseMaskPreparationSeconds": 48,
+            "responseReadSeconds": 47
+          },
+          "kv_bytes": 79775744,
+          "decode_tokens_per_second": 25.270685809491958,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:45:59.023624Z",
+            "helper_system_cpu_seconds": 2.706065,
+            "helper_user_cpu_seconds": 3.033458,
+            "helper_wall_seconds": 18.160311125,
+            "host_since_previous_phase_seconds": 0.000887417,
+            "phase": "bounded-grouping",
+            "request_encode_seconds": 4.6125e-05,
+            "request_write_seconds": 9.8375e-05,
+            "response_bytes": 7805,
+            "response_decode_seconds": 9.075e-05,
+            "started_utc": "2026-10-26T12:45:40.862826Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 18.161000667,
+            "history_projection_and_budget_seconds": 0.000681875,
+            "response_safety_and_json_validation_seconds": 2.5541e-05,
+            "serialize_and_select_tier_seconds": 8.1458e-05,
+            "total_seconds": 18.161790209
+          },
+          "prefix_metrics": {
+            "prefixReclaimCount": 0,
+            "prefixClearCacheSeconds": 0,
+            "prefixPrefillSeconds": 0,
+            "prefixChunkCount": 0,
+            "prefixSynchronizeSeconds": 0
+          }
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.6924881669692695,
+          "prepareSeconds": 0.04392245830968022,
+          "grammarPreparationSeconds": 0.5321586253121495,
+          "grammarSetupSeconds": 0.5330036249943078,
+          "runtimePromptSeconds": 11.791633009910583,
+          "runtimeGenerationSeconds": 6.267645955085754,
+          "generationWallSeconds": 18.059708583634347,
+          "inputTokens": 5299,
+          "generatedTokens": 104,
+          "peakMemoryBytes": 5149225852,
+          "activeMemoryBytes": 4271256896,
+          "cacheMemoryBytes": 70245586,
+          "diagnosticFirstReadSeconds": 0.14648666651919484,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.0008184146136045456,
+            "responseReadSeconds": 5.868299211375415,
+            "responseMaskPreparationSeconds": 7.949955761432648e-05
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 106,
+            "responseReadSeconds": 105,
+            "responseMaskPreparationSeconds": 106
+          },
+          "kv_bytes": 69609472,
+          "decode_tokens_per_second": 16.593151678519956,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:46:19.631008Z",
+            "helper_system_cpu_seconds": 2.599855,
+            "helper_user_cpu_seconds": 4.438792,
+            "helper_wall_seconds": 20.605644334,
+            "host_since_previous_phase_seconds": 0.000841958,
+            "phase": "bounded-category",
+            "request_encode_seconds": 3.2542e-05,
+            "request_write_seconds": 0.000105666,
+            "response_bytes": 7989,
+            "response_decode_seconds": 0.00012375,
+            "started_utc": "2026-10-26T12:45:59.02456Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 20.606852,
+            "history_projection_and_budget_seconds": 0.000450042,
+            "response_safety_and_json_validation_seconds": 9.3625e-05,
+            "serialize_and_select_tier_seconds": 0.000106084,
+            "total_seconds": 20.6075085
+          },
+          "prefix_metrics": {
+            "prefixReclaimCount": 0,
+            "prefixPrefillSeconds": 0,
+            "prefixChunkCount": 0,
+            "prefixClearCacheSeconds": 0,
+            "prefixSynchronizeSeconds": 0
+          }
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 2.149690624792129,
+          "prepareSeconds": 0.044438416603952646,
+          "grammarPreparationSeconds": 0.5003219996578991,
+          "grammarSetupSeconds": 0.5013565835542977,
+          "runtimePromptSeconds": 16.97508406639099,
+          "runtimeGenerationSeconds": 6.532403945922852,
+          "generationWallSeconds": 23.507988625206053,
+          "inputTokens": 5167,
+          "generatedTokens": 83,
+          "peakMemoryBytes": 5149225852,
+          "activeMemoryBytes": 4270208292,
+          "cacheMemoryBytes": 69206248,
+          "diagnosticFirstReadSeconds": 0.24325304152444005,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.0010262508876621723,
+            "responseReadSeconds": 5.836267666891217,
+            "responseMaskPreparationSeconds": 0.0001163724809885025
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 85,
+            "responseReadSeconds": 84,
+            "responseMaskPreparationSeconds": 85
+          },
+          "kv_bytes": 68564992,
+          "decode_tokens_per_second": 12.70588908571764,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:46:46.059627Z",
+            "helper_system_cpu_seconds": 3.920177,
+            "helper_user_cpu_seconds": 4.9671710000000004,
+            "helper_wall_seconds": 26.425363333,
+            "host_since_previous_phase_seconds": 0.001888458,
+            "phase": "bounded-text",
+            "request_encode_seconds": 7.6791e-05,
+            "request_write_seconds": 0.000220208,
+            "response_bytes": 8061,
+            "response_decode_seconds": 0.000168917,
+            "started_utc": "2026-10-26T12:46:19.633029Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 26.427196375,
+            "history_projection_and_budget_seconds": 0.001056792,
+            "response_safety_and_json_validation_seconds": 0.00012475,
+            "serialize_and_select_tier_seconds": 0.000159,
+            "total_seconds": 26.428540875
+          },
+          "prefix_metrics": {
+            "prefixReclaimCount": 0,
+            "prefixSynchronizeSeconds": 0,
+            "prefixPrefillSeconds": 0,
+            "prefixChunkCount": 0,
+            "prefixClearCacheSeconds": 0
+          }
+        }
+      ],
+      "total_generated_tokens": 233,
+      "decode_tokens_per_second": 15.93670098411742,
+      "os_samples": 36,
+      "rss_peak_bytes": 2644475904,
+      "gpu_utilization_min_max": [
+        0,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 36
+      },
+      "text_review": {
+        "reviewer": "agent qualitative review; no model judge",
+        "note": "Groupingは3群完全正解。Textも日本語で3目的を説明。Categoryが全群featでdocs/fixを誤る"
+      }
+    },
+    {
+      "case": "gemma-off-json_schema",
+      "wall_seconds": 63.610261416994035,
+      "calls": 3,
+      "error": "",
+      "evaluation": {
+        "validator_accepted": true,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 1,
+        "reference_groups": 3,
+        "predicted_groups": 2,
+        "exact_partition": false,
+        "exact_group_recall": 0.3333333333333333,
+        "pairs": {
+          "tp": 2,
+          "fp": 4,
+          "fn": 0,
+          "tn": 4,
+          "precision": 0.3333333333333333,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py",
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/app/ui/test_widget_view.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 0,
+        "category_denominator": 1,
+        "breaking_refs_on_exact_groups": [
+          "none"
+        ]
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.9496724586933851,
+          "prepareSeconds": 0.04687583353370428,
+          "grammarPreparationSeconds": 0.5069346665404737,
+          "grammarSetupSeconds": 0.5082599581219256,
+          "runtimePromptSeconds": 17.119496941566467,
+          "runtimeGenerationSeconds": 2.8680319786071777,
+          "generationWallSeconds": 19.987819916568696,
+          "inputTokens": 6486,
+          "generatedTokens": 41,
+          "peakMemoryBytes": 5149225852,
+          "activeMemoryBytes": 4281611572,
+          "cacheMemoryBytes": 82877658,
+          "diagnosticFirstReadSeconds": 0.1664983332157135,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 0.015599206555634737,
+            "responseReadSeconds": 2.7922559180296957,
+            "responseUpdateAndProgressSeconds": 0.0014327894896268845
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 43,
+            "responseReadSeconds": 42,
+            "responseUpdateAndProgressSeconds": 43
+          },
+          "kv_bytes": 79775744,
+          "decode_tokens_per_second": 14.295517032523158,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:47:15.654965Z",
+            "helper_system_cpu_seconds": 2.936252,
+            "helper_user_cpu_seconds": 3.038166,
+            "helper_wall_seconds": 22.716169042,
+            "host_since_previous_phase_seconds": 0.000879458,
+            "phase": "bounded-grouping",
+            "request_encode_seconds": 4.5833e-05,
+            "request_write_seconds": 0.000110625,
+            "response_bytes": 7809,
+            "response_decode_seconds": 0.000101958,
+            "started_utc": "2026-10-26T12:46:52.938128Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 22.717112709,
+            "history_projection_and_budget_seconds": 0.000674208,
+            "response_safety_and_json_validation_seconds": 3.7958e-05,
+            "serialize_and_select_tier_seconds": 9.0041e-05,
+            "total_seconds": 22.717915708
+          },
+          "prefix_metrics": {
+            "prefixChunkCount": 0,
+            "prefixPrefillSeconds": 0,
+            "prefixSynchronizeSeconds": 0,
+            "prefixReclaimCount": 0,
+            "prefixClearCacheSeconds": 0
+          }
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 2.327083583455533,
+          "prepareSeconds": 0.050222708377987146,
+          "grammarPreparationSeconds": 0.5531439166516066,
+          "grammarSetupSeconds": 0.555035375058651,
+          "runtimePromptSeconds": 13.277728080749512,
+          "runtimeGenerationSeconds": 1.4817019701004028,
+          "generationWallSeconds": 14.759747291915119,
+          "inputTokens": 5141,
+          "generatedTokens": 36,
+          "peakMemoryBytes": 5149225852,
+          "activeMemoryBytes": 4267980068,
+          "cacheMemoryBytes": 25280176,
+          "diagnosticFirstReadSeconds": 0.15602016681805253,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 0.018221041187644005,
+            "responseReadSeconds": 1.381442166864872,
+            "responseUpdateAndProgressSeconds": 0.0004757493734359741
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 38,
+            "responseReadSeconds": 37,
+            "responseUpdateAndProgressSeconds": 38
+          },
+          "kv_bytes": 66162688,
+          "decode_tokens_per_second": 24.296383973600694,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:47:33.479956Z",
+            "helper_system_cpu_seconds": 3.019874,
+            "helper_user_cpu_seconds": 3.711083,
+            "helper_wall_seconds": 17.822507041,
+            "host_since_previous_phase_seconds": 0.0011925,
+            "phase": "bounded-category",
+            "request_encode_seconds": 4.4667e-05,
+            "request_write_seconds": 0.000134833,
+            "response_bytes": 7856,
+            "response_decode_seconds": 4.9583e-05,
+            "started_utc": "2026-10-26T12:47:15.656269Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 17.823865209,
+            "history_projection_and_budget_seconds": 0.000597667,
+            "response_safety_and_json_validation_seconds": 4.6791e-05,
+            "serialize_and_select_tier_seconds": 0.000131416,
+            "total_seconds": 17.824645667
+          },
+          "prefix_metrics": {
+            "prefixClearCacheSeconds": 0,
+            "prefixChunkCount": 0,
+            "prefixSynchronizeSeconds": 0,
+            "prefixPrefillSeconds": 0,
+            "prefixReclaimCount": 0
+          }
+        },
+        {
+          "phase": "bounded-text",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 2.388069833163172,
+          "prepareSeconds": 0.04499866673722863,
+          "grammarPreparationSeconds": 0.5210337084718049,
+          "grammarSetupSeconds": 1.1935083749704063,
+          "runtimePromptSeconds": 14.415700078010559,
+          "runtimeGenerationSeconds": 3.925344944000244,
+          "generationWallSeconds": 18.341588124632835,
+          "inputTokens": 5033,
+          "generatedTokens": 61,
+          "peakMemoryBytes": 5149225852,
+          "activeMemoryBytes": 4268897588,
+          "cacheMemoryBytes": 70065368,
+          "diagnosticFirstReadSeconds": 0.2382129170000553,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.0011198348365724087,
+            "responseMaskPreparationSeconds": 0.5631110407412052,
+            "responseReadSeconds": 3.1821692916564643
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 63,
+            "responseMaskPreparationSeconds": 63,
+            "responseReadSeconds": 62
+          },
+          "kv_bytes": 67137536,
+          "decode_tokens_per_second": 15.540035556171036,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:47:55.620879Z",
+            "helper_system_cpu_seconds": 3.51809,
+            "helper_user_cpu_seconds": 9.687187,
+            "helper_wall_seconds": 22.1392195,
+            "host_since_previous_phase_seconds": 0.00087325,
+            "phase": "bounded-text",
+            "request_encode_seconds": 3.4333e-05,
+            "request_write_seconds": 9.8291e-05,
+            "response_bytes": 7987,
+            "response_decode_seconds": 0.000139208,
+            "started_utc": "2026-10-26T12:47:33.480884Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 22.140428209,
+            "history_projection_and_budget_seconds": 0.000443125,
+            "response_safety_and_json_validation_seconds": 0.000115459,
+            "serialize_and_select_tier_seconds": 6.9375e-05,
+            "total_seconds": 22.141062084
+          },
+          "prefix_metrics": {
+            "prefixClearCacheSeconds": 0,
+            "prefixChunkCount": 0,
+            "prefixReclaimCount": 0,
+            "prefixSynchronizeSeconds": 0,
+            "prefixPrefillSeconds": 0
+          }
+        }
+      ],
+      "total_generated_tokens": 138,
+      "decode_tokens_per_second": 16.676578167926415,
+      "os_samples": 35,
+      "rss_peak_bytes": 2919137280,
+      "gpu_utilization_min_max": [
+        0,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 35
+      },
+      "text_review": {
+        "reviewer": "agent qualitative review; no model judge",
+        "note": "READMEと他4ファイルの2群。全群feat、TextはREADMEとメール修正だけでUI機能を落とす"
+      }
+    },
+    {
+      "case": "ministral-instruct-json_schema",
+      "wall_seconds": 65.58361516613513,
+      "calls": 2,
+      "error": "three-phase planner stopped: unresolved_breaking_evidence",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 3,
+        "reference_groups": 3,
+        "predicted_groups": 3,
+        "exact_partition": true,
+        "exact_group_recall": 1.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "tn": 8,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py",
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "category_correct_on_exact_groups": 1,
+        "category_denominator": 3,
+        "breaking_refs_on_exact_groups": [
+          "none",
+          "none",
+          "unresolved"
+        ]
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 0.9337583752349019,
+          "prepareSeconds": 0.5890994998626411,
+          "grammarPreparationSeconds": 0.3737075417302549,
+          "grammarSetupSeconds": 0.37491970835253596,
+          "runtimePromptSeconds": 29.425837874412537,
+          "runtimeGenerationSeconds": 2.5173399448394775,
+          "generationWallSeconds": 31.94363316660747,
+          "inputTokens": 6865,
+          "generatedTokens": 52,
+          "peakMemoryBytes": 3115784502,
+          "activeMemoryBytes": 2333777296,
+          "cacheMemoryBytes": 410009610,
+          "diagnosticFirstReadSeconds": 0.08745937515050173,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.0007180818356573582,
+            "responseReadSeconds": 2.34889216767624,
+            "responseMaskPreparationSeconds": 0.014655167702585459
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 54,
+            "responseReadSeconds": 53,
+            "responseMaskPreparationSeconds": 54
+          },
+          "kv_bytes": 404574976,
+          "decode_tokens_per_second": 20.656725408342044,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:48:36.267065Z",
+            "helper_system_cpu_seconds": 2.572965,
+            "helper_user_cpu_seconds": 2.914992,
+            "helper_wall_seconds": 34.099882917,
+            "host_since_previous_phase_seconds": 0.002204417,
+            "phase": "bounded-grouping",
+            "request_encode_seconds": 5.4375e-05,
+            "request_write_seconds": 0.000285709,
+            "response_bytes": 13239,
+            "response_decode_seconds": 0.000226209,
+            "started_utc": "2026-10-26T12:48:02.166202Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 34.101285167,
+            "history_projection_and_budget_seconds": 0.001499375,
+            "response_safety_and_json_validation_seconds": 3.7708e-05,
+            "serialize_and_select_tier_seconds": 0.000418333,
+            "total_seconds": 34.103242666
+          },
+          "prefix_metrics": {
+            "prefixSynchronizeSeconds": 0,
+            "prefixReclaimCount": 0,
+            "prefixClearCacheSeconds": 0,
+            "prefixChunkCount": 0,
+            "prefixPrefillSeconds": 0
+          }
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.1706882086582482,
+          "prepareSeconds": 0.45674033323302865,
+          "grammarPreparationSeconds": 0.3089612079784274,
+          "grammarSetupSeconds": 0.3112498330883682,
+          "runtimePromptSeconds": 24.74821901321411,
+          "runtimeGenerationSeconds": 3.8048739433288574,
+          "generationWallSeconds": 28.55337362503633,
+          "inputTokens": 5773,
+          "generatedTokens": 77,
+          "peakMemoryBytes": 2946160950,
+          "activeMemoryBytes": 2272435608,
+          "cacheMemoryBytes": 342403074,
+          "diagnosticFirstReadSeconds": 0.040215916465967894,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 0.02075929194688797,
+            "responseUpdateAndProgressSeconds": 0.001172336284071207,
+            "responseReadSeconds": 3.539215624332428
+          },
+          "diagnosticEventCounts": {
+            "responseMaskPreparationSeconds": 79,
+            "responseUpdateAndProgressSeconds": 79,
+            "responseReadSeconds": 78
+          },
+          "kv_bytes": 342793984,
+          "decode_tokens_per_second": 20.237201323057036,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:49:06.858839Z",
+            "helper_system_cpu_seconds": 2.1059,
+            "helper_user_cpu_seconds": 3.448531,
+            "helper_wall_seconds": 30.589139167,
+            "host_since_previous_phase_seconds": 0.001632291,
+            "phase": "bounded-category",
+            "request_encode_seconds": 7.1083e-05,
+            "request_write_seconds": 0.000170666,
+            "response_bytes": 13377,
+            "response_decode_seconds": 7.6167e-05,
+            "started_utc": "2026-10-26T12:48:36.268936Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 30.590056958,
+            "history_projection_and_budget_seconds": 0.000829542,
+            "response_safety_and_json_validation_seconds": 3.4834e-05,
+            "serialize_and_select_tier_seconds": 0.000224625,
+            "total_seconds": 30.591150042
+          },
+          "prefix_metrics": {
+            "prefixReclaimCount": 0,
+            "prefixSynchronizeSeconds": 0,
+            "prefixPrefillSeconds": 0,
+            "prefixChunkCount": 0,
+            "prefixClearCacheSeconds": 0
+          }
+        }
+      ],
+      "total_generated_tokens": 129,
+      "decode_tokens_per_second": 20.404244823386342,
+      "os_samples": 35,
+      "rss_peak_bytes": 2946138112,
+      "gpu_utilization_min_max": [
+        0,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 35
+      },
+      "text_review": {
+        "reviewer": "agent qualitative review; no model judge",
+        "note": "Groupingは完全正解。CategoryでREADME=feat、UI=refactorと誤分類。メール群のbreaking=unresolvedで安全停止しText未実行"
+      }
+    },
+    {
+      "case": "ministral-instruct-none",
+      "wall_seconds": 78.04580004094169,
+      "calls": 2,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": true,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "exact_groups": 3,
+        "reference_groups": 3,
+        "predicted_groups": 3,
+        "exact_partition": true,
+        "exact_group_recall": 1.0,
+        "pairs": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "tn": 8,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "actual_groups": [
+          [
+            "README.md"
+          ],
+          [
+            "deadlinewidget/app/ui/widget_view.py",
+            "tests/unit/app/ui/test_widget_view.py"
+          ],
+          [
+            "deadlinewidget/mail/store_reader/normalization.py",
+            "tests/unit/mail/store_reader/test_normalization.py"
+          ]
+        ],
+        "git_unchanged": true,
+        "evaluation_note": "KeyError"
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": true,
+          "stop_reason": "completed",
+          "json_valid": true,
+          "schema_valid": true,
+          "loadSeconds": 1.0039328332059085,
+          "prepareSeconds": 0.5710025001317263,
+          "grammarPreparationSeconds": 0.31332058319821954,
+          "grammarSetupSeconds": 0.3135879165492952,
+          "runtimePromptSeconds": 30.690513014793396,
+          "runtimeGenerationSeconds": 3.161098003387451,
+          "generationWallSeconds": 33.85193979181349,
+          "inputTokens": 6865,
+          "generatedTokens": 61,
+          "peakMemoryBytes": 3115784502,
+          "activeMemoryBytes": 2333777296,
+          "cacheMemoryBytes": 409485322,
+          "diagnosticFirstReadSeconds": 0.0438318750821054,
+          "diagnosticCPUSeconds": {
+            "responseMaskPreparationSeconds": 3.774790093302727e-05,
+            "responseReadSeconds": 2.96600554138422,
+            "responseUpdateAndProgressSeconds": 0.0005795001052320004
+          },
+          "diagnosticEventCounts": {
+            "responseReadSeconds": 62,
+            "responseMaskPreparationSeconds": 63,
+            "responseUpdateAndProgressSeconds": 63
+          },
+          "kv_bytes": 404574976,
+          "decode_tokens_per_second": 19.29709231875508,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:49:49.143496Z",
+            "helper_system_cpu_seconds": 2.53865,
+            "helper_user_cpu_seconds": 2.917407,
+            "helper_wall_seconds": 35.838962333,
+            "host_since_previous_phase_seconds": 0.000929458,
+            "phase": "bounded-grouping",
+            "request_encode_seconds": 5.0292e-05,
+            "request_write_seconds": 0.000110083,
+            "response_bytes": 13241,
+            "response_decode_seconds": 0.000187041,
+            "started_utc": "2026-10-26T12:49:13.303621Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 35.840251875,
+            "history_projection_and_budget_seconds": 0.000697625,
+            "response_safety_and_json_validation_seconds": 6.825e-05,
+            "serialize_and_select_tier_seconds": 0.000106333,
+            "total_seconds": 35.841125167
+          },
+          "prefix_metrics": {
+            "prefixChunkCount": 0,
+            "prefixPrefillSeconds": 0,
+            "prefixReclaimCount": 0,
+            "prefixSynchronizeSeconds": 0,
+            "prefixClearCacheSeconds": 0
+          }
+        },
+        {
+          "phase": "bounded-category",
+          "helper_ok": false,
+          "stop_reason": "grammar_failure",
+          "json_valid": false,
+          "schema_valid": false,
+          "parse_or_schema_error": "Expecting value: line 1 column 1 (char 0)",
+          "loadSeconds": 1.3001366662792861,
+          "prepareSeconds": 0.47675695829093456,
+          "grammarPreparationSeconds": 0.3109972085803747,
+          "grammarSetupSeconds": 0.31126037519425154,
+          "runtimePromptSeconds": 25.04757511615753,
+          "runtimeGenerationSeconds": 13.989261984825134,
+          "generationWallSeconds": 39.037057999987155,
+          "inputTokens": 5773,
+          "generatedTokens": 258,
+          "peakMemoryBytes": 2946160950,
+          "activeMemoryBytes": 2944,
+          "cacheMemoryBytes": 2292437102,
+          "diagnosticFirstReadSeconds": 0.0407491666264832,
+          "diagnosticCPUSeconds": {
+            "responseUpdateAndProgressSeconds": 0.0023527094163000584,
+            "responseMaskPreparationSeconds": 0.00022749928757548332,
+            "responseReadSeconds": 12.56211079377681
+          },
+          "diagnosticEventCounts": {
+            "responseUpdateAndProgressSeconds": 260,
+            "responseMaskPreparationSeconds": 260,
+            "responseReadSeconds": 259
+          },
+          "kv_bytes": 342793984,
+          "decode_tokens_per_second": 18.442717012510435,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:50:30.4071Z",
+            "helper_system_cpu_seconds": 2.672161,
+            "helper_user_cpu_seconds": 5.323713,
+            "helper_wall_seconds": 41.260406,
+            "host_since_previous_phase_seconds": 0.001865417,
+            "phase": "bounded-category",
+            "request_encode_seconds": 7.1833e-05,
+            "request_write_seconds": 0.000147375,
+            "response_bytes": 13115,
+            "response_decode_seconds": 0.000131333,
+            "started_utc": "2026-10-26T12:49:49.145561Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 41.261891125,
+            "history_projection_and_budget_seconds": 0.001040166,
+            "serialize_and_select_tier_seconds": 0.000189291,
+            "total_seconds": 41.263137916
+          },
+          "prefix_metrics": {
+            "prefixReclaimCount": 0,
+            "prefixChunkCount": 0,
+            "prefixPrefillSeconds": 0,
+            "prefixSynchronizeSeconds": 0,
+            "prefixClearCacheSeconds": 0
+          }
+        }
+      ],
+      "total_generated_tokens": 319,
+      "decode_tokens_per_second": 18.600192661801163,
+      "os_samples": 42,
+      "rss_peak_bytes": 2963456000,
+      "gpu_utilization_min_max": [
+        0,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 42
+      },
+      "text_review": {
+        "reviewer": "agent qualitative review; no model judge",
+        "note": "Groupingは完全正解。Categoryはgrammar_failureで有効JSONなし、Text未実行"
+      }
+    },
+    {
+      "case": "ministral-reasoning-none",
+      "wall_seconds": 228.71822833269835,
+      "calls": 1,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": false,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "evaluation_note": "KeyError"
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": false,
+          "stop_reason": "max_tokens",
+          "json_valid": false,
+          "schema_valid": false,
+          "parse_or_schema_error": "Expecting value: line 1 column 1 (char 0)",
+          "loadSeconds": 0.8945667087100446,
+          "prepareSeconds": 0.5409635417163372,
+          "grammarPreparationSeconds": 0.3264142503030598,
+          "grammarSetupSeconds": 0.3269160417839885,
+          "runtimePromptSeconds": 31.318831086158752,
+          "runtimeGenerationSeconds": 194.63246095180511,
+          "generationWallSeconds": 0,
+          "inputTokens": 7010,
+          "generatedTokens": 4096,
+          "nativeThoughtTokens": 4097,
+          "nativeThoughtForcedClose": false,
+          "peakMemoryBytes": 3168594692,
+          "activeMemoryBytes": 2944,
+          "cacheMemoryBytes": 3448656414,
+          "diagnosticFirstReadSeconds": 0.053025499917566776,
+          "diagnosticCPUSeconds": {
+            "thinkingMaskPreparationSeconds": 0.005799206905066967,
+            "thinkingReadSeconds": 179.30820340663195,
+            "thinkingUpdateAndProgressSeconds": 0.035350251011550426
+          },
+          "diagnosticEventCounts": {
+            "thinkingMaskPreparationSeconds": 4097,
+            "thinkingReadSeconds": 4096,
+            "thinkingUpdateAndProgressSeconds": 4097
+          },
+          "kv_bytes": 0,
+          "decode_tokens_per_second": 21.044793761376997,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:54:24.860659Z",
+            "helper_system_cpu_seconds": 11.617004,
+            "helper_user_cpu_seconds": 48.062591,
+            "helper_wall_seconds": 227.798054417,
+            "host_since_previous_phase_seconds": 0.000939958,
+            "phase": "bounded-grouping",
+            "request_encode_seconds": 4.9875e-05,
+            "request_write_seconds": 0.000115083,
+            "response_bytes": 1359,
+            "response_decode_seconds": 5.3166e-05,
+            "started_utc": "2026-10-26T12:50:37.06141Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 227.798744667,
+            "history_projection_and_budget_seconds": 0.000750209,
+            "serialize_and_select_tier_seconds": 7.7958e-05,
+            "total_seconds": 227.799574125
+          },
+          "prefix_metrics": {
+            "prefixSynchronizeSeconds": 0,
+            "prefixReclaimCount": 0,
+            "prefixClearCacheSeconds": 0,
+            "prefixPrefillSeconds": 0,
+            "prefixChunkCount": 0
+          }
+        }
+      ],
+      "total_generated_tokens": 4096,
+      "decode_tokens_per_second": 21.044793761376997,
+      "os_samples": 117,
+      "rss_peak_bytes": 1625374720,
+      "gpu_utilization_min_max": [
+        0,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 117
+      },
+      "text_review": {
+        "reviewer": "agent qualitative review; no model judge",
+        "note": "GroupingのThinking中に4096上限、最終JSONなし。Grouping精度は判定不能"
+      }
+    },
+    {
+      "case": "ministral-reasoning-json_schema",
+      "wall_seconds": 225.79276983393356,
+      "calls": 1,
+      "error": "LLM backend could not produce a safe, completely assigned commit plan",
+      "evaluation": {
+        "validator_accepted": false,
+        "grouping_available": false,
+        "text_semantic_review": "pending if text exists; no model judge",
+        "evaluation_note": "KeyError"
+      },
+      "phases": [
+        {
+          "phase": "bounded-grouping",
+          "helper_ok": false,
+          "stop_reason": "max_tokens",
+          "json_valid": false,
+          "schema_valid": false,
+          "parse_or_schema_error": "Expecting value: line 1 column 1 (char 0)",
+          "loadSeconds": 1.074060999788344,
+          "prepareSeconds": 0.5830605835653841,
+          "grammarPreparationSeconds": 0.3271106253378093,
+          "grammarSetupSeconds": 0.328211999963969,
+          "runtimePromptSeconds": 28.226805925369263,
+          "runtimeGenerationSeconds": 194.65806806087494,
+          "generationWallSeconds": 0,
+          "inputTokens": 7010,
+          "generatedTokens": 4096,
+          "nativeThoughtTokens": 4097,
+          "nativeThoughtForcedClose": false,
+          "peakMemoryBytes": 3168594692,
+          "activeMemoryBytes": 2559516064,
+          "cacheMemoryBytes": 636469240,
+          "diagnosticFirstReadSeconds": 0.047124041710048914,
+          "diagnosticCPUSeconds": {
+            "thinkingMaskPreparationSeconds": 0.005972124170511961,
+            "thinkingUpdateAndProgressSeconds": 0.03396574268117547,
+            "thinkingReadSeconds": 176.25614879326895
+          },
+          "diagnosticEventCounts": {
+            "thinkingMaskPreparationSeconds": 4097,
+            "thinkingUpdateAndProgressSeconds": 4097,
+            "thinkingReadSeconds": 4096
+          },
+          "kv_bytes": 0,
+          "decode_tokens_per_second": 21.042025336032143,
+          "host_client_times": {
+            "ended_utc": "2026-10-26T12:58:16.649401Z",
+            "helper_system_cpu_seconds": 13.528198,
+            "helper_user_cpu_seconds": 53.460488,
+            "helper_wall_seconds": 224.95650725,
+            "host_since_previous_phase_seconds": 0.000998375,
+            "phase": "bounded-grouping",
+            "request_encode_seconds": 0.000187834,
+            "request_write_seconds": 0.000134583,
+            "response_bytes": 1368,
+            "response_decode_seconds": 5.5875e-05,
+            "started_utc": "2026-10-26T12:54:31.698831Z"
+          },
+          "host_phase_times": {
+            "client_call_seconds": 224.9573665,
+            "history_projection_and_budget_seconds": 0.000776417,
+            "serialize_and_select_tier_seconds": 0.000104792,
+            "total_seconds": 224.958249125
+          },
+          "prefix_metrics": {
+            "prefixSynchronizeSeconds": 0,
+            "prefixClearCacheSeconds": 0,
+            "prefixChunkCount": 0,
+            "prefixReclaimCount": 0,
+            "prefixPrefillSeconds": 0
+          }
+        }
+      ],
+      "total_generated_tokens": 4096,
+      "decode_tokens_per_second": 21.042025336032143,
+      "os_samples": 113,
+      "rss_peak_bytes": 1163411456,
+      "gpu_utilization_min_max": [
+        6,
+        100
+      ],
+      "thermal_samples": {
+        "fair": 113
+      },
+      "text_review": {
+        "reviewer": "agent qualitative review; no model judge",
+        "note": "GroupingのThinking中に4096上限、最終JSONなし。Grouping精度は判定不能"
+      }
+    }
+  ],
+  "monitor_samples": 571,
+  "monitor_valid": 571,
+  "completion": {
+    "state": "complete",
+    "reason": null,
+    "registered_cells": 8,
+    "finished_cells": 8,
+    "calls": 18,
+    "elapsed_seconds": 1142.9177757920697,
+    "monitor_samples": 571,
+    "monitor_fatal": [],
+    "sampler_mean_seconds": 0.18973265026554126,
+    "sampler_max_seconds": 1.6285704583860934
+  },
+  "resources": {
+    "system_CPU_busy_average": 14.774551360578508,
+    "system_GPU_percent_min_max": [
+      0,
+      100
+    ],
+    "thermal_samples": {
+      "nominal": 91,
+      "fair": 480
+    },
+    "swap_MiB_start_end_max": [
+      2599.12,
+      2694.94,
+      2942.94
+    ],
+    "system_free_percent_min_max": [
+      30,
+      70
+    ],
+    "helper_RSS_peak_GiB": 3.4121551513671875,
+    "MLX_peak_GiB": 4.795590277761221,
+    "max_simultaneous_helpers": 1
+  },
+  "input_checks": [
+    {
+      "case": "gemma-on-json_schema",
+      "phase": "bounded-grouping",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 14
+    },
+    {
+      "case": "gemma-on-json_schema",
+      "phase": "bounded-category",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 0
+    },
+    {
+      "case": "gemma-on-json_schema",
+      "phase": "bounded-text",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 0
+    },
+    {
+      "case": "gemma-on-none",
+      "phase": "bounded-grouping",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 14
+    },
+    {
+      "case": "gemma-on-none",
+      "phase": "bounded-category",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 0
+    },
+    {
+      "case": "gemma-on-none",
+      "phase": "bounded-text",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 0
+    },
+    {
+      "case": "gemma-off-none",
+      "phase": "bounded-grouping",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 14
+    },
+    {
+      "case": "gemma-off-none",
+      "phase": "bounded-category",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 0
+    },
+    {
+      "case": "gemma-off-none",
+      "phase": "bounded-text",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 0
+    },
+    {
+      "case": "gemma-off-json_schema",
+      "phase": "bounded-grouping",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 14
+    },
+    {
+      "case": "gemma-off-json_schema",
+      "phase": "bounded-category",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 0
+    },
+    {
+      "case": "gemma-off-json_schema",
+      "phase": "bounded-text",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 0
+    },
+    {
+      "case": "ministral-instruct-json_schema",
+      "phase": "bounded-grouping",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 14
+    },
+    {
+      "case": "ministral-instruct-json_schema",
+      "phase": "bounded-category",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 0
+    },
+    {
+      "case": "ministral-instruct-none",
+      "phase": "bounded-grouping",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 14
+    },
+    {
+      "case": "ministral-instruct-none",
+      "phase": "bounded-category",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 0
+    },
+    {
+      "case": "ministral-reasoning-none",
+      "phase": "bounded-grouping",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 14
+    },
+    {
+      "case": "ministral-reasoning-json_schema",
+      "phase": "bounded-grouping",
+      "input_context_tokens": 32768,
+      "output_limit": 4096,
+      "contexts": 3,
+      "command_contexts": 14
+    }
+  ],
+  "checks": {
+    "source_and_weight_hashes_unchanged": true,
+    "fixture_equal_H182013": true,
+    "git_unchanged": true,
+    "all_requests_32k_4096": true,
+    "history_omissions": 0
+  },
+  "counter_caveat": "Ministral Reasoning raw sampled prefix counter=4097 while emitted generatedTokens=4096; do not use sampled counter as emitted thought token count"
+}

@@ -1,0 +1,255 @@
+{
+  "cases": [
+    {
+      "case": "single",
+      "reference": [
+        "T1"
+      ],
+      "path_candidates": [
+        "T1"
+      ],
+      "content": {
+        "status": "unique_content_correspondence",
+        "turns": [
+          "T1"
+        ]
+      },
+      "path_false_candidates": 0,
+      "strong_false_candidates": 0,
+      "strong_missed_turns": 0
+    },
+    {
+      "case": "separate_files",
+      "reference": [
+        "T1"
+      ],
+      "path_candidates": [
+        "T1"
+      ],
+      "content": {
+        "status": "unique_content_correspondence",
+        "turns": [
+          "T1"
+        ]
+      },
+      "path_false_candidates": 0,
+      "strong_false_candidates": 0,
+      "strong_missed_turns": 0
+    },
+    {
+      "case": "repeat_file_distinct",
+      "reference": [
+        "T1"
+      ],
+      "path_candidates": [
+        "T1",
+        "T2"
+      ],
+      "content": {
+        "status": "unique_content_correspondence",
+        "turns": [
+          "T1"
+        ]
+      },
+      "path_false_candidates": 1,
+      "strong_false_candidates": 0,
+      "strong_missed_turns": 0
+    },
+    {
+      "case": "sequential_composition",
+      "reference": [
+        "T1",
+        "T2"
+      ],
+      "path_candidates": [
+        "T1",
+        "T2"
+      ],
+      "content": {
+        "status": "unmatched",
+        "turns": []
+      },
+      "path_false_candidates": 0,
+      "strong_false_candidates": 0,
+      "strong_missed_turns": 2
+    },
+    {
+      "case": "cancelled",
+      "reference": [],
+      "path_candidates": [
+        "T1",
+        "T2"
+      ],
+      "content": {
+        "status": "unmatched",
+        "turns": []
+      },
+      "path_false_candidates": 2,
+      "strong_false_candidates": 0,
+      "strong_missed_turns": 0
+    },
+    {
+      "case": "overwrite",
+      "reference": [
+        "T1",
+        "T2"
+      ],
+      "path_candidates": [
+        "T1",
+        "T2"
+      ],
+      "content": {
+        "status": "unmatched",
+        "turns": []
+      },
+      "path_false_candidates": 0,
+      "strong_false_candidates": 0,
+      "strong_missed_turns": 2
+    },
+    {
+      "case": "same_line_repeated",
+      "reference": [
+        "T3"
+      ],
+      "path_candidates": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "content": {
+        "status": "ambiguous",
+        "turns": [
+          "T1",
+          "T3"
+        ]
+      },
+      "path_false_candidates": 2,
+      "strong_false_candidates": 0,
+      "strong_missed_turns": 1
+    },
+    {
+      "case": "multiple_sessions_same_change",
+      "reference": [
+        "T1",
+        "T2"
+      ],
+      "path_candidates": [
+        "T1",
+        "T2"
+      ],
+      "content": {
+        "status": "ambiguous",
+        "turns": [
+          "T1",
+          "T2"
+        ]
+      },
+      "path_false_candidates": 0,
+      "strong_false_candidates": 0,
+      "strong_missed_turns": 2
+    },
+    {
+      "case": "other_worktree",
+      "reference": [],
+      "path_candidates": [],
+      "content": {
+        "status": "unmatched",
+        "turns": []
+      },
+      "path_false_candidates": 0,
+      "strong_false_candidates": 0,
+      "strong_missed_turns": 0
+    },
+    {
+      "case": "manual_change",
+      "reference": [],
+      "path_candidates": [
+        "T1"
+      ],
+      "content": {
+        "status": "unmatched",
+        "turns": []
+      },
+      "path_false_candidates": 1,
+      "strong_false_candidates": 0,
+      "strong_missed_turns": 0
+    },
+    {
+      "case": "rename_path_unresolved",
+      "reference": [
+        "T1"
+      ],
+      "path_candidates": [],
+      "content": {
+        "status": "unmatched",
+        "turns": []
+      },
+      "path_false_candidates": 0,
+      "strong_false_candidates": 0,
+      "strong_missed_turns": 1
+    },
+    {
+      "case": "missing_log",
+      "reference": [],
+      "path_candidates": [],
+      "content": {
+        "status": "unmatched",
+        "turns": []
+      },
+      "path_false_candidates": 0,
+      "strong_false_candidates": 0,
+      "strong_missed_turns": 0
+    },
+    {
+      "case": "failed_edit",
+      "reference": [],
+      "path_candidates": [],
+      "content": {
+        "status": "unmatched",
+        "turns": []
+      },
+      "path_false_candidates": 0,
+      "strong_false_candidates": 0,
+      "strong_missed_turns": 0
+    },
+    {
+      "case": "addition",
+      "reference": [
+        "T1"
+      ],
+      "path_candidates": [
+        "T1"
+      ],
+      "content": {
+        "status": "unique_content_correspondence",
+        "turns": [
+          "T1"
+        ]
+      },
+      "path_false_candidates": 0,
+      "strong_false_candidates": 0,
+      "strong_missed_turns": 0
+    },
+    {
+      "case": "deletion",
+      "reference": [
+        "T1"
+      ],
+      "path_candidates": [
+        "T1"
+      ],
+      "content": {
+        "status": "unique_content_correspondence",
+        "turns": [
+          "T1"
+        ]
+      },
+      "path_false_candidates": 0,
+      "strong_false_candidates": 0,
+      "strong_missed_turns": 0
+    }
+  ],
+  "elapsed_ms": 0.17241714522242546,
+  "python_tracemalloc_peak_bytes": 19040,
+  "limits": "synthetic known references; no hunk parser, composition, rename tracking or causal proof; ambiguous candidates are not strong attribution"
+}
