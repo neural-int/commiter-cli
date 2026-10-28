@@ -276,6 +276,7 @@ private struct ModelBenchmarkConfiguration: Decodable {
     let family: String
     let thinking: Bool
     let thinkingBudget: Int?
+    let output_constraint: OutputConstraint?
     let temperature: Float
     let topP: Float
     let topK: Int
@@ -294,7 +295,7 @@ private struct ModelBenchmarkConfiguration: Decodable {
 
 // Research-only adapter: execute the official Python serializer locally, then
 // feed its token IDs directly into the existing Swift/MLX generation runtime.
-private func officialMistralInput(_ request: Request, reasoning: Bool, tokenizer: any MLXLMCommon.Tokenizer) throws -> LMInput? {
+private func officialMistralInput(_ request: Request, messages: [(role: Chat.Message.Role, content: String)], reasoning: Bool, tokenizer: any MLXLMCommon.Tokenizer) throws -> LMInput? {
     let environment = ProcessInfo.processInfo.environment
     guard let python = environment["COMMITER_182_MISTRAL_PYTHON"] else { return nil }
     guard let bridge = environment["COMMITER_182_MISTRAL_BRIDGE"],
@@ -306,7 +307,7 @@ private func officialMistralInput(_ request: Request, reasoning: Bool, tokenizer
     process.standardInput = input
     process.standardOutput = output
     process.standardError = FileHandle.standardError
-    let payload = ["messages": request.messages.map { ["role": $0.role.rawValue, "content": $0.content] }]
+    let payload = ["messages": messages.map { ["role": $0.role.rawValue, "content": $0.content] }]
     try process.run()
     try input.fileHandleForWriting.write(contentsOf: JSONSerialization.data(withJSONObject: payload))
     try input.fileHandleForWriting.close()
@@ -375,7 +376,7 @@ private struct BenchmarkProgressProcessor: LogitProcessor {
         let phase = progress.diagnostic ? progress.phase() : ""
         let mask: [Float]?
         if let native = progress.native { mask = native.maskValues(count: logits.dim(-1)) }
-        else { mask = progress.response.maskValues(count: logits.dim(-1)) }
+        else { mask = progress.response.enforcesGrammar ? progress.response.maskValues(count: logits.dim(-1)) : nil }
         let result = mask.map { logits + MLXArray($0) } ?? logits
         if progress.diagnostic {
             progress.record(phase + "MaskPreparationSeconds", seconds: ProcessInfo.processInfo.systemUptime - begin)
@@ -389,6 +390,7 @@ private struct BenchmarkProgressProcessor: LogitProcessor {
 }
 
 private struct BenchmarkMetrics: Encodable {
+    var outputConstraint: String?
     var comparisonPath: String?
     var comparisonStopReason: String?
     var loadSeconds = 0.0
@@ -436,6 +438,21 @@ struct CommiterMLXHelper {
             FileHandle.standardOutput.write(Data("metal_ok\n".utf8))
             return
         }
+        if CommandLine.arguments.count == 2, CommandLine.arguments[1] == "--benchmark-output-contract" {
+            do {
+                guard let config = try ModelBenchmarkConfiguration.load(), let mode = config.output_constraint else { throw HelperError.malformedRequest }
+                let request = try decodeRequest(try readBoundedRequest())
+                let data = try JSONSerialization.data(withJSONObject: request.schema.foundationValue, options: [.sortedKeys])
+                let schema = String(decoding: data, as: UTF8.self)
+                let messages = try contractMessages(request, schema: schema, enabled: true)
+                let audit: [String: Any] = ["output_constraint": mode.rawValue, "thinking": config.thinking,
+                    "messages": messages.map { ["role": $0.role.rawValue, "content": $0.content] },
+                    "schema": request.schema.foundationValue, "generation_calls": 0]
+                try FileHandle.standardOutput.write(contentsOf: JSONSerialization.data(withJSONObject: audit, options: [.sortedKeys]))
+                try FileHandle.standardOutput.write(contentsOf: Data([10]))
+            } catch { exit(1) }
+            return
+        }
         if CommandLine.arguments.count == 2,
            ["--benchmark-single", "--benchmark-cycle", "--benchmark-token-audit", "--benchmark-cache", "--benchmark-model-defaults"].contains(CommandLine.arguments[1]) {
             await benchmarkMain(mode: CommandLine.arguments[1])
@@ -460,6 +477,21 @@ struct CommiterMLXHelper {
                 exit(1)
             }
         }
+    }
+
+    private static func contractMessages(_ request: Request, schema: String, enabled: Bool) throws -> [(role: Chat.Message.Role, content: String)] {
+        var messages = request.messages.map { (role: $0.role, content: $0.content) }
+        if enabled {
+            var instruction = try StructuredOutputPrompt.instruction(schema: schema)
+            if ProcessInfo.processInfo.environment["COMMITER_182_NEUTRAL_EXAMPLES"] == "1",
+               let cut = instruction.range(of: "Structural example only;") {
+                instruction = String(instruction[..<cut.lowerBound]) + "Choose values independently from the current Git evidence; enum order is not a preference."
+            }
+            if let index = messages.firstIndex(where: { $0.role == .system }) {
+                messages[index].content += "\n\n" + instruction
+            } else { messages.insert((role: .system, content: instruction), at: 0) }
+        }
+        return messages
     }
 
     private static func readBoundedRequest() throws -> Data {
@@ -507,7 +539,7 @@ struct CommiterMLXHelper {
                 throw HelperError.malformedRequest
             }
             do {
-                if research == nil { try BoundedRequestLimits.validate(profile: profile, context: request.contextTokens, output: request.outputTokens) } else { guard request.outputTokens == 0, request.contextTokens > 0, request.contextTokens <= 65536 else { throw HelperError.malformedRequest } }
+                if research == nil { try BoundedRequestLimits.validate(profile: profile, context: request.contextTokens, output: request.outputTokens) } else { guard (request.outputTokens == 0 || request.outputTokens == 4096), request.contextTokens > 0, request.contextTokens <= 65536 else { throw HelperError.malformedRequest } }
             } catch { throw HelperError.malformedRequest }
         }
         let schemaData = try JSONSerialization.data(withJSONObject: request.schema.foundationValue, options: [.sortedKeys])
@@ -635,7 +667,9 @@ struct CommiterMLXHelper {
             (otherDefault ? 0 : (profile == "bounded-grouping" ? 512 : (configuredMode == "T" ? 384 : (configuredMode == "N" ? 0 : (profile == "bounded-category" ? 384 : 0)))))
         )
         let budget = request.outputTokens // Validated by handle before model loading.
-        var wireMessages = request.messages.map { (role: $0.role, content: $0.content) }
+        let outputConstraint = research?.output_constraint ?? .jsonSchema
+        benchmark?.metrics.outputConstraint = research?.output_constraint?.rawValue
+        var wireMessages = try contractMessages(request, schema: schema, enabled: research?.output_constraint != nil)
         if research?.family == "ministral" {
             var merged: [(role: Chat.Message.Role, content: String)] = []
             for message in wireMessages {
@@ -643,7 +677,7 @@ struct CommiterMLXHelper {
                     merged[merged.count - 1].content += "\n\n" + message.content
                 } else { merged.append(message) }
             }
-            if ministralThinking, merged.first?.role == .system {
+            if ministralThinking, ProcessInfo.processInfo.environment["COMMITER_182_MISTRAL_PYTHON"] == nil, merged.first?.role == .system {
                 merged[0].content += "\nThink using [THINK]your thoughts[/THINK], then provide the requested JSON response."
             }
             wireMessages = merged
@@ -654,7 +688,7 @@ struct CommiterMLXHelper {
         // Gemma preserves the established bounded-profile behavior.
         let templateContext: [String: any Sendable]? = research != nil ? ["enable_thinking": research!.thinking] : (otherDefault ? nil : ["enable_thinking": nativeLimit > 0])
         let officialInput = research?.family == "ministral"
-            ? try officialMistralInput(request, reasoning: ministralThinking, tokenizer: context.tokenizer) : nil
+            ? try officialMistralInput(request, messages: wireMessages, reasoning: ministralThinking, tokenizer: context.tokenizer) : nil
         var input: LMInput
         if let officialInput { input = officialInput }
         else { input = try await context.processor.prepare(input: UserInput(chat: chat, additionalContext: templateContext)) }
@@ -672,7 +706,7 @@ struct CommiterMLXHelper {
         // Research-only path comparison; ordinary generation is unchanged.
         let pathMode = ProcessInfo.processInfo.environment["COMMITER_182_PATH"] ?? "full"
         guard ["full", "bounded-cap", "standard-cap"].contains(pathMode),
-              pathMode == "full" || (benchmark != nil && research != nil && pipeline == "eager") else {
+              pathMode == "full" || (benchmark != nil && research != nil && pipeline == "eager" && research?.output_constraint == nil) else {
             throw HelperError.malformedRequest
         }
         let cappedComparison = pathMode != "full"
@@ -699,7 +733,9 @@ struct CommiterMLXHelper {
             benchmark?.metrics.grammarPreparationSeconds = ProcessInfo.processInfo.systemUptime - preparationStart
             let tokenizer = preparation.tokenizer
             let factory: @Sendable () throws -> GrammarConstraint = { try GrammarConstraint(tokenizer: tokenizer, jsonSchema: schema, fastForward: false) }
-            let response = GrammarSamplingState(constraint: try factory(), vocabSize: tokenizer.vocabSize,
+            let response = outputConstraint == .none
+                ? GrammarSamplingState(unconstrainedVocabSize: tokenizer.vocabSize, eos: preparation.eosTokenID, runtimeStopIDs: preparation.runtimeStopIDs)
+                : GrammarSamplingState(constraint: try factory(), vocabSize: tokenizer.vocabSize,
                 eos: preparation.eosTokenID, whitespace: preparation.whitespaceTokenIDs,
                 runtimeStopIDs: preparation.runtimeStopIDs, unknownID: preparation.unknownTokenID,
                 alignRuntimeStops: true, factory: factory)
@@ -736,9 +772,9 @@ struct CommiterMLXHelper {
                 }
             }
         }
-        var parameters = GenerateParameters(maxTokens: cappedComparison ? 1024 : (research != nil ? nil : budget), temperature: research?.temperature ?? 0, topP: research?.topP ?? 1, topK: research?.topK ?? 0, seed: 144)
+        var parameters = GenerateParameters(maxTokens: cappedComparison ? 1024 : (research != nil && budget == 0 ? nil : budget), temperature: research?.temperature ?? 0, topP: research?.topP ?? 1, topK: research?.topK ?? 0, seed: 144)
         var kvBits: Int? = nil
-        if benchmark != nil, CommandLine.arguments.contains("--benchmark-cache"),
+        if benchmark != nil, (CommandLine.arguments.contains("--benchmark-cache") || research?.output_constraint != nil),
            let value = ProcessInfo.processInfo.environment["COMMITER_180_KV_BITS"] {
             if value == "native", research != nil {
                 kvBits = nil

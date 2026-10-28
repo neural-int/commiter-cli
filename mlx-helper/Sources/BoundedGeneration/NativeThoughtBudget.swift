@@ -62,7 +62,7 @@ public final class NativeThoughtBudgetState: @unchecked Sendable {
     public func maskValues(count: Int) -> [Float]? {
         lock.lock(); defer { lock.unlock() }
         if failed { return only(eos, count: count) }
-        if inResponse { return response.maskValues(count: count) }
+        if inResponse { return response.enforcesGrammar ? response.maskValues(count: count) : nil }
         if forceOpen && prefixTokens == 0 { return only(open, count: count) }
         if let limit, prefixTokens >= limit {
             guard seenOpen else { fail("native_budget_before_open"); return only(eos, count: count) }

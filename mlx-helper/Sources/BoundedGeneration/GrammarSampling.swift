@@ -7,6 +7,7 @@ import MLXGuidedGeneration
 // the asynchronous generation stream has drained.
 public final class GrammarSamplingState: @unchecked Sendable {
     private let lock = NSLock()
+    public let enforcesGrammar: Bool
     private let constraint: GrammarConstraint?
     private let factory: @Sendable () throws -> GrammarConstraint
     private var committedTokens: [Int] = []
@@ -20,12 +21,16 @@ public final class GrammarSamplingState: @unchecked Sendable {
     private let unknownID: Int?
     private let alignRuntimeStops: Bool
     private var stopCounts = [Int](repeating: 0, count: 6)
-    public init(constraint: GrammarConstraint?, vocabSize: Int, eos: Int, whitespace: Set<Int> = [], runtimeStopIDs: Set<Int> = [], unknownID: Int? = nil, alignRuntimeStops: Bool = false, factory: @escaping @Sendable () throws -> GrammarConstraint) {
+    public init(constraint: GrammarConstraint?, vocabSize: Int, eos: Int, whitespace: Set<Int> = [], runtimeStopIDs: Set<Int> = [], unknownID: Int? = nil, alignRuntimeStops: Bool = false, enforcesGrammar: Bool = true, factory: @escaping @Sendable () throws -> GrammarConstraint) {
+        self.enforcesGrammar = enforcesGrammar
         self.factory = factory
         self.runtimeStopIDs = runtimeStopIDs; self.unknownID = unknownID; self.alignRuntimeStops = alignRuntimeStops
         self.constraint = constraint; self.vocabSize = vocabSize
-        self.eos = eos; self.whitespace = whitespace; self.failed = constraint == nil
-        self.firstFailure = constraint == nil ? "constraint_unavailable" : nil
+        self.eos = eos; self.whitespace = whitespace; self.failed = enforcesGrammar && constraint == nil
+        self.firstFailure = enforcesGrammar && constraint == nil ? "constraint_unavailable" : nil
+    }
+    public convenience init(unconstrainedVocabSize: Int, eos: Int, runtimeStopIDs: Set<Int>) {
+        self.init(constraint: nil, vocabSize: unconstrainedVocabSize, eos: eos, runtimeStopIDs: runtimeStopIDs, enforcesGrammar: false, factory: { throw StateError.failed })
     }
     public var succeeded: Bool {
         lock.lock(); defer { lock.unlock() }
@@ -42,6 +47,7 @@ public final class GrammarSamplingState: @unchecked Sendable {
     }
     public func maskValues(count: Int) -> [Float] {
         lock.lock(); defer { lock.unlock() }
+        if !enforcesGrammar && !failed && !acceptedStop { return [Float](repeating: 0, count: count) }
         var values = [Float](repeating: -.infinity, count: count)
         if acceptedStop && !failed {
             // TokenIterator evaluates one token ahead before yielding EOS.
@@ -91,10 +97,17 @@ public final class GrammarSamplingState: @unchecked Sendable {
             if !acceptedStop { stopCounts[stopIndex + 3] += 1 }
         }
         if acceptedStop && !failed {
-            if token != eos { fail("unexpected_prefetch_token") }
+            // A constrained matcher pins terminal lookahead to EOS. With no
+            // grammar the runtime may have sampled any token before seeing stop.
+            if enforcesGrammar && token != eos { fail("unexpected_prefetch_token") }
             return
         }
         guard !failed else { return }
+        if !enforcesGrammar {
+            guard token >= 0, token < vocabSize else { fail("token_bounds"); return }
+            acceptedStop = token == eos || runtimeStopIDs.contains(token)
+            return
+        }
         guard let constraint else { fail("constraint_unavailable"); return }
         guard token >= 0, token < vocabSize else { fail("token_bounds"); return }
         do {
@@ -107,11 +120,12 @@ public final class GrammarSamplingState: @unchecked Sendable {
     public func independentCopy() -> GrammarSamplingState {
         lock.lock(); defer { lock.unlock() }
         let clone = failed ? nil : try? factory()
-        let result = GrammarSamplingState(constraint: clone, vocabSize: vocabSize, eos: eos, whitespace: whitespace, runtimeStopIDs: runtimeStopIDs, unknownID: unknownID, alignRuntimeStops: alignRuntimeStops, factory: factory)
+        let result = GrammarSamplingState(constraint: clone, vocabSize: vocabSize, eos: eos, whitespace: whitespace, runtimeStopIDs: runtimeStopIDs, unknownID: unknownID, alignRuntimeStops: alignRuntimeStops, enforcesGrammar: enforcesGrammar, factory: factory)
         // xgrammar v0.1.30 has no Fork(). Replay transient token IDs into a
         // separate matcher, never share mutable state between copies.
         for token in committedTokens { result.commit(token) }
-        if failed { result.firstFailure = firstFailure }
+        if failed { result.failed = true; result.firstFailure = firstFailure }
+        if !enforcesGrammar { result.acceptedStop = acceptedStop }
         result.stopCounts = stopCounts
         return result
     }
@@ -122,7 +136,8 @@ public struct GrammarSamplingProcessor: LogitProcessor {
     public init(state: GrammarSamplingState) { self.state = state }
     public mutating func prompt(_ prompt: MLXArray) {}
     public func process(logits: MLXArray) -> MLXArray {
-        logits + MLXArray(state.maskValues(count: logits.dim(-1)))
+        if !state.enforcesGrammar { return logits }
+        return logits + MLXArray(state.maskValues(count: logits.dim(-1)))
     }
     public mutating func didSample(token: MLXArray) { state.commit(token.item(Int.self)) }
     public func copy() -> Self { Self(state: state.independentCopy()) }
