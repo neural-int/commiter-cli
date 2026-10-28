@@ -28,6 +28,19 @@ actual Swift build configuration), then prepare an isolated fixture and test
 binary. `build.py` changes only the four-file limit to16 in a Go build overlay;
 it does not modify production source or extend the 120-second cycle timeout.
 
+For the current history-backed study, pass `--unlimited-files` to remove the
+planner count guard and both live ETL test count guards in the build overlay.
+The default build retains the historical 16-file study limit. Neither mode
+changes context/IPC capacity, output validation, or the cycle timeout.
+
+```sh
+python3 tools/benchmark182/build.py /absolute/private/unlimited-build --unlimited-files
+```
+
+The unlimited build verifies that 5 and 17 selected files reach a mock client
+and that oversized input remains rejected. This validation never runs a model.
+
+
 ```sh
 python3 tools/benchmark182/fixture.py /absolute/private/fixture
 python3 tools/benchmark182/build.py /absolute/private/build

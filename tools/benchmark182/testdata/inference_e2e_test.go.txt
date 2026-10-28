@@ -1,0 +1,92 @@
+package cli
+
+import (
+ "bytes"
+ "context"
+ "encoding/json"
+ "errors"
+ "fmt"
+ "os"
+ "os/exec"
+ "path/filepath"
+ "strings"
+ "testing"
+ "time"
+
+ "github.com/natsuki0413/commiter-cli/internal/config"
+ "github.com/natsuki0413/commiter-cli/internal/contextinput"
+ "github.com/natsuki0413/commiter-cli/internal/gitstate"
+ "github.com/natsuki0413/commiter-cli/internal/historyattribution"
+ "github.com/natsuki0413/commiter-cli/internal/llm"
+ "github.com/natsuki0413/commiter-cli/internal/mlx"
+ "github.com/natsuki0413/commiter-cli/internal/planning"
+)
+
+type frozenStudy struct {
+ Root string
+ Snapshot gitstate.Snapshot
+ Prepared contextinput.Prepared
+ Prompt []byte
+ History *planning.GroupingHistory
+ Timings map[string]float64
+}
+func studySave(path string, v any) { b,e:=json.MarshalIndent(v,"","  ");if e!=nil {panic(e)};if e=os.WriteFile(path,b,0600);e!=nil {panic(e)} }
+func TestIssue183Freeze(t *testing.T) {
+ if os.Getenv("COMMITER_STUDY_ACTION")!="freeze" {t.Skip("explicit study only")}
+ root:=os.Getenv("COMMITER_STUDY_ROOT");out:=os.Getenv("COMMITER_STUDY_OUT")
+ ctx:=context.Background();clock:=time.Now();times:=map[string]float64{}
+ mark:=func(name string,start time.Time){times[name]=time.Since(start).Seconds()}
+ start:=time.Now();snapshot,e:=gitstate.Collect(root,gitstate.Options{});if e!=nil {t.Fatal(e)};mark("git_collect",start)
+ if len(snapshot.Changes)!=5 {t.Fatalf("expected 5 changes, got %d",len(snapshot.Changes))}
+ start=time.Now();results,sensitive,_,relations,e:=analyzeForPlanningWithStatsAndRelationsContext(ctx,root,snapshot);if e!=nil {t.Fatal(e)};mark("syntax_and_content_read",start)
+ start=time.Now();document,e:=contextinput.Build(snapshot,results);if e!=nil {t.Fatal(e)};mark("document_build",start)
+ start=time.Now();attachRelationContext(&document,snapshot.Changes,relations);mark("relation_extract",start)
+ start=time.Now();if e=attachGroupingSyntaxContext(ctx,root,&document,relations);e!=nil {t.Fatal(e)};mark("grouping_syntax",start)
+ start=time.Now();document,e=contextinput.RawDiffProjection(document);if e!=nil {t.Fatal(e)};mark("raw_diff_projection",start)
+ start=time.Now();prepared,e:=contextinput.Prepare(ctx,document,contextinput.BudgetConfig{Context:"64k",MaxContextTokens:contextinput.Context64K,RequireUncompressed:true},planning.Renderer(planning.Japanese),nil);if e!=nil {t.Fatal(e)};prepared.Budget.ContextTokens=contextinput.Context64K;mark("prepare",start)
+ cycle:=&codexCycle{started:clock};ctx=context.WithValue(ctx,codexCycleKey{},cycle)
+ profile:=&historyattribution.HistoryTiming{};ctx=historyattribution.StudyTimingContext(ctx,profile)
+ start=time.Now();history,e:=attributedHistoryForPlan(ctx,root,snapshot,config.Defaults().Values,prepared.Document,sensitive);if e!=nil {t.Fatal(e)};mark("history_acquire_match_and_snapshot_checks",start)
+ studySave(filepath.Join(out,"history-timing.json"),cycle.attribution.StudyPerformance)
+ studySave(filepath.Join(out,"history-result.json"),cycle.attribution)
+ if history==nil || history.Acquisition.Status=="unavailable" || len(history.Contexts)==0 {t.Fatal("nonempty available or partial history required before inference")}
+ fixture:=frozenStudy{root,snapshot,prepared,prepared.Prompt,history,times}
+ start=time.Now();studySave(filepath.Join(out,"fixture.json"),fixture);mark("fixture_write",start)
+ times["total"]=time.Since(clock).Seconds();studySave(filepath.Join(out,"freeze-timing.json"),times)
+ t.Logf("frozen files=%d contexts=%d operations=%d RPC=%d",len(snapshot.Changes),len(history.Contexts),cycle.attribution.Operations,cycle.attribution.Requests)
+}
+
+type studyClient struct { out,helper,model,path string;maxContext int; calls int; started,lastEnd time.Time; timings []map[string]any }
+func (c *studyClient) Chat(context.Context,[]llm.Message,json.RawMessage)(llm.Response,error){return llm.Response{},errors.New("explicit options required")}
+func (c *studyClient) ChatWithOptions(ctx context.Context,m []llm.Message,s json.RawMessage,o llm.Options)(llm.Response,error){
+ start:=time.Now();c.calls++;prefix:=filepath.Join(c.out,fmt.Sprintf("%02d",c.calls));window:=min(o.ContextTokens,c.maxContext)
+ request:=mlx.Request{Messages:m,Schema:s,ContextTokens:window,OutputTokens:0,Model:c.model,ModelPath:c.path,GenerationProfile:o.GenerationProfile}
+ encodeStart:=time.Now();raw,e:=json.Marshal(request);encodeSeconds:=time.Since(encodeStart).Seconds();if e!=nil{return llm.Response{},e}
+ writeStart:=time.Now();if e=os.WriteFile(prefix+"-request.json",raw,0600);e!=nil{return llm.Response{},e};writeSeconds:=time.Since(writeStart).Seconds()
+ command:=exec.CommandContext(ctx,c.helper,"--benchmark-single");command.Stdin=bytes.NewReader(append(raw,'\n'))
+ stderr,e:=os.OpenFile(prefix+"-progress.jsonl",os.O_CREATE|os.O_EXCL|os.O_WRONLY,0600);if e!=nil{return llm.Response{},e};defer stderr.Close();command.Stderr=stderr
+ runStart:=time.Now();reply,runError:=command.Output();wall:=time.Since(runStart).Seconds();usage:=command.ProcessState
+ os.WriteFile(prefix+"-response.json",reply,0600)
+ row:=map[string]any{"phase":o.GenerationProfile,"request_encode_seconds":encodeSeconds,"request_write_seconds":writeSeconds,"helper_wall_seconds":wall,"host_since_previous_phase_seconds":start.Sub(c.lastEnd).Seconds(),"started_utc":start.UTC().Format(time.RFC3339Nano),"ended_utc":time.Now().UTC().Format(time.RFC3339Nano)}
+ if usage!=nil {row["helper_user_cpu_seconds"]=usage.UserTime().Seconds();row["helper_system_cpu_seconds"]=usage.SystemTime().Seconds()}
+ decodeStart:=time.Now();var response mlx.Response;parseError:=json.Unmarshal(reply,&response);row["response_decode_seconds"]=time.Since(decodeStart).Seconds();row["response_bytes"]=len(reply)
+ c.lastEnd=time.Now();c.timings=append(c.timings,row);studySave(filepath.Join(c.out,"phase-times.json"),c.timings)
+ if runError!=nil || parseError!=nil || !response.OK {return llm.Response{},errors.New("helper failed; inspect private response and progress")}
+ return llm.Response{Backend:"mlx",Model:response.Model,Content:response.GeneratedJSON,StopReason:string(response.StopReason)},nil
+}
+func TestIssue183Inference(t *testing.T){
+ if os.Getenv("COMMITER_STUDY_ACTION")!="infer" {t.Skip("explicit study only")}
+ clock:=time.Now();out:=os.Getenv("COMMITER_STUDY_OUT");b,e:=os.ReadFile(os.Getenv("COMMITER_STUDY_FIXTURE"));if e!=nil{t.Fatal(e)};var fixture frozenStudy;if e=json.Unmarshal(b,&fixture);e!=nil{t.Fatal(e)};fixture.Prepared.Prompt=fixture.Prompt
+ var conf struct{Model string};b,e=os.ReadFile(os.Getenv("COMMITER_182_CASE_CONFIG"));if e!=nil{t.Fatal(e)};if e=json.Unmarshal(b,&conf);e!=nil{t.Fatal(e)}
+ modelPath:=os.Getenv("COMMITER_STUDY_MODEL_PATH");var asset struct{MaxContext int `json:"max_context"`};b,e=os.ReadFile(filepath.Join(modelPath,"asset-manifest.json"));if e!=nil{t.Fatal(e)};json.Unmarshal(b,&asset)
+ timings:=map[string]float64{};start:=time.Now();if e=verifyAttributionSnapshot(context.Background(),fixture.Root,fixture.Snapshot,config.Defaults().Values);e!=nil{t.Fatal(e)};timings["snapshot_before_seconds"]=time.Since(start).Seconds()
+ sensitiveRaw,_:=json.Marshal(fixture.Prepared.Document);sensitive:=planning.ExtractSensitiveValues(sensitiveRaw)
+ client:=&studyClient{out:out,helper:os.Getenv("COMMITER_STUDY_HELPER"),model:conf.Model,path:modelPath,maxContext:asset.MaxContext,started:time.Now()};client.lastEnd=client.started
+ start=time.Now();result,generationError:=(planning.ThreePhaseGenerator{Client:client,GroupingHistory:fixture.History}).Generate(context.Background(),fixture.Prepared,planning.Japanese,sensitive);timings["generator_seconds"]=time.Since(start).Seconds();timings["host_after_last_phase_seconds"]=time.Since(client.lastEnd).Seconds()
+ start=time.Now();snapshotError:=verifyAttributionSnapshot(context.Background(),fixture.Root,fixture.Snapshot,config.Defaults().Values);timings["snapshot_after_seconds"]=time.Since(start).Seconds();timings["total_seconds"]=time.Since(clock).Seconds()
+ paths:=map[string]string{};for _,f:=range fixture.Prepared.Document.Files {if f.NewPath!=nil {paths[f.ID]=*f.NewPath} else if f.OldPath!=nil {paths[f.ID]=*f.OldPath}}
+ errText:="";if generationError!=nil {errText=generationError.Error()};studySave(filepath.Join(out,"result.json"),map[string]any{"result":result,"paths":paths,"error":errText,"calls":client.calls,"timings":timings,"git_unchanged":snapshotError==nil})
+ if snapshotError!=nil{t.Fatal(snapshotError)}
+ t.Logf("finished calls=%d accepted=%v",client.calls,generationError==nil)
+ if strings.Contains(errText,"snapshot_changed"){t.Fatal(errText)}
+}
