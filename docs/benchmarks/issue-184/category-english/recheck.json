@@ -1,0 +1,153 @@
+{
+  "experiment": "H184-001",
+  "audit": "input-output-runtime-recheck",
+  "new_generation_calls": 0,
+  "frozen_hashes_verified": 53,
+  "fixture_verification": {
+    "status": "passed",
+    "fixture_id": "H184-KIMDEL-FIXED-001",
+    "checksum_files": 33,
+    "files": 5,
+    "phases": 3,
+    "contexts": 3,
+    "user_requests": 3,
+    "final_responses": 3,
+    "commands": 14,
+    "patch_forward_and_reverse_check": "passed",
+    "reconstructed_git_diff_byte_identical": true,
+    "live_source_checked": false,
+    "system_sha256": {
+      "grouping": "8301f17636e31f056796e8a9b1f23b4c704a9283a9672b3d60644b707e5f2149",
+      "category": "4b52fdf2074f54114e4497ae7377c85ffba1fb4cfeb3d0cdd8f30912ed916a55",
+      "text": "8bd943cf1c2f60093944207cc2f8b6ee6ff9f57ee21bb835636862a58ab84393"
+    },
+    "model_inference_calls": 0
+  },
+  "category_input_checks": {
+    "changed_fields": [
+      "/agent_history_contexts/0/final_responses/0",
+      "/agent_history_contexts/0/user_requests/0",
+      "/agent_history_contexts/1/final_responses/0",
+      "/agent_history_contexts/1/user_requests/0",
+      "/agent_history_contexts/2/final_responses/0",
+      "/agent_history_contexts/2/user_requests/0"
+    ],
+    "all_other_request_values_equal": true,
+    "non_target_user_bytes_equal_after_reverse_substitution": true,
+    "shared_actual_grouping_response_identical": true
+  },
+  "history_condition": {
+    "acquisition": {
+      "status": "partial",
+      "reasons": [
+        "history_incomplete"
+      ]
+    },
+    "blocks": 9,
+    "match_status": {
+      "ambiguous": 9
+    },
+    "match_reasons": {
+      "history_incomplete": 9
+    },
+    "candidate_links": 4,
+    "omission_reasons_present": 0
+  },
+  "phases": [
+    {
+      "arm": "ja",
+      "phase": "category",
+      "schema_valid": true,
+      "contract_probe_matches_saved_wire": true,
+      "input_tokens": 4946,
+      "output_tokens": 71,
+      "thinking_tokens_in_all_progress_samples": 0,
+      "stop_reason": "completed",
+      "budget_not_reached": true
+    },
+    {
+      "arm": "ja",
+      "phase": "text",
+      "schema_valid": true,
+      "contract_probe_matches_saved_wire": true,
+      "input_tokens": 4830,
+      "output_tokens": 68,
+      "thinking_tokens_in_all_progress_samples": 0,
+      "stop_reason": "completed",
+      "budget_not_reached": true
+    },
+    {
+      "arm": "en",
+      "phase": "category",
+      "schema_valid": true,
+      "contract_probe_matches_saved_wire": true,
+      "input_tokens": 4847,
+      "output_tokens": 71,
+      "thinking_tokens_in_all_progress_samples": 0,
+      "stop_reason": "completed",
+      "budget_not_reached": true
+    },
+    {
+      "arm": "en",
+      "phase": "text",
+      "schema_valid": true,
+      "contract_probe_matches_saved_wire": true,
+      "input_tokens": 4830,
+      "output_tokens": 81,
+      "thinking_tokens_in_all_progress_samples": 0,
+      "stop_reason": "completed",
+      "budget_not_reached": true
+    }
+  ],
+  "category_scores": {
+    "ja": {
+      "correct": 2,
+      "total": 3
+    },
+    "en": {
+      "correct": 1,
+      "total": 3
+    }
+  },
+  "text_invalid_scopes": {
+    "ja": {
+      "G001": "docs"
+    },
+    "en": {
+      "G001": "docs",
+      "G002": "fix",
+      "G003": "feat"
+    }
+  },
+  "text_input_difference": "/groups/1/type: feat -> fix; original Japanese history retained",
+  "monitor_recheck": {
+    "ja": {
+      "valid_samples": 35,
+      "maximum_helpers": 1,
+      "thermal": "nominal",
+      "low_power_mode": false,
+      "power_source": "Battery Power",
+      "swap_used_M_range": [
+        436.06,
+        635.88
+      ]
+    },
+    "en": {
+      "valid_samples": 21,
+      "maximum_helpers": 1,
+      "thermal": "nominal",
+      "low_power_mode": false,
+      "power_source": "Battery Power",
+      "swap_used_M_range": [
+        810.69,
+        810.69
+      ]
+    }
+  },
+  "release_build_evidence": {
+    "helper_binary_hash_matches_frozen_plan": true,
+    "build_request_configuration": "Release",
+    "binary_path_configuration": "Products/Release"
+  },
+  "verdict": "valid paired Category comparison with incomplete source history; no translation gain on this one fixture"
+}

@@ -1,0 +1,154 @@
+{
+  "id": "H184-003",
+  "case": "C184-02",
+  "input_audit": {
+    "changed_fields": [
+      "/agent_history_contexts/0/user_requests",
+      "/agent_history_contexts/1/user_requests",
+      "/agent_history_contexts/2/user_requests"
+    ],
+    "representation": "required user_requests arrays retained as []; deliberate ablation, no budget omission flags",
+    "removed_characters": 1933,
+    "non_target_bytes_reverse_identical": true,
+    "shared_fixed_grouping": true
+  },
+  "results": [
+    {
+      "arm": "with-request",
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "docs"
+        },
+        "G002": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        },
+        "G003": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        }
+      },
+      "correct": 2,
+      "total": 3,
+      "wall_seconds": 20.996907082997495,
+      "metrics": {
+        "runtimePromptSeconds": 16.064692974090576,
+        "grammarPreparationReused": false,
+        "cacheReusedTokens": 0,
+        "diagnosticFirstReadSeconds": 0.05478587499237619,
+        "prefixReclaimCount": 0,
+        "prefixPrefillSeconds": 0,
+        "loadSeconds": 1.4258730000001378,
+        "prefixSynchronizeSeconds": 0,
+        "prefixKVLayers": [],
+        "outputConstraint": "json_schema",
+        "prepareSeconds": 0.0642985416634474,
+        "runtimeGenerationSeconds": 2.6200629472732544,
+        "cacheMemoryBytes": 236243234,
+        "grammarPreparationSeconds": 0.7441634166461881,
+        "generatedTokens": 71,
+        "phaseEndKVLayers": [],
+        "diagnosticEventCounts": {
+          "responseReadSeconds": 72,
+          "responseMaskPreparationSeconds": 73,
+          "responseUpdateAndProgressSeconds": 73
+        },
+        "diagnosticCPUSeconds": {
+          "responseReadSeconds": 2.4939512917480897,
+          "responseMaskPreparationSeconds": 0.031522208417300135,
+          "responseUpdateAndProgressSeconds": 0.0011065832513850182
+        },
+        "prefixChunkCount": 0,
+        "activeMemoryBytes": 2585701986,
+        "prefixClearCacheSeconds": 0,
+        "modelReused": false,
+        "inputTokens": 4996,
+        "grammarSetupSeconds": 0.751643833325943,
+        "peakMemoryBytes": 3385030150,
+        "prefixMemorySamples": [],
+        "generationWallSeconds": 18.68765391665511,
+        "benchmarkCacheMode": "native"
+      }
+    },
+    {
+      "arm": "final-only",
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "docs"
+        },
+        "G002": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        },
+        "G003": {
+          "breaking_evidence_ref": "none",
+          "type": "fix"
+        }
+      },
+      "correct": 3,
+      "total": 3,
+      "wall_seconds": 17.335370540997246,
+      "metrics": {
+        "prepareSeconds": 0.04812958333059214,
+        "grammarPreparationSeconds": 0.669210166670382,
+        "inputTokens": 4052,
+        "prefixChunkCount": 0,
+        "loadSeconds": 1.1319455416523851,
+        "runtimeGenerationSeconds": 2.6034070253372192,
+        "prefixMemorySamples": [],
+        "generationWallSeconds": 15.430211375001818,
+        "generatedTokens": 71,
+        "runtimePromptSeconds": 12.823965907096863,
+        "benchmarkCacheMode": "native",
+        "diagnosticCPUSeconds": {
+          "responseMaskPreparationSeconds": 0.03493166671250947,
+          "responseUpdateAndProgressSeconds": 0.0009840415441431105,
+          "responseReadSeconds": 2.4740967084362637
+        },
+        "cacheReusedTokens": 0,
+        "diagnosticEventCounts": {
+          "responseMaskPreparationSeconds": 73,
+          "responseUpdateAndProgressSeconds": 73,
+          "responseReadSeconds": 72
+        },
+        "cacheMemoryBytes": 200215080,
+        "grammarSetupSeconds": 0.675182125007268,
+        "prefixPrefillSeconds": 0,
+        "peakMemoryBytes": 3380210944,
+        "diagnosticFirstReadSeconds": 0.05021170832333155,
+        "activeMemoryBytes": 2560847282,
+        "phaseEndKVLayers": [],
+        "grammarPreparationReused": false,
+        "outputConstraint": "json_schema",
+        "prefixClearCacheSeconds": 0,
+        "modelReused": false,
+        "prefixSynchronizeSeconds": 0,
+        "prefixKVLayers": [],
+        "prefixReclaimCount": 0
+      }
+    }
+  ],
+  "resources": {
+    "with-request": {
+      "samples": 11,
+      "max_helpers": 1,
+      "peak_rss_gib": 0.7920684814453125,
+      "thermal": {
+        "nominal": 11
+      }
+    },
+    "final-only": {
+      "samples": 9,
+      "max_helpers": 1,
+      "peak_rss_gib": 0.696563720703125,
+      "thermal": {
+        "nominal": 9
+      }
+    }
+  },
+  "new_generation_calls": 2,
+  "text_evaluated": false,
+  "source_hashes_match": true
+}

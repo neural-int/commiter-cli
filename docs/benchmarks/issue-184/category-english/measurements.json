@@ -1,0 +1,266 @@
+{
+  "id": "H184-001",
+  "case": "C184-02",
+  "fixture": "H184-KIMDEL-FIXED-001",
+  "state": "complete",
+  "valid_arms": 2,
+  "valid_actual_generation_calls": 5,
+  "all_actual_generation_calls": 7,
+  "excluded_generation_calls": 2,
+  "grouping_shared_actual_response": true,
+  "translation_method": "assistant-prepared; not human-approved; no translation engine",
+  "translated_fields": [
+    "agent_history_contexts[].user_requests[]",
+    "agent_history_contexts[].final_responses[]"
+  ],
+  "translation_only_in": "category",
+  "static_system_language": "English, unchanged",
+  "prompt_lineage": "Q1-R reconstructed H182-024; lost H182-016 wire identity not established",
+  "conditions": {
+    "model": "mlx-community/Qwen3.5-4B-4bit@0e7ffd5c629ef7719d4cbc04069232580bfa9d9c",
+    "context_tokens": 32768,
+    "output_tokens": 4096,
+    "kv": "native",
+    "sampling": [
+      0.6,
+      0.95,
+      20
+    ],
+    "repetition_penalty": 1.0,
+    "seed": 144,
+    "thinking_budget": null,
+    "timeout": null,
+    "retries": 0,
+    "warmup": 0,
+    "thinking": "OFF",
+    "output_constraint": "json_schema",
+    "prompt_lineage": "H182-024 Q1-R old; reconstructed, not byte-verified against lost H182-016 wire",
+    "source_case": "H182-024/off-json_schema-old",
+    "runtime": "Swift Release; see exact source execution contract"
+  },
+  "gold": {
+    "G001": {
+      "type": "docs",
+      "breaking_evidence_ref": "none"
+    },
+    "G002": {
+      "type": "feat",
+      "breaking_evidence_ref": "none"
+    },
+    "G003": {
+      "type": "fix",
+      "breaking_evidence_ref": "none"
+    }
+  },
+  "quality": {
+    "ja": {
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "docs"
+        },
+        "G002": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        },
+        "G003": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        }
+      },
+      "category_correct": 2,
+      "category_total": 3,
+      "validator_accepted": false,
+      "failure": "invalid_scope",
+      "scope_violations": 1,
+      "japanese_summaries": 3
+    },
+    "en": {
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "docs"
+        },
+        "G002": {
+          "breaking_evidence_ref": "none",
+          "type": "fix"
+        },
+        "G003": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        }
+      },
+      "category_correct": 1,
+      "category_total": 3,
+      "validator_accepted": false,
+      "failure": "invalid_scope",
+      "scope_violations": 3,
+      "japanese_summaries": 3
+    }
+  },
+  "phases": [
+    {
+      "arm": "ja",
+      "phase": "category",
+      "stop_reason": "completed",
+      "ok": true,
+      "metrics": {
+        "inputTokens": 4946,
+        "generatedTokens": 71,
+        "runtimePromptSeconds": 16.033175945281982,
+        "runtimeGenerationSeconds": 2.70231294631958,
+        "loadSeconds": 1.0939510416646954,
+        "prepareSeconds": 0.057669625006383285,
+        "grammarPreparationSeconds": 0.6824146666622255,
+        "grammarSetupSeconds": 0.6848170416778885,
+        "peakMemoryBytes": 3374102002,
+        "activeMemoryBytes": 2590535270,
+        "cacheMemoryBytes": 228266270
+      },
+      "helper_wall_seconds": 20.761991041,
+      "helper_cpu_user_seconds": 2.764842,
+      "helper_cpu_system_seconds": 2.346522,
+      "decode_tps": 26.27378893947075,
+      "mlx_peak_gib": 3.1423773635178804
+    },
+    {
+      "arm": "ja",
+      "phase": "text",
+      "stop_reason": "completed",
+      "ok": true,
+      "metrics": {
+        "inputTokens": 4830,
+        "generatedTokens": 68,
+        "runtimePromptSeconds": 15.951556086540222,
+        "runtimeGenerationSeconds": 2.665439009666443,
+        "loadSeconds": 1.4749015833367594,
+        "prepareSeconds": 0.07010145834647119,
+        "grammarPreparationSeconds": 0.7524503333261237,
+        "grammarSetupSeconds": 1.3524310833308846,
+        "peakMemoryBytes": 3360863784,
+        "activeMemoryBytes": 2580622946,
+        "cacheMemoryBytes": 231328034
+      },
+      "helper_wall_seconds": 21.675361207999998,
+      "helper_cpu_user_seconds": 7.133279,
+      "helper_cpu_system_seconds": 2.59909,
+      "decode_tps": 25.511744877069848,
+      "mlx_peak_gib": 3.1300483122467995
+    },
+    {
+      "arm": "en",
+      "phase": "category",
+      "stop_reason": "completed",
+      "ok": true,
+      "metrics": {
+        "inputTokens": 4847,
+        "generatedTokens": 71,
+        "runtimePromptSeconds": 15.780917048454285,
+        "runtimeGenerationSeconds": 2.6208380460739136,
+        "loadSeconds": 0.8726192916801665,
+        "prepareSeconds": 0.050551499996799976,
+        "grammarPreparationSeconds": 0.6718225833319593,
+        "grammarSetupSeconds": 0.6741866666416172,
+        "peakMemoryBytes": 3365320376,
+        "activeMemoryBytes": 2581245538,
+        "cacheMemoryBytes": 231772450
+      },
+      "helper_wall_seconds": 20.141805542,
+      "helper_cpu_user_seconds": 2.664284,
+      "helper_cpu_system_seconds": 2.00436,
+      "decode_tps": 27.090571317964468,
+      "mlx_peak_gib": 3.13419883698225
+    },
+    {
+      "arm": "en",
+      "phase": "text",
+      "stop_reason": "completed",
+      "ok": true,
+      "metrics": {
+        "inputTokens": 4830,
+        "generatedTokens": 81,
+        "runtimePromptSeconds": 15.784296870231628,
+        "runtimeGenerationSeconds": 3.187233090400696,
+        "loadSeconds": 0.9156262916512787,
+        "prepareSeconds": 0.05665749998297542,
+        "grammarPreparationSeconds": 0.6933251666778233,
+        "grammarSetupSeconds": 1.1452283333346713,
+        "peakMemoryBytes": 3360863784,
+        "activeMemoryBytes": 2580622946,
+        "cacheMemoryBytes": 231327010
+      },
+      "helper_wall_seconds": 21.245390417,
+      "helper_cpu_user_seconds": 6.369975,
+      "helper_cpu_system_seconds": 2.050578,
+      "decode_tps": 25.41389277237228,
+      "mlx_peak_gib": 3.1300483122467995
+    }
+  ],
+  "resources": {
+    "ja": {
+      "scope": "G/C/T",
+      "samples": 35,
+      "all_valid": true,
+      "max_simultaneous_helpers": 1,
+      "rss_peak_gib": 2.311126708984375,
+      "thermal": {
+        "nominal": 35
+      },
+      "gpu_utilization_range": [
+        11,
+        100
+      ]
+    },
+    "en": {
+      "scope": "C/T; G replayed",
+      "samples": 21,
+      "all_valid": true,
+      "max_simultaneous_helpers": 1,
+      "rss_peak_gib": 3.03973388671875,
+      "thermal": {
+        "nominal": 21
+      },
+      "gpu_utilization_range": [
+        15,
+        100
+      ]
+    }
+  },
+  "audit": {
+    "replacement_string_values": 6,
+    "restored_raw_input_byte_identical": true,
+    "outer_JSON_encoding_preserved": true
+  },
+  "translation_audit": {
+    "changed_json_paths": [
+      "/agent_history_contexts/0/user_requests/0",
+      "/agent_history_contexts/0/final_responses/0",
+      "/agent_history_contexts/1/user_requests/0",
+      "/agent_history_contexts/1/final_responses/0",
+      "/agent_history_contexts/2/user_requests/0",
+      "/agent_history_contexts/2/final_responses/0"
+    ],
+    "system_equal": true,
+    "schema_equal": true,
+    "non_target_fields_equal": true
+  },
+  "excluded_initial_en": {
+    "reason": "non-target JSON HTML escapes changed",
+    "category_correct": 2,
+    "input_tokens": 4598,
+    "retained": true
+  },
+  "preparation_failures_before_inference": [
+    "numeric spelling check",
+    "inline code order check was overstrict",
+    "hash-path type error"
+  ],
+  "limits": [
+    "one fixed fixture, one valid generation per arm",
+    "CPU/GPU/background load/OS cache not controlled",
+    "EN Grouping replay excluded from performance totals",
+    "no App Server or live Git in inference",
+    "native KV dtype/bytes not exported",
+    "Apple translator quality and latency not tested"
+  ]
+}

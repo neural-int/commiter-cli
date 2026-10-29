@@ -1,0 +1,331 @@
+{
+  "id": "H184-002",
+  "case": "C184-02",
+  "fixture": "H184-KIMDEL-REPAIRED-002",
+  "actual_generation_calls": 4,
+  "shared_previous_grouping": true,
+  "repair": "five candidate links only; original ambiguous/history_incomplete retained",
+  "conditions": {
+    "model": "mlx-community/Qwen3.5-4B-4bit@0e7ffd5c629ef7719d4cbc04069232580bfa9d9c",
+    "family": "qwen",
+    "thinking": false,
+    "thinkingBudget": null,
+    "temperature": 0.6,
+    "topP": 0.95,
+    "topK": 20,
+    "attentionLayers": 8,
+    "otherLayers": 24,
+    "output_constraint": "json_schema"
+  },
+  "context_tokens": 32768,
+  "output_tokens": 4096,
+  "kv": "native",
+  "seed": 144,
+  "old_category_scores": {
+    "ja": 2,
+    "en": 1
+  },
+  "quality": {
+    "ja": {
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "docs"
+        },
+        "G002": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        },
+        "G003": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        }
+      },
+      "category_correct": 2,
+      "category_total": 3,
+      "validator_accepted": false,
+      "invalid_scopes": {
+        "G001": "docs"
+      },
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_scope)"
+    },
+    "en": {
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "docs"
+        },
+        "G002": {
+          "breaking_evidence_ref": "none",
+          "type": "fix"
+        },
+        "G003": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        }
+      },
+      "category_correct": 1,
+      "category_total": 3,
+      "validator_accepted": false,
+      "invalid_scopes": {
+        "G001": "docs",
+        "G002": "fix",
+        "G003": "feat"
+      },
+      "error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_scope)"
+    }
+  },
+  "phases": [
+    {
+      "arm": "ja",
+      "phase": "category",
+      "metrics": {
+        "runtimePromptSeconds": 21.475146174430847,
+        "cacheMemoryBytes": 236313890,
+        "outputConstraint": "json_schema",
+        "generatedTokens": 71,
+        "benchmarkCacheMode": "native",
+        "prepareSeconds": 0.08298320835456252,
+        "peakMemoryBytes": 3385030150,
+        "inputTokens": 4996,
+        "modelReused": false,
+        "diagnosticEventCounts": {
+          "responseMaskPreparationSeconds": 73,
+          "responseUpdateAndProgressSeconds": 73,
+          "responseReadSeconds": 72
+        },
+        "prefixSynchronizeSeconds": 0,
+        "prefixMemorySamples": [],
+        "phaseEndKVLayers": [],
+        "grammarSetupSeconds": 2.840091958321864,
+        "loadSeconds": 1.9480396250146441,
+        "grammarPreparationReused": false,
+        "cacheReusedTokens": 0,
+        "diagnosticCPUSeconds": {
+          "responseMaskPreparationSeconds": 0.051562208303948864,
+          "responseUpdateAndProgressSeconds": 0.003488166752504185,
+          "responseReadSeconds": 3.255946791614406
+        },
+        "prefixKVLayers": [],
+        "prefixChunkCount": 0,
+        "prefixPrefillSeconds": 0,
+        "grammarPreparationSeconds": 2.803318208345445,
+        "activeMemoryBytes": 2585718370,
+        "diagnosticFirstReadSeconds": 0.12134820834035054,
+        "generationWallSeconds": 25.070983708341373,
+        "runtimeGenerationSeconds": 3.5875109434127808,
+        "prefixClearCacheSeconds": 0,
+        "prefixReclaimCount": 0
+      },
+      "host": {
+        "ended_utc": "2026-10-29T06:05:45.187415Z",
+        "helper_system_cpu_seconds": 4.591049,
+        "helper_user_cpu_seconds": 5.238724,
+        "helper_wall_seconds": 30.306521541,
+        "host_since_previous_phase_seconds": 0.000898667,
+        "phase": "bounded-category",
+        "request_encode_seconds": 3.3167e-05,
+        "request_write_seconds": 7.1333e-05,
+        "response_bytes": 1529,
+        "response_decode_seconds": 0.000172833,
+        "started_utc": "2026-10-29T06:05:14.879731Z"
+      }
+    },
+    {
+      "arm": "ja",
+      "phase": "text",
+      "metrics": {
+        "prefixMemorySamples": [],
+        "activeMemoryBytes": 2588372578,
+        "benchmarkCacheMode": "native",
+        "peakMemoryBytes": 3371136912,
+        "prefixPrefillSeconds": 0,
+        "diagnosticFirstReadSeconds": 0.05592291665379889,
+        "prefixKVLayers": [],
+        "grammarSetupSeconds": 6.047749958321219,
+        "grammarPreparationSeconds": 2.8768759583181236,
+        "loadSeconds": 4.363633458327968,
+        "generatedTokens": 74,
+        "phaseEndKVLayers": [],
+        "inputTokens": 4880,
+        "grammarPreparationReused": false,
+        "prefixChunkCount": 0,
+        "cacheReusedTokens": 0,
+        "modelReused": false,
+        "runtimePromptSeconds": 16.599876046180725,
+        "prefixClearCacheSeconds": 0,
+        "diagnosticEventCounts": {
+          "responseUpdateAndProgressSeconds": 76,
+          "responseReadSeconds": 75,
+          "responseMaskPreparationSeconds": 76
+        },
+        "diagnosticCPUSeconds": {
+          "responseMaskPreparationSeconds": 0.2686011249606963,
+          "responseReadSeconds": 2.709521041630069,
+          "responseUpdateAndProgressSeconds": 0.0011744166549760848
+        },
+        "prefixSynchronizeSeconds": 0,
+        "prefixReclaimCount": 0,
+        "generationWallSeconds": 19.625994291651295,
+        "runtimeGenerationSeconds": 3.024060010910034,
+        "prepareSeconds": 0.2123354166687932,
+        "outputConstraint": "json_schema",
+        "cacheMemoryBytes": 226182434
+      },
+      "host": {
+        "ended_utc": "2026-10-29T06:06:15.784186Z",
+        "helper_system_cpu_seconds": 4.265381,
+        "helper_user_cpu_seconds": 15.928837,
+        "helper_wall_seconds": 30.592134208,
+        "host_since_previous_phase_seconds": 0.002974459,
+        "phase": "bounded-text",
+        "request_encode_seconds": 0.000100666,
+        "request_write_seconds": 0.000539125,
+        "response_bytes": 1653,
+        "response_decode_seconds": 4.5083e-05,
+        "started_utc": "2026-10-29T06:05:45.190588Z"
+      }
+    },
+    {
+      "arm": "en",
+      "phase": "category",
+      "metrics": {
+        "diagnosticCPUSeconds": {
+          "responseMaskPreparationSeconds": 0.028363333171000704,
+          "responseReadSeconds": 2.584740749996854,
+          "responseUpdateAndProgressSeconds": 0.0018323750409763306
+        },
+        "cacheMemoryBytes": 233473314,
+        "inputTokens": 4897,
+        "loadSeconds": 1.9684743333200458,
+        "prepareSeconds": 0.1739279166504275,
+        "benchmarkCacheMode": "native",
+        "prefixKVLayers": [],
+        "runtimePromptSeconds": 17.233152985572815,
+        "runtimeGenerationSeconds": 2.676589012145996,
+        "grammarPreparationSeconds": 1.0583408333477564,
+        "modelReused": false,
+        "outputConstraint": "json_schema",
+        "generatedTokens": 71,
+        "phaseEndKVLayers": [],
+        "grammarSetupSeconds": 1.0660405416565482,
+        "generationWallSeconds": 19.91302999999607,
+        "prefixClearCacheSeconds": 0,
+        "prefixSynchronizeSeconds": 0,
+        "prefixPrefillSeconds": 0,
+        "grammarPreparationReused": false,
+        "prefixReclaimCount": 0,
+        "prefixMemorySamples": [],
+        "prefixChunkCount": 0,
+        "diagnosticEventCounts": {
+          "responseMaskPreparationSeconds": 73,
+          "responseReadSeconds": 72,
+          "responseUpdateAndProgressSeconds": 73
+        },
+        "peakMemoryBytes": 3364435426,
+        "activeMemoryBytes": 2582670946,
+        "cacheReusedTokens": 0,
+        "diagnosticFirstReadSeconds": 0.05479150000610389
+      },
+      "host": {
+        "ended_utc": "2026-10-29T06:06:42.029994Z",
+        "helper_system_cpu_seconds": 2.911291,
+        "helper_user_cpu_seconds": 2.854189,
+        "helper_wall_seconds": 23.247585667,
+        "host_since_previous_phase_seconds": 0.000805084,
+        "phase": "bounded-category",
+        "request_encode_seconds": 3.9292e-05,
+        "request_write_seconds": 9.025e-05,
+        "response_bytes": 1528,
+        "response_decode_seconds": 0.000106167,
+        "started_utc": "2026-10-29T06:06:18.781692Z"
+      }
+    },
+    {
+      "arm": "en",
+      "phase": "text",
+      "metrics": {
+        "benchmarkCacheMode": "native",
+        "prepareSeconds": 0.06301695833099075,
+        "prefixSynchronizeSeconds": 0,
+        "prefixChunkCount": 0,
+        "cacheReusedTokens": 0,
+        "prefixPrefillSeconds": 0,
+        "grammarPreparationSeconds": 0.7052228749962524,
+        "prefixReclaimCount": 0,
+        "prefixKVLayers": [],
+        "grammarSetupSeconds": 1.3739434583112597,
+        "diagnosticEventCounts": {
+          "responseMaskPreparationSeconds": 84,
+          "responseUpdateAndProgressSeconds": 84,
+          "responseReadSeconds": 83
+        },
+        "generatedTokens": 82,
+        "prefixMemorySamples": [],
+        "diagnosticFirstReadSeconds": 0.052015291643328965,
+        "prefixClearCacheSeconds": 0,
+        "runtimePromptSeconds": 17.517225980758667,
+        "loadSeconds": 1.707121624989668,
+        "inputTokens": 4880,
+        "cacheMemoryBytes": 228377890,
+        "modelReused": false,
+        "outputConstraint": "json_schema",
+        "diagnosticCPUSeconds": {
+          "responseMaskPreparationSeconds": 0.33728383347624913,
+          "responseUpdateAndProgressSeconds": 0.0012340832618065178,
+          "responseReadSeconds": 2.9094996249768883
+        },
+        "generationWallSeconds": 20.83574029165902,
+        "peakMemoryBytes": 3371102960,
+        "phaseEndKVLayers": [],
+        "grammarPreparationReused": false,
+        "runtimeGenerationSeconds": 3.3181369304656982,
+        "activeMemoryBytes": 2586209890
+      },
+      "host": {
+        "ended_utc": "2026-10-29T06:07:06.227947Z",
+        "helper_system_cpu_seconds": 3.033689,
+        "helper_user_cpu_seconds": 7.589141,
+        "helper_wall_seconds": 24.195927416,
+        "host_since_previous_phase_seconds": 0.001051208,
+        "phase": "bounded-text",
+        "request_encode_seconds": 0.0001125,
+        "request_write_seconds": 0.000106083,
+        "response_bytes": 1677,
+        "response_decode_seconds": 0.000211584,
+        "started_utc": "2026-10-29T06:06:42.031163Z"
+      }
+    }
+  ],
+  "resources": {
+    "ja": {
+      "samples": 32,
+      "max_helpers": 1,
+      "peak_helper_rss_gib": 3.086639404296875,
+      "thermal": {
+        "nominal": 32
+      }
+    },
+    "en": {
+      "samples": 23,
+      "max_helpers": 1,
+      "peak_helper_rss_gib": 1.3710174560546875,
+      "thermal": {
+        "nominal": 23
+      }
+    }
+  },
+  "completion": {
+    "state": "complete",
+    "reason": null,
+    "finished_cells": 2,
+    "registered_cells": 2,
+    "actual_generation_calls": 4,
+    "elapsed_seconds": 117.46175029198639,
+    "monitor_samples": 58,
+    "monitor_fatal": []
+  },
+  "initial_en_serialization_error": false,
+  "source_hashes_match": true,
+  "translation_byte_identical_to_previous": true
+}

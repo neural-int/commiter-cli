@@ -1,0 +1,395 @@
+{
+  "id": "H184-005",
+  "case": "C184-02",
+  "phase": "Text only; Grouping/Category replayed",
+  "generation_calls": 4,
+  "model_visible_input_identical_per_pair": true,
+  "prompt_schema_unchanged": true,
+  "implementation": "existing JSON grammar intersected with a scope-value prefix constraint before sampling; no post-generation replacement",
+  "not_supported": [
+    "JSON Schema not",
+    "regex lookahead"
+  ],
+  "non_inference_tests": 13,
+  "conditions": {
+    "model": "mlx-community/Qwen3.5-4B-4bit@0e7ffd5c629ef7719d4cbc04069232580bfa9d9c",
+    "family": "qwen",
+    "thinking": false,
+    "thinkingBudget": null,
+    "temperature": 0.6,
+    "topP": 0.95,
+    "topK": 20,
+    "attentionLayers": 8,
+    "otherLayers": 24,
+    "output_constraint": "json_schema"
+  },
+  "context_tokens": 32768,
+  "output_tokens": 4096,
+  "kv": "native",
+  "seed": 144,
+  "scope_policy": [
+    "build",
+    "chore",
+    "ci",
+    "docs",
+    "feat",
+    "fix",
+    "perf",
+    "refactor",
+    "revert",
+    "style",
+    "test"
+  ],
+  "rows": [
+    {
+      "arm": "with-request-A",
+      "source_input": "with-request",
+      "mode": "A",
+      "ok": true,
+      "stop_reason": "completed",
+      "text": {
+        "G001": {
+          "scope": "docs",
+          "summary": "README.mdに品質チェックコマンドの説明と失敗時の確認手順を追加"
+        },
+        "G002": {
+          "scope": "ui",
+          "summary": "期限日のツールチップ表示とテストを追加"
+        },
+        "G003": {
+          "scope": "mail",
+          "summary": "空の山括括角のMessage-IDをNoneに正規化する修正"
+        }
+      },
+      "invalid_scopes": {
+        "G001": "docs"
+      },
+      "host_validator_accepted": false,
+      "host_error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_scope)",
+      "metrics": {
+        "prepareSeconds": 0.07849012498627417,
+        "runtimePromptSeconds": 18.842132925987244,
+        "diagnosticCPUSeconds": {
+          "responseMaskPreparationSeconds": 0.32540975001757033,
+          "responseReadSeconds": 2.699715291673783,
+          "responseUpdateAndProgressSeconds": 0.001240958197740838
+        },
+        "prefixMemorySamples": [],
+        "grammarSetupSeconds": 1.1586579583236016,
+        "generatedTokens": 74,
+        "grammarPreparationReused": false,
+        "runtimeGenerationSeconds": 3.052186965942383,
+        "activeMemoryBytes": 2367729222,
+        "prefixKVLayers": [],
+        "modelReused": false,
+        "phaseEndKVLayers": [],
+        "cacheReusedTokens": 0,
+        "prefixSynchronizeSeconds": 0,
+        "prefixChunkCount": 0,
+        "benchmarkCacheMode": "native",
+        "outputConstraint": "json_schema",
+        "loadSeconds": 2.121315249998588,
+        "cacheMemoryBytes": 446858558,
+        "diagnosticFirstReadSeconds": 1.0542708333523478,
+        "peakMemoryBytes": 3371136912,
+        "diagnosticEventCounts": {
+          "responseReadSeconds": 75,
+          "responseMaskPreparationSeconds": 76,
+          "responseUpdateAndProgressSeconds": 76
+        },
+        "prefixPrefillSeconds": 0,
+        "prefixReclaimCount": 0,
+        "inputTokens": 4880,
+        "grammarPreparationSeconds": 0.733462291653268,
+        "generationWallSeconds": 21.895223333354807,
+        "prefixClearCacheSeconds": 0
+      },
+      "host_times": {
+        "ended_utc": "2026-10-29T12:20:18.73662Z",
+        "helper_system_cpu_seconds": 2.667258,
+        "helper_user_cpu_seconds": 5.764814,
+        "helper_wall_seconds": 27.61028375,
+        "host_since_previous_phase_seconds": 0.00072175,
+        "phase": "bounded-text",
+        "request_encode_seconds": 3.2125e-05,
+        "request_write_seconds": 0.000113792,
+        "response_bytes": 1653,
+        "response_decode_seconds": 4.6667e-05,
+        "started_utc": "2026-10-29T12:19:51.126061Z"
+      },
+      "resource": {
+        "samples": 16,
+        "max_helpers": 1,
+        "rss_peak_gib": 0.77691650390625,
+        "thermal": {
+          "nominal": 16
+        }
+      }
+    },
+    {
+      "arm": "with-request-B",
+      "source_input": "with-request",
+      "mode": "B",
+      "ok": true,
+      "stop_reason": "completed",
+      "text": {
+        "G001": {
+          "scope": "docs/README.md",
+          "summary": "品質チェックコマンドの説明と失敗時の確認手順を記載"
+        },
+        "G002": {
+          "scope": "app/ui/widget",
+          "summary": "期限日の日本語ツールチップと日付差計算を実装"
+        },
+        "G003": {
+          "scope": "mail/store/",
+          "summary": "空の山括括値を正規化してloc:キーを生成"
+        }
+      },
+      "invalid_scopes": {},
+      "host_validator_accepted": true,
+      "host_error": "",
+      "metrics": {
+        "diagnosticEventCounts": {
+          "responseUpdateAndProgressSeconds": 85,
+          "responseMaskPreparationSeconds": 85,
+          "responseReadSeconds": 84
+        },
+        "grammarSetupSeconds": 1.7426332916656975,
+        "modelReused": false,
+        "activeMemoryBytes": 2367729222,
+        "prefixSynchronizeSeconds": 0,
+        "generatedTokens": 83,
+        "prefixClearCacheSeconds": 0,
+        "phaseEndKVLayers": [],
+        "prefixChunkCount": 0,
+        "loadSeconds": 1.6682575833401643,
+        "scopeConstraintRejectedTokens": 6,
+        "inputTokens": 4880,
+        "prefixReclaimCount": 0,
+        "diagnosticCPUSeconds": {
+          "responseUpdateAndProgressSeconds": 0.0011654583795461804,
+          "responseMaskPreparationSeconds": 1.7957534582528751,
+          "responseReadSeconds": 3.008053583325818
+        },
+        "runtimeGenerationSeconds": 4.858428955078125,
+        "grammarPreparationSeconds": 0.7241866250114981,
+        "generationWallSeconds": 21.317878000001656,
+        "cacheReusedTokens": 0,
+        "diagnosticFirstReadSeconds": 0.05074095833697356,
+        "benchmarkCacheMode": "native",
+        "prefixMemorySamples": [],
+        "grammarPreparationReused": false,
+        "prefixKVLayers": [],
+        "peakMemoryBytes": 3371136912,
+        "runtimePromptSeconds": 16.45874512195587,
+        "prefixPrefillSeconds": 0,
+        "prepareSeconds": 0.057028250012081116,
+        "outputConstraint": "json_schema",
+        "cacheMemoryBytes": 446858558
+      },
+      "host_times": {
+        "ended_utc": "2026-10-29T12:20:45.728281Z",
+        "helper_system_cpu_seconds": 2.511775,
+        "helper_user_cpu_seconds": 7.660741,
+        "helper_wall_seconds": 24.908282417,
+        "host_since_previous_phase_seconds": 0.000707166,
+        "phase": "bounded-text",
+        "request_encode_seconds": 3.0625e-05,
+        "request_write_seconds": 7.4e-05,
+        "response_bytes": 1713,
+        "response_decode_seconds": 0.000588125,
+        "started_utc": "2026-10-29T12:20:20.818213Z"
+      },
+      "resource": {
+        "samples": 14,
+        "max_helpers": 1,
+        "rss_peak_gib": 0.4763031005859375,
+        "thermal": {
+          "nominal": 14
+        }
+      }
+    },
+    {
+      "arm": "final-only-B",
+      "source_input": "final-only",
+      "mode": "B",
+      "ok": true,
+      "stop_reason": "completed",
+      "text": {
+        "G001": {
+          "scope": "docs/README.md",
+          "summary": "品質チェックコマンド表を更新し失敗時の確認手順を追加"
+        },
+        "G002": {
+          "scope": "app/ui",
+          "summary": "期限日表示のツールチップを暦日差に基づいて計算"
+        },
+        "G003": {
+          "scope": "mail/store",
+          "summary": "角括弧正規化を拡張し空文字列も `None` に正規化"
+        }
+      },
+      "invalid_scopes": {},
+      "host_validator_accepted": true,
+      "host_error": "",
+      "metrics": {
+        "prefixKVLayers": [],
+        "runtimeGenerationSeconds": 5.138007044792175,
+        "outputConstraint": "json_schema",
+        "prefixChunkCount": 0,
+        "grammarPreparationReused": false,
+        "peakMemoryBytes": 3350522192,
+        "inputTokens": 3936,
+        "grammarSetupSeconds": 1.8617702916671988,
+        "prepareSeconds": 0.04575916667818092,
+        "grammarPreparationSeconds": 0.6956163750146516,
+        "generationWallSeconds": 18.388908375025494,
+        "runtimePromptSeconds": 13.250229001045227,
+        "cacheMemoryBytes": 384396868,
+        "prefixReclaimCount": 0,
+        "prefixClearCacheSeconds": 0,
+        "loadSeconds": 1.479423000011593,
+        "benchmarkCacheMode": "native",
+        "diagnosticFirstReadSeconds": 0.04500466666650027,
+        "prefixPrefillSeconds": 0,
+        "generatedTokens": 85,
+        "activeMemoryBytes": 2367695814,
+        "diagnosticEventCounts": {
+          "responseUpdateAndProgressSeconds": 87,
+          "responseReadSeconds": 86,
+          "responseMaskPreparationSeconds": 87
+        },
+        "scopeConstraintRejectedTokens": 6,
+        "modelReused": false,
+        "prefixSynchronizeSeconds": 0,
+        "prefixMemorySamples": [],
+        "diagnosticCPUSeconds": {
+          "responseMaskPreparationSeconds": 2.054645666619763,
+          "responseReadSeconds": 3.0237594582722522,
+          "responseUpdateAndProgressSeconds": 0.0013811667449772358
+        },
+        "cacheReusedTokens": 0,
+        "phaseEndKVLayers": []
+      },
+      "host_times": {
+        "ended_utc": "2026-10-29T12:21:09.714018Z",
+        "helper_system_cpu_seconds": 2.206673,
+        "helper_user_cpu_seconds": 8.053815,
+        "helper_wall_seconds": 21.885649375,
+        "host_since_previous_phase_seconds": 0.000690583,
+        "phase": "bounded-text",
+        "request_encode_seconds": 3.025e-05,
+        "request_write_seconds": 6.4917e-05,
+        "response_bytes": 1718,
+        "response_decode_seconds": 0.00061175,
+        "started_utc": "2026-10-29T12:20:47.802314Z"
+      },
+      "resource": {
+        "samples": 12,
+        "max_helpers": 1,
+        "rss_peak_gib": 0.477020263671875,
+        "thermal": {
+          "nominal": 12
+        }
+      }
+    },
+    {
+      "arm": "final-only-A",
+      "source_input": "final-only",
+      "mode": "A",
+      "ok": true,
+      "stop_reason": "completed",
+      "text": {
+        "G001": {
+          "scope": "docs",
+          "summary": "品質チェックコマンドの定義と失敗時の確認手順を記載"
+        },
+        "G002": {
+          "scope": "ui",
+          "summary": "期限日の日付差に基づいてツールチップを計算"
+        },
+        "G003": {
+          "scope": "mail",
+          "summary": "角括弧内パースを空文字列にも正規化"
+        }
+      },
+      "invalid_scopes": {
+        "G001": "docs"
+      },
+      "host_validator_accepted": false,
+      "host_error": "LLM backend could not produce a safe, completely assigned commit plan (violations: invalid_scope)",
+      "metrics": {
+        "diagnosticCPUSeconds": {
+          "responseUpdateAndProgressSeconds": 0.0011379583447705954,
+          "responseReadSeconds": 2.660543208301533,
+          "responseMaskPreparationSeconds": 0.31493016687454656
+        },
+        "runtimeGenerationSeconds": 3.0398030281066895,
+        "prefixMemorySamples": [],
+        "grammarSetupSeconds": 1.1069744166452438,
+        "inputTokens": 3936,
+        "runtimePromptSeconds": 13.465543031692505,
+        "prepareSeconds": 0.0513750416575931,
+        "prefixSynchronizeSeconds": 0,
+        "cacheMemoryBytes": 384396868,
+        "grammarPreparationReused": false,
+        "generatedTokens": 74,
+        "benchmarkCacheMode": "native",
+        "prefixReclaimCount": 0,
+        "outputConstraint": "json_schema",
+        "grammarPreparationSeconds": 0.7166555416479241,
+        "prefixPrefillSeconds": 0,
+        "cacheReusedTokens": 0,
+        "prefixClearCacheSeconds": 0,
+        "modelReused": false,
+        "activeMemoryBytes": 2367695814,
+        "diagnosticFirstReadSeconds": 0.05341899997438304,
+        "prefixKVLayers": [],
+        "peakMemoryBytes": 3350522192,
+        "diagnosticEventCounts": {
+          "responseUpdateAndProgressSeconds": 76,
+          "responseReadSeconds": 75,
+          "responseMaskPreparationSeconds": 76
+        },
+        "generationWallSeconds": 16.508784249977907,
+        "phaseEndKVLayers": [],
+        "prefixChunkCount": 0,
+        "loadSeconds": 1.7795398750167806
+      },
+      "host_times": {
+        "ended_utc": "2026-10-29T12:21:31.425622Z",
+        "helper_system_cpu_seconds": 2.203646,
+        "helper_user_cpu_seconds": 5.630385,
+        "helper_wall_seconds": 19.563412875,
+        "host_since_previous_phase_seconds": 0.000721625,
+        "phase": "bounded-text",
+        "request_encode_seconds": 3.5667e-05,
+        "request_write_seconds": 0.00011625,
+        "response_bytes": 1640,
+        "response_decode_seconds": 0.000539333,
+        "started_utc": "2026-10-29T12:21:11.860307Z"
+      },
+      "resource": {
+        "samples": 10,
+        "max_helpers": 1,
+        "rss_peak_gib": 0.7701568603515625,
+        "thermal": {
+          "nominal": 10
+        }
+      }
+    }
+  ],
+  "completion": {
+    "state": "complete",
+    "reason": null,
+    "finished_cells": 4,
+    "registered_cells": 4,
+    "actual_generation_calls": 4,
+    "elapsed_seconds": 106.75609433298814,
+    "monitor_samples": 54,
+    "monitor_fatal": []
+  },
+  "harness_id": "H184-HARNESS-001",
+  "harness_revision": 1
+}
