@@ -391,6 +391,7 @@ private struct BenchmarkProgressProcessor: LogitProcessor {
 
 private struct BenchmarkMetrics: Encodable {
     var outputConstraint: String?
+    var scopeConstraintRejectedTokens: Int?
     var comparisonPath: String?
     var comparisonStopReason: String?
     var loadSeconds = 0.0
@@ -740,6 +741,22 @@ struct CommiterMLXHelper {
                 runtimeStopIDs: preparation.runtimeStopIDs, unknownID: preparation.unknownTokenID,
                 alignRuntimeStops: true, factory: factory)
             responseState = response
+            if research != nil, profile == "bounded-text",
+               ProcessInfo.processInfo.environment["COMMITER_184_SCOPE_CONSTRAINT"] == "1" {
+                guard outputConstraint == .jsonSchema,
+                      let path = ProcessInfo.processInfo.environment["COMMITER_184_SCOPE_POLICY"],
+                      let words = try? JSONDecoder().decode([String].self, from: Data(contentsOf: URL(fileURLWithPath: path))) else { throw HelperError.malformedRequest }
+                let forbidden = Set(words)
+                let hostTokenizer = context.tokenizer
+                // Only tokens containing a quote can close a JSON string.
+                let quoteTokens = Set((0..<tokenizer.vocabSize).filter {
+                    hostTokenizer.decode(tokenIds: [$0]).contains("\"")
+                })
+                response.setPrefixConstraint { ids in
+                    guard let last = ids.last, quoteTokens.contains(last) else { return true }
+                    return ScopeValueConstraint.allows(hostTokenizer.decode(tokenIds: ids), forbidden: forbidden)
+                }
+            }
             if nativeLimit > 0 {
                 let open: Int
                 let close: Int
@@ -897,6 +914,10 @@ struct CommiterMLXHelper {
             guard output.utf8.count <= maxResponseBytes else { throw HelperError.responseTooLarge }
         }
         benchmark?.metrics.generationWallSeconds = ProcessInfo.processInfo.systemUptime - generationStart
+        if research != nil, profile == "bounded-text",
+           ProcessInfo.processInfo.environment["COMMITER_184_SCOPE_CONSTRAINT"] == "1" {
+            benchmark?.metrics.scopeConstraintRejectedTokens = responseState?.prefixRejectedTokenCount
+        }
         benchmark?.metrics.activeMemoryBytes = Memory.activeMemory
         benchmark?.metrics.peakMemoryBytes = Memory.peakMemory
         benchmark?.metrics.cacheMemoryBytes = Memory.cacheMemory

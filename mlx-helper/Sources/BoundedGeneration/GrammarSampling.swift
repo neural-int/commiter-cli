@@ -11,6 +11,14 @@ public final class GrammarSamplingState: @unchecked Sendable {
     private let constraint: GrammarConstraint?
     private let factory: @Sendable () throws -> GrammarConstraint
     private var committedTokens: [Int] = []
+    private var prefixConstraint: (@Sendable ([Int]) -> Bool)?
+    private var prefixRejections = 0
+    public var prefixRejectedTokenCount: Int {
+        lock.lock(); defer { lock.unlock() }; return prefixRejections
+    }
+    public func setPrefixConstraint(_ check: @escaping @Sendable ([Int]) -> Bool) {
+        lock.lock(); defer { lock.unlock() }; prefixConstraint = check
+    }
     private let vocabSize: Int
     private let eos: Int
     private let whitespace: Set<Int>
@@ -71,6 +79,11 @@ public final class GrammarSamplingState: @unchecked Sendable {
                 excluded.remove(eos)
                 for token in excluded where values.indices.contains(token) { values[token] = -.infinity }
             }
+            if let check = prefixConstraint {
+                for i in values.indices where values[i].isFinite {
+                    if !check(committedTokens + [i]) { values[i] = -.infinity; prefixRejections += 1 }
+                }
+            }
             guard values.contains(where: { $0.isFinite }) else { throw StateError.noFiniteToken }
         } catch {
             switch error {
@@ -121,6 +134,7 @@ public final class GrammarSamplingState: @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }
         let clone = failed ? nil : try? factory()
         let result = GrammarSamplingState(constraint: clone, vocabSize: vocabSize, eos: eos, whitespace: whitespace, runtimeStopIDs: runtimeStopIDs, unknownID: unknownID, alignRuntimeStops: alignRuntimeStops, enforcesGrammar: enforcesGrammar, factory: factory)
+        result.prefixConstraint = prefixConstraint
         // xgrammar v0.1.30 has no Fork(). Replay transient token IDs into a
         // separate matcher, never share mutable state between copies.
         for token in committedTokens { result.commit(token) }

@@ -1,0 +1,83 @@
+{
+  "harness_id": "H184-HARNESS-001",
+  "revision": 1,
+  "name": "Qwen Text scope runtime constraint",
+  "status": "research_only_not_production_default",
+  "evaluation_id": "H184-005",
+  "case_id": "C184-02",
+  "fixture_id": "H184-KIMDEL-REPAIRED-002",
+  "runtime": "Swift Release / MLX",
+  "model": "mlx-community/Qwen3.5-4B-4bit@0e7ffd5c629ef7719d4cbc04069232580bfa9d9c",
+  "model_quantization": {
+    "mode": "affine",
+    "bits": 4,
+    "group_size": 64
+  },
+  "prompt_lineage": "Q1-R; H184-004 saved Text wire unchanged; no structural example",
+  "settings": {
+    "thinking": false,
+    "output_constraint": "json_schema",
+    "context_tokens": 32768,
+    "output_tokens": 4096,
+    "kv": "native",
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "repetition_penalty": 1.0,
+    "seed": 144,
+    "pipeline": "eager",
+    "warmup": 0,
+    "retries": 0,
+    "output_repair": false,
+    "timeout": null
+  },
+  "profiles": {
+    "A": {
+      "scope_constraint": false,
+      "purpose": "newly measured control in the same binary"
+    },
+    "B": {
+      "scope_constraint": true,
+      "purpose": "current improved harness profile"
+    }
+  },
+  "environment": {
+    "COMMITER_182_NEUTRAL_EXAMPLES": "1",
+    "COMMITER_180_KV_BITS": "native",
+    "COMMITER_182_PIPELINE": "eager",
+    "COMMITER_184_SCOPE_CONSTRAINT": "0 or 1",
+    "COMMITER_184_SCOPE_POLICY": "caller-supplied JSON array derived from internal/planning/schema.go allowedTypes"
+  },
+  "scope_policy": [
+    "feat",
+    "fix",
+    "docs",
+    "style",
+    "refactor",
+    "perf",
+    "test",
+    "build",
+    "ci",
+    "chore",
+    "revert"
+  ],
+  "constraint_implementation": "JSON grammar mask intersected with completed scope-value prefix check before sampling; prompt and Schema unchanged; no post-generation replacement",
+  "source_sha256": {
+    "mlx-helper/Sources/BoundedGeneration/ScopeValueConstraint.swift": "ace246d452a4746fd670c2ca3bb51e0137a487456e42a9eacf007dde8fb647e1",
+    "mlx-helper/Sources/BoundedGeneration/GrammarSampling.swift": "41e5b4ab7fbd26db19194af8ae38b45345a473622ccfe141d19636bb4f40774c",
+    "mlx-helper/Sources/commiter-mlx-helper/CommiterMLXHelper.swift": "233d5da446598b4c60b0a97254ca33eea66b4dc95ccddc1446f5581de794c6fa",
+    "mlx-helper/Tests/BoundedGenerationTests/ScopeValueConstraintTests.swift": "fe1daecffcdc61cb43641ffacdeeb78608c6560c6fdc6df59fd4fa0a92a57a32",
+    "mlx-helper/Package.resolved": "b62d4f3b6f7df30d7f8c955eb5fe02deb067dda9ce24afc9a0c04abf1b0286cc"
+  },
+  "measured_artifact_sha256": {
+    "commiter-mlx-helper": "abe75c626bf38f800833d008c54b8fbc78102af1617858f2f05a28dd04bd2f9e",
+    "mlx.metallib": "0214ad23cc2fa1df961eb7e2118881bd4b2bdb0183546ef537fff1a2a61e2ada"
+  },
+  "input_availability": "real histories and actual requests are private; public reports contain measurements only",
+  "measurement_report": "../text-scope-grammar/goal.md",
+  "limitations": [
+    "additional CPU cost; decode slowdown observed",
+    "one generation per input and profile",
+    "validator acceptance does not guarantee semantic accuracy"
+  ]
+}
