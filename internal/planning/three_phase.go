@@ -96,6 +96,18 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 	}
 	ctx, cancel := context.WithTimeout(parent, CandidateCycleTimeout)
 	defer cancel()
+	// MLX intentionally retains model preparation for this invocation only.
+	// Each phase still validates independently; every exit closes the cycle.
+	if lifecycle, ok := g.Client.(interface {
+		BeginCycle(context.Context) (llm.OptionsBackend, func(), error)
+	}); ok {
+		cycle, closeCycle, e := lifecycle.BeginCycle(ctx)
+		if e != nil {
+			return result, e
+		}
+		defer closeCycle()
+		client = cycle
+	}
 	var original map[string]json.RawMessage
 	if err := json.Unmarshal(prepared.Prompt, &original); err != nil {
 		return result, errors.New("invalid candidate input")
@@ -180,7 +192,7 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 		if contextTokens > result.Telemetry.ContextTokens {
 			result.Telemetry.ContextTokens = contextTokens
 		}
-		response, e := client.ChatWithOptions(ctx, []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: string(encoded)}}, shape, llm.Options{ContextTokens: contextTokens, OutputTokens: budget, GenerationProfile: profile})
+		response, e := client.ChatWithOptions(ctx, []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: string(encoded)}}, shape, llm.Options{ContextTokens: contextTokens, OutputTokens: budget, GenerationProfile: profile, LiteralNewlines: true})
 		if e != nil {
 			return generationError(nil)
 		}

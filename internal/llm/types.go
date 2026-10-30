@@ -62,6 +62,9 @@ type Options struct {
 	OutputTokens  int
 	// GenerationProfile selects an explicitly supported bounded generation contract.
 	GenerationProfile string
+	// LiteralNewlines opts canonical JSON user bodies into model-only display
+	// projection. GenerationProfile alone never changes the message contract.
+	LiteralNewlines bool
 }
 
 // ChatOptions is a descriptive alias for callers that use chat terminology.

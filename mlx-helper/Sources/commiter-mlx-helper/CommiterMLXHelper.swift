@@ -190,6 +190,8 @@ private final class BenchmarkState: @unchecked Sendable {
     let retainModel: Bool
     let auditOnly: Bool
     var prefixTokens: [Int] = []
+    var typedPrefixSnapshot: PrefixCacheSnapshot?
+    var prefixAttempted = false
     var prefixCache: [KVCache]?
     var grammarPreparation: GrammarPreparation?
     var metrics = BenchmarkMetrics()
@@ -198,6 +200,28 @@ private final class BenchmarkState: @unchecked Sendable {
         self.auditOnly = auditOnly
     }
 }
+// Private audited token plan and per-model/runtime verification record. No default activation.
+private struct PrefixReusePlan: Decodable {
+    let tokens: [Int]
+    let profiles: [String]
+    let model: String
+    let runtimeRevision: String
+    let verifiedCacheTypes: [String]
+    let validationRecord: String
+
+    static func load() -> PrefixReusePlan? {
+        guard let path = ProcessInfo.processInfo.environment["COMMITER_184_PREFIX_PLAN"],
+              let data = try? Data(contentsOf: URL(fileURLWithPath: path)), data.count <= maxRequestBytes,
+              let plan = try? JSONDecoder().decode(Self.self, from: data),
+              plan.tokens.count > 4, plan.tokens.count < 32768, plan.tokens.allSatisfy({ $0 >= 0 }),
+              plan.profiles.first == "bounded-grouping", Set(plan.profiles).count == plan.profiles.count,
+              plan.profiles.count >= 2, plan.profiles.allSatisfy({ ["bounded-grouping", "bounded-category", "bounded-text"].contains($0) }),
+              plan.runtimeRevision == "c6446cf7bfb7cea76408013b614d4b2c530eaa03",
+              !plan.validationRecord.isEmpty, !plan.verifiedCacheTypes.isEmpty else { return nil }
+        return plan
+    }
+}
+
 private struct PrefixMemorySample: Encodable {
     let chunk: Int
     let processedTokens: Int
@@ -217,6 +241,7 @@ private struct KVLayerSnapshot: Encodable {
     let index: Int
     let kind: String
     let offset: Int
+    let nativeType: String
     let bits: Int
     let bytes: Int
     let arrays: [KVArraySnapshot]
@@ -230,12 +255,13 @@ private func kvLayerSnapshots(_ cache: [KVCache]) -> [KVLayerSnapshot] {
         let quantized = layer as? QuantizedKVCache
         return KVLayerSnapshot(index: index,
             kind: quantized != nil ? "affine" : (layer is RotatingKVCache ? "rotating" : "simple"),
-            offset: layer.offset, bits: quantized?.bits ?? 16,
+            offset: layer.offset, nativeType: String(describing: type(of: layer)),
+            bits: quantized?.bits ?? (arrays.map { item in item.bytes / max(1, item.shape.reduce(1, *)) * 8 }.max() ?? 16),
             bytes: arrays.reduce(0) { $0 + $1.bytes }, arrays: arrays)
     }
 }
 
-private func benchmarkKVCache(model: any LanguageModel, parameters: GenerateParameters, bits: Int?) throws -> [KVCache] {
+private func benchmarkKVCache(model: any LanguageModel, parameters: GenerateParameters, bits: Int?, configuration: ModelBenchmarkConfiguration? = nil) throws -> [KVCache] {
     let cache = try model.newCache(parameters: parameters)
     guard let bits else { return cache }
     // Quantize eligible global layers from the first prefill token. Native
@@ -246,6 +272,11 @@ private func benchmarkKVCache(model: any LanguageModel, parameters: GeneratePara
         }
         return layer
     }
+    if let configuration {
+        guard converted.count == configuration.attentionLayers + configuration.otherLayers,
+              converted.filter({ $0 is QuantizedKVCache }).count == configuration.attentionLayers else { throw HelperError.malformedRequest }
+        return converted
+    }
     guard converted.count == 24,
           converted.filter({ $0 is QuantizedKVCache }).count == 4,
           converted.filter({ $0 is RotatingKVCache }).count == 20 else {
@@ -254,7 +285,140 @@ private func benchmarkKVCache(model: any LanguageModel, parameters: GeneratePara
     return converted
 }
 
+private func cacheContainsPrefilledPrefix(_ cache: KVCache, tokenCount: Int) -> Bool {
+    guard tokenCount > 0 else { return false }
+    if let recurrentCache = cache as? MambaCache {
+        let state = recurrentCache.state
+        return state.count == 2 && state.allSatisfy { $0.size > 0 }
+    }
+    return cache.offset == tokenCount
+}
+
+// Research-only configuration; never read by normal CLI inference.
+private struct ModelBenchmarkConfiguration: Decodable {
+    let model: String
+    let family: String
+    let thinking: Bool
+    let thinkingBudget: Int?
+    let output_constraint: OutputConstraint?
+    let temperature: Float
+    let topP: Float
+    let topK: Int
+    let attentionLayers: Int
+    let otherLayers: Int
+    static func load() throws -> Self? {
+        guard CommandLine.arguments.dropFirst().first.map({ $0.hasPrefix("--benchmark-") || $0 == "--three-phase" }) == true,
+              let path = ProcessInfo.processInfo.environment["COMMITER_182_CASE_CONFIG"] else { return nil }
+        let value = try JSONDecoder().decode(Self.self, from: Data(contentsOf: URL(fileURLWithPath: path)))
+        guard ["gemma", "qwen", "ministral"].contains(value.family), value.temperature > 0,
+              value.topP > 0, value.topP <= 1, value.topK > 0,
+              value.thinkingBudget.map({ $0 > 0 && value.thinking }) ?? true else { throw HelperError.malformedRequest }
+        return value
+    }
+}
+
+// Research-only adapter: execute the official Python serializer locally, then
+// feed its token IDs directly into the existing Swift/MLX generation runtime.
+private func officialMistralInput(_ request: Request, messages: [(role: Chat.Message.Role, content: String)], reasoning: Bool, tokenizer: any MLXLMCommon.Tokenizer) throws -> LMInput? {
+    let environment = ProcessInfo.processInfo.environment
+    guard let python = environment["COMMITER_182_MISTRAL_PYTHON"] else { return nil }
+    guard let bridge = environment["COMMITER_182_MISTRAL_BRIDGE"],
+          let assets = environment["COMMITER_182_MISTRAL_ASSETS"] else { throw HelperError.malformedRequest }
+    let process = Process()
+    process.executableURL = URL(fileURLWithPath: python)
+    process.arguments = [bridge, "--assets", assets] + (reasoning ? ["--reasoning"] : [])
+    let input = Pipe(), output = Pipe()
+    process.standardInput = input
+    process.standardOutput = output
+    process.standardError = FileHandle.standardError
+    let payload = ["messages": messages.map { ["role": $0.role.rawValue, "content": $0.content] }]
+    try process.run()
+    try input.fileHandleForWriting.write(contentsOf: JSONSerialization.data(withJSONObject: payload))
+    try input.fileHandleForWriting.close()
+    let data = output.fileHandleForReading.readDataToEndOfFile()
+    process.waitUntilExit()
+    struct Serialized: Decodable { let tokens: [Int]; let eos: Int; let open: Int?; let close: Int? }
+    guard process.terminationStatus == 0 else { throw HelperError.malformedRequest }
+    let serialized = try JSONDecoder().decode(Serialized.self, from: data)
+    guard serialized.eos == tokenizer.eosTokenId, serialized.tokens.first == 1,
+          serialized.tokens.last == 4, !serialized.tokens.contains(serialized.eos),
+          serialized.tokens.allSatisfy({ $0 >= 0 && $0 < 131072 }) else { throw HelperError.malformedRequest }
+    if reasoning {
+        guard serialized.open == tokenizer.convertTokenToId("[THINK]"),
+              serialized.close == tokenizer.convertTokenToId("[/THINK]") else { throw HelperError.malformedRequest }
+    }
+    return LMInput(tokens: MLXArray(serialized.tokens))
+}
+
+private final class BenchmarkTokenProgress: @unchecked Sendable {
+    let native: NativeThoughtBudgetState?
+    let response: GrammarSamplingState
+    let started = ProcessInfo.processInfo.systemUptime
+    var count = 0
+    let diagnostic = ProcessInfo.processInfo.environment["COMMITER_182_DIAGNOSTICS"] == "1"
+    var diagnosticTotals: [String: Double] = [:]
+    var diagnosticCounts: [String: Int] = [:]
+    var firstReadSeconds = 0.0
+    func phase() -> String { native?.isResponsePhase == false ? "thinking" : "response" }
+    func record(_ name: String, seconds: Double) {
+        diagnosticTotals[name, default: 0] += seconds
+        diagnosticCounts[name, default: 0] += 1
+    }
+    func consume(_ token: MLXArray) {
+        guard diagnostic else { sampled(token.item(Int.self)); return }
+        let name = phase()
+        let begin = ProcessInfo.processInfo.systemUptime
+        let value = token.item(Int.self)
+        let read = ProcessInfo.processInfo.systemUptime
+        if count == 0 { firstReadSeconds = read - begin }
+        else { record(name + "ReadSeconds", seconds: read - begin) }
+        sampled(value)
+        record(name + "UpdateAndProgressSeconds", seconds: ProcessInfo.processInfo.systemUptime - read)
+    }
+    init(native: NativeThoughtBudgetState?, response: GrammarSamplingState) {
+        self.native = native; self.response = response
+    }
+    func sampled(_ token: Int) {
+        if let native { native.commit(token) } else { response.commit(token) }
+        count += 1
+        if count == 1 || count % 64 == 0 {
+            let elapsed = ProcessInfo.processInfo.systemUptime - started
+            let entry: [String: Any] = ["event": "generation_progress", "tokens": count,
+                "seconds_including_prefill": elapsed, "thinking_tokens": native?.stats().prefixTokens ?? 0]
+            if let data = try? JSONSerialization.data(withJSONObject: entry, options: [.sortedKeys]) {
+                FileHandle.standardError.write(data + Data([10]))
+            }
+        }
+    }
+}
+
+private struct BenchmarkProgressProcessor: LogitProcessor {
+    let progress: BenchmarkTokenProgress
+    mutating func prompt(_ prompt: MLXArray) {}
+    func process(logits: MLXArray) -> MLXArray {
+        let begin = progress.diagnostic ? ProcessInfo.processInfo.systemUptime : 0
+        let phase = progress.diagnostic ? progress.phase() : ""
+        let mask: [Float]?
+        if let native = progress.native { mask = native.maskValues(count: logits.dim(-1)) }
+        else { mask = progress.response.enforcesGrammar ? progress.response.maskValues(count: logits.dim(-1)) : nil }
+        let result = mask.map { logits + MLXArray($0) } ?? logits
+        if progress.diagnostic {
+            progress.record(phase + "MaskPreparationSeconds", seconds: ProcessInfo.processInfo.systemUptime - begin)
+        }
+        return result
+    }
+    mutating func didSample(token: MLXArray) { progress.consume(token) }
+    func copy() -> Self {
+        Self(progress: BenchmarkTokenProgress(native: progress.native?.independentCopy(), response: progress.response.independentCopy()))
+    }
+}
+
 private struct BenchmarkMetrics: Encodable {
+    var outputConstraint: String?
+    var scopeConstraintRejectedTokens: Int?
+    var prefillProtectionEnabled: Bool?
+    var comparisonPath: String?
+    var comparisonStopReason: String?
     var loadSeconds = 0.0
     var prepareSeconds = 0.0
     var grammarSetupSeconds = 0.0
@@ -265,7 +429,11 @@ private struct BenchmarkMetrics: Encodable {
     var runtimeGenerationSeconds: Double?
     var inputTokens = 0
     var generatedTokens: Int?
+    var nativeThoughtTokens: Int?
+    var nativeThoughtForcedClose: Bool?
     var prefixPrefillSeconds = 0.0
+    var prefixReuseStatus: String?
+    var prefixSnapshotSeconds = 0.0
     var cacheReusedTokens = 0
     var modelReused = false
     var activeMemoryBytes = 0
@@ -276,6 +444,10 @@ private struct BenchmarkMetrics: Encodable {
     var prefixSynchronizeSeconds = 0.0
     var prefixClearCacheSeconds = 0.0
     var prefixMemorySamples: [PrefixMemorySample] = []
+    var diagnosticCPUSeconds: [String: Double]?
+    var diagnosticEventCounts: [String: Int]?
+    var diagnosticFirstReadSeconds: Double?
+    var benchmarkCacheMode: String?
     var requestedKVBits: Int? = nil
     var prefixKVLayers: [KVLayerSnapshot] = []
     var phaseEndKVLayers: [KVLayerSnapshot] = []
@@ -294,13 +466,30 @@ struct CommiterMLXHelper {
             FileHandle.standardOutput.write(Data("metal_ok\n".utf8))
             return
         }
+        if CommandLine.arguments.count == 2, CommandLine.arguments[1] == "--benchmark-output-contract" {
+            do {
+                guard let config = try ModelBenchmarkConfiguration.load(), let mode = config.output_constraint else { throw HelperError.malformedRequest }
+                let request = try decodeRequest(try readBoundedRequest())
+                let data = try JSONSerialization.data(withJSONObject: request.schema.foundationValue, options: [.sortedKeys])
+                let schema = String(decoding: data, as: UTF8.self)
+                let messages = try contractMessages(request, schema: schema, enabled: true)
+                let audit: [String: Any] = ["output_constraint": mode.rawValue, "thinking": config.thinking,
+                    "messages": messages.map { ["role": $0.role.rawValue, "content": $0.content] },
+                    "schema": request.schema.foundationValue, "generation_calls": 0]
+                try FileHandle.standardOutput.write(contentsOf: JSONSerialization.data(withJSONObject: audit, options: [.sortedKeys]))
+                try FileHandle.standardOutput.write(contentsOf: Data([10]))
+            } catch { exit(1) }
+            return
+        }
         if CommandLine.arguments.count == 2,
-           ["--benchmark-single", "--benchmark-cycle", "--benchmark-token-audit", "--benchmark-cache"].contains(CommandLine.arguments[1]) {
+           ["--three-phase", "--benchmark-single", "--benchmark-cycle", "--benchmark-token-audit", "--benchmark-input-audit", "--benchmark-cache", "--benchmark-model-defaults"].contains(CommandLine.arguments[1]) {
             await benchmarkMain(mode: CommandLine.arguments[1])
             return
         }
+        var decodedRequest: Request?
         do {
             let request = try decodeRequest(try readBoundedRequest())
+            decodedRequest = request
             let response = try await handle(request)
             try writeResponse(response)
         } catch {
@@ -311,13 +500,29 @@ struct CommiterMLXHelper {
                     generatedJSON: nil,
                     model: nil,
                     runtime: "mlx",
-                    errorClass: classifyError(error)
+                    errorClass: classifyError(error),
+                    generationProfile: decodedRequest?.generationProfile
                 ))
             } catch {
                 FileHandle.standardError.write(Data("response_write_failed\n".utf8))
                 exit(1)
             }
         }
+    }
+
+    private static func contractMessages(_ request: Request, schema: String, enabled: Bool) throws -> [(role: Chat.Message.Role, content: String)] {
+        var messages = request.messages.map { (role: $0.role, content: $0.content) }
+        if enabled {
+            var instruction = try StructuredOutputPrompt.instruction(schema: schema)
+            if ProcessInfo.processInfo.environment["COMMITER_182_NEUTRAL_EXAMPLES"] == "1",
+               let cut = instruction.range(of: "Structural example only;") {
+                instruction = String(instruction[..<cut.lowerBound]) + "Choose values independently from the current Git evidence; enum order is not a preference."
+            }
+            if let index = messages.firstIndex(where: { $0.role == .system }) {
+                messages[index].content += "\n\n" + instruction
+            } else { messages.insert((role: .system, content: instruction), at: 0) }
+        }
+        return messages
     }
 
     private static func readBoundedRequest() throws -> Data {
@@ -356,13 +561,16 @@ struct CommiterMLXHelper {
         let modelID = request.model?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
             ? request.model!
             : URL(filePath: modelPath).lastPathComponent
+        let research = try ModelBenchmarkConfiguration.load()
+        if let research { guard research.model == modelID else { throw HelperError.malformedRequest } }
         if let profile = request.generationProfile {
             guard ["bounded-grouping", "bounded-category", "bounded-text"].contains(profile),
-                  modelID == "mlx-community/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2" else {
+                  (research != nil || modelID == "mlx-community/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2" ||
+                   (benchmark != nil && CommandLine.arguments.contains("--benchmark-model-defaults"))) else {
                 throw HelperError.malformedRequest
             }
             do {
-                try BoundedRequestLimits.validate(profile: profile, context: request.contextTokens, output: request.outputTokens)
+                if research == nil { try BoundedRequestLimits.validate(profile: profile, context: request.contextTokens, output: request.outputTokens) } else { guard (request.outputTokens == 0 || request.outputTokens == 4096), request.contextTokens > 0, request.contextTokens <= 65536 else { throw HelperError.malformedRequest } }
             } catch { throw HelperError.malformedRequest }
         }
         let schemaData = try JSONSerialization.data(withJSONObject: request.schema.foundationValue, options: [.sortedKeys])
@@ -452,6 +660,9 @@ struct CommiterMLXHelper {
                 benchmarkMetrics: benchmark?.metrics
             )
         } catch {
+            benchmark?.metrics.activeMemoryBytes = Memory.activeMemory
+            benchmark?.metrics.peakMemoryBytes = Memory.peakMemory
+            benchmark?.metrics.cacheMemoryBytes = Memory.cacheMemory
             let reason = classify(error)
             return Response(
                 ok: false,
@@ -460,68 +671,178 @@ struct CommiterMLXHelper {
                 model: modelID,
                 runtime: "mlx",
                 errorClass: classifyError(error),
+                generationProfile: request.generationProfile,
                 benchmarkMetrics: benchmark?.metrics
             )
         }
     }
 
     private static func generateBounded(_ request: Request, profile: String, schema: String, context: ModelContext, benchmark: BenchmarkState? = nil) async throws -> String {
+        let research = try ModelBenchmarkConfiguration.load()
+        let pipeline = research == nil ? "eager" : (ProcessInfo.processInfo.environment["COMMITER_182_PIPELINE"] ?? "eager")
+        guard ["eager", "overlap"].contains(pipeline),
+              pipeline != "overlap" || (benchmark != nil && ProcessInfo.processInfo.environment["COMMITER_182_PROGRESS"] == "1") else {
+            throw HelperError.malformedRequest
+        }
+        let cacheMode = ProcessInfo.processInfo.environment["COMMITER_180_KV_BITS"] ?? "8"
+        if research != nil {
+            guard ["4", "8", "native"].contains(cacheMode) else { throw HelperError.malformedRequest }
+            benchmark?.metrics.benchmarkCacheMode = cacheMode
+        }
         let configuredMode = benchmark == nil ? nil : ProcessInfo.processInfo.environment["COMMITER_180_THINKING"]
-        let nativeLimit = profile == "bounded-grouping" ? 512 : (configuredMode == "T" ? 384 : (configuredMode == "N" ? 0 : (profile == "bounded-category" ? 384 : 0)))
+        let modelDefaults = CommandLine.arguments.contains("--benchmark-model-defaults")
+        let modelName = request.model?.split(separator: "@").first.map(String.init) ?? ""
+        let qwenThinking = research.map { $0.family == "qwen" && $0.thinking } ?? (modelDefaults && modelName == "mlx-community/Qwen3.5-4B-4bit")
+        let ministralThinking = research.map { $0.family == "ministral" && $0.thinking } ?? false
+        let otherDefault = modelDefaults && !modelName.contains("gemma-4-E4B")
+        let nativeLimit = research.map { $0.thinking ? Int.max : 0 } ?? (qwenThinking ? (profile == "bounded-grouping" ? 512 : 384) :
+            (otherDefault ? 0 : (profile == "bounded-grouping" ? 512 : (configuredMode == "T" ? 384 : (configuredMode == "N" ? 0 : (profile == "bounded-category" ? 384 : 0)))))
+        )
         let budget = request.outputTokens // Validated by handle before model loading.
-        let chat = request.messages.map { Chat.Message(role: $0.role, content: $0.content) }
+        let outputConstraint = research?.output_constraint ?? .jsonSchema
+        benchmark?.metrics.outputConstraint = research?.output_constraint?.rawValue
+        var wireMessages = try contractMessages(request, schema: schema, enabled: research?.output_constraint != nil)
+        // Research layout comparison: caller supplies the finalized wire; Schema still constrains sampling.
+        if (benchmark?.auditOnly == true && ProcessInfo.processInfo.environment["COMMITER_184_AUDIT_WIRE"] == "1") || (research != nil && ProcessInfo.processInfo.environment["COMMITER_184_LAYOUT_WIRE"] == "1") {
+            wireMessages = request.messages.map { (role: $0.role, content: $0.content) }
+        }
+        if research?.family == "ministral" {
+            var merged: [(role: Chat.Message.Role, content: String)] = []
+            for message in wireMessages {
+                if let last = merged.last, last.role == message.role {
+                    merged[merged.count - 1].content += "\n\n" + message.content
+                } else { merged.append(message) }
+            }
+            if ministralThinking, ProcessInfo.processInfo.environment["COMMITER_182_MISTRAL_PYTHON"] == nil, merged.first?.role == .system {
+                merged[0].content += "\nThink using [THINK]your thoughts[/THINK], then provide the requested JSON response."
+            }
+            wireMessages = merged
+        }
+        let chat = wireMessages.map { Chat.Message(role: $0.role, content: $0.content) }
         let prepareStart = ProcessInfo.processInfo.systemUptime
-        var input = try await context.processor.prepare(input: UserInput(chat: chat, additionalContext: ["enable_thinking": nativeLimit > 0]))
+        // Candidate chat templates choose their own default thinking behavior.
+        // Gemma preserves the established bounded-profile behavior.
+        let templateContext: [String: any Sendable]? = research != nil ? ["enable_thinking": research!.thinking] : (otherDefault ? nil : ["enable_thinking": nativeLimit > 0])
+        let officialInput = research?.family == "ministral"
+            ? try officialMistralInput(request, messages: wireMessages, reasoning: ministralThinking, tokenizer: context.tokenizer) : nil
+        var input: LMInput
+        if let officialInput { input = officialInput }
+        else { input = try await context.processor.prepare(input: UserInput(chat: chat, additionalContext: templateContext)) }
         benchmark?.metrics.prepareSeconds = ProcessInfo.processInfo.systemUptime - prepareStart
         benchmark?.metrics.inputTokens = input.text.tokens.size
         if benchmark?.auditOnly == true {
-            let data = try JSONSerialization.data(withJSONObject: ["token_ids": input.text.tokens.asArray(Int.self), "enable_thinking": nativeLimit > 0], options: [.sortedKeys])
+            var audit: [String: Any] = ["token_ids": input.text.tokens.asArray(Int.self), "enable_thinking": nativeLimit > 0]
+            if let research {
+                let cache = try benchmarkKVCache(model: context.model, parameters: GenerateParameters(), bits: cacheMode == "native" ? nil : Int(cacheMode), configuration: research)
+                audit["planned_cache"] = try JSONSerialization.jsonObject(with: JSONEncoder().encode(kvLayerSnapshots(cache)))
+            }
+            let data = try JSONSerialization.data(withJSONObject: audit, options: [.sortedKeys])
             return String(decoding: data, as: UTF8.self)
         }
+        // Research-only path comparison; ordinary generation is unchanged.
+        let pathMode = ProcessInfo.processInfo.environment["COMMITER_182_PATH"] ?? "full"
+        guard ["full", "bounded-cap", "standard-cap"].contains(pathMode),
+              pathMode == "full" || (benchmark != nil && research != nil && pipeline == "eager" && research?.output_constraint == nil) else {
+            throw HelperError.malformedRequest
+        }
+        let cappedComparison = pathMode != "full"
+        if cappedComparison { benchmark?.metrics.comparisonPath = pathMode }
+        var progressMetrics: BenchmarkTokenProgress?
+        var responseState: GrammarSamplingState?
         let grammarStart = ProcessInfo.processInfo.systemUptime
         do { try TokenBudget.validate(context: request.contextTokens, prompt: input.text.tokens.size, output: budget) }
         catch { throw HelperError.inputTooLarge }
-        let components: GenerationComponents
         var nativeState: NativeThoughtBudgetState?
-        let preparationStart = ProcessInfo.processInfo.systemUptime
-        let preparation: GrammarPreparation
-        if let retained = benchmark?.grammarPreparation {
-            preparation = retained
-            benchmark?.metrics.grammarPreparationReused = true
-        } else {
-            preparation = try GrammarPreparation(context: context)
-            if benchmark?.retainModel == true {
-                benchmark?.grammarPreparation = preparation
+        var components = GenerationComponents()
+        if pathMode != "standard-cap" {
+            let preparationStart = ProcessInfo.processInfo.systemUptime
+            let preparation: GrammarPreparation
+            if let retained = benchmark?.grammarPreparation {
+                preparation = retained
+                benchmark?.metrics.grammarPreparationReused = true
+            } else {
+                preparation = try GrammarPreparation(context: context)
+                if benchmark?.retainModel == true {
+                    benchmark?.grammarPreparation = preparation
+                }
+            }
+            benchmark?.metrics.grammarPreparationSeconds = ProcessInfo.processInfo.systemUptime - preparationStart
+            let tokenizer = preparation.tokenizer
+            let factory: @Sendable () throws -> GrammarConstraint = { try GrammarConstraint(tokenizer: tokenizer, jsonSchema: schema, fastForward: false) }
+            let response = outputConstraint == .none
+                ? GrammarSamplingState(unconstrainedVocabSize: tokenizer.vocabSize, eos: preparation.eosTokenID, runtimeStopIDs: preparation.runtimeStopIDs)
+                : GrammarSamplingState(constraint: try factory(), vocabSize: tokenizer.vocabSize,
+                eos: preparation.eosTokenID, whitespace: preparation.whitespaceTokenIDs,
+                runtimeStopIDs: preparation.runtimeStopIDs, unknownID: preparation.unknownTokenID,
+                alignRuntimeStops: true, factory: factory)
+            responseState = response
+            if research != nil, profile == "bounded-text",
+               ProcessInfo.processInfo.environment["COMMITER_184_SCOPE_CONSTRAINT"] == "1" {
+                guard outputConstraint == .jsonSchema,
+                      let path = ProcessInfo.processInfo.environment["COMMITER_184_SCOPE_POLICY"],
+                      let words = try? JSONDecoder().decode([String].self, from: Data(contentsOf: URL(fileURLWithPath: path))) else { throw HelperError.malformedRequest }
+                let forbidden = Set(words)
+                let hostTokenizer = context.tokenizer
+                // Only tokens containing a quote can close a JSON string.
+                let quoteTokens = Set((0..<tokenizer.vocabSize).filter {
+                    hostTokenizer.decode(tokenIds: [$0]).contains("\"")
+                })
+                response.setPrefixConstraint(candidate: { quoteTokens.contains($0) }) { ids in
+                    return ScopeValueConstraint.allows(hostTokenizer.decode(tokenIds: ids), forbidden: forbidden)
+                }
+            }
+            if nativeLimit > 0 {
+                let open: Int
+                let close: Int
+                if qwenThinking || ministralThinking {
+                    guard let opening = context.tokenizer.convertTokenToId(ministralThinking ? "[THINK]" : "<think>"),
+                          let closing = context.tokenizer.convertTokenToId(ministralThinking ? "[/THINK]" : "</think>"), opening != closing,
+                          context.tokenizer.decode(tokenIds: [opening]) == (ministralThinking ? "[THINK]" : "<think>"),
+                          context.tokenizer.decode(tokenIds: [closing]) == (ministralThinking ? "[/THINK]" : "</think>") else { throw HelperError.grammarFailure }
+                    open = opening; close = closing
+                } else {
+                    guard context.tokenizer.convertTokenToId("<|channel>") == 100,
+                          context.tokenizer.convertTokenToId("<channel|>") == 101 else { throw HelperError.grammarFailure }
+                    open = 100; close = 101
+                }
+                let state = NativeThoughtBudgetState(limit: research != nil ? research?.thinkingBudget : nativeLimit, open: open, close: close, eos: context.tokenizer.eosTokenId ?? 0, response: response, forceOpen: !qwenThinking && officialInput == nil, promptHasOpen: qwenThinking)
+                nativeState = state
+                components = GenerationComponents(logitProcessorFactory: { NativeThoughtBudgetProcessor(state: state) })
+            } else {
+                components = GenerationComponents(logitProcessorFactory: { GrammarSamplingProcessor(state: response) })
+            }
+            if officialInput != nil || (research != nil && ProcessInfo.processInfo.environment["COMMITER_182_PROGRESS"] == "1") {
+                let progress = BenchmarkTokenProgress(native: nativeState, response: response)
+                progressMetrics = progress
+                if pipeline == "overlap" {
+                    components = GenerationComponents(logitProcessorFactory: {
+                        OverlappedTokenProcessor(BenchmarkProgressProcessor(progress: progress))
+                    })
+                } else {
+                    components = GenerationComponents(logitProcessorFactory: { BenchmarkProgressProcessor(progress: progress) })
+                }
             }
         }
-        benchmark?.metrics.grammarPreparationSeconds = ProcessInfo.processInfo.systemUptime - preparationStart
-        let tokenizer = preparation.tokenizer
-        let factory: @Sendable () throws -> GrammarConstraint = { try GrammarConstraint(tokenizer: tokenizer, jsonSchema: schema, fastForward: false) }
-        let response = GrammarSamplingState(constraint: try factory(), vocabSize: tokenizer.vocabSize,
-            eos: preparation.eosTokenID, whitespace: preparation.whitespaceTokenIDs,
-            runtimeStopIDs: preparation.runtimeStopIDs, unknownID: preparation.unknownTokenID,
-            alignRuntimeStops: true, factory: factory)
-        if nativeLimit > 0 {
-            guard context.tokenizer.convertTokenToId("<|channel>") == 100,
-                  context.tokenizer.convertTokenToId("<channel|>") == 101 else { throw HelperError.grammarFailure }
-            let state = NativeThoughtBudgetState(limit: nativeLimit, open: 100, close: 101, eos: context.tokenizer.eosTokenId ?? 0, response: response, forceOpen: true)
-            nativeState = state
-            components = GenerationComponents(logitProcessorFactory: { NativeThoughtBudgetProcessor(state: state) })
-        } else {
-            components = GenerationComponents(logitProcessorFactory: { GrammarSamplingProcessor(state: response) })
-        }
-        var parameters = GenerateParameters(maxTokens: budget, temperature: 0, topP: 1, topK: 0, seed: 144)
+        var parameters = GenerateParameters(maxTokens: cappedComparison ? 1024 : (research != nil && budget == 0 ? nil : budget), temperature: research?.temperature ?? 0, topP: research?.topP ?? 1, topK: research?.topK ?? 0, seed: 144)
         var kvBits: Int? = nil
-        if benchmark != nil, CommandLine.arguments.contains("--benchmark-cache"),
+        if benchmark != nil, (CommandLine.arguments.contains("--benchmark-cache") || research?.output_constraint != nil),
            let value = ProcessInfo.processInfo.environment["COMMITER_180_KV_BITS"] {
-            guard let bits = Int(value), [4, 8].contains(bits) else { throw HelperError.malformedRequest }
-            kvBits = bits
-            parameters.kvCache = KVCacheConfiguration(
-                strategy: .affine(try AffineKVCacheConfiguration(bits: bits, groupSize: 64)),
-                compatibility: .requireAtLeastOneLayer)
-            benchmark?.metrics.requestedKVBits = bits
+            if value == "native", research != nil {
+                kvBits = nil
+            } else {
+                guard let bits = Int(value), [4, 8].contains(bits) else { throw HelperError.malformedRequest }
+                kvBits = bits
+                parameters.kvCache = KVCacheConfiguration(
+                    strategy: .affine(try AffineKVCacheConfiguration(bits: bits, groupSize: 64)),
+                    compatibility: .requireAtLeastOneLayer)
+                benchmark?.metrics.requestedKVBits = bits
+            }
         }
-        if request.contextTokens > 16384 {
+        let prefillPolicy = ProcessInfo.processInfo.environment["COMMITER_184_PREFILL_POLICY"] ?? "adaptive8k"
+        guard ["adaptive8k", "legacy"].contains(prefillPolicy) else { throw HelperError.malformedRequest }
+        let protectPrefill = request.contextTokens > 16384 && (prefillPolicy == "legacy" || input.text.tokens.size > 8192)
+        benchmark?.metrics.prefillProtectionEnabled = protectPrefill
+        if protectPrefill {
             // The dependency submits prefill chunks asynchronously. At long
             // contexts, wait for each chunk before submitting the next and
             // release unused buffers; keep token order and KV contents intact.
@@ -533,13 +854,54 @@ struct CommiterMLXHelper {
         benchmark?.metrics.grammarSetupSeconds = ProcessInfo.processInfo.systemUptime - grammarStart
         let generationStart = ProcessInfo.processInfo.systemUptime
         var workingCache: [KVCache]? = nil
+        if ProcessInfo.processInfo.environment["COMMITER_184_PREFIX_PLAN"] != nil,
+           !CommandLine.arguments.contains("--benchmark-cache"), let benchmark {
+            benchmark.metrics.prefixReuseStatus = "disabled_unverified_plan"
+            if let plan = PrefixReusePlan.load(), research != nil, plan.model == request.model,
+               plan.profiles.contains(profile) {
+                let tokens = input.text.tokens.asArray(Int.self)
+                let identity = "\(request.model ?? "")|\(request.modelPath ?? "")|\(request.contextTokens)|\(request.outputTokens)|\(kvBits.map(String.init) ?? "native")|\(plan.runtimeRevision)"
+                if let snapshot = benchmark.typedPrefixSnapshot, snapshot.tokens == plan.tokens,
+                   let fork = snapshot.fork(tokens: tokens, identity: identity),
+                   PrefixCacheSnapshot.supports(fork, verifiedTypes: Set(plan.verifiedCacheTypes)) {
+                    workingCache = fork
+                    input = LMInput(tokens: MLXArray(Array(tokens.dropFirst(snapshot.tokens.count))))
+                    benchmark.metrics.cacheReusedTokens = snapshot.tokens.count
+                    benchmark.metrics.prefixReuseStatus = "reused"
+                } else if !benchmark.prefixAttempted && profile == plan.profiles.first {
+                    benchmark.prefixAttempted = true
+                    if tokens.count > plan.tokens.count, Array(tokens.prefix(plan.tokens.count)) == plan.tokens {
+                        // Let the runtime choose each layer's cache type. Native-only initially.
+                        let cache = try context.model.newCache(parameters: parameters)
+                        if kvBits == nil, PrefixCacheSnapshot.supports(cache, verifiedTypes: Set(plan.verifiedCacheTypes)) {
+                            let started = ProcessInfo.processInfo.systemUptime
+                            for start in stride(from: 0, to: plan.tokens.count, by: 512) {
+                                let end = min(start + 512, plan.tokens.count)
+                                _ = context.model(MLXArray(Array(tokens[start..<end])).expandedDimensions(axis: 0), cache: cache)
+                                eval(cache)
+                                benchmark.metrics.prefixChunkCount += 1
+                            }
+                            benchmark.metrics.prefixPrefillSeconds = ProcessInfo.processInfo.systemUptime - started
+                            let copying = ProcessInfo.processInfo.systemUptime
+                            benchmark.typedPrefixSnapshot = PrefixCacheSnapshot(tokens: plan.tokens, identity: identity, caches: cache, verifiedTypes: Set(plan.verifiedCacheTypes))
+                            benchmark.metrics.prefixSnapshotSeconds = ProcessInfo.processInfo.systemUptime - copying
+                            if let snapshot = benchmark.typedPrefixSnapshot, let fork = snapshot.fork(tokens: tokens, identity: identity) {
+                                workingCache = fork
+                                input = LMInput(tokens: MLXArray(Array(tokens.dropFirst(plan.tokens.count))))
+                                benchmark.metrics.prefixReuseStatus = "created"
+                            } else { benchmark.metrics.prefixReuseStatus = "fallback_copy_failed" }
+                        } else { benchmark.metrics.prefixReuseStatus = "fallback_cache_type" }
+                    } else { benchmark.metrics.prefixReuseStatus = "fallback_prefix_mismatch" }
+                } else { benchmark.metrics.prefixReuseStatus = "fallback_identity_or_prefix_mismatch" }
+            }
+        }
         if CommandLine.arguments.contains("--benchmark-cache"), profile != "bounded-grouping", let benchmark {
             let tokens = input.text.tokens.asArray(Int.self)
             guard let lengthText = ProcessInfo.processInfo.environment["COMMITER_180_PREFIX_TOKENS"], let length = Int(lengthText), length > 4, length < tokens.count else { throw HelperError.malformedRequest }
             if profile == "bounded-category" {
-                guard context.model is Gemma4Model || context.model is Gemma4TextModel else { throw HelperError.malformedRequest }
+                guard research != nil || context.model is Gemma4Model || context.model is Gemma4TextModel else { throw HelperError.malformedRequest }
                 let prefixStart = ProcessInfo.processInfo.systemUptime
-                let cache = try benchmarkKVCache(model: context.model, parameters: parameters, bits: kvBits)
+                let cache = try benchmarkKVCache(model: context.model, parameters: parameters, bits: kvBits, configuration: research)
                 for start in stride(from: 0, to: length, by: 512) {
                     let end = min(start + 512, length)
                     // Only materialize KV state, as in the runtime prefill path.
@@ -568,7 +930,9 @@ struct CommiterMLXHelper {
                             peakActiveBytes: Memory.peakMemory))
                     }
                 }
-                guard cache.allSatisfy({ $0.offset == length }) else { throw HelperError.malformedRequest }
+                guard cache.allSatisfy({ cacheContainsPrefilledPrefix($0, tokenCount: length) }) else {
+                    throw HelperError.malformedRequest
+                }
                 benchmark.metrics.prefixPrefillSeconds = ProcessInfo.processInfo.systemUptime - prefixStart
                 benchmark.metrics.prefixKVLayers = kvLayerSnapshots(cache)
                 benchmark.prefixTokens = Array(tokens.prefix(length))
@@ -583,25 +947,45 @@ struct CommiterMLXHelper {
             }
             input = LMInput(tokens: MLXArray(Array(tokens.dropFirst(length))))
         }
-        if kvBits != nil, workingCache == nil {
-            workingCache = try benchmarkKVCache(model: context.model, parameters: parameters, bits: kvBits)
+        if (kvBits != nil || (research != nil && CommandLine.arguments.contains("--benchmark-cache"))), workingCache == nil {
+            workingCache = try benchmarkKVCache(model: context.model, parameters: parameters, bits: kvBits, configuration: research)
+        }
+        if modelDefaults, workingCache == nil {
+            workingCache = try context.model.newCache(parameters: parameters)
         }
         let stream = try generate(input: input, cache: workingCache,
             parameters: parameters,
             context: context, components: components)
         var output = ""
         var completed = false
+        var lastPathProgress = generationStart
         for await event in stream {
             try Task.checkCancellation()
             switch event {
-            case .chunk(let chunk): output += chunk
+            case .chunk(let chunk):
+                output += chunk
+                if cappedComparison, ProcessInfo.processInfo.systemUptime - lastPathProgress >= 5 {
+                    lastPathProgress = ProcessInfo.processInfo.systemUptime
+                    FileHandle.standardError.write(Data("path_comparison_progress bytes=\(output.utf8.count)\n".utf8))
+                }
             case .info(let info):
                 benchmark?.metrics.runtimePromptSeconds = info.promptTime
                 benchmark?.metrics.runtimeGenerationSeconds = info.generateTime
                 benchmark?.metrics.generatedTokens = info.generationTokenCount
+                if let progress = progressMetrics, progress.diagnostic {
+                    benchmark?.metrics.diagnosticCPUSeconds = progress.diagnosticTotals
+                    benchmark?.metrics.diagnosticEventCounts = progress.diagnosticCounts
+                    benchmark?.metrics.diagnosticFirstReadSeconds = progress.firstReadSeconds
+                }
+                if let nativeState {
+                    benchmark?.metrics.nativeThoughtTokens = nativeState.stats().prefixTokens
+                    benchmark?.metrics.nativeThoughtForcedClose = nativeState.stats().forcedClose
+                }
+                if cappedComparison { benchmark?.metrics.comparisonStopReason = String(describing: info.stopReason) }
                 switch info.stopReason {
                 case .stop: completed = true
-                case .length: throw HelperError.maxTokens
+                case .length:
+                    if cappedComparison { completed = true } else { throw HelperError.maxTokens }
                 case .cancelled: throw HelperError.cancelled
                 }
             default: break
@@ -609,6 +993,10 @@ struct CommiterMLXHelper {
             guard output.utf8.count <= maxResponseBytes else { throw HelperError.responseTooLarge }
         }
         benchmark?.metrics.generationWallSeconds = ProcessInfo.processInfo.systemUptime - generationStart
+        if research != nil, profile == "bounded-text",
+           ProcessInfo.processInfo.environment["COMMITER_184_SCOPE_CONSTRAINT"] == "1" {
+            benchmark?.metrics.scopeConstraintRejectedTokens = responseState?.prefixRejectedTokenCount
+        }
         benchmark?.metrics.activeMemoryBytes = Memory.activeMemory
         benchmark?.metrics.peakMemoryBytes = Memory.peakMemory
         benchmark?.metrics.cacheMemoryBytes = Memory.cacheMemory
@@ -616,15 +1004,23 @@ struct CommiterMLXHelper {
             benchmark?.metrics.phaseEndKVLayers = kvLayerSnapshots(workingCache)
         }
         guard completed else { throw HelperError.cancelled }
+        if cappedComparison { return output }
         if let nativeState, !nativeState.succeeded {
             FileHandle.standardError.write(Data("candidate_native_failure code=\(nativeState.diagnostic)\n".utf8))
             throw HelperError.grammarFailure
         }
-        if nativeLimit == 0, !response.succeeded {
+        if nativeLimit == 0, let response = responseState, !response.succeeded {
             FileHandle.standardError.write(Data("candidate_text_failure code=\(response.diagnostic)\n".utf8))
             throw HelperError.grammarFailure
         }
-        do { return try CandidateOutput.finalJSON(output, native: nativeLimit > 0) }
+        do {
+            if qwenThinking || ministralThinking {
+                let parts = output.components(separatedBy: ministralThinking ? "[/THINK]" : "</think>")
+                guard parts.count == 2 else { throw CandidateOutputError.invalid }
+                return try CandidateOutput.finalJSON(parts[1], native: false)
+            }
+            return try CandidateOutput.finalJSON(output, native: nativeLimit > 0)
+        }
         catch {
             FileHandle.standardError.write(Data("candidate_final_json_invalid native=\(nativeLimit > 0)\n".utf8))
             throw HelperError.grammarFailure
@@ -632,15 +1028,18 @@ struct CommiterMLXHelper {
     }
 
     private static func benchmarkMain(mode: String) async {
-        let audit = mode == "--benchmark-token-audit"
+        let audit = mode == "--benchmark-token-audit" || mode == "--benchmark-input-audit"
         let state = BenchmarkState(retainModel: mode != "--benchmark-single", auditOnly: audit)
         let reader = BenchmarkLineReader(handle: .standardInput, maximumBytes: maxRequestBytes)
-        let profiles = audit ? ["bounded-category", "bounded-text"] : ["bounded-grouping", "bounded-category", "bounded-text"]
+        let profiles = mode == "--benchmark-token-audit" ? ["bounded-category", "bounded-text"] : ["bounded-grouping", "bounded-category", "bounded-text"]
         var count = 0
+        var decodedRequest: Request?
         do {
             while let data = try reader.next() {
+                decodedRequest = nil
                 guard count < profiles.count else { throw HelperError.trailingInput }
                 let request = try decodeRequest(data)
+                decodedRequest = request
                 if mode != "--benchmark-single" {
                     guard request.generationProfile == profiles[count] else { throw HelperError.malformedRequest }
                 }
@@ -652,7 +1051,8 @@ struct CommiterMLXHelper {
             }
         } catch {
             try? writeResponse(Response(ok: false, stopReason: classify(error), generatedJSON: nil,
-                model: nil, runtime: "mlx", errorClass: classifyError(error)))
+                model: nil, runtime: "mlx", errorClass: classifyError(error),
+                generationProfile: decodedRequest?.generationProfile))
         }
     }
 

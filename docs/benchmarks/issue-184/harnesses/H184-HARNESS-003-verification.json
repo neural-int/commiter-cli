@@ -1,0 +1,36 @@
+{
+  "harness_id": "H184-HARNESS-003",
+  "revision": 1,
+  "generation_calls": 0,
+  "projection_golden_comparison": [
+    {
+      "phase": "01",
+      "entire_request_equal_to_measured_final_wire": true,
+      "source_unchanged": true,
+      "wire_sha256": "a949378839e5df86c37bf8e116e98c48b90c33b6fbe26d3cd940d647620ebf29"
+    },
+    {
+      "phase": "02",
+      "entire_request_equal_to_measured_final_wire": true,
+      "source_unchanged": true,
+      "wire_sha256": "200830ab90eca39231865eb0508cda0e24d0d9776eec68e83dc0915101ddf0ca"
+    },
+    {
+      "phase": "03",
+      "entire_request_equal_to_measured_final_wire": true,
+      "source_unchanged": true,
+      "wire_sha256": "a2491b0fcf55b1fcabc793cb96d77bb58ca5d1a5c26742e9d1322bf18d2aaccf"
+    }
+  ],
+  "python_tests": {
+    "passed": 15,
+    "command": "python3 -B -m unittest discover -s tools/benchmark184 -p 'test_*.py'"
+  },
+  "scope": "research finalized-wire projection; production backend defaults unchanged",
+  "cli_projection": {
+    "all_three_requests_equal_to_measured_final_wire": true,
+    "output_permissions": "0600",
+    "generation_calls": 0
+  },
+  "manifest_source_hashes_verified": true
+}

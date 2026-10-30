@@ -76,13 +76,14 @@ type Request struct {
 // Response is the machine-readable helper output. GeneratedJSON is accepted
 // by a caller only when StopReason is StopReasonCompleted.
 type Response struct {
-	OK                bool       `json:"ok"`
-	StopReason        StopReason `json:"stop_reason"`
-	GeneratedJSON     string     `json:"generated_json,omitempty"`
-	Model             string     `json:"model,omitempty"`
-	Runtime           string     `json:"runtime,omitempty"`
-	ErrorClass        string     `json:"error_class,omitempty"`
-	GenerationProfile string     `json:"generation_profile,omitempty"`
+	BenchmarkMetrics  json.RawMessage `json:"benchmark_metrics,omitempty"`
+	OK                bool            `json:"ok"`
+	StopReason        StopReason      `json:"stop_reason"`
+	GeneratedJSON     string          `json:"generated_json,omitempty"`
+	Model             string          `json:"model,omitempty"`
+	Runtime           string          `json:"runtime,omitempty"`
+	ErrorClass        string          `json:"error_class,omitempty"`
+	GenerationProfile string          `json:"generation_profile,omitempty"`
 }
 
 // FailureKind identifies failures without exposing helper diagnostics or
@@ -135,9 +136,8 @@ func (err *Error) Error() string {
 
 func (err *Error) Unwrap() error { return err.Cause }
 
-// Client launches one helper per Generate call. A helper must not be reused:
-// this prevents one malformed request or stale model state from contaminating
-// a later planning run.
+// Client launches one helper per Generate call. BeginSession explicitly scopes
+// reuse to a sequential three-phase cycle; no session crosses planning runs.
 type Client struct {
 	Executable       string
 	MaxRequestBytes  int

@@ -81,12 +81,65 @@ func TestThreePhaseRestoresIDsAndUsesSharedBoundedProfiles(t *testing.T) {
 		if c.options[i].GenerationProfile != profile || c.options[i].ContextTokens != 16384 || c.options[i].OutputTokens != []int{768, 512, 768}[i] {
 			t.Fatalf("phase %d options = %#v", i, c.options[i])
 		}
+		if !c.options[i].LiteralNewlines {
+			t.Fatal("planner did not opt into model-only display")
+		}
 	}
 	if time.Until(c.deadline) > CandidateCycleTimeout {
 		t.Fatal("cycle deadline exceeded")
 	}
 	if strings.Contains(c.messages[2][1].Content, `"breaking_evidence_ref"`) {
 		t.Fatal("generated category fed back into text phase")
+	}
+}
+
+type cycleCandidateClient struct {
+	candidateClient
+	cycle           *candidateClient
+	started, closed int
+	startErr        error
+}
+
+func (c *cycleCandidateClient) BeginCycle(ctx context.Context) (llm.OptionsBackend, func(), error) {
+	c.started++
+	if _, ok := ctx.Deadline(); !ok {
+		return nil, nil, errors.New("missing cycle deadline")
+	}
+	if c.startErr != nil {
+		return nil, nil, c.startErr
+	}
+	return c.cycle, func() { c.closed++ }, nil
+}
+
+func TestThreePhaseScopesReusableBackendToOneValidatedInvocation(t *testing.T) {
+	for _, failurePhase := range []int{-1, 0, 1, 2} {
+		t.Run(string(rune('A'+failurePhase+1)), func(t *testing.T) {
+			responses := candidateResponses()
+			if failurePhase >= 0 {
+				responses[failurePhase] = `{}`
+			}
+			cycle := &candidateClient{responses: responses}
+			client := &cycleCandidateClient{cycle: cycle}
+			result, err := (ThreePhaseGenerator{Client: client}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
+			wantCalls := 3
+			if failurePhase >= 0 {
+				wantCalls = failurePhase + 1
+			}
+			if (err != nil) != (failurePhase >= 0) || cycle.calls != wantCalls || client.started != 1 || client.closed != 1 || client.calls != 0 {
+				t.Fatalf("result=%+v err=%v cycle=%+v client=%+v", result, err, cycle, client)
+			}
+			if failurePhase >= 0 && len(result.Plan.Commits) != 0 {
+				t.Fatal("partial plan accepted")
+			}
+		})
+	}
+	client := &cycleCandidateClient{startErr: errors.New("start failed")}
+	if _, err := (ThreePhaseGenerator{Client: client}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{}); err == nil || client.calls != 0 || client.closed != 0 {
+		t.Fatal("session start failure did not stop planner")
+	}
+	client = &cycleCandidateClient{}
+	if _, err := (ThreePhaseGenerator{Client: client}).Generate(context.Background(), contextinput.Prepared{}, English, SensitiveValues{}); err == nil || client.started != 0 {
+		t.Fatal("started helper before validating input")
 	}
 }
 func TestThreePhaseScalesRawDiffContextWithinConfiguredCeiling(t *testing.T) {

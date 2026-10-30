@@ -240,7 +240,7 @@ func finalMetadata(ctx context.Context, f fixture, p partition, backend llm.Opti
 			}
 			var r llm.Response
 			if backend != nil {
-				r, err = recorder.ChatWithOptions(ctx, []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: string(encoded)}}, shape, llm.Options{ContextTokens: 16384, OutputTokens: budget, GenerationProfile: profile})
+				r, err = recorder.ChatWithOptions(ctx, []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: string(encoded)}}, shape, llm.Options{ContextTokens: 16384, OutputTokens: budget, GenerationProfile: profile, LiteralNewlines: true})
 			} else {
 				answers := map[string]any{}
 				for _, g := range batch {

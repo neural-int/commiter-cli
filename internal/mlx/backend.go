@@ -14,10 +14,22 @@ type Backend struct {
 	Client        *Client
 	Model         string
 	ModelPath     string
+	session       *Session
 	ModelRevision string
 }
 
 var _ llm.OptionsBackend = (*Backend)(nil)
+
+// BeginCycle scopes process reuse to one planner invocation.
+func (backend *Backend) BeginCycle(ctx context.Context) (llm.OptionsBackend, func(), error) {
+	session, err := backend.Client.BeginSession(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	cycle := *backend
+	cycle.session = session
+	return &cycle, session.Close, nil
+}
 
 func (backend *Backend) Chat(ctx context.Context, messages []llm.Message, schema json.RawMessage) (llm.Response, error) {
 	return backend.ChatWithOptions(ctx, messages, schema, llm.Options{})
@@ -31,7 +43,24 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 	if options.GenerationProfile != "" {
 		model += "@" + backend.ModelRevision
 	}
-	response, err := backend.Client.Generate(ctx, Request{
+	if options.LiteralNewlines {
+		rendered := append([]llm.Message(nil), messages...)
+		for i, m := range rendered {
+			if m.Role == "user" {
+				content, e := llm.LiteralNewlineDisplay([]byte(m.Content))
+				if e != nil {
+					return llm.Response{}, e
+				}
+				rendered[i].Content = content
+			}
+		}
+		messages = rendered
+	}
+	generate := backend.Client.Generate
+	if backend.session != nil {
+		generate = backend.session.Generate
+	}
+	response, err := generate(ctx, Request{
 		Schema: schema, Messages: messages, ContextTokens: options.ContextTokens,
 		OutputTokens: options.OutputTokens, Model: model, ModelPath: backend.ModelPath,
 		GenerationProfile: options.GenerationProfile,
