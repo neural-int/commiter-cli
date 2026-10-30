@@ -190,6 +190,8 @@ private final class BenchmarkState: @unchecked Sendable {
     let retainModel: Bool
     let auditOnly: Bool
     var prefixTokens: [Int] = []
+    var typedPrefixSnapshot: PrefixCacheSnapshot?
+    var prefixAttempted = false
     var prefixCache: [KVCache]?
     var grammarPreparation: GrammarPreparation?
     var metrics = BenchmarkMetrics()
@@ -198,6 +200,28 @@ private final class BenchmarkState: @unchecked Sendable {
         self.auditOnly = auditOnly
     }
 }
+// Private audited token plan and per-model/runtime verification record. No default activation.
+private struct PrefixReusePlan: Decodable {
+    let tokens: [Int]
+    let profiles: [String]
+    let model: String
+    let runtimeRevision: String
+    let verifiedCacheTypes: [String]
+    let validationRecord: String
+
+    static func load() -> PrefixReusePlan? {
+        guard let path = ProcessInfo.processInfo.environment["COMMITER_184_PREFIX_PLAN"],
+              let data = try? Data(contentsOf: URL(fileURLWithPath: path)), data.count <= maxRequestBytes,
+              let plan = try? JSONDecoder().decode(Self.self, from: data),
+              plan.tokens.count > 4, plan.tokens.count < 32768, plan.tokens.allSatisfy({ $0 >= 0 }),
+              plan.profiles.first == "bounded-grouping", Set(plan.profiles).count == plan.profiles.count,
+              plan.profiles.count >= 2, plan.profiles.allSatisfy({ ["bounded-grouping", "bounded-category", "bounded-text"].contains($0) }),
+              plan.runtimeRevision == "c6446cf7bfb7cea76408013b614d4b2c530eaa03",
+              !plan.validationRecord.isEmpty, !plan.verifiedCacheTypes.isEmpty else { return nil }
+        return plan
+    }
+}
+
 private struct PrefixMemorySample: Encodable {
     let chunk: Int
     let processedTokens: Int
@@ -408,6 +432,8 @@ private struct BenchmarkMetrics: Encodable {
     var nativeThoughtTokens: Int?
     var nativeThoughtForcedClose: Bool?
     var prefixPrefillSeconds = 0.0
+    var prefixReuseStatus: String?
+    var prefixSnapshotSeconds = 0.0
     var cacheReusedTokens = 0
     var modelReused = false
     var activeMemoryBytes = 0
@@ -824,6 +850,47 @@ struct CommiterMLXHelper {
         benchmark?.metrics.grammarSetupSeconds = ProcessInfo.processInfo.systemUptime - grammarStart
         let generationStart = ProcessInfo.processInfo.systemUptime
         var workingCache: [KVCache]? = nil
+        if ProcessInfo.processInfo.environment["COMMITER_184_PREFIX_PLAN"] != nil,
+           !CommandLine.arguments.contains("--benchmark-cache"), let benchmark {
+            benchmark.metrics.prefixReuseStatus = "disabled_unverified_plan"
+            if let plan = PrefixReusePlan.load(), research != nil, plan.model == request.model,
+               plan.profiles.contains(profile) {
+                let tokens = input.text.tokens.asArray(Int.self)
+                let identity = "\(request.model ?? "")|\(request.modelPath ?? "")|\(request.contextTokens)|\(request.outputTokens)|\(kvBits.map(String.init) ?? "native")|\(plan.runtimeRevision)"
+                if let snapshot = benchmark.typedPrefixSnapshot, snapshot.tokens == plan.tokens,
+                   let fork = snapshot.fork(tokens: tokens, identity: identity),
+                   PrefixCacheSnapshot.supports(fork, verifiedTypes: Set(plan.verifiedCacheTypes)) {
+                    workingCache = fork
+                    input = LMInput(tokens: MLXArray(Array(tokens.dropFirst(snapshot.tokens.count))))
+                    benchmark.metrics.cacheReusedTokens = snapshot.tokens.count
+                    benchmark.metrics.prefixReuseStatus = "reused"
+                } else if !benchmark.prefixAttempted && profile == plan.profiles.first {
+                    benchmark.prefixAttempted = true
+                    if tokens.count > plan.tokens.count, Array(tokens.prefix(plan.tokens.count)) == plan.tokens {
+                        // Let the runtime choose each layer's cache type. Native-only initially.
+                        let cache = try context.model.newCache(parameters: parameters)
+                        if kvBits == nil, PrefixCacheSnapshot.supports(cache, verifiedTypes: Set(plan.verifiedCacheTypes)) {
+                            let started = ProcessInfo.processInfo.systemUptime
+                            for start in stride(from: 0, to: plan.tokens.count, by: 512) {
+                                let end = min(start + 512, plan.tokens.count)
+                                _ = context.model(MLXArray(Array(tokens[start..<end])).expandedDimensions(axis: 0), cache: cache)
+                                eval(cache)
+                                benchmark.metrics.prefixChunkCount += 1
+                            }
+                            benchmark.metrics.prefixPrefillSeconds = ProcessInfo.processInfo.systemUptime - started
+                            let copying = ProcessInfo.processInfo.systemUptime
+                            benchmark.typedPrefixSnapshot = PrefixCacheSnapshot(tokens: plan.tokens, identity: identity, caches: cache, verifiedTypes: Set(plan.verifiedCacheTypes))
+                            benchmark.metrics.prefixSnapshotSeconds = ProcessInfo.processInfo.systemUptime - copying
+                            if let snapshot = benchmark.typedPrefixSnapshot, let fork = snapshot.fork(tokens: tokens, identity: identity) {
+                                workingCache = fork
+                                input = LMInput(tokens: MLXArray(Array(tokens.dropFirst(plan.tokens.count))))
+                                benchmark.metrics.prefixReuseStatus = "created"
+                            } else { benchmark.metrics.prefixReuseStatus = "fallback_copy_failed" }
+                        } else { benchmark.metrics.prefixReuseStatus = "fallback_cache_type" }
+                    } else { benchmark.metrics.prefixReuseStatus = "fallback_prefix_mismatch" }
+                } else { benchmark.metrics.prefixReuseStatus = "fallback_identity_or_prefix_mismatch" }
+            }
+        }
         if CommandLine.arguments.contains("--benchmark-cache"), profile != "bounded-grouping", let benchmark {
             let tokens = input.text.tokens.asArray(Int.self)
             guard let lengthText = ProcessInfo.processInfo.environment["COMMITER_180_PREFIX_TOKENS"], let length = Int(lengthText), length > 4, length < tokens.count else { throw HelperError.malformedRequest }

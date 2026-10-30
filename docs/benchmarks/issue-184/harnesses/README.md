@@ -4,7 +4,9 @@
 | --- | --- | --- | --- |
 | [H184-HARNESS-001](H184-HARNESS-001.json) | 1 | Text scopeの追加マスク比較。profile BがON | 親ハーネスの保存仕様 |
 | [H184-HARNESS-002](H184-HARNESS-002.json) | 1 | 3phase共通でraw_diffを保持し、LLM表示だけ実改行化 | 旧研究用基準（保存） |
-| [H184-HARNESS-003](H184-HARNESS-003.json) | 1 | 混合配置＋採用済み表示整理1〜4 | 現在の採用研究用基準 |
+| [H184-HARNESS-003](H184-HARNESS-003.json) | 1 | 混合配置＋採用済み表示整理1〜4 | 旧研究用基準（再利用なし） |
+
+| [H184-HARNESS-004](H184-HARNESS-004.json) | 1 | 003の表示整理＋キャッシュ型別prefix再利用 | 現在の採用研究用基準 |
 
 H184-HARNESS-002の短縮表記は **4-HARNESS-002 / revision 1**。実験番号H184-005、ケースC184-02とは別の識別子である。旧H184-HARNESS-001は上書きしない。製品mainの既定経路を変更した登録ではない。
 
@@ -58,7 +60,7 @@ python3 -B tools/benchmark184/multiline_view.py proxy --bundle "$BUNDLE" < "$PHA
 
 ## H184-HARNESS-003 / revision 1
 
-短縮表記は **4-HARNESS-003**。002を上書きせず、現在の研究用基準を003へ更新する。1〜4の採用範囲・混合配置・固定設定は[manifest](H184-HARNESS-003.json)に記録。従来prefill保護、native KV、同一helper内のモデル/共通文法準備保持。KV prefix再利用は未実装。
+短縮表記は **4-HARNESS-003**。002を上書きせず、当時の研究用基準を003へ更新した。1〜4の採用範囲・混合配置・固定設定は[manifest](H184-HARNESS-003.json)に記録。従来prefill保護、native KV、同一helper内のモデル/共通文法準備保持。KV prefix再利用は未実装。
 
 1. 完全な出力Schemaはプロンプト内に一回。ランタイムSchemaとフィールド説明は保持。
 2. Category規則はCategoryのsystemへ一度だけ置く。Grouping/Textには置かない。
@@ -76,3 +78,11 @@ python3 -B tools/benchmark184/adopted_projection.py --source "$FINALIZED_MIXED_I
 推論比較は固定Release helper/Metal/modelをmanifestのSHAと照合し、case/scope-policyとenvironmentを準備して、Go評価器で --persistent --wire --independent-phases --phase-count 3 を使用する。--wireは完成済みプロンプトなので、研究専用COMMITER_184_LAYOUT_WIRE=1でSchema説明の再追加を避ける。この経路と登録は研究用であり、本番CLIの既定入力を003へ切り替える変更ではない。
 
 [非推論照合](H184-HARNESS-003-verification.json)で、最初の混合配置から1〜4を適用した要求全体が実測最終要求と全3phaseで一致。テスト15件通過。再推論はしていない。[最終結果](../display-ids-omitted/goal.md)はGrouping3/3、Category3/3、合成validator通過。Textの意味精度は完全ではなく、各phase固定入力の評価でE2E成功とは呼ばない。
+
+## H184-HARNESS-004 / revision 1
+
+短縮表記4-HARNESS-004。003の入力投影を維持し、Groupingで共通prefix状態を保存、Categoryは独立prefill、Textで独立コピーを再利用する。モデル再利用とは別の最適化。型はKVCacheSimple/RotatingKVCache/MambaCache、runtime.copy()を使用。未知型・不一致は通常prefillへ戻る。
+
+COMMITER_184_PREFIX_PLANへprivate JSON planを指定する。tokens、profiles、model、runtimeRevision、verifiedCacheTypes、validationRecordが必要。[実装仕様](../prefix-reuse/implementation.md)参照。2モデルの実検証結果を採用記録とするが、新しいモデル/設定は別途検証が必要。
+
+[測定](../prefix-reuse/two-model-smoke/goal.md)：Qwen/Gemma両方で全3phase完走、Grouping/Category3/3、validator通過。Gemma全出力一致、Qwen Textのsummary差分あり。Qwenの差の原因・厳密同等性は未確定のままユーザー採用。実装Releaseテスト46件通過。性能は各1回比較で保証値ではない。本番CLI既定には自動適用しない。
