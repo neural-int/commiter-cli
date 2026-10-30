@@ -48,6 +48,7 @@ jobs:
               mlx-helper/* | \
               .github/scripts/build-mlx-helper.sh | \
               .github/scripts/test-mlx-helper.sh | \
+              .github/scripts/tests/test_mlx_test_layout.py | \
               .github/scripts/build-release-package.sh | \
               .github/scripts/release-preflight.sh | \
               .github/scripts/verify-release-package.sh | \
@@ -83,6 +84,9 @@ jobs:
 
       - name: Run go vet
         run: go vet ./...
+
+      - name: Verify test Metal library placement
+        run: python3 -m unittest discover -s .github/scripts/tests -p 'test_mlx_test_layout.py'
 
       - name: Build helper and Metal library for tests
         run: bash .github/scripts/build-mlx-helper.sh

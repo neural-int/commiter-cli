@@ -43,3 +43,15 @@ MLX Release Buildの失敗ログは、テスト起動後の`Failed to load the d
 保存済みQwen/Gemmaのprefix再利用なし・あり計4条件を新評価器で再評価し、すべてCategory 3/3・最終host validator受理を確認した。追加モデル推論は行っていない。独立した固定フェーズ入力の評価であり、上流応答を伝播するE2Eの証明ではない。
 
 003/004のmanifestにあるソース・バイナリSHAは過去の採用・計測時点を表すため、今回の修正後バイナリで上書きしない。今回の修正はcommitで追跡する。依存・sampling・prompt・予算・文法の条件は変更しない。
+
+## Metal探索の追加修正
+
+`92abd770`のGitHub CI（run `41074826240`）では、helperとMetalのビルドは成功したが、Swiftテストは再び`Failed to load the default metallib`で停止した。上記のローカル成功は、このCI構成での成功を証明していなかった。
+
+固定依存のMLXは、`current_binary_dir()`内の`dladdr`でMLXコードを含むMach-Oイメージのディレクトリを取得し、そこから`mlx.metallib`等を探す。CIのSwiftPMテストではイメージが`.xctest/Contents/MacOS/`内にあるため、`--show-bin-path`のProductsルートにだけ配置しても届かない。ローカルの別ビルド方式での配置結果を、CIへ一般化したことが不足だった。
+
+配置処理はProductsルートに加え、ビルド済みの各`.xctest/Contents/MacOS/`内の実行可能ファイル横へコピーする。各コピーを`cmp`で確認し、配置先をCIログへ出す。ランタイム・モデル設定・テスト内容・テスト有効／無効は変更しない。
+
+既存SwiftPMテストbundleをprivateな一時領域へ複製した再現では、Productsルートだけの配置で同じMetalエラーとなり、同じbundleの`Contents/MacOS/`へ追加配置する変更だけで全53件が成功した。この53件は再現用の既存バイナリであり、現在のソースの56件とは区別する。配置順序・複数bundle・空白を含むパスを、標準Pythonのみの回帰テストでも確認する。新しいGitHub CIの最終結果はPRで確認する。
+
+修正後の配置スクリプトを現在のソースで実行し、Protocol 10件・BoundedGeneration 46件の全56件と、実helperの失敗応答テストが成功した。Productsルートと2つのテストbundle内への配置ログも確認した。
