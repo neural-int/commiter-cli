@@ -48,10 +48,12 @@ scope追加マスクは、研究設定が存在するbounded-textで`COMMITER_18
 依存は既存のPackage.resolvedに固定する。通常のテストと配布用Releaseビルドは次で実行できる。
 
 ```sh
-swift test --package-path mlx-helper -c release --disable-automatic-resolution
 bash .github/scripts/build-mlx-helper.sh
+bash .github/scripts/test-mlx-helper.sh --triple arm64-apple-macosx14.0
 ```
 
 Swiftテストで同じMetal探索失敗が出る環境では、検証済みのmlx.metallibをテスト実行ファイル横に配置してから`swift test --package-path mlx-helper -c release --disable-automatic-resolution --skip-build`を再実行する。配布用ビルドスクリプトはhelper横へMetalライブラリを配置する既存処理を維持している。
+
+PR #185の再レビュー後は、上のテスト用スクリプトでビルド・Metal配置・テスト実行を順に行う。テスト無効化による回避はしない。[再レビュー対応](pr-185-review-fixes.md)に通常Plannerへの適用範囲と回帰検証を記録する。
 
 モデル・実履歴・固定入力・Goの3phase評価器は別の資産であり、この取り込みで追加しない。完全な3phase推論の再実行や精度の再測定も今回の検証範囲には含まない。歴史的なhelper/Metalの測定SHAを、新しいビルド結果として上書きしない。
