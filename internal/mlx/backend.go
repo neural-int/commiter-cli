@@ -43,7 +43,7 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 	if options.GenerationProfile != "" {
 		model += "@" + backend.ModelRevision
 	}
-	if options.GenerationProfile != "" {
+	if options.LiteralNewlines {
 		rendered := append([]llm.Message(nil), messages...)
 		for i, m := range rendered {
 			if m.Role == "user" {

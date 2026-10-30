@@ -486,8 +486,10 @@ struct CommiterMLXHelper {
             await benchmarkMain(mode: CommandLine.arguments[1])
             return
         }
+        var decodedRequest: Request?
         do {
             let request = try decodeRequest(try readBoundedRequest())
+            decodedRequest = request
             let response = try await handle(request)
             try writeResponse(response)
         } catch {
@@ -498,7 +500,8 @@ struct CommiterMLXHelper {
                     generatedJSON: nil,
                     model: nil,
                     runtime: "mlx",
-                    errorClass: classifyError(error)
+                    errorClass: classifyError(error),
+                    generationProfile: decodedRequest?.generationProfile
                 ))
             } catch {
                 FileHandle.standardError.write(Data("response_write_failed\n".utf8))
@@ -668,6 +671,7 @@ struct CommiterMLXHelper {
                 model: modelID,
                 runtime: "mlx",
                 errorClass: classifyError(error),
+                generationProfile: request.generationProfile,
                 benchmarkMetrics: benchmark?.metrics
             )
         }
@@ -1029,10 +1033,13 @@ struct CommiterMLXHelper {
         let reader = BenchmarkLineReader(handle: .standardInput, maximumBytes: maxRequestBytes)
         let profiles = mode == "--benchmark-token-audit" ? ["bounded-category", "bounded-text"] : ["bounded-grouping", "bounded-category", "bounded-text"]
         var count = 0
+        var decodedRequest: Request?
         do {
             while let data = try reader.next() {
+                decodedRequest = nil
                 guard count < profiles.count else { throw HelperError.trailingInput }
                 let request = try decodeRequest(data)
+                decodedRequest = request
                 if mode != "--benchmark-single" {
                     guard request.generationProfile == profiles[count] else { throw HelperError.malformedRequest }
                 }
@@ -1044,7 +1051,8 @@ struct CommiterMLXHelper {
             }
         } catch {
             try? writeResponse(Response(ok: false, stopReason: classify(error), generatedJSON: nil,
-                model: nil, runtime: "mlx", errorClass: classifyError(error)))
+                model: nil, runtime: "mlx", errorClass: classifyError(error),
+                generationProfile: decodedRequest?.generationProfile))
         }
     }
 

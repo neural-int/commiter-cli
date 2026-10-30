@@ -136,9 +136,8 @@ func (err *Error) Error() string {
 
 func (err *Error) Unwrap() error { return err.Cause }
 
-// Client launches one helper per Generate call. A helper must not be reused:
-// this prevents one malformed request or stale model state from contaminating
-// a later planning run.
+// Client launches one helper per Generate call. BeginSession explicitly scopes
+// reuse to a sequential three-phase cycle; no session crosses planning runs.
 type Client struct {
 	Executable       string
 	MaxRequestBytes  int

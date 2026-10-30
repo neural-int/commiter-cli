@@ -2,10 +2,64 @@ package mlx
 
 import (
 	"context"
+	"errors"
+	"os"
 	"strings"
 	"testing"
 	"time"
 )
+
+func TestSessionPreservesFailureStopReasons(t *testing.T) {
+	for _, reason := range []StopReason{StopReasonMaxTokens, StopReasonGrammar, StopReasonCancelled, StopReasonTimeout, StopReasonInternal} {
+		t.Run(string(reason), func(t *testing.T) {
+			helper := shellHelper(t, `IFS= read -r request
+printf '%s\n' '{"ok":false,"stop_reason":"`+string(reason)+`","generation_profile":"bounded-grouping"}'`)
+			s, err := NewClient(helper).BeginSession(context.Background())
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer s.Close()
+			r := validRequest()
+			r.GenerationProfile = "bounded-grouping"
+			response, err := s.Generate(context.Background(), r)
+			var failure *Error
+			if !errors.As(err, &failure) || failure.Kind != FailureStopState || failure.StopReason != reason || response.StopReason != reason {
+				t.Fatalf("response=%+v err=%v", response, err)
+			}
+		})
+	}
+}
+
+// CI uses the freshly built Swift executable, without loading any model, to
+// cover failure responses produced outside handle's generation catch block.
+func TestRealHelperPreservesProfileOnEarlyFailure(t *testing.T) {
+	helper := os.Getenv("COMMITER_MLX_TEST_HELPER")
+	if helper == "" {
+		t.Skip("set COMMITER_MLX_TEST_HELPER to the built Swift helper")
+	}
+	for _, sessionMode := range []bool{false, true} {
+		t.Run(map[bool]string{false: "single", true: "session"}[sessionMode], func(t *testing.T) {
+			client := NewClient(helper)
+			generate := client.Generate
+			if sessionMode {
+				s, err := client.BeginSession(context.Background())
+				if err != nil {
+					t.Fatal(err)
+				}
+				defer s.Close()
+				generate = s.Generate
+			}
+			r := validRequest()
+			r.GenerationProfile = "bounded-grouping"
+			r.ModelPath = "/commiter-test-nonexistent-model"
+			response, err := generate(context.Background(), r)
+			var failure *Error
+			if !errors.As(err, &failure) || failure.Kind != FailureStopState || response.StopReason != StopReasonInternal || response.GenerationProfile != r.GenerationProfile {
+				t.Fatalf("session=%v response=%+v err=%v", sessionMode, response, err)
+			}
+		})
+	}
+}
 
 func TestSessionKeepsOneProcessAndEnforcesPhaseOrder(t *testing.T) {
 	helper := shellHelper(t, `for profile in bounded-grouping bounded-category bounded-text; do

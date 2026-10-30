@@ -11,7 +11,8 @@ import (
 )
 
 // Session owns exactly one sequential Grouping/Category/Text helper cycle.
-// It retains model preparation, never response matcher or KV state.
+// It retains model preparation, never a response matcher. Production phases
+// have independent KV state; research-only prefix plans can opt into snapshots.
 type Session struct {
 	client  *Client
 	command *exec.Cmd
