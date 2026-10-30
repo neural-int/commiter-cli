@@ -1,0 +1,179 @@
+{
+  "harness_id": "H184-HARNESS-002",
+  "revision": 1,
+  "name": "Three-phase raw diff with literal newline display",
+  "status": "adopted_research_baseline_not_production_default",
+  "evaluation_id": "H184-005",
+  "case_id": "C184-02",
+  "fixture_id": "H184-KIMDEL-REPAIRED-002",
+  "runtime": "Swift Release / MLX",
+  "model": "mlx-community/Qwen3.5-4B-4bit@0e7ffd5c629ef7719d4cbc04069232580bfa9d9c",
+  "model_quantization": {
+    "mode": "affine",
+    "bits": 4,
+    "group_size": 64
+  },
+  "prompt_lineage": "Q1-R / H184-005 multiline-ab common canonical instructions; no new language instruction",
+  "settings": {
+    "thinking": false,
+    "output_constraint": "json_schema",
+    "context_tokens": 32768,
+    "output_tokens": 4096,
+    "kv": "native",
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "repetition_penalty": 1.0,
+    "seed": 144,
+    "pipeline": "eager",
+    "warmup": 0,
+    "retries": 0,
+    "output_repair": false,
+    "timeout": null
+  },
+  "environment": {
+    "COMMITER_182_NEUTRAL_EXAMPLES": "1",
+    "COMMITER_180_KV_BITS": "native",
+    "COMMITER_182_PIPELINE": "eager",
+    "COMMITER_184_SCOPE_CONSTRAINT": "1",
+    "COMMITER_184_SCOPE_POLICY": "caller-supplied JSON array derived from internal/planning/schema.go allowedTypes"
+  },
+  "scope_policy": [
+    "feat",
+    "fix",
+    "docs",
+    "style",
+    "refactor",
+    "perf",
+    "test",
+    "build",
+    "ci",
+    "chore",
+    "revert"
+  ],
+  "constraint_implementation": "JSON grammar mask intersected with completed scope-value prefix check before sampling; prompt and Schema unchanged; no post-generation replacement",
+  "source_sha256": {
+    "mlx-helper/Sources/BoundedGeneration/ScopeValueConstraint.swift": "ace246d452a4746fd670c2ca3bb51e0137a487456e42a9eacf007dde8fb647e1",
+    "mlx-helper/Sources/BoundedGeneration/GrammarSampling.swift": "41e5b4ab7fbd26db19194af8ae38b45345a473622ccfe141d19636bb4f40774c",
+    "mlx-helper/Sources/commiter-mlx-helper/CommiterMLXHelper.swift": "233d5da446598b4c60b0a97254ca33eea66b4dc95ccddc1446f5581de794c6fa",
+    "mlx-helper/Tests/BoundedGenerationTests/ScopeValueConstraintTests.swift": "fe1daecffcdc61cb43641ffacdeeb78608c6560c6fdc6df59fd4fa0a92a57a32",
+    "mlx-helper/Package.resolved": "b62d4f3b6f7df30d7f8c955eb5fe02deb067dda9ce24afc9a0c04abf1b0286cc"
+  },
+  "measured_artifact_sha256": {
+    "commiter-mlx-helper": "abe75c626bf38f800833d008c54b8fbc78102af1617858f2f05a28dd04bd2f9e",
+    "mlx.metallib": "0214ad23cc2fa1df961eb7e2118881bd4b2bdb0183546ef537fff1a2a61e2ada"
+  },
+  "input_availability": "real histories and actual requests are private; public reports contain measurements only",
+  "measurement_report": "../multiline-ab/results.md",
+  "limitations": [
+    "additional CPU cost; decode slowdown observed",
+    "one generation per input and profile",
+    "validator acceptance does not guarantee semantic accuracy",
+    "one fixture and seed; A then B without warmup",
+    "Text has remaining semantic issues despite validator acceptance",
+    "runtime/model binaries and real histories are private; this checkout does not contain the historical three-phase evaluator",
+    "no new generation during registration; test covers fixed-display selection and existing roundtrip",
+    "literal-newline display must not be parsed as canonical strict JSON"
+  ],
+  "requested_harness_id": "4-HARNESS-002",
+  "parent": {
+    "harness_id": "H184-HARNESS-001",
+    "revision": 1,
+    "profile": "B"
+  },
+  "study_key": "H184-005/multiline-ab",
+  "adopted_arm": "B",
+  "phases": [
+    "grouping",
+    "category",
+    "text"
+  ],
+  "input_contract": {
+    "host_format": "strict canonical JSON; unchanged source fixture",
+    "llm_display": "JSON-like text with literal LF inside string values; not strict JSON",
+    "ipc_format": "strict outer JSON; serializer escapes display LF for transport",
+    "projection": "only JSON newline escape converted to literal LF; restore_view recovers exact canonical bytes",
+    "raw_diff": "full original file headers, @@ hunk headers, +/- prefixes, code and diff_range retained",
+    "history": "Japanese final_responses; user_requests empty arrays in all phases, as in both measured arms",
+    "safety": "existing upstream safety filtering retained; no new instruction execution",
+    "not_adopted": [
+      "header removal",
+      "added_code/deleted_code projection",
+      "translation",
+      "new prompt optimization"
+    ]
+  },
+  "scope_constraint": true,
+  "bundle_configuration": {
+    "helper": "CALLER_SUPPLIED_RELEASE_HELPER",
+    "representation": "raw",
+    "display_format": "literal_newlines"
+  },
+  "entrypoint": "python3 -B tools/benchmark184/multiline_view.py proxy --bundle BUNDLE",
+  "fixed_display_selection": "display_format=literal_newlines forces measured arm B; stale STUDY_ARM cannot select A/C/D",
+  "runtime_dependencies": {
+    "eventsource": {
+      "revision": "86b5096ac59ab46e66bd1f6377c604bc1dab0bc2",
+      "version": "1.5.1"
+    },
+    "mlx-swift": {
+      "revision": "0bb916c67f4b9e5c682cbe02a42c701c93ab5021",
+      "version": "0.31.6"
+    },
+    "mlx-swift-lm": {
+      "revision": "c6446cf7bfb7cea76408013b614d4b2c530eaa03"
+    },
+    "swift-argument-parser": {
+      "revision": "6a52f3251125d74daf04fcbd5e6f08a75d074382",
+      "version": "1.8.2"
+    },
+    "swift-asn1": {
+      "revision": "3b6410f7dee09eb33cdd26260c5fd47fda19b0e2",
+      "version": "1.7.3"
+    },
+    "swift-collections": {
+      "revision": "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
+      "version": "1.6.0"
+    },
+    "swift-crypto": {
+      "revision": "da9d28d69ebe3894b18376c8f2395c2f37b8448f",
+      "version": "4.5.2"
+    },
+    "swift-huggingface": {
+      "revision": "f2f99991f2d7d8fdb3187e4fd539cd2facf5c13d",
+      "version": "0.11.0"
+    },
+    "swift-jinja": {
+      "revision": "4588064a20f3fc093c95f2f7d3359999bf30cae5",
+      "version": "2.5.1"
+    },
+    "swift-numerics": {
+      "revision": "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
+      "version": "1.1.1"
+    },
+    "swift-syntax": {
+      "revision": "79e4b74a295b6eb74a8b585e3a39d29e70c1dbd1",
+      "version": "603.0.2"
+    },
+    "swift-transformers": {
+      "revision": "c21fdcde390313a6d98d8e33a346f2c3486c3ab0",
+      "version": "1.3.4"
+    },
+    "yyjson": {
+      "revision": "8b4a38dc994a110abaec8a400615567bd996105f",
+      "version": "0.12.0"
+    }
+  },
+  "display_source_sha256": {
+    "tools/benchmark184/multiline_view.py": "d15e2d593cfd6dcd3faf8753f8c1d9dbb109c0a0bcc5301898fa157b5d408582",
+    "tools/benchmark184/test_multiline_view.py": "a6e762609021288552c76414785101b158f92a7590323629f0bbd0c0cded07f0"
+  },
+  "evidence": {
+    "grouping": "A and B 3/3",
+    "category": "A and B 3/3",
+    "host_validator": "A and B accepted",
+    "input_tokens_reduction_per_phase": 25,
+    "claim": "quality maintained in this fixture; no proven general accuracy/speed improvement",
+    "selection": "user adopted display-only change after comparisons"
+  }
+}
