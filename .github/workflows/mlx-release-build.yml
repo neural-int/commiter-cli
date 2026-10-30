@@ -47,6 +47,7 @@ jobs:
               internal/mlxmodel/* | \
               mlx-helper/* | \
               .github/scripts/build-mlx-helper.sh | \
+              .github/scripts/test-mlx-helper.sh | \
               .github/scripts/build-release-package.sh | \
               .github/scripts/release-preflight.sh | \
               .github/scripts/verify-release-package.sh | \
@@ -83,8 +84,11 @@ jobs:
       - name: Run go vet
         run: go vet ./...
 
-      - name: Run Swift helper tests
-        run: swift test --package-path mlx-helper --triple arm64-apple-macosx14.0
+      - name: Build helper and Metal library for tests
+        run: bash .github/scripts/build-mlx-helper.sh
+
+      - name: Run Swift helper tests with Metal library
+        run: bash .github/scripts/test-mlx-helper.sh --triple arm64-apple-macosx14.0
 
       - name: Build and verify release package
         shell: bash
