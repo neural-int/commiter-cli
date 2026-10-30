@@ -283,7 +283,7 @@ private struct ModelBenchmarkConfiguration: Decodable {
     let attentionLayers: Int
     let otherLayers: Int
     static func load() throws -> Self? {
-        guard CommandLine.arguments.dropFirst().first?.hasPrefix("--benchmark-") == true,
+        guard CommandLine.arguments.dropFirst().first.map({ $0.hasPrefix("--benchmark-") || $0 == "--three-phase" }) == true,
               let path = ProcessInfo.processInfo.environment["COMMITER_182_CASE_CONFIG"] else { return nil }
         let value = try JSONDecoder().decode(Self.self, from: Data(contentsOf: URL(fileURLWithPath: path)))
         guard ["gemma", "qwen", "ministral"].contains(value.family), value.temperature > 0,
@@ -392,6 +392,7 @@ private struct BenchmarkProgressProcessor: LogitProcessor {
 private struct BenchmarkMetrics: Encodable {
     var outputConstraint: String?
     var scopeConstraintRejectedTokens: Int?
+    var prefillProtectionEnabled: Bool?
     var comparisonPath: String?
     var comparisonStopReason: String?
     var loadSeconds = 0.0
@@ -455,7 +456,7 @@ struct CommiterMLXHelper {
             return
         }
         if CommandLine.arguments.count == 2,
-           ["--benchmark-single", "--benchmark-cycle", "--benchmark-token-audit", "--benchmark-cache", "--benchmark-model-defaults"].contains(CommandLine.arguments[1]) {
+           ["--three-phase", "--benchmark-single", "--benchmark-cycle", "--benchmark-token-audit", "--benchmark-input-audit", "--benchmark-cache", "--benchmark-model-defaults"].contains(CommandLine.arguments[1]) {
             await benchmarkMain(mode: CommandLine.arguments[1])
             return
         }
@@ -671,6 +672,10 @@ struct CommiterMLXHelper {
         let outputConstraint = research?.output_constraint ?? .jsonSchema
         benchmark?.metrics.outputConstraint = research?.output_constraint?.rawValue
         var wireMessages = try contractMessages(request, schema: schema, enabled: research?.output_constraint != nil)
+        // Research layout comparison: caller supplies the finalized wire; Schema still constrains sampling.
+        if (benchmark?.auditOnly == true && ProcessInfo.processInfo.environment["COMMITER_184_AUDIT_WIRE"] == "1") || (research != nil && ProcessInfo.processInfo.environment["COMMITER_184_LAYOUT_WIRE"] == "1") {
+            wireMessages = request.messages.map { (role: $0.role, content: $0.content) }
+        }
         if research?.family == "ministral" {
             var merged: [(role: Chat.Message.Role, content: String)] = []
             for message in wireMessages {
@@ -752,8 +757,7 @@ struct CommiterMLXHelper {
                 let quoteTokens = Set((0..<tokenizer.vocabSize).filter {
                     hostTokenizer.decode(tokenIds: [$0]).contains("\"")
                 })
-                response.setPrefixConstraint { ids in
-                    guard let last = ids.last, quoteTokens.contains(last) else { return true }
+                response.setPrefixConstraint(candidate: { quoteTokens.contains($0) }) { ids in
                     return ScopeValueConstraint.allows(hostTokenizer.decode(tokenIds: ids), forbidden: forbidden)
                 }
             }
@@ -804,7 +808,11 @@ struct CommiterMLXHelper {
                 benchmark?.metrics.requestedKVBits = bits
             }
         }
-        if request.contextTokens > 16384 {
+        let prefillPolicy = ProcessInfo.processInfo.environment["COMMITER_184_PREFILL_POLICY"] ?? "adaptive8k"
+        guard ["adaptive8k", "legacy"].contains(prefillPolicy) else { throw HelperError.malformedRequest }
+        let protectPrefill = request.contextTokens > 16384 && (prefillPolicy == "legacy" || input.text.tokens.size > 8192)
+        benchmark?.metrics.prefillProtectionEnabled = protectPrefill
+        if protectPrefill {
             // The dependency submits prefill chunks asynchronously. At long
             // contexts, wait for each chunk before submitting the next and
             // release unused buffers; keep token order and KV contents intact.
@@ -949,10 +957,10 @@ struct CommiterMLXHelper {
     }
 
     private static func benchmarkMain(mode: String) async {
-        let audit = mode == "--benchmark-token-audit"
+        let audit = mode == "--benchmark-token-audit" || mode == "--benchmark-input-audit"
         let state = BenchmarkState(retainModel: mode != "--benchmark-single", auditOnly: audit)
         let reader = BenchmarkLineReader(handle: .standardInput, maximumBytes: maxRequestBytes)
-        let profiles = audit ? ["bounded-category", "bounded-text"] : ["bounded-grouping", "bounded-category", "bounded-text"]
+        let profiles = mode == "--benchmark-token-audit" ? ["bounded-category", "bounded-text"] : ["bounded-grouping", "bounded-category", "bounded-text"]
         var count = 0
         do {
             while let data = try reader.next() {

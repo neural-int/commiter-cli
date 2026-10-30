@@ -96,6 +96,16 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 	}
 	ctx, cancel := context.WithTimeout(parent, CandidateCycleTimeout)
 	defer cancel()
+	if lifecycle, ok := g.Client.(interface {
+		BeginCycle(context.Context) (llm.OptionsBackend, func(), error)
+	}); ok {
+		cycle, closeCycle, e := lifecycle.BeginCycle(ctx)
+		if e != nil {
+			return result, e
+		}
+		defer closeCycle()
+		client = cycle
+	}
 	var original map[string]json.RawMessage
 	if err := json.Unmarshal(prepared.Prompt, &original); err != nil {
 		return result, errors.New("invalid candidate input")

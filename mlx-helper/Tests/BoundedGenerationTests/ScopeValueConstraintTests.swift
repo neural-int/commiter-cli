@@ -26,7 +26,7 @@ struct ScopeValueConstraintTests {
         let factory: @Sendable () throws -> GrammarConstraint = { try GrammarConstraint(tokenizer: tokenizer, jsonSchema: schema, fastForward: false) }
         let state = GrammarSamplingState(constraint: try factory(), vocabSize: 5, eos: 4, factory: factory)
         let blocked = words
-        state.setPrefixConstraint { ids in ScopeValueConstraint.allows(ids.filter { $0 != 4 }.map { vocab[$0] }.joined(), forbidden: blocked) }
+        state.setPrefixConstraint(candidate: { $0 == 3 }) { ids in ScopeValueConstraint.allows(ids.filter { $0 != 4 }.map { vocab[$0] }.joined(), forbidden: blocked) }
         state.commit(0); state.commit(1)
         #expect(!state.maskValues(count: 5)[3].isFinite)
         let clone = state.independentCopy()

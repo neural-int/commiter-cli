@@ -13,11 +13,12 @@ public final class GrammarSamplingState: @unchecked Sendable {
     private var committedTokens: [Int] = []
     private var prefixConstraint: (@Sendable ([Int]) -> Bool)?
     private var prefixRejections = 0
+    private var prefixCandidate: (@Sendable (Int) -> Bool)?
     public var prefixRejectedTokenCount: Int {
         lock.lock(); defer { lock.unlock() }; return prefixRejections
     }
-    public func setPrefixConstraint(_ check: @escaping @Sendable ([Int]) -> Bool) {
-        lock.lock(); defer { lock.unlock() }; prefixConstraint = check
+    public func setPrefixConstraint(candidate: (@Sendable (Int) -> Bool)? = nil, _ check: @escaping @Sendable ([Int]) -> Bool) {
+        lock.lock(); defer { lock.unlock() }; prefixConstraint = check; prefixCandidate = candidate
     }
     private let vocabSize: Int
     private let eos: Int
@@ -81,6 +82,7 @@ public final class GrammarSamplingState: @unchecked Sendable {
             }
             if let check = prefixConstraint {
                 for i in values.indices where values[i].isFinite {
+                    if prefixCandidate?(i) == false { continue }
                     if !check(committedTokens + [i]) { values[i] = -.infinity; prefixRejections += 1 }
                 }
             }
@@ -135,6 +137,7 @@ public final class GrammarSamplingState: @unchecked Sendable {
         let clone = failed ? nil : try? factory()
         let result = GrammarSamplingState(constraint: clone, vocabSize: vocabSize, eos: eos, whitespace: whitespace, runtimeStopIDs: runtimeStopIDs, unknownID: unknownID, alignRuntimeStops: alignRuntimeStops, enforcesGrammar: enforcesGrammar, factory: factory)
         result.prefixConstraint = prefixConstraint
+        result.prefixCandidate = prefixCandidate
         // xgrammar v0.1.30 has no Fork(). Replay transient token IDs into a
         // separate matcher, never share mutable state between copies.
         for token in committedTokens { result.commit(token) }

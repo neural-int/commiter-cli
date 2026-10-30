@@ -307,7 +307,7 @@ func TestGemmaThreePhaseDefaultPlanning(t *testing.T) {
 		helper := filepath.Join(t.TempDir(), "helper")
 		script := `#!/bin/sh
 set -eu
-request=$(cat)
+while IFS= read -r request; do
 case "$request" in
  *'"context_tokens":16384'*) ;;
  *) exit 1 ;;
@@ -320,6 +320,7 @@ case "$request" in
 esac
 escaped=$(printf '%s' "$result" | sed 's/"/\\"/g')
 printf '{"ok":true,"stop_reason":"completed","generation_profile":"%s","generated_json":"%s"}\n' "$profile" "$escaped"
+done
 `
 		if err := os.WriteFile(helper, []byte(script), 0o700); err != nil {
 			t.Fatal(err)
