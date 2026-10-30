@@ -29,7 +29,9 @@ H184-HARNESS-002の短縮表記は **4-HARNESS-002 / revision 1**。実験番号
 }
 ```
 
-bundleには測定時と同じ`case.json`と`scope-policy.json`も必要。固定されたhelper/Metalのハッシュ、case設定とmanifest、モデルrevisionを実行前に確認する。親ハーネスのsource hashは歴史的な測定バイナリの出典であり、このチェックアウトのソースから同じバイナリを再ビルドしたという意味ではない。
+bundleには測定時と同じ`case.json`と`scope-policy.json`も必要。固定されたhelper/Metalのハッシュ、case設定とmanifest、モデルrevisionを実行前に確認する。
+
+001のSwift実装・生成経路への接続・前提となるモデル別研究経路・対応テストは、このブランチの`mlx-helper`へ取り込み済み。取り込み元はcommit `374f8f6da57adc84dc230f997afe070d55f160a6`に固定し、ソース一致と検証内容を[移植記録](runtime-import.md)へ記載する。既存のPackage.swift・Package.resolvedは変更していない。測定時のバイナリSHAは歴史的な測定資産の識別子として保持し、再ビルドしたバイナリとのbyte一致を主張するものではない。
 
 ```sh
 export COMMITER_182_CASE_CONFIG="$BUNDLE/case.json"

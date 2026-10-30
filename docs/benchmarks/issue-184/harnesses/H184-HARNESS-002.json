@@ -71,7 +71,7 @@
     "validator acceptance does not guarantee semantic accuracy",
     "one fixture and seed; A then B without warmup",
     "Text has remaining semantic issues despite validator acceptance",
-    "runtime/model binaries and real histories are private; this checkout does not contain the historical three-phase evaluator",
+    "historical runtime/model binaries and real histories are private; Swift runtime sources are now included; the historical Go three-phase evaluator remains external",
     "no new generation during registration; test covers fixed-display selection and existing roundtrip",
     "literal-newline display must not be parsed as canonical strict JSON"
   ],
@@ -175,5 +175,26 @@
     "input_tokens_reduction_per_phase": 25,
     "claim": "quality maintained in this fixture; no proven general accuracy/speed improvement",
     "selection": "user adopted display-only change after comparisons"
+  },
+  "runtime_source_import": {
+    "source_commit": "374f8f6da57adc84dc230f997afe070d55f160a6",
+    "source_harness": "H184-HARNESS-001 / revision 1",
+    "scope": "Swift runtime and prerequisite source/tests only; no whole-branch merge",
+    "sha256": {
+      "mlx-helper/Sources/BoundedGeneration/GrammarSampling.swift": "41e5b4ab7fbd26db19194af8ae38b45345a473622ccfe141d19636bb4f40774c",
+      "mlx-helper/Sources/BoundedGeneration/NativeThoughtBudget.swift": "591f3d304bf4082611026a8a68e5a70c09114784463bce55e8fc566a32b9661a",
+      "mlx-helper/Sources/BoundedGeneration/OverlappedTokenProcessor.swift": "e78deaf4897a282140b2dc8cf170f504b04bdbdc3664b6e5683f5fe4014af73c",
+      "mlx-helper/Sources/BoundedGeneration/ScopeValueConstraint.swift": "ace246d452a4746fd670c2ca3bb51e0137a487456e42a9eacf007dde8fb647e1",
+      "mlx-helper/Sources/BoundedGeneration/StructuredOutputPrompt.swift": "adabc990a02f0f6106021a25325a1ec203b49210b753e1edace9063bc71c27fa",
+      "mlx-helper/Sources/commiter-mlx-helper/CommiterMLXHelper.swift": "233d5da446598b4c60b0a97254ca33eea66b4dc95ccddc1446f5581de794c6fa",
+      "mlx-helper/Tests/BoundedGenerationTests/NativeThoughtBudgetTests.swift": "aeab41bcd7b874164a68d0029170926a44992ac6c10a80d7bbc3566b89a96680",
+      "mlx-helper/Tests/BoundedGenerationTests/OutputConstraintTests.swift": "49263e67848ad53de5edfef7b500ac0bf25fb789b624cf71a33e64339550395f",
+      "mlx-helper/Tests/BoundedGenerationTests/OverlappedTokenProcessorTests.swift": "3212f40048938c9aba57aacfbbbce6c1fd62527697984da013cacc5b3dc103a1",
+      "mlx-helper/Tests/BoundedGenerationTests/ScopeValueConstraintTests.swift": "fe1daecffcdc61cb43641ffacdeeb78608c6560c6fdc6df59fd4fa0a92a57a32"
+    },
+    "dependencies": "Package.swift and Package.resolved unchanged; no added dependencies",
+    "source_equality": "all 24 tracked Swift package files byte-identical to source commit",
+    "measured_artifacts": "historical measured SHA-256 retained; rebuilding is not claimed to produce byte-identical artifacts",
+    "verification_report": "runtime-import.md"
   }
 }
