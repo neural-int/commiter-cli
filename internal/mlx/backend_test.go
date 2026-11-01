@@ -108,3 +108,34 @@ printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{}","gener
 		t.Fatal(err)
 	}
 }
+
+func TestHarness004BackendProjectsOnlyJSONBodies(t *testing.T) {
+	marker := filepath.Join(t.TempDir(), "request.json")
+	helper := shellHelper(t, "IFS= read -r request\nprintf '%s' \"$request\" > "+shellQuote(marker)+"\nprintf '%s\\n' '{\"ok\":true,\"stop_reason\":\"completed\",\"generated_json\":\"{}\",\"generation_profile\":\"bounded-text\",\"benchmark_metrics\":{\"prefixReuseStatus\":\"reused\",\"cacheReusedTokens\":23}}'")
+	messages := []llm.Message{
+		{Role: "system", Content: "fixed system"},
+		{Role: "user", Content: `{"raw_diff":"-old\n+new\n"}`},
+		{Role: "user", Content: "fixed instructions\n\nPhase input:\n" + `{"groups":[]}`},
+	}
+	before, _ := json.Marshal(messages)
+	b := &Backend{Client: NewClient(helper)}
+	response, err := b.ChatWithOptions(context.Background(), messages, json.RawMessage(`{"type":"object"}`), llm.Options{GenerationProfile: "bounded-text", InputLayout: "harness004", LiteralNewlines: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(marker)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var request Request
+	if err = json.Unmarshal(data, &request); err != nil {
+		t.Fatal("outer IPC must remain JSON:", err)
+	}
+	after, _ := json.Marshal(messages)
+	if string(before) != string(after) || request.InputLayout != "harness004" || request.Messages[2] != messages[2] || !strings.Contains(request.Messages[1].Content, "-old\n+new\n") {
+		t.Fatal("projection changed instructions/host or failed to render body")
+	}
+	if response.PrefixReuseStatus != "reused" || response.CacheReusedTokens != 23 {
+		t.Fatalf("prefix telemetry lost: %#v", response)
+	}
+}

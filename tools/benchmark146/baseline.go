@@ -31,7 +31,7 @@ func (c *recordingClient) ChatWithOptions(ctx context.Context, m []llm.Message, 
 				Files []contextinput.File `json:"files"`
 			} `json:"groups"`
 		}
-		if json.Unmarshal([]byte(m[1].Content), &payload) == nil {
+		if json.Unmarshal(benchmarkPayload(m), &payload) == nil {
 			c.ValidatedGroups = nil
 			for _, g := range payload.Groups {
 				c.ValidatedGroups = append(c.ValidatedGroups, restoreFileIDs(g.Files, c.Files))

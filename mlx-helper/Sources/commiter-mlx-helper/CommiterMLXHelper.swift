@@ -94,6 +94,7 @@ private struct Request: Decodable {
     let model: String?
     let modelPath: String?
     let generationProfile: String?
+    let inputLayout: String?
 
     enum CodingKeys: String, CodingKey {
         case schema
@@ -103,6 +104,7 @@ private struct Request: Decodable {
         case model
         case modelPath = "model_path"
         case generationProfile = "generation_profile"
+        case inputLayout = "input_layout"
     }
 
     init(from decoder: Swift.Decoder) throws {
@@ -114,6 +116,8 @@ private struct Request: Decodable {
         model = try container.decodeIfPresent(String.self, forKey: .model)
         modelPath = try container.decodeIfPresent(String.self, forKey: .modelPath)
         generationProfile = try container.decodeIfPresent(String.self, forKey: .generationProfile)
+        inputLayout = try container.decodeIfPresent(String.self, forKey: .inputLayout)
+        guard inputLayout == nil || (inputLayout == "harness004" && generationProfile != nil) else { throw HelperError.malformedRequest }
         guard !messages.isEmpty, contextTokens >= 0, outputTokens >= 0 else {
             throw HelperError.malformedRequest
         }
@@ -417,6 +421,9 @@ private struct BenchmarkMetrics: Encodable {
     var outputConstraint: String?
     var scopeConstraintRejectedTokens: Int?
     var prefillProtectionEnabled: Bool?
+    var prefillSynchronizationEnabled: Bool?
+    var prefillCacheClearEnabled: Bool?
+    var prefixPreparationOnly: Bool?
     var comparisonPath: String?
     var comparisonStopReason: String?
     var loadSeconds = 0.0
@@ -482,7 +489,7 @@ struct CommiterMLXHelper {
             return
         }
         if CommandLine.arguments.count == 2,
-           ["--three-phase", "--benchmark-single", "--benchmark-cycle", "--benchmark-token-audit", "--benchmark-input-audit", "--benchmark-cache", "--benchmark-model-defaults"].contains(CommandLine.arguments[1]) {
+           ["--three-phase", "--benchmark-single", "--benchmark-cycle", "--benchmark-multifile", "--benchmark-text-replay", "--benchmark-token-audit", "--benchmark-input-audit", "--benchmark-cache", "--benchmark-model-defaults"].contains(CommandLine.arguments[1]) {
             await benchmarkMain(mode: CommandLine.arguments[1])
             return
         }
@@ -512,6 +519,12 @@ struct CommiterMLXHelper {
 
     private static func contractMessages(_ request: Request, schema: String, enabled: Bool) throws -> [(role: Chat.Message.Role, content: String)] {
         var messages = request.messages.map { (role: $0.role, content: $0.content) }
+        if request.inputLayout == "harness004" {
+            guard request.messages.count == 3, request.messages[0].role == .system,
+                  request.messages[1].role == .user, request.messages[2].role == .user,
+                  request.messages[2].content.contains("\n\nPhase input:\n") else { throw HelperError.malformedRequest }
+            return messages
+        }
         if enabled {
             var instruction = try StructuredOutputPrompt.instruction(schema: schema)
             if ProcessInfo.processInfo.environment["COMMITER_182_NEUTRAL_EXAMPLES"] == "1",
@@ -561,16 +574,16 @@ struct CommiterMLXHelper {
         let modelID = request.model?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
             ? request.model!
             : URL(filePath: modelPath).lastPathComponent
-        let research = try ModelBenchmarkConfiguration.load()
+        let research = request.inputLayout == "harness004" ? nil : try ModelBenchmarkConfiguration.load()
         if let research { guard research.model == modelID else { throw HelperError.malformedRequest } }
         if let profile = request.generationProfile {
             guard ["bounded-grouping", "bounded-category", "bounded-text"].contains(profile),
-                  (research != nil || modelID == "mlx-community/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2" ||
+                  (research != nil || (request.inputLayout == "harness004" && modelID == "mlx-community/Qwen3.5-4B-4bit@0e7ffd5c629ef7719d4cbc04069232580bfa9d9c") || modelID == "mlx-community/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2" ||
                    (benchmark != nil && CommandLine.arguments.contains("--benchmark-model-defaults"))) else {
                 throw HelperError.malformedRequest
             }
             do {
-                if research == nil { try BoundedRequestLimits.validate(profile: profile, context: request.contextTokens, output: request.outputTokens) } else { guard (request.outputTokens == 0 || request.outputTokens == 4096), request.contextTokens > 0, request.contextTokens <= 65536 else { throw HelperError.malformedRequest } }
+                if research == nil { try BoundedRequestLimits.validate(profile: profile, context: request.contextTokens, output: request.outputTokens, harness004: request.inputLayout == "harness004") } else { guard (request.outputTokens == 0 || request.outputTokens == 4096), request.contextTokens > 0, request.contextTokens <= 65536 else { throw HelperError.malformedRequest } }
             } catch { throw HelperError.malformedRequest }
         }
         let schemaData = try JSONSerialization.data(withJSONObject: request.schema.foundationValue, options: [.sortedKeys])
@@ -678,7 +691,7 @@ struct CommiterMLXHelper {
     }
 
     private static func generateBounded(_ request: Request, profile: String, schema: String, context: ModelContext, benchmark: BenchmarkState? = nil) async throws -> String {
-        let research = try ModelBenchmarkConfiguration.load()
+        let research = request.inputLayout == "harness004" ? nil : try ModelBenchmarkConfiguration.load()
         let pipeline = research == nil ? "eager" : (ProcessInfo.processInfo.environment["COMMITER_182_PIPELINE"] ?? "eager")
         guard ["eager", "overlap"].contains(pipeline),
               pipeline != "overlap" || (benchmark != nil && ProcessInfo.processInfo.environment["COMMITER_182_PROGRESS"] == "1") else {
@@ -695,7 +708,7 @@ struct CommiterMLXHelper {
         let qwenThinking = research.map { $0.family == "qwen" && $0.thinking } ?? (modelDefaults && modelName == "mlx-community/Qwen3.5-4B-4bit")
         let ministralThinking = research.map { $0.family == "ministral" && $0.thinking } ?? false
         let otherDefault = modelDefaults && !modelName.contains("gemma-4-E4B")
-        let nativeLimit = research.map { $0.thinking ? Int.max : 0 } ?? (qwenThinking ? (profile == "bounded-grouping" ? 512 : 384) :
+        let nativeLimit = request.inputLayout == "harness004" ? 0 : research.map { $0.thinking ? Int.max : 0 } ?? (qwenThinking ? (profile == "bounded-grouping" ? 512 : 384) :
             (otherDefault ? 0 : (profile == "bounded-grouping" ? 512 : (configuredMode == "T" ? 384 : (configuredMode == "N" ? 0 : (profile == "bounded-category" ? 384 : 0)))))
         )
         let budget = request.outputTokens // Validated by handle before model loading.
@@ -776,12 +789,16 @@ struct CommiterMLXHelper {
                 runtimeStopIDs: preparation.runtimeStopIDs, unknownID: preparation.unknownTokenID,
                 alignRuntimeStops: true, factory: factory)
             responseState = response
-            if research != nil, profile == "bounded-text",
-               ProcessInfo.processInfo.environment["COMMITER_184_SCOPE_CONSTRAINT"] == "1" {
-                guard outputConstraint == .jsonSchema,
-                      let path = ProcessInfo.processInfo.environment["COMMITER_184_SCOPE_POLICY"],
-                      let words = try? JSONDecoder().decode([String].self, from: Data(contentsOf: URL(fileURLWithPath: path))) else { throw HelperError.malformedRequest }
-                let forbidden = Set(words)
+            if profile == "bounded-text", request.inputLayout == "harness004" || (research != nil && ProcessInfo.processInfo.environment["COMMITER_184_SCOPE_CONSTRAINT"] == "1") {
+                guard outputConstraint == .jsonSchema else { throw HelperError.malformedRequest }
+                let forbidden: Set<String>
+                if request.inputLayout == "harness004" {
+                    forbidden = ["feat", "fix", "docs", "style", "refactor", "perf", "test", "build", "ci", "chore", "revert"]
+                } else {
+                    guard let path = ProcessInfo.processInfo.environment["COMMITER_184_SCOPE_POLICY"],
+                          let words = try? JSONDecoder().decode([String].self, from: Data(contentsOf: URL(fileURLWithPath: path))) else { throw HelperError.malformedRequest }
+                    forbidden = Set(words)
+                }
                 let hostTokenizer = context.tokenizer
                 // Only tokens containing a quote can close a JSON string.
                 let quoteTokens = Set((0..<tokenizer.vocabSize).filter {
@@ -823,7 +840,7 @@ struct CommiterMLXHelper {
                 }
             }
         }
-        var parameters = GenerateParameters(maxTokens: cappedComparison ? 1024 : (research != nil && budget == 0 ? nil : budget), temperature: research?.temperature ?? 0, topP: research?.topP ?? 1, topK: research?.topK ?? 0, seed: 144)
+        var parameters = GenerateParameters(maxTokens: cappedComparison ? 1024 : (research != nil && budget == 0 ? nil : budget), temperature: research?.temperature ?? (request.inputLayout == "harness004" ? (modelName.contains("Qwen") ? 0.6 : 1.0) : 0), topP: research?.topP ?? (request.inputLayout == "harness004" ? 0.95 : 1), topK: research?.topK ?? (request.inputLayout == "harness004" ? (modelName.contains("Qwen") ? 20 : 64) : 0), seed: 144)
         var kvBits: Int? = nil
         if benchmark != nil, (CommandLine.arguments.contains("--benchmark-cache") || research?.output_constraint != nil),
            let value = ProcessInfo.processInfo.environment["COMMITER_180_KV_BITS"] {
@@ -838,23 +855,27 @@ struct CommiterMLXHelper {
                 benchmark?.metrics.requestedKVBits = bits
             }
         }
-        let prefillPolicy = ProcessInfo.processInfo.environment["COMMITER_184_PREFILL_POLICY"] ?? "adaptive8k"
-        guard ["adaptive8k", "legacy"].contains(prefillPolicy) else { throw HelperError.malformedRequest }
-        let protectPrefill = request.contextTokens > 16384 && (prefillPolicy == "legacy" || input.text.tokens.size > 8192)
+        let prefillPolicy = request.inputLayout == "harness004" ? "legacy" : (ProcessInfo.processInfo.environment["COMMITER_184_PREFILL_POLICY"] ?? "adaptive8k")
+        guard ["adaptive8k", "legacy", "diagnostic-off", "diagnostic-sync-only"].contains(prefillPolicy),
+              !prefillPolicy.hasPrefix("diagnostic-") || (benchmark != nil && research != nil) else { throw HelperError.malformedRequest }
+        let protectPrefill = prefillPolicy != "diagnostic-off" && request.contextTokens > 16384 && (["legacy", "diagnostic-sync-only"].contains(prefillPolicy) || input.text.tokens.size > 8192)
+        let clearPrefillCache = protectPrefill && prefillPolicy != "diagnostic-sync-only"
         benchmark?.metrics.prefillProtectionEnabled = protectPrefill
+        benchmark?.metrics.prefillSynchronizationEnabled = protectPrefill
+        benchmark?.metrics.prefillCacheClearEnabled = clearPrefillCache
         if protectPrefill {
             // The dependency submits prefill chunks asynchronously. At long
             // contexts, wait for each chunk before submitting the next and
             // release unused buffers; keep token order and KV contents intact.
             parameters.prefill.progress = { _, _ in
                 Stream().synchronize()
-                Memory.clearCache()
+                if clearPrefillCache { Memory.clearCache() }
             }
         }
         benchmark?.metrics.grammarSetupSeconds = ProcessInfo.processInfo.systemUptime - grammarStart
         let generationStart = ProcessInfo.processInfo.systemUptime
         var workingCache: [KVCache]? = nil
-        if ProcessInfo.processInfo.environment["COMMITER_184_PREFIX_PLAN"] != nil,
+        if request.inputLayout == nil, ProcessInfo.processInfo.environment["COMMITER_184_PREFIX_PLAN"] != nil,
            !CommandLine.arguments.contains("--benchmark-cache"), let benchmark {
             benchmark.metrics.prefixReuseStatus = "disabled_unverified_plan"
             if let plan = PrefixReusePlan.load(), research != nil, plan.model == request.model,
@@ -894,6 +915,55 @@ struct CommiterMLXHelper {
                     } else { benchmark.metrics.prefixReuseStatus = "fallback_prefix_mismatch" }
                 } else { benchmark.metrics.prefixReuseStatus = "fallback_identity_or_prefix_mismatch" }
             }
+        }
+        if request.inputLayout == "harness004", kvBits == nil, let benchmark {
+            let tokens = input.text.tokens.asArray(Int.self)
+            let identity = "\(modelName)|\(request.modelPath ?? "")|\(request.contextTokens)|\(budget)|native|004-r2"
+            let verified: Set<String> = ["KVCacheSimple", "RotatingKVCache", "MambaCache"]
+            if profile == "bounded-text", let snapshot = benchmark.typedPrefixSnapshot,
+               let fork = snapshot.fork(tokens: tokens, identity: identity) {
+                workingCache = fork
+                input = LMInput(tokens: MLXArray(Array(tokens.dropFirst(snapshot.tokens.count))))
+                benchmark.metrics.cacheReusedTokens = snapshot.tokens.count
+                benchmark.metrics.prefixReuseStatus = "reused"
+            } else if profile == "bounded-grouping", !benchmark.prefixAttempted {
+                benchmark.prefixAttempted = true
+                // An empty phase body gives a token boundary inside the common chat
+                // prefix. Compare token IDs; never assume a character/token ratio.
+                let commonChat = Array(chat.prefix(2)) + [Chat.Message(role: .user, content: "")]
+                let boundary = try await context.processor.prepare(input: UserInput(chat: commonChat, additionalContext: templateContext))
+                let reference = boundary.text.tokens.asArray(Int.self)
+                let count = zip(tokens, reference).prefix(while: { $0.0 == $0.1 }).count
+                let cache = try context.model.newCache(parameters: parameters)
+                if count > 4, count < tokens.count, PrefixCacheSnapshot.supports(cache, verifiedTypes: verified) {
+                    let started = ProcessInfo.processInfo.systemUptime
+                    for start in stride(from: 0, to: count, by: 512) {
+                        let end = min(start+512, count)
+                        _ = context.model(MLXArray(Array(tokens[start..<end])).expandedDimensions(axis: 0), cache: cache)
+                        eval(cache)
+                        Stream().synchronize()
+                        Memory.clearCache()
+                    }
+                    benchmark.metrics.prefixPrefillSeconds = ProcessInfo.processInfo.systemUptime - started
+                    benchmark.typedPrefixSnapshot = PrefixCacheSnapshot(tokens: Array(tokens.prefix(count)), identity: identity, caches: cache, verifiedTypes: verified)
+                    if let snapshot = benchmark.typedPrefixSnapshot, let fork = snapshot.fork(tokens: tokens, identity: identity) {
+                        workingCache = fork
+                        input = LMInput(tokens: MLXArray(Array(tokens.dropFirst(count))))
+                        benchmark.metrics.prefixReuseStatus = "created"
+                    } else { benchmark.metrics.prefixReuseStatus = "fallback_copy_failed" }
+                } else { benchmark.metrics.prefixReuseStatus = "fallback_cache_type_or_boundary" }
+            } else if profile == "bounded-category" { benchmark.metrics.prefixReuseStatus = "independent_category" }
+            else { benchmark.metrics.prefixReuseStatus = "fallback_prefix_mismatch" }
+        }
+        // Research replay builds the immutable common-prefix checkpoint only;
+        // no Grouping tokens are sampled before the single Text comparison.
+        if CommandLine.arguments.contains("--benchmark-text-replay"), profile == "bounded-grouping" {
+            guard research != nil, workingCache != nil,
+                  benchmark?.metrics.prefixReuseStatus == "created" else { throw HelperError.malformedRequest }
+            benchmark?.metrics.prefixPreparationOnly = true
+            benchmark?.metrics.generatedTokens = 0
+            benchmark?.metrics.generationWallSeconds = ProcessInfo.processInfo.systemUptime - generationStart
+            return "{}"
         }
         if CommandLine.arguments.contains("--benchmark-cache"), profile != "bounded-grouping", let benchmark {
             let tokens = input.text.tokens.asArray(Int.self)
@@ -1031,14 +1101,20 @@ struct CommiterMLXHelper {
         let audit = mode == "--benchmark-token-audit" || mode == "--benchmark-input-audit"
         let state = BenchmarkState(retainModel: mode != "--benchmark-single", auditOnly: audit)
         let reader = BenchmarkLineReader(handle: .standardInput, maximumBytes: maxRequestBytes)
-        let profiles = mode == "--benchmark-token-audit" ? ["bounded-category", "bounded-text"] : ["bounded-grouping", "bounded-category", "bounded-text"]
+        let profiles = mode == "--benchmark-text-replay" ? ["bounded-grouping", "bounded-text"] : (mode == "--benchmark-multifile"
+            ? ["bounded-grouping", "bounded-category", "bounded-text", "bounded-category", "bounded-text"]
+            : (mode == "--benchmark-token-audit" ? ["bounded-category", "bounded-text"] : ["bounded-grouping", "bounded-category", "bounded-text"]))
         var count = 0
         var decodedRequest: Request?
         do {
+            if mode == "--benchmark-text-replay", try ModelBenchmarkConfiguration.load() == nil {
+                throw HelperError.malformedRequest
+            }
             while let data = try reader.next() {
                 decodedRequest = nil
                 guard count < profiles.count else { throw HelperError.trailingInput }
                 let request = try decodeRequest(data)
+                if mode == "--benchmark-multifile", request.inputLayout != "harness004", try ModelBenchmarkConfiguration.load() == nil { throw HelperError.malformedRequest }
                 decodedRequest = request
                 if mode != "--benchmark-single" {
                     guard request.generationProfile == profiles[count] else { throw HelperError.malformedRequest }

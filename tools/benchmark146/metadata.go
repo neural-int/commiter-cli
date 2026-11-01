@@ -31,7 +31,7 @@ func (c *templateClient) ChatWithOptions(_ context.Context, m []llm.Message, s j
 	if err := json.Unmarshal(s, &shape); err != nil {
 		return llm.Response{}, err
 	}
-	if err := json.Unmarshal([]byte(m[1].Content), &payload); err != nil {
+	if err := json.Unmarshal(benchmarkPayload(m), &payload); err != nil {
 		return llm.Response{}, err
 	}
 	c.Templates[o.GenerationProfile] = phaseTemplate{System: strings.TrimSuffix(m[0].Content, string(s)), Schema: shape, Payload: payload}

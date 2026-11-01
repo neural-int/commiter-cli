@@ -50,6 +50,8 @@ type Response struct {
 	PromptEvalDuration int64
 	EvalCount          int
 	EvalDuration       int64
+	PrefixReuseStatus  string
+	CacheReusedTokens  int
 	Availability       TelemetryAvailability
 }
 
@@ -65,6 +67,8 @@ type Options struct {
 	// LiteralNewlines opts canonical JSON user bodies into model-only display
 	// projection. GenerationProfile alone never changes the message contract.
 	LiteralNewlines bool
+	// InputLayout opts only three-phase requests into the registered model display.
+	InputLayout string
 }
 
 // ChatOptions is a descriptive alias for callers that use chat terminology.

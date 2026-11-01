@@ -86,3 +86,9 @@ python3 -B tools/benchmark184/adopted_projection.py --source "$FINALIZED_MIXED_I
 COMMITER_184_PREFIX_PLANへprivate JSON planを指定する。tokens、profiles、model、runtimeRevision、verifiedCacheTypes、validationRecordが必要。[実装仕様](../prefix-reuse/implementation.md)参照。2モデルの実検証結果を採用記録とするが、新しいモデル/設定は別途検証が必要。
 
 [測定](../prefix-reuse/two-model-smoke/goal.md)：Qwen/Gemma両方で全3phase完走、Grouping/Category3/3、validator通過。Gemma全出力一致、Qwen Textのsummary差分あり。Qwenの差の原因・厳密同等性は未確定のままユーザー採用。実装Releaseテスト46件通過。性能は各1回比較で保証値ではない。本番CLI既定には自動適用しない。
+
+## H184-HARNESS-004 / revision 2
+
+revision 1は過去の研究条件として保持する。ユーザー指定に従い、004の固定指示・混合配置・型別prefix再利用をThreePhaseGeneratorへ接続した[revision 2](H184-HARNESS-004-r2.json)を追加する。通常の4ファイル上限・120秒制限とsummary48文字上限は維持する。単一呼び出しの旧Generatorは変更しない。各4096出力、自然順Schema、48文字内で完結する新Text指示を反映した。固定指示は公開コードで管理し、private要求や外部prefix planを本番の前提にしない。
+
+[接続仕様・再実行手順・ローカル検証結果](production-integration.md)を参照。準備専用のrunnerは推論前にvalidatorの実行権限と正常・異常計画を検査する。新revisionの多ファイル意味品質・速度改善、CI成功、mainマージは別の確認事項として残す。

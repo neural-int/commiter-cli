@@ -78,7 +78,7 @@ func TestThreePhaseRestoresIDsAndUsesSharedBoundedProfiles(t *testing.T) {
 		t.Fatalf("commit = %#v", commit)
 	}
 	for i, profile := range []string{"bounded-grouping", "bounded-category", "bounded-text"} {
-		if c.options[i].GenerationProfile != profile || c.options[i].ContextTokens != 16384 || c.options[i].OutputTokens != []int{768, 512, 768}[i] {
+		if c.options[i].GenerationProfile != profile || c.options[i].ContextTokens != 16384 || c.options[i].OutputTokens != 4096 {
 			t.Fatalf("phase %d options = %#v", i, c.options[i])
 		}
 		if !c.options[i].LiteralNewlines {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strings"
 
 	"github.com/natsuki0413/commiter-cli/internal/llm"
 )
@@ -47,11 +48,19 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 		rendered := append([]llm.Message(nil), messages...)
 		for i, m := range rendered {
 			if m.Role == "user" {
-				content, e := llm.LiteralNewlineDisplay([]byte(m.Content))
+				body, prefix := m.Content, ""
+				if options.InputLayout == "harness004" && i == 2 {
+					before, after, ok := strings.Cut(body, "\n\nPhase input:\n")
+					if !ok {
+						return llm.Response{}, errors.New("missing phase input")
+					}
+					prefix, body = before+"\n\nPhase input:\n", after
+				}
+				content, e := llm.LiteralNewlineDisplay([]byte(body))
 				if e != nil {
 					return llm.Response{}, e
 				}
-				rendered[i].Content = content
+				rendered[i].Content = prefix + content
 			}
 		}
 		messages = rendered
@@ -63,7 +72,7 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 	response, err := generate(ctx, Request{
 		Schema: schema, Messages: messages, ContextTokens: options.ContextTokens,
 		OutputTokens: options.OutputTokens, Model: model, ModelPath: backend.ModelPath,
-		GenerationProfile: options.GenerationProfile,
+		GenerationProfile: options.GenerationProfile, InputLayout: options.InputLayout,
 	})
 	if err != nil {
 		var failure *Error
@@ -75,7 +84,13 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 	if options.GenerationProfile != "" && response.GenerationProfile != options.GenerationProfile {
 		return llm.Response{}, &Error{Kind: FailureProtocol}
 	}
+	var cache struct {
+		PrefixReuseStatus string `json:"prefixReuseStatus"`
+		CacheReusedTokens int    `json:"cacheReusedTokens"`
+	}
+	_ = json.Unmarshal(response.BenchmarkMetrics, &cache)
 	return llm.Response{
+		PrefixReuseStatus: cache.PrefixReuseStatus, CacheReusedTokens: cache.CacheReusedTokens,
 		Backend: "mlx", Model: response.Model, Content: response.GeneratedJSON,
 		StopReason: string(response.StopReason),
 	}, nil

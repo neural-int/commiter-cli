@@ -71,6 +71,7 @@ type Request struct {
 	Model             string `json:"model,omitempty"`
 	ModelPath         string `json:"model_path,omitempty"`
 	GenerationProfile string `json:"generation_profile,omitempty"`
+	InputLayout       string `json:"input_layout,omitempty"`
 }
 
 // Response is the machine-readable helper output. GeneratedJSON is accepted

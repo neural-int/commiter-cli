@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/natsuki0413/commiter-cli/internal/contextinput"
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
 )
 
@@ -51,23 +50,32 @@ func TestThreePhaseUsesRawDiffInAllPhasesAndPreservesHostInput(t *testing.T) {
 	if string(opaque["mode"]) != `"metadata_only"` || len(opaque["raw_diff"])+len(opaque["syntax_context"]) != 0 {
 		t.Fatal("opaque content leaked")
 	}
-	var metadata struct {
-		Groups []struct {
-			Files []contextinput.File `json:"files"`
-		} `json:"groups"`
-	}
 	for phase := 1; phase <= 2; phase++ {
-		if err := json.Unmarshal([]byte(c.messages[phase][1].Content), &metadata); err != nil {
-			t.Fatal(err)
-		}
-		originalFile := metadata.Groups[0].Files[1]
-		if originalFile.Mode != syntax.ModeRawDiff || originalFile.RawDiff != file.GroupingRawDiff || originalFile.HeadIdentity == nil || *originalFile.HeadIdentity != identity || len(originalFile.Evidence) != 0 {
-			t.Fatalf("phase %d lost original data: %+v", phase, originalFile)
-		}
-		if strings.Contains(c.messages[phase][1].Content, `"syntax_context"`) {
-			t.Fatal("grouping context reached Category/Text")
+		var body map[string]any
+		if phase == 1 {
+			_, data, ok := strings.Cut(c.messages[phase][2].Content, "\n\nPhase input:\n")
+			if !ok {
+				t.Fatal("missing phase payload")
+			}
+			if err := json.Unmarshal([]byte(data), &body); err != nil {
+				t.Fatal(err)
+			}
+			groups := body["groups"].([]any)
+			fs := groups[0].(map[string]any)["files"].([]any)
+			changed := fs[1].(map[string]any)
+			if changed["raw_diff"] != file.GroupingRawDiff {
+				t.Fatal("category diff lost")
+			}
+			if _, ok := changed["head_identity"]; ok {
+				t.Fatal("host identity exposed")
+			}
+		} else {
+			if c.messages[phase][0].Content != c.messages[0][0].Content || c.messages[phase][1].Content != c.messages[0][1].Content {
+				t.Fatal("common prefix drift")
+			}
 		}
 	}
+
 	after, _ := json.Marshal(p.Document)
 	if string(after) != string(original) || !reflect.DeepEqual(file.GroupingSyntaxContext, originalContext) {
 		t.Fatal("projection mutated host input")

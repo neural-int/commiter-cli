@@ -11,8 +11,8 @@ import (
 )
 
 // Session owns exactly one sequential Grouping/Category/Text helper cycle.
-// It retains model preparation, never a response matcher. Production phases
-// have independent KV state; research-only prefix plans can opt into snapshots.
+// It retains model preparation, never a response matcher. Harness004 requests
+// can fork a common prefix snapshot; every phase owns its mutable cache state.
 type Session struct {
 	client  *Client
 	command *exec.Cmd

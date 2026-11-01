@@ -59,7 +59,7 @@ func (b *fixtureBackend) ChatWithOptions(ctx context.Context, m []llm.Message, s
 	var payload struct {
 		Groups []finalizedGroup `json:"groups"`
 	}
-	if err := json.Unmarshal([]byte(m[1].Content), &payload); err != nil {
+	if err := json.Unmarshal(benchmarkPayload(m), &payload); err != nil {
 		return llm.Response{}, err
 	}
 	answers := map[string]any{}
@@ -160,7 +160,8 @@ func TestOverflowAndCancellationStopBeforeBackend(t *testing.T) {
 	}
 }
 
-// The four-file adapter must preserve actual requests, not merely counts.
+// The archived metadata adapter retains semantic output across the explicit
+// production 004 layout/budget migration; its historical wire is not 004.
 type phaseRequest struct {
 	Messages []llm.Message
 	Schema   string
@@ -176,18 +177,28 @@ func TestFourFileMetadataMatchesProductionRequests(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		_, err = (planning.ThreePhaseGenerator{Client: original}).Generate(ctx, contextinput.Prepared{Document: d, Prompt: prompt, Budget: contextinput.Budget{ContextTokens: 16384}}, planning.English, planning.SensitiveValues{})
+		production, err := (planning.ThreePhaseGenerator{Client: original}).Generate(ctx, contextinput.Prepared{Document: d, Prompt: prompt, Budget: contextinput.Budget{ContextTokens: 16384}}, planning.English, planning.SensitiveValues{})
 		if err != nil {
 			t.Fatal(err)
 		}
 		candidate := &fixtureBackend{Fixture: f}
-		_, _, failure := finalMetadata(ctx, f, partition{Groups: f.Expected}, candidate, "mock")
+		archived, _, failure := finalMetadata(ctx, f, partition{Groups: f.Expected}, candidate, "mock")
 		cancel()
 		if failure != "" {
 			t.Fatal(failure)
 		}
-		if !reflect.DeepEqual(original.Requests[1:], candidate.Requests) {
-			t.Fatalf("%s metadata requests differ from production", f.Name)
+		if !reflect.DeepEqual(production.Plan, archived) {
+			t.Fatalf("%s metadata plan changed across layout migration", f.Name)
+		}
+		for _, req := range original.Requests[1:] {
+			if len(req.Messages) != 3 || req.Options.InputLayout != "harness004" || req.Options.OutputTokens != 4096 {
+				t.Fatal("004 production request contract missing")
+			}
+		}
+		for _, req := range candidate.Requests {
+			if len(req.Messages) != 2 || req.Options.InputLayout != "" {
+				t.Fatal("archived adapter contract unexpectedly changed")
+			}
 		}
 	}
 }
@@ -221,7 +232,7 @@ func (b *auditConflictBackend) ChatWithOptions(ctx context.Context, m []llm.Mess
 			var payload struct {
 				Files []contextinput.File `json:"files"`
 			}
-			if err := json.Unmarshal([]byte(m[1].Content), &payload); err != nil {
+			if err := json.Unmarshal(benchmarkPayload(m), &payload); err != nil {
 				return llm.Response{}, err
 			}
 			out := map[string]string{}
