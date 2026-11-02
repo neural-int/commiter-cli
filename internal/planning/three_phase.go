@@ -69,7 +69,7 @@ type candidateGroup struct {
 	FileIDs  []string            `json:"-"`
 	Files    []contextinput.File `json:"files"`
 	Type     string              `json:"type,omitempty"`
-	Breaking bool                `json:"breaking"`
+	Breaking *bool               `json:"breaking,omitempty"`
 }
 
 func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextinput.Prepared, language Language, sensitive SensitiveValues) (result Result, err error) {
@@ -174,17 +174,32 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 		if e != nil {
 			return errors.New("cannot encode candidate schema")
 		}
-		// Retain the existing safe context selection, then project only model display.
-		encoded, _ = addCodexContext(payload, g.CodexContext, files, sensitive, encoded, system, prepared.Budget.ContextTokens, budget)
+		requiredSize := func(messages []llm.Message) int {
+			size := contextinput.TemplateReserve + budget
+			for _, message := range messages {
+				size += len(message.Content)
+			}
+			return size
+		}
+		// Trial projection must not replace the Grouping snapshot. Compare the
+		// complete final contract against the prepared ceiling before choosing
+		// the smallest context tier, preserving the existing history policy.
+		records := g.CodexContext
+		if profile == "bounded-text" {
+			// Text uses Grouping's frozen shared history, not a new selection.
+			records = nil
+		}
+		encoded, _ = addCodexContextWithFit(payload, records, files, sensitive, encoded, system, func(candidate []byte) bool {
+			trialCommon := common004
+			messages, err := harness004Messages(profile, candidate, shape, &trialCommon)
+			return err == nil && requiredSize(messages) <= prepared.Budget.ContextTokens
+		})
 		messages, e := harness004Messages(profile, encoded, shape, &common004)
 		if e != nil {
 			return e
 		}
 		// Exact tokenized prompt+output is additionally checked by the helper.
-		requiredTokens := contextinput.TemplateReserve + budget
-		for _, message := range messages {
-			requiredTokens += len(message.Content)
-		}
+		requiredTokens := requiredSize(messages)
 		if cycleContext == 0 {
 			for _, tier := range []int{contextinput.Context16K, contextinput.Context32K, contextinput.Context64K} {
 				if tier <= prepared.Budget.ContextTokens && requiredTokens <= tier {
@@ -330,7 +345,8 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 			return result, generationError([]Violation{InvalidType})
 		}
 		groups[i].Type = c.Type
-		groups[i].Breaking = c.Reference != "none"
+		breaking := c.Reference != "none"
+		groups[i].Breaking = &breaking
 	}
 	properties = map[string]any{}
 	for _, name := range names {
