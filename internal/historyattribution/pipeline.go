@@ -52,6 +52,9 @@ type Result struct {
 // It never reads Codex rollout files or writes Git. Retrieval failures remain
 // explicit optional history failures; malformed fixed Git evidence is an error.
 func Collect(parent context.Context, request Request) (Result, error) {
+	if err := parent.Err(); err != nil {
+		return Result{}, err
+	}
 	ctx, cancel := context.WithCancel(parent)
 	defer cancel()
 	ctx = context.WithValue(ctx, historyFetchModeContext{}, "pipeline100x4")
@@ -87,12 +90,27 @@ func Collect(parent context.Context, request Request) (Result, error) {
 		}
 	}
 	sources := map[string]ContextSource{}
-	attributed, err := attributeWithSources(request, h, sources)
+	if err := ctx.Err(); err != nil {
+		return Result{}, err
+	}
+	guard, stopGuard, guardError := startMemoryGuard(ctx, cancel, 1)
+	defer stopGuard()
+	if guardError != nil {
+		return Result{}, guardError
+	}
+	ctx = context.WithValue(ctx, memoryGuardContext{}, guard)
+	attributed, err := attributeWithSourcesContext(ctx, request, h, sources)
 	if err != nil {
+		if resourceError := guard.failure(); resourceError != nil {
+			return Result{}, resourceError
+		}
 		return Result{}, err
 	}
 	commandSources := map[string]CommandSource{}
 	appendCommandContexts(request, h, attributed, sources, commandSources)
+	if err := matchingCheckpoint(ctx); err != nil {
+		return Result{}, err
+	}
 	status := "no_related_evidence"
 	if attributed.Acquisition.Status == "unavailable" {
 		status = "unavailable"
@@ -117,7 +135,17 @@ func attribute(request Request, history History) (*planning.GroupingHistory, err
 }
 
 func attributeWithSources(request Request, history History, sources map[string]ContextSource) (*planning.GroupingHistory, error) {
-	h, err := uniqueHistorySources(history)
+	return attributeWithSourcesContext(context.Background(), request, history, sources)
+}
+
+func attributeWithSourcesContext(ctx context.Context, request Request, history History, sources map[string]ContextSource) (*planning.GroupingHistory, error) {
+	if err := matchingCheckpoint(ctx); err != nil {
+		return nil, err
+	}
+	h, err := uniqueHistorySourcesContext(ctx, history)
+	if stop := matchingCheckpoint(ctx); stop != nil {
+		return nil, stop
+	}
 	if err != nil {
 		h = History{Status: "unavailable", Error: failure("history.identity", "invalid_schema").(*StageError)}
 	}
@@ -139,6 +167,9 @@ func attributeWithSources(request Request, history History, sources map[string]C
 	// Invalid/sensitive retained operations cannot become evidence by projection.
 	retained := []Operation{}
 	for _, op := range h.Operations {
+		if err := matchingCheckpoint(ctx); err != nil {
+			return nil, err
+		}
 		if !safePath(op.Path) || (op.OldPath != "" && !safePath(op.OldPath)) || request.AllowPath == nil || !request.AllowPath(op.Path) || (op.OldPath != "" && !request.AllowPath(op.OldPath)) || (op.Diff != nil && !safe(*op.Diff)) {
 			out.Acquisition.Status = "partial"
 			if !containsString(out.Acquisition.Reasons, "history_incomplete") {
@@ -152,6 +183,9 @@ func attributeWithSources(request Request, history History, sources map[string]C
 	h.Status = out.Acquisition.Status
 	contexts := map[string]TurnContext{}
 	for _, turn := range h.Turns {
+		if err := matchingCheckpoint(ctx); err != nil {
+			return nil, err
+		}
 		contexts[sourceTurnKey(turn.Thread, turn.Turn)] = turn
 	}
 	ops := map[string]Operation{}
@@ -184,7 +218,10 @@ func attributeWithSources(request Request, history History, sources map[string]C
 		input.Files = append(input.Files, GitFile{Path: path, OldPath: oldPath, Kind: kind, Diff: wire.RawDiff})
 		projected = append(projected, wire)
 	}
-	compared := compare(input)
+	compared, compareError := compareContext(ctx, input)
+	if compareError != nil {
+		return nil, compareError
+	}
 	type resultKey struct {
 		path  string
 		block int
@@ -196,6 +233,9 @@ func attributeWithSources(request Request, history History, sources map[string]C
 	refs := map[string]string{}
 	omissions := map[string][]string{}
 	for i, file := range input.Files {
+		if err := matchingCheckpoint(ctx); err != nil {
+			return nil, err
+		}
 		wire := projected[i]
 		current, e := comparisonBlocks(file.Kind, file.Diff, file.OldPath)
 		if e != nil || len(current) != len(wire.ChangeBlocks) {
@@ -203,6 +243,9 @@ func attributeWithSources(request Request, history History, sources map[string]C
 		}
 		target := planning.AttributedFileHistory{FileID: wire.FileID, RawDiff: wire.RawDiff, Blocks: []planning.AttributedBlockHistory{}}
 		for index, block := range wire.ChangeBlocks {
+			if err := matchingCheckpoint(ctx); err != nil {
+				return nil, err
+			}
 			r, ok := results[resultKey{file.Path, index}]
 			if !ok {
 				return nil, failure("history.match", "invalid_schema")
@@ -234,6 +277,9 @@ func attributeWithSources(request Request, history History, sources map[string]C
 			}
 			indexes := map[string]int{}
 			for _, candidate := range r.Candidates {
+				if err := matchingCheckpoint(ctx); err != nil {
+					return nil, err
+				}
 				key := sourceTurnKey(candidate.Thread, candidate.Turn)
 				turn, exists := contexts[key]
 				if !exists {
@@ -301,6 +347,9 @@ func attributeWithSources(request Request, history History, sources map[string]C
 					if blocks, e := comparisonBlocks(op.Kind, *op.Diff, op.OldPath); e == nil {
 						exact, partial := false, false
 						for _, source := range blocks {
+							if err := matchingCheckpoint(ctx); err != nil {
+								return nil, err
+							}
 							if equalBlock(current[index], source) {
 								exact = true
 							} else if overlap(current[index], source) {

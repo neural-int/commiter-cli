@@ -1,15 +1,24 @@
 package historyattribution
 
-import "encoding/json"
+import (
+	"context"
+	"encoding/json"
+)
 
 // Validate retained source identities again at the projection boundary. Equal
 // text under different identities remains separate attribution evidence.
 func uniqueHistorySources(h History) (History, error) {
+	return uniqueHistorySourcesContext(context.Background(), h)
+}
+func uniqueHistorySourcesContext(ctx context.Context, h History) (History, error) {
 	turns := make([]TurnContext, 0, len(h.Turns))
 	operations := make([]Operation, 0, len(h.Operations))
 	seenTurns := map[string]string{}
 	seenOps := map[string]string{}
 	for _, turn := range h.Turns {
+		if err := matchingCheckpoint(ctx); err != nil {
+			return History{}, err
+		}
 		key, _ := json.Marshal([]string{turn.Thread, turn.Turn})
 		body, _ := json.Marshal(turn)
 		if previous, ok := seenTurns[string(key)]; ok {
@@ -22,6 +31,9 @@ func uniqueHistorySources(h History) (History, error) {
 		turns = append(turns, turn)
 	}
 	for _, op := range h.Operations {
+		if err := matchingCheckpoint(ctx); err != nil {
+			return History{}, err
+		}
 		key := operationKey(op)
 		body, _ := json.Marshal(op)
 		if previous, ok := seenOps[key]; ok {

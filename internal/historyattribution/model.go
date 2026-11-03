@@ -2,6 +2,7 @@
 package historyattribution
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"regexp"
@@ -338,6 +339,14 @@ func rewrittenByOrderedPair(current, first, last Block) bool {
 	return old != "" && new != "" && middle != "" && old == blockSide(first, "-") && middle == blockSide(last, "-") && new == blockSide(last, "+")
 }
 func compare(in Input) Comparison {
+	out, _ := compareContext(context.Background(), in)
+	return out
+}
+
+func compareContext(ctx context.Context, in Input) (Comparison, error) {
+	if err := matchingCheckpoint(ctx); err != nil {
+		return Comparison{}, err
+	}
 	out := Comparison{HistoryStatus: in.History.Status, Fallback: in.History.Status != "complete", Limits: "unique content correspondence, not causal provenance; no patch replay; superseded/split-merge causes are not inferred from mismatch"}
 	if e := in.History.Error; e != nil {
 		if e.Reason == "" {
@@ -356,6 +365,9 @@ func compare(in Input) Comparison {
 	var ops []parsed
 	seen := map[string]bool{}
 	for _, op := range in.History.Operations {
+		if err := matchingCheckpoint(ctx); err != nil {
+			return Comparison{}, err
+		}
 		if !op.Completed || seen[operationKey(op)] {
 			continue
 		}
@@ -370,6 +382,9 @@ func compare(in Input) Comparison {
 		ops = append(ops, parsed{op, bs, err})
 	}
 	for _, file := range in.Files {
+		if err := matchingCheckpoint(ctx); err != nil {
+			return Comparison{}, err
+		}
 		kind := "update"
 		if file.Kind == "untracked" {
 			kind = "add"
@@ -390,10 +405,16 @@ func compare(in Input) Comparison {
 			continue
 		}
 		for n, b := range bs {
+			if err := matchingCheckpoint(ctx); err != nil {
+				return Comparison{}, err
+			}
 			r := Attribution{Path: file.Path, Block: n, Status: "unmatched", Reason: "no_content_evidence", Reasons: []string{}}
 			exactCount := 0
 			unknown := false
 			for _, entry := range ops {
+				if err := matchingCheckpoint(ctx); err != nil {
+					return Comparison{}, err
+				}
 				op := entry.op
 				relevant := op.Path == file.Path || (file.OldPath != "" && (op.Path == file.OldPath || op.OldPath == file.OldPath)) || (op.OldPath != "" && op.OldPath == file.Path)
 				if !relevant {
@@ -415,6 +436,9 @@ func compare(in Input) Comparison {
 					if op.Kind == "rename" && op.OldPath == file.OldPath && op.Path != file.Path {
 						mappings := map[string]bool{}
 						for _, candidate := range ops {
+							if err := matchingCheckpoint(ctx); err != nil {
+								return Comparison{}, err
+							}
 							if candidate.err == nil && candidate.op.Kind == "rename" && candidate.op.OldPath == file.OldPath {
 								mappings[candidate.op.Path] = true
 							}
@@ -432,6 +456,9 @@ func compare(in Input) Comparison {
 				}
 				exact, partial, positions := false, false, 0
 				for _, eb := range entry.blocks {
+					if err := matchingCheckpoint(ctx); err != nil {
+						return Comparison{}, err
+					}
 					if equalBlock(b, eb) {
 						exact = true
 						positions++
@@ -454,13 +481,56 @@ func compare(in Input) Comparison {
 				}
 			}
 			if exactCount == 0 {
-				for _, first := range ops {
-					for _, last := range ops {
+				// A rewriting pair must start with the current old side and
+				// end with its new side. Filter before enumerating ordered pairs.
+				oldSide, newSide := blockSide(b, "-"), blockSide(b, "+")
+				var firstCandidates, lastCandidates []parsed
+				if oldSide != "" && newSide != "" {
+					for _, entry := range ops {
+						if err := matchingCheckpoint(ctx); err != nil {
+							return Comparison{}, err
+						}
+						if entry.op.Path != file.Path || entry.op.ItemOrder <= 0 {
+							continue
+						}
+						firstMatch, lastMatch := false, false
+						for _, block := range entry.blocks {
+							if err := matchingCheckpoint(ctx); err != nil {
+								return Comparison{}, err
+							}
+							firstMatch = firstMatch || blockSide(block, "-") == oldSide
+							lastMatch = lastMatch || blockSide(block, "+") == newSide
+						}
+						if firstMatch {
+							firstCandidates = append(firstCandidates, entry)
+						}
+						if lastMatch {
+							lastCandidates = append(lastCandidates, entry)
+						}
+					}
+				}
+				for _, first := range firstCandidates {
+					if err := matchingCheckpoint(ctx); err != nil {
+						return Comparison{}, err
+					}
+					if first.op.Path != file.Path || first.op.ItemOrder <= 0 {
+						continue
+					}
+					for _, last := range lastCandidates {
+						if err := matchingCheckpoint(ctx); err != nil {
+							return Comparison{}, err
+						}
 						if first.op.Path != file.Path || last.op.Path != file.Path || first.op.Thread != last.op.Thread || first.op.Turn != last.op.Turn || first.op.ItemOrder <= 0 || first.op.ItemOrder >= last.op.ItemOrder {
 							continue
 						}
 						for _, a := range first.blocks {
+							if err := matchingCheckpoint(ctx); err != nil {
+								return Comparison{}, err
+							}
 							for _, z := range last.blocks {
+								if err := matchingCheckpoint(ctx); err != nil {
+									return Comparison{}, err
+								}
 								if rewrittenByOrderedPair(b, a, z) {
 									addReason(&r, "history_superseded_or_rewritten")
 								}
@@ -478,6 +548,9 @@ func compare(in Input) Comparison {
 			}
 			repeats := 0
 			for _, other := range bs {
+				if err := matchingCheckpoint(ctx); err != nil {
+					return Comparison{}, err
+				}
 				if equalBlock(b, other) {
 					repeats++
 				}
@@ -513,14 +586,19 @@ func compare(in Input) Comparison {
 			out.Results = append(out.Results, r)
 		}
 	}
-	markSplitMergeEvidence(in, &out)
+	if err := markSplitMergeEvidenceContext(ctx, in, &out); err != nil {
+		return Comparison{}, err
+	}
 
 	for _, r := range out.Results {
 		if r.Status == "error" {
 			out.Fallback = true
 		}
 	}
-	return out
+	if err := matchingCheckpoint(ctx); err != nil {
+		return Comparison{}, err
+	}
+	return out, nil
 }
 
 func operationKey(op Operation) string {
