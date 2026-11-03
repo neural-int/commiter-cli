@@ -349,6 +349,10 @@ During interactive normal execution, the CLI must send at most one HTTP GET ever
 
 ## 10. LLM Input and Output
 
+Category receives host-supplied breaking evidence candidates with their IDs, visible file IDs and Fact descriptions. The host validates the selected reference and finalizes breaking. Text receives finalized type/breaking without evidence candidates or Fact descriptions.
+
+Enumerate Turns that started before HEAD as well, then select edit evidence by matching current Git changes. Content correspondence establishes relevance, not that an individual edit occurred after HEAD. Retain the cycle-start upper bound, parent cancellation, response-size limits and memory protection.
+
 Normal history acquisition uses the current worktree only, 100-item pages and four body workers, with parent cancellation and resource protection but no history-specific five-second deadline. Revalidate the Git snapshot before/after acquisition and after generation. Match every current change block by content, preserve rename/partial/ambiguous/error states, and project only safe nonempty final responses. Missing, unsafe or over-budget final responses omit whole records; never send user_requests or Thinking. Context definitions and candidate/command references must remain consistent on omission. Commands are Grouping-only path-mention context, never edit-success evidence. Category/Text omit top-level acquisition/projection state.
 
 Harness 004 uses the local MLX helper with Thinking OFF, JSON Schema constraints, native KV, fixed model-specific sampling and seed 144. See the [migration contract](docs/migrations/harness004.md).

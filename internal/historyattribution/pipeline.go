@@ -15,7 +15,7 @@ import (
 // The caller must revalidate that snapshot before and after collection.
 type Request struct {
 	Root        string
-	Since       time.Time
+	Since       time.Time // Legacy caller metadata; never a Turn-start lower bound.
 	Until       time.Time
 	Files       []contextinput.File
 	AllowPath   func(string) bool
@@ -74,7 +74,7 @@ func Collect(parent context.Context, request Request) (Result, error) {
 	}
 	h := History{Status: "complete"}
 	if len(targets) > 0 {
-		if request.Since.IsZero() || request.Until.Before(request.Since) || request.Root == "" || request.SafeText == nil {
+		if request.Until.IsZero() || request.Root == "" || request.SafeText == nil {
 			h.Status = "unavailable"
 			h.Error = failure("history.request", "invalid_request").(*StageError)
 		} else {

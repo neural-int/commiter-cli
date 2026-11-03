@@ -327,7 +327,9 @@ func readHistory(ctx context.Context, root string, roots []string, targets map[s
 						if turn.ID == "" || turn.Started == nil {
 							return finish(failure("history.turns", "invalid_schema"))
 						}
-						if *turn.Started < since || *turn.Started > until {
+						// A Turn can span HEAD: startedAt is not an edit timestamp.
+						// Relevance is established later by matching current Git blocks.
+						if *turn.Started > until {
 							continue
 						}
 						turnKey, _ := json.Marshal([]string{th.ID, turn.ID})

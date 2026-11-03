@@ -68,15 +68,27 @@ func TestHarness004CategoryHasNoUnconfirmedBreaking(t *testing.T) {
 				t.Fatal(err)
 			}
 			for _, phase := range []int{1, 2} {
+				visible := strings.Join([]string{client.messages[phase][0].Content, client.messages[phase][1].Content, client.messages[phase][2].Content}, "\n")
+				if phase == 1 && breaking && !strings.Contains(visible, `"fact":"public signature removed"`) {
+					t.Fatal("Category lost the meaning of the breaking evidence")
+				}
+				if phase == 2 && (strings.Contains(visible, "public signature removed") || strings.Contains(visible, "breaking_evidence_candidates")) {
+					t.Fatal("Text received evidence instead of finalized values")
+				}
 				_, body, ok := strings.Cut(client.messages[phase][2].Content, "\n\nPhase input:\n")
 				if !ok {
 					t.Fatal("missing phase input")
 				}
 				var payload struct {
-					Groups []map[string]json.RawMessage `json:"groups"`
+					Groups   []map[string]json.RawMessage `json:"groups"`
+					Evidence []metadataBreakingEvidence   `json:"breaking_evidence_candidates"`
 				}
 				if err := json.Unmarshal([]byte(body), &payload); err != nil || len(payload.Groups) != 1 {
 					t.Fatalf("invalid phase input: %v", err)
+				}
+				// one.go (host F001) sorts after asset.bin and is displayed as F2.
+				if phase == 1 && breaking && (len(payload.Evidence) != 1 || payload.Evidence[0].ID != "observed-api" || payload.Evidence[0].Fact != "public signature removed" || len(payload.Evidence[0].FileIDs) != 1 || payload.Evidence[0].FileIDs[0] != "F2") {
+					t.Fatal("Category evidence ID, file binding or fact changed")
 				}
 				value, exists := payload.Groups[0]["breaking"]
 				if phase == 1 && exists {

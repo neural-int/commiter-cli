@@ -6,6 +6,7 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 )
@@ -25,6 +26,10 @@ func fetchFixtureReply(method string, args map[string]any, mode, failureMode str
 		items = append(items, map[string]any{"id": fmt.Sprintf("progress%d", i), "type": "agentMessage", "phase": "commentary", "text": "progress"})
 	}
 	duplicate := os.Getenv("POC_DUPLICATE")
+	turnCount := 6
+	if count, err := strconv.Atoi(os.Getenv("POC_FIXTURE_TURN_COUNT")); err == nil && count > 0 {
+		turnCount = count
+	}
 	switch method {
 	case "initialize":
 		return map[string]any{}, true
@@ -43,8 +48,8 @@ func fetchFixtureReply(method string, args map[string]any, mode, failureMode str
 			start, _ = strconv.Atoi(cursor)
 		}
 		end := start + config.turnPage
-		if end > 6 {
-			end = 6
+		if end > turnCount {
+			end = turnCount
 		}
 		turns := []any{}
 		for i := start; i < end; i++ {
@@ -62,12 +67,13 @@ func fetchFixtureReply(method string, args map[string]any, mode, failureMode str
 			turns = append(turns, extra)
 		}
 		page := map[string]any{"data": turns}
-		if end < 6 {
+		if end < turnCount {
 			page["nextCursor"] = strconv.Itoa(end)
 		}
 		return page, true
 	case "thread/items/list":
-		if config.itemsView == "full" || args["limit"] != float64(config.itemPage) || args["threadId"] != "S" || !containsString([]string{"T1", "T2", "T3", "T4", "T5", "T6"}, fmt.Sprint(args["turnId"])) {
+		turnNumber, turnError := strconv.Atoi(strings.TrimPrefix(fmt.Sprint(args["turnId"]), "T"))
+		if config.itemsView == "full" || args["limit"] != float64(config.itemPage) || args["threadId"] != "S" || turnError != nil || turnNumber < 1 || turnNumber > turnCount || fmt.Sprint(args["turnId"]) != fmt.Sprintf("T%d", turnNumber) {
 			return nil, false
 		}
 		start := 0

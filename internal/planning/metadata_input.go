@@ -34,6 +34,7 @@ type metadataGroup struct {
 type metadataBreakingEvidence struct {
 	ID      string   `json:"id"`
 	FileIDs []string `json:"file_ids"`
+	Fact    string   `json:"fact"`
 }
 
 // projectFileMetadata selects safe metadata without mutating host input.

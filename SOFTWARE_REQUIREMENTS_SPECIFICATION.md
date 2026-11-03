@@ -353,7 +353,9 @@ CLI は、Git の前処理、構文解析、モデルのロード、プロンプ
 
 Harness 004はローカルMLX helper、Thinking OFF、JSON Schema、native KV、固定したモデル別samplingとseed144を使用します。[移行契約](docs/migrations/harness004.md)を参照してください。
 
-入力内F形式ID、許可されたメタデータ、完全なraw_diff、全change_blocksと内容照合済みfinal-only履歴を投影します。Git identity、元出典ID、証拠factはホストに保持します。Category/Textは専用の許可フィールドを使い、Textには確定type/breakingを渡します。
+入力内F形式ID、許可されたメタデータ、完全なraw_diff、全change_blocksと内容照合済みfinal-only履歴を投影します。Git identity、元出典IDはホストに保持します。Categoryには破壊的変更の証拠候補のID・対象ファイルID・Factを渡し、参照を検証してbreakingを確定します。Textには確定type/breakingを渡し、証拠候補・Factを再送しません。
+
+HEAD以前に開始したTurnも探索し、現在のGit差分と一致しない編集履歴は候補に採用しません。内容一致は関連性を示すもので、個別編集がHEAD以降であることは保証しません。サイクル開始時刻の上限、親キャンセル、応答サイズ・メモリ保護を維持します。
 
 LLM は各ファイルの実際の変更内容から変更目的を判断し、その目的をファイル間で比較してグルーピングを決定します。通常ファイルにおいて、ファイルパス、同一ディレクトリ、類似したファイル名、import 関係、構文ノードの近さのみをグルーピングの決定根拠として扱ってはなりません。opaque file に限り、ファイル内容を取得しないことによる情報不足を補うため、メタデータをグルーピングの補助的な判断材料として使用できます。
 

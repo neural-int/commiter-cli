@@ -5,11 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"errors"
-	"os"
-	"os/exec"
 	"path/filepath"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/natsuki0413/commiter-cli/internal/config"
@@ -50,17 +46,9 @@ func attributedHistoryForPlan(ctx context.Context, root string, snapshot gitstat
 	}
 	queryCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	command := exec.CommandContext(queryCtx, "git", "-C", canonical, "show", "-s", "--format=%ct", snapshot.Head)
-	command.Env = append(os.Environ(), "GIT_OPTIONAL_LOCKS=0", "LC_ALL=C")
-	timestamp, err := command.Output()
-	if err != nil {
-		return nil, exitcode.New(exitcode.Safety, "git_snapshot_unavailable")
-	}
-	since, err := strconv.ParseInt(strings.TrimSpace(string(timestamp)), 10, 64)
-	if err != nil {
-		return nil, exitcode.New(exitcode.Safety, "git_snapshot_unavailable")
-	}
-	request := historyattribution.Request{Root: canonical, Since: time.Unix(since, 0), Until: cycle.started, Files: document.Files,
+	// Turn start times do not locate individual edits relative to HEAD.
+	// Search this worktree through cycle start and let content matching select history.
+	request := historyattribution.Request{Root: canonical, Until: cycle.started, Files: document.Files,
 		AllowPath: func(path string) bool {
 			allowed, e := gitstate.ContentReadAllowed(path, values.SensitivePatterns, false)
 			return e == nil && allowed

@@ -273,7 +273,7 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 	// instead so the model can still associate each witness with its files.
 	visibleEvidence := []metadataBreakingEvidence{}
 	for _, evidence := range g.Evidence {
-		projected := metadataBreakingEvidence{ID: evidence.ID}
+		projected := metadataBreakingEvidence{ID: evidence.ID, Fact: evidence.Fact}
 		for _, originalID := range evidence.FileIDs {
 			for visibleID, restoredID := range inverse {
 				if restoredID == originalID {

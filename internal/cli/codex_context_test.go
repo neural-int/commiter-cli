@@ -350,6 +350,9 @@ func TestAttributedHistoryCacheAndSnapshotGuard(t *testing.T) {
 	calls := 0
 	collectAttributedHistory = func(ctx context.Context, request historyattribution.Request) (historyattribution.Result, error) {
 		calls++
+		if !request.Since.IsZero() || request.Until.IsZero() {
+			t.Fatal("history enumeration still uses a HEAD timestamp lower bound")
+		}
 		deadline, ok := ctx.Deadline()
 		if ok && time.Until(deadline) < 6*time.Second {
 			t.Fatal("history-specific five-second timeout remains")
