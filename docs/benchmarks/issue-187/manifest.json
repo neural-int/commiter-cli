@@ -1,0 +1,114 @@
+{
+  "harness_id": "H184-HARNESS-004",
+  "revision": 4,
+  "parent": "../issue-184/harnesses/H184-HARNESS-004-r3.json",
+  "issue": 187,
+  "date": "2026-11-03",
+  "status": "local_implementation_pending_quality_and_ci",
+  "normal_planner": "three-phase",
+  "legacy_planners": "research_only_no_configuration_route",
+  "files_limit": 4,
+  "cycle_seconds": 120,
+  "context_tokens": 65536,
+  "output_tokens": 4096,
+  "maximum_input_tokens": 61440,
+  "summary_characters": 48,
+  "scope_characters": 16,
+  "prefill_protection": {
+    "threshold": 12000,
+    "inclusive_light_side": true,
+    "count": "full_template_applied_input_including_reused_prefix"
+  },
+  "acquisition": {
+    "worktree": "current_only",
+    "page_size": 100,
+    "body_workers": 4,
+    "history_specific_timeout": null,
+    "parent_cancellation": true,
+    "resource_protection": true,
+    "snapshot_revalidation": true
+  },
+  "history": {
+    "text": "safe_nonempty_final_responses_only",
+    "request_fallback": false,
+    "partial_body_truncation": false,
+    "attribution": "current_git_changed_blocks_by_content",
+    "omission": "whole_records_with_reference_safe_host_compiled_display",
+    "all_fit_preparations": 1,
+    "maximum_overflow_preparations": 5,
+    "transport_overflow": "Preserve the existing IPC byte limit; if optional history overflows the frame, send the host-compiled mandatory-only display in one request and reflect empty selection to the planner"
+  },
+  "display": {
+    "file_ids": "input_local_F1_natural_path_order_host_mapping",
+    "files": "complete_raw_diff_all_change_blocks_allowlisted_metadata",
+    "category": "referenced_context_union_no_command_or_top_level_coverage",
+    "text": "finalized_type_breaking_no_evidence_candidates",
+    "literal_newlines": true,
+    "canonical_host_unchanged": true
+  },
+  "models": [
+    {
+      "model": "mlx-community/gemma-4-E4B-it-4bit",
+      "revision": "475b9088d29754a3379866cf5aeb6b41acd313c2",
+      "quantization": "4bit",
+      "temperature": 1.0,
+      "top_p": 0.95,
+      "top_k": 64,
+      "seed": 144
+    },
+    {
+      "model": "mlx-community/Qwen3.5-4B-4bit",
+      "revision": "0e7ffd5c629ef7719d4cbc04069232580bfa9d9c",
+      "quantization": "4bit",
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "top_k": 20,
+      "seed": 144
+    }
+  ],
+  "source_sha256": {
+    "internal/planning/prompts/harness004.json": "28ead0c5ed9a68b4a06c13fe7fcb0b2da2cfa9ee860590f59f9f12375f4c68fe",
+    "internal/planning/attributed_history_input.go": "e03238a085a3a80611d8f1000a01ce821ac1f765a4a825b29db3f34e7df00d02",
+    "internal/planning/grouping_history.go": "ddba07a8d6c73f18f7ba15e3a8fca79f5653ba72ff7f42d882d1920147829931",
+    "internal/planning/grouping_input.go": "887ce32de4364a4e300a4881db6bf22090a27546c5b92404d302826155cf0e98",
+    "internal/planning/metadata_input.go": "0decdc2f3abeb8ae9825449bced1225e7912c000037ac3077cb507dc93abcddc",
+    "internal/historyattribution/pipeline.go": "4a9093947590c4a0f3b47c36871a8ff0afdd4ef57f05f1d40a6828c28c7133f5",
+    "internal/mlx/backend.go": "5da221efa38ed83748ccfac897c1484dacdae64a46f26c970d1db09e147cd70f",
+    "internal/config/config.go": "564af6f451e6fbc551593f14fd7ed63d74d88d898f6b3c82803167033b184268",
+    "mlx-helper/Sources/commiter-mlx-helper/CommiterMLXHelper.swift": "c03f277bcab90727a8676091ae61bd70557574bff7be3d4aac5ced9590559fd8"
+  },
+  "limitations": [
+    "One synthetic normal-CLI case merged independent documentation in both baseline and migration; semantic quality is not certified",
+    "Model smoke is not a long-input performance comparison",
+    "Remote CI and release are not performed",
+    "Research 7/9/11-file results do not change the normal four-file limit",
+    "Research measurements predate the final rejection-profile fix; the exact measured helper is retained privately. Final helper passed four error-protocol cases and a normal Gemma three-phase smoke. No byte-identical runtime claim.",
+    "Research helper-cycle TAT was not separately timed; interleaved oracle phase wait sums are not normal three-phase TAT."
+  ],
+  "runtime_sha256": {
+    "measured_research_helper": "d73ec4c740b0d232ae5fc8d0f1d3b67f49442ce450c72d6bf7e57d7b339e3105",
+    "final_helper": "8227bafc1205b0fabf1257b145240bb95b2bf05b622452cdc3d2bec97b93efca"
+  },
+  "release": {
+    "breaking": true,
+    "category": "Changed",
+    "candidate_next_major": "3.0.0",
+    "latest_public_tag_checked": "v2.0.0",
+    "execution": "not_performed"
+  },
+  "local_verification": {
+    "go_test_all": "passed",
+    "go_vet_all": "passed",
+    "cli_build": "passed",
+    "race_history_planning_cli": "passed",
+    "final_race_mlx_planning_serial": "passed",
+    "swift_testing": 69,
+    "xctest": 2,
+    "python_projection": 24,
+    "python_release_notes": 25,
+    "real_helper_error_protocol_cases": 4,
+    "live_attributed_history_cycle": "passed",
+    "remote_ci": "not_run",
+    "issue_complete": false
+  }
+}

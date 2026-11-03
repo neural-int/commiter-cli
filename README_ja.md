@@ -20,9 +20,9 @@ Git の状態把握、対象ファイルの選定、機密ファイルの判別�
 ## 主な機能
 
 - **複数コミットの計画立案** — ファイル単位の変更を目的ごとにグループ化し、Conventional Commits 形式のメッセージを作成します。
-- **完全ローカルでの LLM 推論** — MLX はローカルの Swift helper、Ollama は loopback エンドポイントで推論し、リポジトリの内容がクラウド上の外部 LLM に送信されることはありません。
+- **完全ローカルでの LLM 推論** — MLX はローカルの Swift helper で推論し、リポジトリの内容がクラウド上の外部 LLM に送信されることはありません。
 - **構文を意識した前処理** — 対応言語では Tree-sitter を利用して構文解析を行い、生のテキスト差分のみから構文をモデルに推測させる負担を軽減します。
-- **コンテキスト予算管理** — 暫定候補の3段構成は、設定された上限内で各段階の16K / 32K / 64Kを選択します。明示的に選択した単段構成では、適応型の圧縮とコンテキスト段階を使用できます。
+- **コンテキスト予算管理** — 全3フェーズを64K固定とし、モデルのtokenizerによる実token数と各4,096 tokensの出力予約で受付を判定します。
 - **機密情報の保護** — 明らかな機密ファイルは自動的に対象から除外されます。機密情報を含む可能性があるファイルについても、内容を読み込む前にユーザーの承認を求めます。
 - **計画の検証と承認フロー** — モデルの出力を検証し、デフォルトでは実際のコミット作成前に必ずユーザーの承認を要求します。
 - **リポジトリ単位の検証機能** — 明示的に指定した検証コマンドや、package.json のスクリプト自動検出に対応しています。検証コマンドの信頼設定（trust）はリポジトリごとに安全に管理されます。
@@ -52,7 +52,7 @@ v1 で対象とする環境は以下のとおりです。
 - macOS 14 以降
 - Apple Silicon（M シリーズ）
 - Git
-- MLX 用の同梱 Swift helper（Ollama の単段構成を選ぶ場合は Ollama 0.31.2 以降）
+- MLX 用の同梱 Swift helper
 
 現時点のソースビルドによる導入では、追加で以下が必要です。
 
@@ -77,9 +77,9 @@ cp dist/commiter-mlx-helper dist/mlx.metallib "$HOME/.local/commiter/libexec/"
 export PATH="$HOME/.local/commiter/bin:$PATH"
 ```
 
-Apple Silicon の macOS と Xcode（Swift 6.2 以降）が必要です。CLI を `bin/`、helper と Metal library を隣の `libexec/` に配置します。PATH の設定は使用するシェルの設定ファイルにも追記してください。既存の planner 未指定の v1 設定は単段構成として読み込みます。設定ファイルがない場合と、新しいテンプレートでは Gemma 3段構成を使用します。
+Apple Silicon の macOS と Xcode（Swift 6.2 以降）が必要です。CLI を `bin/`、helper と Metal library を隣の `libexec/` に配置します。PATH の設定は使用するシェルの設定ファイルにも追記してください。旧single-pass/Ollama設定は移行が必要です。planner省略から旧backendへ戻る処理は廃止します。[移行手順](docs/migrations/harness004.md)を参照してください。
 
-なお、Ollama のモデルデータはバイナリには含まれていません。
+モデルの重みは、取得内容の確認後に別途インストールします。
 
 ## クイックスタート
 
@@ -92,8 +92,8 @@ commiter --dry-run
 commiter
 ```
 
-- `commiter setup`: 選択された backend を準備します。Ollama では、個別の確認後に Homebrew 経由の Ollama 導入、一時的なデーモン起動、設定モデルの pull を行えます。MLX では macOS Apple Silicon と `commiter-mlx-helper` が必要です。モデル取得を確認後に行い、モデル・tokenizer のロード、JSON Schema grammar、制約付き生成を確認します。
-- `commiter doctor`: 読み取り専用で環境診断を行います。リポジトリ状態、設定、Git の identity と、選択された backend の機能を確認します。Ollama は daemon を起動・停止せず、疎通、設定モデル、structured output を診断します。daemon が停止している場合は手動で起動して再実行してください。MLX は platform 対応、helper、ローカルに準備済みの固定モデルに加え、モデルと tokenizer をロードし、JSON Schema grammar をコンパイルして制約付き JSON 生成を試す probe を実行します。MLX の診断はモデルを download/update しません。モデルがない場合は `commiter setup` を実行してください。
+- `commiter setup`: 固定MLXモデルのID・revision・概算容量・保存先を表示し、確認後に取得します。その後、モデル/tokenizerのロード、JSON Schema grammar、3フェーズの制約付き生成を確認します。
+- `commiter doctor`: リポジトリ、設定、Git identity、MLX platform/helper、準備済みの固定モデルと3フェーズの制約付き生成を診断します。モデルの取得・更新は行いません。
 
 対話的な端末から起動した場合、commiter は公式 GitHub Releases の metadata を最大24時間に1回確認します。新しい安定版がある場合は、バージョンと Homebrew の更新コマンドを表示します。ローカルには確認時刻と最新バージョンだけを保存します。ネットワーク障害が発生しても通常処理は継続し、JSON 出力と CI 環境では更新確認を行いません。
 - `commiter --dry-run`: 差分の解析とコミット計画の生成を行いますが、インデックスの変更、コミット作成、push は一切実行しません。
@@ -149,7 +149,7 @@ commiter --no-push
 | `--no-confirm-commit` | 通常のコミット計画承認プロンプトをスキップ（安全上不可欠な確認はスキップされません） |
 | `--no-confirm-push` | 通常の push 承認プロンプトをスキップ（安全上不可欠な確認はスキップされません） |
 | `--language en\|ja` | 今回の実行で使用するコミットメッセージ言語を一時的に変更 |
-| `--model NAME` | 今回の実行で使用するモデルを変更（別モデルには単段構成を明示） |
+| `--model NAME` | モデル名を変更（設定revisionと対応する固定MLXモデルの組が必要） |
 | `--record-metrics` | 今回の実行のメトリクスログをローカルに保存 |
 | `--json` | `--dry-run` または対応する読み取り専用コマンドの出力を JSON 形式で表示 |
 
@@ -192,16 +192,15 @@ commiter config show --effective
 | `llm.model` | `"mlx-community/gemma-4-E4B-it-4bit"` |
 | `llm.model_revision` | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` |
 | `llm.model_quantization` | `"4bit"` |
-| `llm.endpoint` | `"http://127.0.0.1:11434"` |
-| `llm.context` | `"16k"` |
-| `llm.max_context_tokens` | `16384` |
+| `llm.context` | `"64k"` |
+| `llm.max_context_tokens` | `65536` |
 | `verification.autodetect` | `true` |
 | `verification.timeout_seconds` | `600` |
 | `metrics.persist` | `false` |
 
-Ollama のエンドポイントは、必ずローカルホストを指す loopback HTTP URL である必要があります。また、検証処理（verification）に関する設定はリポジトリ固有のスコープに限定されており、グローバル設定には記述できません。
+検証処理の設定はリポジトリ固有のスコープに限定します。グローバル設定には記述できません。
 
-既定の Gemma 3段構成は最大4ファイル、圧縮していない入力、設定上限内の段階別16K / 32K / 64K context、共有120秒、retry / repairなしに限定します。モデル、backend、revision、量子化、context の別構成には `llm.planner = "single-pass"` を明示してください。[選定根拠と制約](docs/decisions/issue-143-production-candidate.md) に未確認の意味評価と時間の課題を記録しています。`commiter setup` はモデル ID、固定 revision、量子化、概算容量、保存先を表示してから取得の承認を求めます。新しい revision に更新する際は設定を変更し、`commiter setup --update-model` を実行します。ファイルはユーザーの `commiter/mlx-models` キャッシュに保存し、固定されたファイルのハッシュで検証します。通常実行中にモデルレジストリへの通信や自動取得は行いません。macOS 向け配布物には非公開の `commiter-mlx-helper` を `libexec` に含めます。MLX の計画生成では、その helper を同梱の場所から起動し、`PATH` を検索せず、Ollama へ暗黙に切り替えません。ソースからビルドする場合は、`bin/` と `libexec/` の同じ配置に helper をビルドして置く必要があります。
+通常の計画生成をHarness 004の3フェーズへ統一します。最大4ファイル、完全なGit差分、生成サイクル120秒、全フェーズ65,536 tokens、出力各4,096 tokens、summary48文字、scope16文字を維持します。対応するGemma/Qwenの固定4bitモデルと旧設定の変更方法は[移行手順](docs/migrations/harness004.md)を参照してください。single-passとOllamaへの暗黙復帰は廃止します。履歴は現在worktreeから取得し、編集内容と差分ブロックを照合したうえで、安全な非空の最終応答だけを渡します。欠落・危険・予算超過では記録全体を省きます。通常生成中のモデル取得は行いません。
 
 全設定項目のスキーマや詳細な制限事項については、[ソフトウェア要求仕様書](SOFTWARE_REQUIREMENTS_SPECIFICATION.md) を参照してください。
 
@@ -213,7 +212,7 @@ Ollama のエンドポイントは、必ずローカルホストを指す loopba
 
 `commiter` が扱うリポジトリの diff、プロンプト、LLM からの応答、その他解析に使用されるリポジトリ内のデータは、推論・分析・テレメトリなどの目的でローカルホスト（loopback）の外へ送信されることは一切ありません。設定可能な LLM エンドポイントも、loopback の HTTP URL に制限されています。
 
-ただし、この境界は「すべてのサブプロセスが完全にオフラインである」という意味ではありません。ユーザー自身が承認した Git push、検証コマンドの実行、Git フック、コミット署名処理、Ollama のモデルダウンロードなどは、各機能独自のネットワーク通信を行う可能性があります。これらは、`commiter` がリポジトリの内容をクラウド LLM に送信しないこととは明確に区別されます。
+ただし、この境界は「すべてのサブプロセスが完全にオフラインである」という意味ではありません。ユーザー自身が承認した Git push、検証コマンドの実行、Git フック、コミット署名処理、承認後のモデルダウンロードなどは、各機能独自のネットワーク通信を行う可能性があります。これらは、`commiter` がリポジトリの内容をクラウド LLM に送信しないこととは明確に区別されます。
 
 MLX の明示的な setup で Hugging Face に送るのは、設定したモデル ID、revision、取得対象ファイルへのリクエストだけです。リポジトリの diff、プロンプト、LLM の応答は送信しません。通常の MLX 実行はモデルレジストリへ通信しません。
 
@@ -279,7 +278,7 @@ v1 の提供範囲において、以下の機能は意図的に対象外とし�
 - サブモジュールの再帰的な解析（親リポジトリから見えるサブモジュールのコミットポインタ変更のみを扱います）
 - 現時点でのパッケージ化された GitHub Releases や Homebrew によるワンライナーインストール
 
-現在のバージョンは、ローカルホスト上の Ollama と Apple Silicon 搭載の macOS 環境を主なターゲットとしています。
+通常の計画生成は、Apple Silicon macOS上のMLXを対象とします。
 
 ## ドキュメント一覧
 

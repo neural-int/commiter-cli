@@ -58,7 +58,7 @@ v1 では、Windows および Linux、GUI、クラウド LLM、llama.cpp バッ�
 
 v1 の対象 OS は macOS 14 以降、対象アーキテクチャは Apple Silicon とし、動作基準環境は M3 チップおよび 16GB メモリのマシンとします。
 
-Ollama backend の実行時依存関係は、システムにインストールされた Git（system Git）および Ollama とします。MLX backend は配布物に同梱された非公開 Swift helper と macOS の system framework を使用します。構文認識構造解析には、公式の `github.com/tree-sitter/go-tree-sitter` と対象言語の文法定義（grammar）を使用し、Tree-sitter の C 実装を CGo 経由で Go CLI に組み込みます。Tree-sitter の用途以外に CGo の利用範囲を広げることはせず、外部パーサー実行ファイル、実行時の共有文法ライブラリ（runtime shared grammar）、Oniguruma、およびクラウド LLM へのフォールバックを要求しません。
+通常実行はsystem Git、Apple Silicon macOS、同梱MLX Swift helperを使用します。既存のTree-sitter/CGoによる構文解析は維持します。
 
 対話的な通常実行では、更新確認のために固定された公式 GitHub Releases metadata エンドポイントへ、リポジトリの内容を含まない HTTP GET を最大24時間に1回だけ送信できます。更新確認のネットワーク障害は通常処理を妨げず、JSON 出力および CI 環境では更新確認を行いません。
 
@@ -71,7 +71,7 @@ Ollama backend の実行時依存関係は、システムにインストール�
 3. CLI は pathspec を適用して無視対象（ignored）ファイルを除外し、追跡対象ファイルについては HEAD からワーキングツリーの最終状態までの変更全体をファイル単位で対象とします。部分的にステージングされている（partial stage）ファイルなど、staged と unstaged の変更が混在しているファイルもファイル全体を対象とします。名前変更（rename）は変更前パスと変更後パスを持つ1つの変更として扱い、1つの file ID を付与します。シンボリックリンクはリンク先を追従せず Git が追跡するリンク情報自体を対象とし、サブモジュールは親リポジトリ側のポインタ更新のみを対象とします。
 4. CLI はファイルパスのみに基づいて機密判定を行い、明確な機密ファイルを常に自動除外します。明確な機密ファイルを対象に含めるオーバーライド手段は提供しません。機密候補についてはファイル内容を読み取る前にユーザーに確認を求め、承認された候補のみをローカル解析に渡します。
 5. CLI は機密判定を経た対象変更について、Git のメタデータおよび Tree-sitter による構造エビデンスを生成します。v1 における構文解析の対象言語は Go、JavaScript、JSX、TypeScript、TSX、Python、Rust、HTML、CSS とし、未対応言語や構文解析に失敗したテキストファイルについては、生の差分（raw diff）と Git メタデータへフォールバックして処理を継続します。opaque file は内容を渡さず、メタデータのみを計画生成に渡します。構造エビデンスには、実装とテスト、ドキュメントとソースコード、同一機能といった関係性やグルーピングの推奨を含めません。
-6. 既定の3段構成は固定16K context とし、圧縮を必要とする入力は停止します。単段構成では、CLI は各対象変更に file ID と change_hash を付与し、設定で許可されたコンテキスト段階から最小の段階を選んで LLM 入力を構築します。通常予算を超過する場合は、階層的な要約と許可された範囲内のコンテキスト拡張を、情報損失が少ない順に適用します。
+6. 完全なGit差分を3フェーズ専用に準備します。全フェーズ64K固定の実token判定を使い、通常経路では要約を行いません。
 7. 選択された backend と planner がコミット計画を生成します。CLI は Git の状態変更（mutation）を行う前に、スキーマ、ファイルの割り当て、および安全条件を検証します。
 8. CLI はコミット計画全体と除外ファイル一覧を表示し、`Create these N commits? [y/r/N]` の確認プロンプトを一度だけ提示します。
 9. ユーザーが承認した場合にのみ、承認済みの検証定義（verification definition）に基づく検証コマンドを作業ツリー全体に対して一度だけ実行します。
@@ -138,9 +138,9 @@ glob、言語、モデル、および分類補助の設定は、リポジトリ�
 | `llm.model_revision` | string | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` | global、repo |
 | `llm.model_quantization` | string | `"4bit"` | global、repo |
 | `llm.model` | string | `"mlx-community/gemma-4-E4B-it-4bit"` | global、repo、CLI |
-| `llm.endpoint` | string | `"http://127.0.0.1:11434"` | global |
-| `llm.context` | string | `"16k"` | global、repo |
-| `llm.max_context_tokens` | integer | `16384` | global、repo |
+| `llm.endpoint` | string | `"http://127.0.0.1:11434"` | global | （旧研究用。通常生成では未使用）
+| `llm.context` | string | `"64k"` | global、repo |
+| `llm.max_context_tokens` | integer | `65536` | global、repo |
 | `analysis.untracked` | string | `"auto-safe"` | global |
 | `analysis.include` | string array | `[]` | global、repo |
 | `analysis.exclude` | string array | `[]` | global、repo |
@@ -154,9 +154,9 @@ glob、言語、モデル、および分類補助の設定は、リポジトリ�
 
 リポジトリ設定に `verification.commands` が明示されている場合は、そのコマンド一覧を使用します。未指定の場合にのみ `verification.autodetect` を評価し、`true` であればリポジトリルートの `package.json` から自動検出し、`false` であれば `Verification: none` として検証を実行しません。
 
-`llm.context` の許容値は `"auto"` および実装が対応する固定コンテキスト段階です。
+`llm.context`は`"64k"`または`"auto"`を受け付け、どちらも65,536 tokens固定とします。
 
-`llm.max_context_tokens` は実装が対応するコンテキスト段階から設定し、`"auto"` の場合に自動選択できる最大値を指定します。対応値と既定値は設定検証および配布時のテストで固定します。
+`llm.max_context_tokens`は65,536に限定し、helperが各フェーズの最終実入力token数を検査します。
 
 `analysis.include` および `analysis.exclude` は doublestar 形式の glob を使用し、リポジトリルートからの相対パスに限定します。
 
@@ -166,7 +166,7 @@ glob、言語、モデル、および分類補助の設定は、リポジトリ�
 
 `safety.additional_sensitive_patterns` は、組み込みの明確な機密パターンを置き換えるものではなく、自動除外対象への追加パターンとしてのみ適用されます。
 
-`provider = "ollama"`、`think = false`、`stream = false`、`keep_alive = 0` は v1 における固定値であり、設定によって変更することはできません。
+Thinking OFF、JSON Schema、native KV、固定モデル別samplingとseed144を使います。通常backend/Plannerを別経路へ緩和する設定は提供しません。
 
 未知のキー、未対応の `schema_version`、型の不一致、またはスキーマの許可元と異なる設定ファイルに記述されたキーが存在する場合、終了コード 2 で終了します。したがって、グローバル設定内に `verification.*` が記述されていた場合は設定エラーとして拒否します。
 
@@ -215,44 +215,23 @@ v1 における Tree-sitter 対応言語は Go、JavaScript、JSX、TypeScript�
 
 ### FR-006 入力サイズ制御
 
-CLI は、構造エビデンスと必要な diff hunk を優先して LLM への入力を構成しなければなりません。
+通常入力は完全なGit差分を保持し、全3フェーズを65,536 tokens、各出力予約を4,096 tokensとします。helperはchat template適用後の実token数を判定に使い、同じ準備済み入力を生成へ渡します。Goのバイト見積もりでtoken上限の採否を決めてはなりません。必須入力が61,440 tokensを超える場合は生成前に停止します。実入力12,000以下では追加の毎chunk同期・allocator cache解放を省き、12,001以上では実施します。再利用prefixを含む全入力で判定します。
 
-`llm.context = "auto"` の場合は、通常予算を上限として最小のコンテキスト段階を選択します。通常予算内で許容可能な最弱の chunk 圧縮 profile を適用しても収まらず、かつ `llm.max_context_tokens` がより大きな段階を許可する場合に限り、同じ profile の最終プロンプトを拡張後の予算で再計測します。それでも収まらない場合にのみ、拡張後の予算でより強い profile へ進みます。`llm.context` が固定値の場合は、その指定段階を超えて自動昇格してはなりません。
-
-コンテキスト段階の選択前に、最終プロンプトの UTF-8 バイト数を入力トークン数の保守的な上限見積もりとし、チャットテンプレート用の固定 256 トークンと、`max(1024, 48 × 対象ファイル数)` で算出した出力予約トークン数を加算しなければなりません。CLI は、この合計値が収まる最小の許可コンテキスト段階を選択します。
-
-許可されたコンテキスト上限を超える場合は、ファイル単位、hunk 単位、chunk 単位の順に raw diff を階層的に要約します。それでも上限を超える場合は、共通の構造エビデンス表現に対し、特定言語へ依存しない決定論的な canonicalization と budget-aware reduction を行わなければなりません。reduction は宣言、role、enclosing declaration、および tag、attribute、selector、property、rule の構造を優先し、ファイル全体へ分散した代表点を保持します。単純な先頭 N 件の切り捨てを行ってはなりません。
-
-chunk 単位の raw diff 要約は、file 単位と hunk 単位の要約後の入力を、全圧縮 profile で共通の境界に分割して処理します。追加行と削除行には chunk ごとに独立した quota を与え、hunk と changed line を元 diff 上の位置に基づく先頭、末尾、既選択位置から最遠の順で決定論的に順位付けします。各 changed line は chunk 番号と元 diff 行番号の組で識別し、strong で選択する行の集合は medium の部分集合、medium は light の部分集合でなければなりません。選択後は元 diff 順に復元し、連続した省略区間には追加行数と削除行数を明示します。長い行は UTF-8 を壊さず、省略記号を上限に含めて先頭と末尾を保持します。chunk の digest は sampling 前の同一入力から算出し、profile 間で変更してはなりません。
-
-CLI は chunk 圧縮 profile またはコンテキスト予算を遷移するたびに最終プロンプトを再生成して上限見積もりを再計算し、対応リソース範囲内で収まる、情報損失が最も少ない組み合わせで停止します。profile を強めても選択行、最終プロンプトの UTF-8 バイト数、および上限見積もりは増加してはなりません。
-
-構造エビデンスを縮約した場合は、ファイルごとに縮約前後の件数、JSON バイト数、digest、coverage digest、および縮約レベルを計画入力へ含めなければなりません。対象 file ID、old/new path、status、change_hash、Git identity は完全保持し、構造エビデンスは元の観測事実に由来すること、宣言・role・enclosing declaration・tag・attribute・selector・property・rule の coverage が維持されること、および各 structural file に代表 evidence が残ることを検証します。縮約後も合計値が許可されたコンテキスト上限を超える場合、またはこれらの invariant を維持できない場合は、LLM を呼び出すことなく、Git の状態を変更せずに停止しなければなりません。
+任意履歴は記録全体で選別します。全件収容時は準備1回、超過時は全件1回＋必須1回＋候補最大3回とします。出力予約を含む実token判定に通過した準備済み入力を再利用し、tokenizer失敗を履歴不在として扱ってはなりません。通信量・メモリのバイト制限は別の資源保護として維持します。
 
 ### FR-007 階層要約
 
-階層要約および構造エビデンス縮約は、対象 file ID、変更前後のパス（old/new path）、ステータス、change_hash、Git identity の完全な集合を維持し、処理後であっても対象ファイルの割り当て漏れを検出できなければなりません。raw diff の要約では、保持する changed line が元 diff に由来することを元 diff 行番号で検証します。構造エビデンスの byte-for-byte 完全一致は縮約前後の invariant とせず、監査 metadata と coverage invariant により由来と保持範囲を検証します。
+通常Plannerで差分の階層要約・部分切断・圧縮は行いません。履歴不在・取得不能では状態を保持してGit差分だけで続行します。必須入力の超過ではGitを変更せず停止します。過去比較用の要約処理は研究用のみに限定します。
 
 ### FR-008 コミット計画の生成
 
-計画生成は runtime-neutral な LLM backend contract（メッセージ、構造化出力スキーマ、応答、数値 telemetry、能力情報、および retry 可否）を介して実行します。backend は設定に従って選択し、既定は暫定候補の Gemma 3段構成と MLX とします。MLX を選択した場合は、準備済みのローカル model と helper を使用し、利用不能時に Ollama へ自動切替してはなりません。backend の追加は、既存 Ollama の structured output、retry、daemon/model lifecycle、およびローカル送信境界を変更してはなりません。
+通常生成はMLXのHarness 004 Three-phase Plannerだけを使用します。設定は検証済みのGemma/Qwen 4bitモデルと固定revisionの組に限定します。既定のGemmaと対応するQwenの組は[移行手順](docs/migrations/harness004.md)を参照してください。single-pass、Ollama生成、planner省略からの旧設定復帰は廃止し、利用不能な設定は移行方法の分かるエラーにします。
 
-CLI は選択された backend に構造化された入力を送り、ファイル単位のコミット計画を取得しなければなりません。Ollama は loopback API を使用し、MLX は準備済みのローカル model と bounded IPC helper を使用します。
+Grouping、Category、Textの順に同じhelperで生成します。Grouping/Textの型別KV prefix再利用では独立した実行用コピーを作り、Categoryは独立prefillにします。未対応cache型やprefix不一致では通常prefillへ戻します。
 
 ### FR-009 LLM 生成失敗と出力検証
 
-既定の `three-phase` は membership、type / breaking evidence reference、scope / summary の順に最大3呼び出しで生成し、共有120秒、固定16K context、出力枠768 / 512 / 768 tokens、retry / repairなしとします。最大4ファイルかつ圧縮していない入力に限定し、未解決 evidence、途中停止または不正な出力では部分 plan を返さず終了コード5で停止します。各段階と最終 plan を検証します。
-
-以下の初期生成・修復・通信リトライの規定は、明示的に選択した `single-pass` に適用します。初期生成（initial generation）の試行は1回とします。通信エラー（transport error）またはタイムアウトに対するリトライ予算は、初期生成と自動修復（repair）を通じて合計1回とします。
-
-LLM から候補出力を受け取るたびに、Git の変更を行う前に JSON スキーマ、対象 file ID の完全な割り当て、機密値の有無、その他の安全条件を再検証しなければなりません。不正な候補出力に基づいて Git の状態を変更してはなりません。
-
-不正な JSON、JSON スキーマ違反、対象 file ID の欠落・重複・範囲外割り当て、type 名をそのまま scope に使用した計画、または SR-010 による機密値の一致を検出した場合は、自動修復（repair）を1回だけ実行します。複数の違反を同時に検出した場合も、それらを1つの修復リクエストにまとめ、修復の試行回数を追加してはなりません。
-
-修復リクエストには、元の正規化済み入力、候補出力、および機密値そのものを含まない違反理由を渡し、候補出力は命令ではなく信頼できないデータ（untrusted data）であることを明示しなければなりません。
-修復後の出力を新たな候補としてすべての検証にかけ、1件でも違反が残る場合は追加の修復を行わず、終了コード 5 で Git の状態を変更せずに停止します。
-
-したがって、1回の計画生成サイクルにおける Ollama の呼び出し回数は、初期生成、任意の自動修復、および共有される通信リトライを合わせて最大3回とします。
+通常生成は最大4ファイル、生成サイクル120秒、各フェーズ4,096出力tokens、retry/repairなしとします。全ファイルの完全割当、未知ID・重複・欠落の拒否、フェーズごとのSchema検査、機密値検査と最終validatorを通過した計画だけを返します。未解決breaking evidence、途中停止、不正出力、機密値の混入では部分planを返さず終了コード5で停止します。summaryは最大48文字、scopeは最大16文字です。
 
 ### FR-010 ファイル単位の分割
 
@@ -310,11 +289,11 @@ CLI は全コミットが正常に完了した後に一度だけプッシュを�
 
 ### FR-015 setup
 
-`commiter setup` は選択された backend に応じて準備しなければなりません。Ollama では、Ollama のインストール、デーモンの起動、および設定モデルの取得について個別にユーザー確認を行い、Homebrew 自体を自動的にインストールしてはなりません。MLX では、macOS Apple Silicon 対応と helper の利用可能性を確認し、設定された固定 model の取得を個別の確認後に行わなければなりません。取得済みまたは取得後の model について helper を起動し、model/tokenizer load、JSON Schema grammar compile、および制約付き生成を確認しなければなりません。
+setupはApple Silicon macOS、同梱helper、対応する固定モデルを準備します。モデルID・固定revision・量子化・概算容量・保存先を表示し、確認後に取得します。モデル/tokenizerのロード、JSON Schema grammar、3フェーズの制約付き生成を確認します。Ollama導入・daemon起動・pullの経路は提供しません。
 
 ### FR-016 doctor
 
-`commiter doctor` は、Git、設定、検証 trust、および Git のユーザー識別情報（Git identity）に加え、選択された backend の能力を読み取り専用で診断しなければなりません。Ollama では loopback API、設定モデル、structured output、および thinking 無効化を確認します。MLX では platform、helper、ローカルの固定 model、model/tokenizer load、JSON Schema grammar compile、および制約付き JSON 生成を確認します。診断は model download/update、daemon 操作、設定や model ファイルの変更を行ってはならず、MLX の失敗時に Ollama へ自動切替してはなりません。
+doctorはリポジトリ、設定、Git identity、MLX platform/helper、準備済み固定モデル、model/tokenizer load、JSON Schema grammar、3フェーズの制約付き生成を読み取り専用で診断します。モデル取得・更新、設定変更、daemon操作を行いません。設定不正時に旧backendの診断へ戻してはなりません。
 
 ### FR-017 言語設定
 
@@ -328,25 +307,11 @@ CLI は、Git の前処理、構文解析、モデルのロード、プロンプ
 
 ### FR-019 daemon lifecycle
 
-通常実行時にループバックの Ollama が停止している場合、CLI は一時的にデーモンを起動し、自身が起動したデーモンのみを終了時に停止しなければなりません。
-
-既存のデーモンはそのまま再利用し、CLI の終了時に停止してはなりません。
-
-通常実行時の Ollama 呼び出しでは、`keep_alive: 0` を指定しなければなりません。
+通常生成のhelperは1サイクル内で共有し、正常終了・失敗・キャンセルのいずれでもcloseします。常駐daemonやOllamaの起動・停止は行いません。
 
 ### FR-020 model lifecycle
 
-通常実行時には、モデルの pull や更新を実行してはなりません。
-
-`setup --update-model` は、更新内容を表示し、明示的な確認を得た場合にのみモデルを更新しなければなりません。
-
-Ollama の公開ローカル API は pull 開始前のリモート差分を提供しません。対象モデルが取得済みの場合、更新内容として、`/api/tags` から取得した現在のローカルモデルのタグ、ダイジェスト、サイズ、更新日時、形式、パラメータサイズ、量子化レベル、および承認後に実行する更新操作を表示します。
-
-リモート差分とダウンロードサイズは pull 開始後にのみ判明することを明示し、確認前に `/api/pull` を呼び出してはなりません。
-
-setup は既存の公式 Ollama アプリまたは CLI を再利用し、未インストールの状態で Homebrew が存在する場合にのみ、インストール確認、デーモン起動確認、モデル取得確認を個別に提示しなければなりません。
-
-setup は Homebrew 自体をインストールしてはなりません。
+通常生成とdoctorはモデルレジストリへの通信やモデルの取得・更新を行いません。setup --update-modelは、対応する固定モデルの取得計画を表示して確認後に更新します。モデルとrevisionの受付条件を設定・setup・doctor・helperで一致させます。未検証モデルを一般許可してはなりません。
 
 ### FR-021 設定と状態コマンド
 
@@ -384,9 +349,11 @@ setup は Homebrew 自体をインストールしてはなりません。
 
 ## 10. LLM 入力と出力
 
-Ollama エンドポイントはループバックに限定し、`think: false`、`stream: false`、JSON Schema、`keep_alive: 0` を使用します。commiter v1 が必要とする API 機能、従来の Ollama モデル `qwen3.5:4b-q4_K_M` の動作互換性、および thinking を無効化したモデルにおける構造化出力（structured outputs）の修正を踏まえ、対応する Ollama のバージョンは `0.31.2` 以上とします。下位バージョン、`0.31.2` のプレリリース版、および不正なバージョン応答は API 非互換として扱います。[Ollama Chat API](https://docs.ollama.com/api/chat)、[Structured Outputs](https://docs.ollama.com/capabilities/structured-outputs)、[Ollama v0.31.2](https://github.com/ollama/ollama/releases/tag/v0.31.2) を参照してください。
+履歴取得は現在worktree限定、100件ページ、本文最大4並列とし、履歴専用5秒期限を設けず、親キャンセルと資源保護を維持します。取得前後・生成後にGit snapshotを再検査します。全変更ブロックを編集内容と照合し、rename・部分一致・曖昧・errorを保持します。安全な非空最終応答のみを投影し、欠落・危険・予算超過では記録全体を省きます。user_requestsやThinkingを送らず、省略時も本文辞書と候補・コマンド参照を整合させます。コマンドはGrouping専用のパス言及補助情報であり、編集成功の証拠にしません。Category/Textには取得・投影のトップレベル状態を渡しません。
 
-入力には、機械的に計算したリポジトリ状態、対象 file ID、変更前後のパス（old/new path）、ステータス、言語、change_hash、構造エビデンス、ならびに必要な raw diff hunk または階層要約を含めます。構造エビデンスは構文上の客観的な観測事実に限定し、実装とテスト、ドキュメントとソースコード、同一機能、同一の論理的変更といった意味的な関係性ラベルやグルーピングの推奨は含めません。
+Harness 004はローカルMLX helper、Thinking OFF、JSON Schema、native KV、固定したモデル別samplingとseed144を使用します。[移行契約](docs/migrations/harness004.md)を参照してください。
+
+入力内F形式ID、許可されたメタデータ、完全なraw_diff、全change_blocksと内容照合済みfinal-only履歴を投影します。Git identity、元出典ID、証拠factはホストに保持します。Category/Textは専用の許可フィールドを使い、Textには確定type/breakingを渡します。
 
 LLM は各ファイルの実際の変更内容から変更目的を判断し、その目的をファイル間で比較してグルーピングを決定します。通常ファイルにおいて、ファイルパス、同一ディレクトリ、類似したファイル名、import 関係、構文ノードの近さのみをグルーピングの決定根拠として扱ってはなりません。opaque file に限り、ファイル内容を取得しないことによる情報不足を補うため、メタデータをグルーピングの補助的な判断材料として使用できます。
 
@@ -409,7 +376,7 @@ LLM は各ファイルの実際の変更内容から変更目的を判断し、�
 
 `type` は `feat`、`fix`、`docs`、`style`、`refactor`、`perf`、`test`、`build`、`ci`、`chore`、`revert` のいずれかとします。
 
-`scope` は必須の単一行文字列とし、空文字列は許可しません。また、前後の空白を除去したうえで大文字小文字を区別せず、`feat`、`fix`、`docs`、`style`、`refactor`、`perf`、`test`、`build`、`ci`、`chore`、`revert` のいずれかの Conventional Commit type 名と一致する scope を使用してはなりません。該当する計画は生成後の決定的検証で無効として検出し、自動修復の対象にします。
+`scope` は必須の単一行文字列とし、空文字列は許可しません。また、前後の空白を除去したうえで大文字小文字を区別せず、`feat`、`fix`、`docs`、`style`、`refactor`、`perf`、`test`、`build`、`ci`、`chore`、`revert` のいずれかの Conventional Commit type 名と一致する scope を使用してはなりません。該当する計画は生成後の決定的検証で無効として検出し、修復せず停止します。
 
 `breaking` は boolean とし、`true` は公開 API、CLI、設定形式、または保存形式の非互換変更を差分から説明できる場合だけに指定します。通常の UI 変更や内部リファクタリングだけでは `breaking=true` にしてはなりません。`true` の場合のみ件名（subject）の scope の直後に `!` を付与します。
 
@@ -518,15 +485,7 @@ CLI は、`git reset`、force push、`git stash`、`git commit --amend`、ファ
 
 ### SR-010 機密値の出力検査
 
-CLI はコミットサマリ（summary）および LLM の生成出力を検査し、承認済み機密の平文値（raw value）またはその完全一致部分が summary に含まれる場合は、自動修復推論へ回さなければなりません。
-
-承認済み機密候補を読み取った後、CLI は `auth`、`credential`、`credentials`、`secret`、`secrets`、`token`、`tokens`、`password`、`passwd`、`api_key`、`apikey`、`access_key`、`private_key`、`client_secret`、`bearer` を大文字小文字を区別せずキーとして認識し、それらに割り当てられた空でないスカラー値を抽出しなければなりません。加えて、Bearer トークン、JWT、プロバイダ固有のトークン、URI の userinfo、および秘密鍵ブロックとして構文上認識可能な値を、キー名にかかわらず抽出します。
-
-抽出した値、およびプレフィックスや URI から分離した認証情報の部分は、生成出力に対して大文字小文字を変更しない完全な UTF-8 バイト列の部分一致で検査します。v1 では、エンコード、ハッシュ化、または大文字小文字を変換した派生値の推測検査は行いません。
-
-抽出した値は現在のプロセス内メモリにのみ保持し、ターミナル、JSON 出力、メトリクス、デバッグログ、永続化ファイル、または機密値を除去していない修復理由に含めてはなりません。
-
-機密値の一致が検出された場合は FR-009 に定める1回限りの自動修復へ回し、自動修復後も機密値が残る場合、または修復後の候補が他の検証に違反する場合は、追加の修復を行わず終了コード 5 で Git の状態を変更せずに停止しなければなりません。
+承認済み機密の平文値をLLM入力・出力に混入させてはなりません。生成されたsummaryや出力に機密値を検出した場合は修復推論を追加せず、Gitを変更せず停止します。
 
 ### SR-011 terminal-safe 出力
 
@@ -540,11 +499,11 @@ CLI はコミットサマリ（summary）および LLM の生成出力を検査�
 
 ### NFR-002 メモリ管理
 
-デフォルトの `keep_alive: 0` 設定により、推論終了後にモデルをアンロードし、モデルがメモリに常駐することを前提としてはなりません。
+MLXモデルは生成サイクルに限定して保持し、helper終了時に解放します。履歴取得では親contextのキャンセル、応答容量上限と段階的メモリ保護を維持します。
 
 ### NFR-003 大規模差分
 
-入力サイズが通常予算を超える場合であっても、設定された最大予算までの適応的拡張と階層要約を用いて、対象ファイルの完全な集合を保持したまま計画生成を継続しなければなりません。
+必須Git差分と出力予約が64K枠に収まらない場合は停止します。通常入口の4ファイル上限を維持し、7/9/11ファイルの研究結果と通常実行の対応範囲を区別します。
 
 ### NFR-004 操作可視性
 
@@ -611,7 +570,7 @@ Ctrl-C（SIGINT）を受信した場合は、実行中の処理を停止し、�
 | 2 | usage または設定エラー |
 | 3 | 利用者による中止 |
 | 4 | 安全条件違反または復元失敗 |
-| 5 | LLM、Ollama、JSON schema エラー |
+| 5 | LLM、MLX、JSON Schemaエラー |
 | 6 | 検証失敗または検証環境エラー |
 | 7 | commit または commit 後の回復エラー |
 | 8 | push エラー |
@@ -647,11 +606,7 @@ Unicode パス、ASCII 大文字小文字、ディレクトリコンポーネン
 
 ### AC-005 大規模差分
 
-実装が対応する各コンテキスト段階に収まるケースと最大上限を超えるケースを用意し、最終プロンプトの UTF-8 バイト数、チャットテンプレート用の 256 トークン、および `max(1024, 48 × 対象ファイル数)` の出力予約トークンに基づいて、許可された最小のコンテキスト段階が選択されることを確認します。
-
-`llm.context = "auto"` では、通常予算と最弱 profile、拡張予算と同じ profile、拡張予算とより強い profile の順に評価され、固定コンテキスト設定では指定段階を超えて自動昇格しないことを確認します。各遷移で最終プロンプトが再生成・再計測され、同一入力と profile の出力が選択経路に依存せず決定論的であることを確認します。最大予算と最強 profile でも上限を超える場合は、LLM を呼び出すことなく Git を変更せずに停止することを確認します。
-
-chunk 圧縮について、追加行と削除行の独立 quota、hunk 間の位置的な coverage、元 diff 行番号による profile 間の選択集合の包含、sampling 前 chunk digest の一致、省略行数、UTF-8 と excerpt 上限、profile を強めた際の最終プロンプト bytes と上限見積もりの単調非増加を確認します。各 profile 後に最終プロンプトが再計測され、上限内となる最初の profile が記録されることを確認します。
+必須入力61,440/61,441、出力予約4,096、prefill保護12,000/12,001の境界を実token数で検証します。全フェーズ64K固定、計数失敗時停止、通常準備1回・履歴超過時最大5回、採用した準備済み入力の再利用と元diff不変を確認します。
 
 ### AC-006 構造解析と計画分割
 
@@ -663,11 +618,7 @@ Go、JavaScript、JSX、TypeScript、TSX、Python、Rust、HTML、CSS のケー�
 
 ### AC-007 LLM retry と出力検証
 
-通信エラー（transport error）とタイムアウトを返す Ollama のテストケースを用意し、通信リトライの予算が初期生成と修復を通じて合計1回のみ共有されることを確認します。1回の計画生成サイクルにおける Ollama 呼び出しが、初期生成、任意の自動修復、および共有通信リトライを合わせて最大3回に制限されることを確認します。
-
-不正な JSON、スキーマ違反、欠落・重複・範囲外の file ID、SR-010 の機密値一致を返すケースでは、複数の違反が1つの修復リクエストにまとめられ、自動修復が合計1回だけ実行されることを確認します。修復リクエストに機密値そのものが含まれず、元の候補出力が信頼できないデータ（untrusted data）として扱われることを確認します。
-
-修復後の候補を全体検証し、1件でも違反が残る場合は追加の修復を行わず終了コード 5 となり、インデックス、コミット、リモートを含む Git の状態が変更されないことを確認します。
+Grouping/Category/Textの途中停止、不正JSON、重複キー、未知・欠落・重複file ID、未解決breaking evidence、機密出力では追加retry/repairや部分planの返却を行わず停止することを確認します。JSON成立・validator受理・意味品質・完走は別々に評価します。
 
 ### AC-008 検証 trust
 
@@ -706,7 +657,7 @@ upstream あり、リモートが1つで upstream なし、複数リモート、
 
 ### AC-011 setup と doctor
 
-Ollama 未インストール、デーモン停止、モデル未取得、モデル取得済みの各状態において、setup による個別の確認と doctor による非破壊的な診断を確認します。MLX では unsupported platform、helper 不在/起動失敗、固定モデル未取得/破損/準備済み、tokenizer load、JSON Schema grammar compile、制約付き生成の各状態を確認します。doctor が model registry に通信せず、ファイルや設定を変更しないこと、および probe 出力に JSON 以外の reasoning が混入すると失敗することを確認します。
+unsupported platform、helper不在/起動失敗、固定モデル未取得/破損/準備済み、tokenizer load、JSON Schema grammar、3フェーズ制約付き生成を検査します。旧設定では確認・ダウンロード・helper起動へ進まず、doctorは設定不正を明示します。
 
 ### AC-012 設定優先順位
 
@@ -720,11 +671,11 @@ Ollama 未インストール、デーモン停止、モデル未取得、モデ�
 
 ### AC-014 metrics とメモリ
 
-M3 チップおよび 16GB メモリの環境で区間別メトリクスが表示され、`keep_alive: 0` により推論終了後のモデル解放が Ollama の状態で確認できることを確認します。
+区間別時間・KV再利用・実token数・準備回数・TAT・メモリ/swap/熱状態を区別して確認します。未測定や退行を成功扱いせず、生成サイクル終了時のhelper解放を確認します。
 
 ### AC-015 daemon と model lifecycle
 
-Ollama デーモンの停止中、起動済み、モデル未取得、更新可能の各状態において、既存デーモンの再利用、自身が起動したデーモンのみの停止、通常実行での pull の非実行、setup での個別確認を確認します。
+モデルの準備済み・未取得・破損と正常・失敗・キャンセル時のhelperライフサイクルを確認します。通常実行がモデル取得・旧backend起動を行わず、setupの確認前にモデルの本体をダウンロードしないことを確認します。
 
 ### AC-016 設定と trust コマンド
 
@@ -732,15 +683,11 @@ Ollama デーモンの停止中、起動済み、モデル未取得、更新可�
 
 ### AC-017 JSON 制約と割当
 
-不正な type、空の scope、前後の空白や大文字小文字の違いを含む Conventional Commit type 名と同じ scope（`feat(feat)`、`test(test)`、`fix(perf)`、`fix(PERF)` など）、複数行の summary、body の存在、file ID の欠落・重複・範囲外割り当て、複数コミットへの同一ファイルの割り当てを検出することを確認します。type 名 scope を含む候補は1回の自動修復に送られ、修復後も違反が残る場合は Git の状態を変更せずに停止することを確認します。
-
-`--json` が `--dry-run` および読み取り専用サブコマンドで正常に動作し、コミットまたはプッシュを伴う実行では使用法エラーとして終了コード 2 になることを確認します。
+不正type、空・type名と同じscope、48文字超summary、16文字超scope、複数行summary、body、file IDの欠落・重複・未知ID、同一ファイルの複数割当を検出し、Git変更前に停止することを確認します。
 
 ### AC-018 機密値の summary 検査
 
-承認済みの機密候補に対して、SR-010 に定める機密キーに割り当てられた空でないスカラー値、Bearer トークン、JWT、プロバイダ固有のトークン、URI の userinfo、秘密鍵ブロックを含むテストケースを用意し、抽出した値と認証情報部分が生成出力に対する大文字小文字を変更しない完全な UTF-8 バイト列の部分一致で検査されることを確認します。エンコード、ハッシュ化、または大文字小文字を変換した派生値は v1 の検査対象にならないことを確認します。
-
-機密値の一致を含む生成出力において、FR-009 に定める共有された1回限りの自動修復が実行され、修復後も一致または他の検証違反が残る場合は終了コード 5 で Git を変更せずに停止することを確認します。抽出した平文値（raw value）がターミナル、`--json`、メトリクス、デバッグログ、永続化ファイル、および機密値を除去していない修復理由に残らないことを確認します。
+入力・出力に機密値を混入させないことと、検出時に修復推論・Git変更を行わず停止することを確認します。履歴の最終応答が危険な場合は記録全体を除外し、依頼本文への置換や部分切断を行わないことを確認します。
 
 ### AC-019 push 失敗の保持
 

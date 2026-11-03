@@ -58,7 +58,7 @@ v1 does not target Windows or Linux, a GUI, cloud LLMs, a llama.cpp backend, hun
 
 The target OS for v1 is macOS 14 or later, the target architecture is Apple Silicon, and the reference machine is an M3 Mac with 16 GB of memory.
 
-The Ollama backend requires system Git and Ollama at runtime. The MLX backend uses the private Swift helper included in the distribution and macOS system frameworks. Syntax-aware structural analysis uses the official `github.com/tree-sitter/go-tree-sitter` package and target-language grammars, embedding Tree-sitter's C implementation into the Go CLI via CGo. CGo must not be extended beyond the Tree-sitter boundary, and the implementation must not require an external parser executable, runtime shared grammar, Oniguruma, or a cloud-LLM fallback.
+Normal runtime dependencies are system Git, Apple Silicon macOS, and the bundled MLX Swift helper. Existing Tree-sitter/CGo analysis remains unchanged.
 
 During interactive normal execution, the CLI may send an HTTP GET containing no repository content to a fixed official GitHub Releases metadata endpoint for an update check at most once every 24 hours. Update-check network failures must not interrupt normal processing, and update checks are skipped for JSON output and CI environments.
 
@@ -71,7 +71,7 @@ The default is the provisional Gemma three-phase planner with MLX 4bit, model `m
 3. The CLI applies pathspec, excludes ignored files, and targets tracked files at file granularity from HEAD through the final working-tree state. A file containing both staged and unstaged changes, including a partially staged file, is targeted as a whole file. A rename is represented as one change with an old path and new path and receives one file ID. A symlink is handled as Git-tracked link information without following the link target, and a submodule is handled only as the parent repository's pointer update.
 4. The CLI performs sensitive classification using paths only and always automatically excludes clearly sensitive files. No override is provided to target clearly sensitive files. Sensitive candidates are confirmed before their contents are read, and only approved candidates are passed to local analysis.
 5. For target changes remaining after sensitive classification, the CLI generates Git metadata and Tree-sitter structural evidence. v1 parses Go, JavaScript, JSX, TypeScript, TSX, Python, Rust, HTML, and CSS. A text file in an unsupported language or one for which syntax parsing fails falls back to raw diff plus Git metadata. Opaque files are passed to plan generation as metadata only, without their contents. Structural evidence does not include relationships or grouping recommendations such as source/test, docs/source, or same-feature relationships.
-6. The default three-phase planner uses fixed 16K context and stops if input requires compression. For single-pass, the CLI assigns a file ID and change_hash to every target change and constructs LLM input using the smallest context tier allowed by configuration. When the normal budget is exceeded, it applies hierarchical summarization and permitted context expansion in order of least information loss.
+6. Prepare complete Git diffs for fixed 64K Three-phase planning. Use actual-token admission without normal-path summarization.
 7. The selected backend and planner produce a commit plan. Before any Git mutation, the CLI validates the schema, file assignment, and safety conditions.
 8. The CLI displays the full plan and exclusion list and prompts exactly once with `Create these N commits? [y/r/N]`.
 9. Only after user approval, the CLI runs verification once against the entire working tree based on an approved verification definition.
@@ -138,9 +138,9 @@ Configuration files use TOML and the following v1 schema:
 | `llm.model_revision` | string | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` | global, repo |
 | `llm.model_quantization` | string | `"4bit"` | global, repo |
 | `llm.model` | string | `"mlx-community/gemma-4-E4B-it-4bit"` | global, repo, CLI |
-| `llm.endpoint` | string | `"http://127.0.0.1:11434"` | global |
-| `llm.context` | string | `"16k"` | global, repo |
-| `llm.max_context_tokens` | integer | `16384` | global, repo |
+| `llm.endpoint` | string | `"http://127.0.0.1:11434"` | global | (deprecated; unused by normal planning)
+| `llm.context` | string | `"64k"` | global, repo |
+| `llm.max_context_tokens` | integer | `65536` | global, repo |
 | `analysis.untracked` | string | `"auto-safe"` | global |
 | `analysis.include` | string array | `[]` | global, repo |
 | `analysis.exclude` | string array | `[]` | global, repo |
@@ -156,7 +156,7 @@ If `verification.commands` is explicitly present in repository configuration, th
 
 Allowed values for `llm.context` are `"auto"` and the fixed context tiers supported by the implementation.
 
-`llm.max_context_tokens` is set to a context tier supported by the implementation and specifies the largest tier that automatic selection may use. Supported values and the default are fixed by configuration validation and release tests.
+`llm.max_context_tokens` must be 65,536. The helper measures actual final input tokens independently for each phase.
 
 `analysis.include` and `analysis.exclude` use doublestar globs and are restricted to repository-root-relative paths.
 
@@ -166,7 +166,7 @@ Array-valued configuration overrides replace the prior value; they do not append
 
 `safety.additional_sensitive_patterns` does not replace built-in clearly sensitive patterns. It only adds patterns to the automatically excluded set.
 
-`provider = "ollama"`, `think = false`, `stream = false`, and `keep_alive = 0` are fixed v1 values and cannot be relaxed through configuration.
+Thinking is OFF; the helper uses JSON Schema, native KV, model-specific fixed sampling and seed 144. Normal backend/planner selection cannot be relaxed.
 
 Unknown keys, unsupported `schema_version` values, type mismatches, or keys declared in a configuration source not allowed by the schema cause exit code 2. Therefore, any `verification.*` key in global configuration is rejected as a configuration error.
 
@@ -215,46 +215,23 @@ The internal candidate graph retains every changed file ID as a node and represe
 
 ### FR-006 Input Size Control
 
-The CLI must prioritize structural evidence and required diff hunks when constructing LLM input.
+All three phases use a fixed 65,536-token context and reserve 4,096 output tokens. The helper measures the final chat-template-applied input and reuses that same prepared input for generation. Go byte estimates must not determine token admission. Mandatory input above 61,440 tokens stops before inference. Extra per-chunk synchronization and allocator-cache reclamation apply above 12,000 full-input tokens, including reused prefixes; 12,000 or fewer uses the lighter path.
 
-When `llm.context = "auto"`, the CLI selects the smallest context tier up to the normal budget. Only when the weakest acceptable chunk-compression profile does not fit within the normal budget and `llm.max_context_tokens` permits a larger tier does the CLI remeasure the same profile's final prompt against the expanded budget. Only if it still does not fit may the CLI proceed to stronger profiles under the expanded budget. With a fixed `llm.context`, the CLI must not automatically promote beyond that tier.
-
-Before selecting a context tier, the CLI must treat the UTF-8 byte length of the final prompt as a conservative upper bound on input token count, then add a fixed 256 tokens for the chat template and output-reserve tokens calculated as `max(1024, 48 × target file count)`.
-The CLI selects the smallest allowed context tier that can contain the resulting total.
-
-If the allowed context maximum is exceeded, the CLI must hierarchically summarize raw diffs in file, hunk, then chunk order. If the total still exceeds the limit, it must apply deterministic, language-agnostic canonicalization and budget-aware reduction to the common structural-evidence representation. Reduction must prioritize declarations, roles, enclosing declarations, and tag, attribute, selector, property, and rule structures while retaining representative points distributed across the file. It must not truncate to the first N items.
-
-Chunk-level raw-diff summarization processes the output of file- and hunk-level summarization using boundaries shared by every compression profile. Additions and deletions receive independent quotas in each chunk. Hunks and changed lines are ranked deterministically by their positions in the original diff: first, last, then farthest from positions already selected. Each changed line is identified by its chunk number and original diff line number. The lines selected by strong must be a subset of medium, and those selected by medium must be a subset of light. Selected lines are restored to original diff order, and each contiguous omission reports its addition and deletion counts. Long lines retain their head and tail without breaking UTF-8, with the omission marker included in the limit. Each chunk digest is calculated from the same pre-sampling input and must remain identical across profiles.
-
-After each chunk-compression profile or context-budget transition, the CLI must rerender the final prompt and recalculate its conservative bound, stopping at the least-lossy combination that fits within supported resources. Strengthening the profile must not increase the selected-line set, final-prompt UTF-8 byte count, or conservative bound.
-
-When structural evidence is reduced, the planning input must include, per file, the before/after counts, JSON byte sizes, digests, coverage digests, and reduction level. Target file IDs, old/new paths, status, change_hash values, and Git identities must remain exact. Validation must ensure that retained evidence derives from original observed facts, declaration/role/enclosing-declaration/tag/attribute/selector/property/rule coverage remains present, and every structural file retains representative evidence. If the total still exceeds the allowed context maximum or these invariants cannot be preserved, the CLI must stop without calling the LLM or modifying Git.
+Optional final-response records are admitted whole. Full fit takes one preparation; overflow permits one full preparation, one mandatory preparation, and at most three shortlisted preparations. Tokenizer failure is an error. Transport and memory byte limits remain independent resource protections.
 
 ### FR-007 Hierarchical Summarization
 
-Hierarchical summarization and structural-evidence reduction must preserve the complete sets of target file IDs, old/new paths, statuses, change_hash values, and Git identities so that missing file assignments remain detectable afterward. For raw-diff summarization, retained changed lines must be validated as deriving from the original diff by original diff line number. Byte-for-byte equality of structural evidence is not a pre/post reduction invariant; provenance and retained scope are instead validated through audit metadata and the coverage invariant.
+Normal planning preserves complete Git diffs without hierarchical summarization, truncation, or compression. Missing or unavailable history remains explicit and permits Git-only planning. Mandatory overflow stops without Git mutation. Historical summarization is research-only.
 
 ### FR-008 Commit Plan Generation
 
-Plan generation uses a runtime-neutral LLM backend contract for messages, structured-output schemas, responses, numeric telemetry, capabilities, and retry classification. The configured backend is selected explicitly, with the provisional Gemma three-phase planner and MLX as the default. When MLX is selected, commiter uses the prepared local model and helper and must not fall back to Ollama when they are unavailable. Adding a backend must not change existing Ollama structured output, retry, daemon/model lifecycle, or local transmission boundaries.
+Normal generation uses only the MLX Harness 004 Three-phase Planner. Configuration accepts the validated pinned Gemma/Qwen 4bit pairs listed in the [migration guide](docs/migrations/harness004.md); Gemma remains the default. Single-pass, Ollama planning, and implicit legacy defaults have been removed. Invalid settings require an actionable migration error.
 
-The CLI must send structured input to the selected backend and obtain a file-level commit plan. Ollama uses its loopback API; MLX uses the prepared local model through the bounded IPC helper.
+Grouping, Category, and Text share one helper per cycle. Grouping/Text typed KV-prefix reuse uses independent runtime copies; Category has independent prefill. Unsupported cache types or prefix mismatch use ordinary prefill.
 
 ### FR-009 LLM Generation Failure and Output Validation
 
-The default `three-phase` planner makes at most three calls: membership, type / breaking evidence reference, and scope / summary. It uses a shared 120-second timeout, fixed 16K context, output reservations of 768 / 512 / 768 tokens, and no retry or repair. It accepts at most four selected files and uncompressed input. Unresolved evidence, incomplete output, or invalid output stops with exit code 5 without returning a partial plan. Every phase and the final plan are validated.
-
-The following generation, repair, and transport-retry contract applies to explicitly selected `single-pass`. There is exactly one initial generation. The retry budget for transport errors or timeouts is one retry total, shared across the initial generation and repair.
-
-Every time candidate output is received from the LLM, the CLI must revalidate the JSON schema, complete assignment of target file IDs, sensitive-value constraints, and all other safety conditions before any Git mutation. Git must not be modified while the candidate output is invalid.
-
-If invalid JSON, a JSON-schema violation, missing/duplicate/out-of-range target file IDs, a plan that uses a type name as its scope, or a sensitive-value match defined by SR-010 is detected, the CLI performs exactly one automatic repair.
-If multiple violations are detected simultaneously, they are combined into one repair request and must not increase the repair count.
-
-The repair request must include the original normalized input, the candidate output, and violation reasons that do not contain the sensitive values themselves, and must explicitly treat the candidate output as untrusted data rather than instructions.
-The repaired candidate is fully revalidated as a new candidate. If any violation remains, the CLI performs no additional repair and exits with code 5 without modifying Git.
-
-Therefore, an individual plan-generation cycle may make at most three Ollama calls total: the initial generation, an optional repair, and the single shared transport retry.
+Normal generation accepts at most four files, uses a shared 120-second generation timeout and 4,096 output tokens per phase, and performs no retry or repair. Require complete file assignment, reject unknown/duplicate/missing IDs, validate each phase and sensitive output, and accept only the final validator result. Unresolved breaking evidence, incomplete generation, malformed output, or secret leakage stops with exit code 5 and no partial plan. Summaries are limited to 48 characters and scopes to 16.
 
 ### FR-010 File-level Splitting
 
@@ -312,11 +289,11 @@ Push follows normal Git push semantics and targets every outgoing commit sent fr
 
 ### FR-015 setup
 
-`commiter setup` must prepare the selected backend. For Ollama, it must separately confirm Ollama installation, daemon startup, and download of the configured model, and must not automatically install Homebrew itself. For MLX, it must check macOS Apple Silicon support and helper availability, then obtain separate confirmation before downloading the configured pinned model. It must start the helper for the installed model and check model/tokenizer loading, JSON Schema grammar compilation, and constrained generation.
+Setup prepares Apple Silicon macOS, the bundled helper, and a supported pinned model. Display model ID, revision, quantization, estimated size, and destination before confirmed download. Verify model/tokenizer loading, JSON Schema grammar, and three-phase constrained generation. Do not provide Ollama installation, daemon startup, or pull paths.
 
 ### FR-016 doctor
 
-`commiter doctor` must perform read-only diagnostics for Git, configuration, verification trust, Git identity, and the selected backend's capabilities. For Ollama it checks the loopback API, configured model, structured output, and thinking-disabled operation. For MLX it checks platform support, helper availability, the locally installed pinned model, model/tokenizer loading, JSON Schema grammar compilation, and constrained JSON generation. Doctor must not download or update a model, operate a daemon, or change configuration or model files, and must not fall back to Ollama when MLX fails.
+Doctor checks repository, configuration, Git identity, MLX platform/helper, installed pin, tokenizer/model loading, JSON Schema grammar, and three-phase constrained generation read-only. It must not download/update models, modify configuration, or operate daemons. Invalid configuration must not restore legacy backend diagnostics.
 
 ### FR-017 Language Configuration
 
@@ -330,25 +307,11 @@ The CLI must display timing for Git preprocessing, syntax analysis, model load, 
 
 ### FR-019 Daemon Lifecycle
 
-During normal execution, if loopback Ollama is stopped, the CLI must start a temporary daemon and stop only a daemon that it started itself.
-
-An existing daemon must be reused and must not be stopped when the CLI exits.
-
-Normal Ollama calls must specify `keep_alive: 0`.
+Share one helper only within a generation cycle and close it on success, failure, or cancellation. Do not start or stop an Ollama daemon or introduce a persistent service.
 
 ### FR-020 Model Lifecycle
 
-Normal execution must not pull or update models.
-
-`setup --update-model` must update a model only after displaying the update and obtaining explicit confirmation.
-
-Ollama's public local API does not provide remote differences before a pull starts. When the target model is installed, the displayed update details are the current local model tag, digest, size, modification time, format, parameter size, and quantization level retrieved from `/api/tags`, together with the update operation that will run after approval.
-
-The CLI must state that remote differences and download size are known only after the pull starts, and must not call `/api/pull` before confirmation.
-
-setup must reuse an existing official Ollama App or CLI. If Ollama is not installed and Homebrew is available, setup must separately prompt for Ollama installation, daemon startup, and model download.
-
-setup must not install Homebrew itself.
+Normal generation and doctor never contact a model registry or download/update weights. Setup --update-model displays the supported pinned-model plan before confirmed installation. Configuration, setup, doctor, and helper must agree on supported model/revision pairs; do not generally enable unvalidated models.
 
 ### FR-021 Configuration and State Commands
 
@@ -386,7 +349,9 @@ During interactive normal execution, the CLI must send at most one HTTP GET ever
 
 ## 10. LLM Input and Output
 
-The Ollama endpoint is restricted to loopback and uses `think: false`, `stream: false`, JSON Schema, and `keep_alive: 0`. Based on the API features required by commiter v1, operational compatibility of the legacy Ollama model `qwen3.5:4b-q4_K_M`, and the structured-output fix for models with thinking disabled, supported Ollama versions are `0.31.2` or later. Earlier versions, prereleases of `0.31.2`, and invalid version responses are treated as API-incompatible. See [Ollama Chat API](https://docs.ollama.com/api/chat), [Structured Outputs](https://docs.ollama.com/capabilities/structured-outputs), and [Ollama v0.31.2](https://github.com/ollama/ollama/releases/tag/v0.31.2).
+Normal history acquisition uses the current worktree only, 100-item pages and four body workers, with parent cancellation and resource protection but no history-specific five-second deadline. Revalidate the Git snapshot before/after acquisition and after generation. Match every current change block by content, preserve rename/partial/ambiguous/error states, and project only safe nonempty final responses. Missing, unsafe or over-budget final responses omit whole records; never send user_requests or Thinking. Context definitions and candidate/command references must remain consistent on omission. Commands are Grouping-only path-mention context, never edit-success evidence. Category/Text omit top-level acquisition/projection state.
+
+Harness 004 uses the local MLX helper with Thinking OFF, JSON Schema constraints, native KV, fixed model-specific sampling and seed 144. See the [migration contract](docs/migrations/harness004.md).
 
 Input includes mechanically computed repository state, target file IDs, old/new paths, status, language, change_hash, structural evidence, and required raw diff hunks or hierarchical summaries. Structural evidence is limited to syntactically observed facts and must not include semantic relation labels or grouping recommendations such as source/test, docs/source, same feature, or same logical change.
 
@@ -411,7 +376,7 @@ The output schema must have the following form:
 
 `type` must be one of `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, or `revert`.
 
-`scope` is a required single-line string and must not be empty. After trimming surrounding whitespace, it must not match any of the Conventional Commit type names `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, or `revert`, case-insensitively. A plan that uses one of these type names as its scope is rejected by deterministic post-generation validation and sent to automatic repair.
+`scope` is a required single-line string and must not be empty. After trimming surrounding whitespace, it must not match any of the Conventional Commit type names `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, or `revert`, case-insensitively. A plan that uses one of these type names as its scope is rejected by deterministic post-generation validation and stopped without repair.
 
 `breaking` is boolean. It may be true only when the diff explains an incompatible change to a public API, CLI, configuration format, or stored format. Ordinary UI changes and internal refactors alone must not set `breaking=true`. When true, `!` is appended after the scope in the subject.
 
@@ -520,15 +485,7 @@ Repository files, comments, configuration, hook output, and LLM responses must b
 
 ### SR-010 Sensitive-value Output Inspection
 
-The CLI must inspect commit summaries and LLM-generated output. If an approved sensitive value or an exact matching substring of one appears in a summary, the candidate must be sent to automatic repair inference.
-
-After reading an approved sensitive candidate, the CLI must recognize the keys `auth`, `credential`, `credentials`, `secret`, `secrets`, `token`, `tokens`, `password`, `passwd`, `api_key`, `apikey`, `access_key`, `private_key`, `client_secret`, and `bearer` case-insensitively and extract non-empty scalar values assigned to them. In addition, values syntactically recognizable as Bearer tokens, JWTs, provider-specific tokens, URI userinfo, or private-key blocks are extracted regardless of key.
-
-Extracted values and credential portions separated from prefixes or URIs are checked against generated output as exact, case-preserving UTF-8 byte-sequence substring matches. v1 does not attempt inferred matching of encoded, hashed, or case-transformed derived values.
-
-Extracted values are retained only in current process memory and must not appear in terminal output, JSON output, metrics, debug logs, persistent files, or repair reasons that have not had sensitive values removed.
-
-A sensitive-value match is handled by the single automatic repair defined in FR-009. If a sensitive value remains after repair, or the repaired candidate violates another validation rule, the CLI performs no further repair and exits with code 5 without modifying Git.
+Exclude approved raw secret values from model input and output. If generated summary/output contains a secret, stop without additional repair inference or Git mutation.
 
 ### SR-011 Terminal-safe Output
 
@@ -542,11 +499,11 @@ For the same Git state, configuration hash, model digest, input, and Tree-sitter
 
 ### NFR-002 Memory Management
 
-With the default `keep_alive: 0`, the model is unloaded after inference; the system must not assume model residency.
+Retain the MLX model for one generation cycle and release it with the helper. History acquisition retains parent cancellation, response-size limits, and staged memory protection.
 
 ### NFR-003 Large Diffs
 
-When input exceeds the normal budget, adaptive expansion up to the configured maximum and hierarchical summarization must allow plan generation to continue while preserving the complete target-file set.
+Stop when mandatory Git evidence plus output reservation exceeds 64K. Preserve the four-file normal-entry limit and distinguish 7/9/11-file research results from supported normal behavior.
 
 ### NFR-004 Operational Visibility
 
@@ -584,7 +541,7 @@ v1 defines no numeric performance gate. Per-phase measurements are collected on 
 
 ## 14. Failure Behavior
 
-If the LLM is unavailable, the model is not installed, API compatibility diagnostics fail, transport errors or timeouts remain after the allowed retry, the final candidate fails schema/assignment/safety validation, verification fails, or stage restoration fails before commit creation begins, commits and push must not start.
+If the LLM is unavailable, the model is not installed, API compatibility diagnostics fail, transport errors or timeouts occur, the final candidate fails schema/assignment/safety validation, verification fails, or stage restoration fails before commit creation begins, commits and push must not start.
 
 Unsupported Tree-sitter grammar, syntax error, or structural-evidence extraction failure for an individual file is not fatal; only that file falls back to raw diff plus Git metadata.
 
@@ -613,7 +570,7 @@ On Ctrl-C, the CLI stops the in-progress operation and reports stage-restoration
 | 2 | Usage or configuration error |
 | 3 | User cancellation |
 | 4 | Safety-condition violation or restoration failure |
-| 5 | LLM, Ollama, or JSON-schema error |
+| 5 | LLM / MLX / JSON Schema error |
 | 6 | Verification failure or verification-environment error |
 | 7 | Commit or post-commit recovery error |
 | 8 | Push error |
@@ -649,11 +606,7 @@ Verify that sensitive candidates are confirmed before reading; when approved, th
 
 ### AC-005 Large Diffs
 
-Prepare fixtures that fit within each implementation-supported context tier and a fixture exceeding the maximum. Verify that the smallest allowed context tier is selected using the final prompt UTF-8 byte count, the fixed 256-token chat-template allowance, and output-reserve tokens calculated as `max(1024, 48 × target file count)`.
-
-With `llm.context = "auto"`, verify evaluation proceeds from the normal budget with the weakest profile, to the expanded budget with the same profile, and only then to stronger profiles under the expanded budget. With a fixed context tier, verify that the CLI never automatically promotes beyond that tier. Verify that every transition rerenders and remeasures the final prompt and that identical input and profile produce deterministic output independent of the selection path. If the strongest profile still exceeds the maximum budget, verify that the CLI does not call the LLM and stops without modifying Git.
-
-For chunk compression, verify independent addition and deletion quotas, positional coverage across hunks, profile-set inclusion by original diff line identity, equal pre-sampling chunk digests, omission counts, UTF-8 and excerpt bounds, and non-increasing final-prompt bytes and conservative estimates as profiles strengthen. Verify that the final prompt is remeasured after each profile and that the first fitting profile is recorded.
+Verify mandatory-input boundaries 61,440/61,441, a 4,096 output reservation, and prefill protection boundaries 12,000/12,001 using actual token counts. Check fixed 64K for all phases, tokenizer failure, one normal preparation / at most five on overflow, reuse of the accepted prepared object, and unchanged diffs.
 
 ### AC-006 Structural Analysis and Plan Splitting
 
@@ -665,11 +618,7 @@ Using a diff containing implementation, corresponding tests, docs, dependency ch
 
 ### AC-007 LLM Retry and Output Validation
 
-Using Ollama fixtures that return transport errors and timeouts, verify that the transport-retry budget is exactly one total retry shared across the initial generation and repair. Verify that one plan-generation cycle makes at most three Ollama calls total: initial generation, optional repair, and the shared transport retry.
-
-For fixtures returning invalid JSON, schema violations, missing/duplicate/out-of-range file IDs, or an SR-010 sensitive-value match, verify that multiple violations are combined into one repair request and exactly one automatic repair is performed. Verify that the repair request does not contain the sensitive value itself and treats the original candidate output as untrusted data.
-
-Fully revalidate the repaired candidate. If any violation remains, verify that no further repair occurs, the CLI exits with code 5, and Git state including the index, commits, and remote is unchanged.
+Incomplete generation, invalid JSON, duplicate keys, unknown/missing/duplicate file IDs, unresolved breaking evidence, or sensitive output must stop without retry, repair, or a partial plan. Evaluate JSON validity, validator acceptance, semantic quality, and completion separately.
 
 ### AC-008 Verification Trust
 
@@ -708,7 +657,7 @@ Prepare local commits that are already ahead of the remote-tracking ref before r
 
 ### AC-011 setup and doctor
 
-For states where Ollama is not installed, the daemon is stopped, the model is missing, and the model is present, verify setup's separate confirmations and doctor's non-destructive diagnostics. For MLX, verify unsupported platforms, a missing or unstartable helper, a missing, corrupt, or ready pinned model, tokenizer loading, JSON Schema grammar compilation, and constrained generation. Verify that doctor makes no model-registry requests and changes no files or configuration, and that reasoning text outside the required JSON causes the probe to fail.
+Test unsupported platform, unavailable/failed helper, missing/corrupt/ready pin, tokenizer loading, JSON Schema grammar, and three-phase constrained generation. Legacy settings must fail before prompting, downloading, or starting a helper; doctor reports invalid configuration.
 
 ### AC-012 Configuration Precedence
 
@@ -722,11 +671,11 @@ Verify that English summaries are generated with the default configuration and J
 
 ### AC-014 Metrics and Memory
 
-On an M3 machine with 16 GB of memory, verify that per-phase metrics are displayed and that Ollama state confirms the model is released after inference because of `keep_alive: 0`.
+Record phase durations, KV reuse, actual tokens, preparation calls, TAT, memory/swap, and thermal state separately. Do not count missing measurements or regressions as success. Verify helper release after the cycle.
 
 ### AC-015 Daemon and Model Lifecycle
 
-For states where the Ollama daemon is stopped, already running, the model is missing, and an update is available, verify reuse of an existing daemon, stopping only a daemon started by commiter, no model pull during normal execution, and setup's separate confirmations.
+Test ready/missing/corrupt models and helper cleanup on success, failure, and cancellation. Normal execution never downloads weights or starts a legacy backend. Setup never downloads model bodies before confirmation.
 
 ### AC-016 Configuration and Trust Commands
 
@@ -734,15 +683,11 @@ Verify output and state changes for `config init --global`, `config init --repo`
 
 ### AC-017 JSON Constraints and Assignment
 
-Verify detection of invalid type, empty scope, and a scope equal to a Conventional Commit type name after trimming and case folding (`feat(feat)`, `test(test)`, `fix(perf)`, or `fix(PERF)`), multiline summary, body, missing file IDs, duplicate file IDs, out-of-range file IDs, and assignment of one file to multiple commits. Verify that a candidate with a type-name scope is sent to exactly one automatic repair and that the CLI stops without modifying Git if the violation remains after repair.
-
-Verify that `--json` succeeds with `--dry-run` and read-only subcommands and causes exit code 2 as a usage error when used with execution that performs commits or push.
+Reject invalid types, empty/type-named scopes, summaries above 48 characters, scopes above 16, multiline summaries, bodies, missing/duplicate/unknown file IDs, and repeated assignment before Git mutation.
 
 ### AC-018 Sensitive-value Inspection of Summaries
 
-For an approved sensitive candidate, prepare fixtures containing non-empty scalar values assigned to the sensitive keys from SR-010, Bearer tokens, JWTs, provider-specific tokens, URI userinfo, and private-key blocks. Verify that extracted values and credential portions are checked against generated output as exact, case-preserving UTF-8 byte-sequence substring matches. Verify that encoded, hashed, or case-transformed derived values are outside the v1 inspection scope.
-
-When generated output contains a sensitive-value match, verify that the single shared automatic repair from FR-009 runs. If a match or another validation violation remains after repair, verify the CLI exits with code 5 without modifying Git. Verify that extracted raw values never remain in terminal output, `--json`, metrics, debug logs, persistent files, or repair reasons that have not had sensitive values removed.
+Exclude secrets from input/output and stop without repair inference or Git mutation when detected. Omit unsafe final-response records whole without request fallback or truncation.
 
 ### AC-019 Preserving Local Commits on Push Failure
 

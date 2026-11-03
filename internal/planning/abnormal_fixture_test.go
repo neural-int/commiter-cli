@@ -66,7 +66,7 @@ func TestGeneratorRunsAbnormalFixtures(t *testing.T) {
 			steps := abnormalFixtureSteps(t, fixture.Steps)
 			client := &scriptedChat{steps: steps}
 
-			result, err := (Generator{Client: client}).Generate(context.Background(), prepared, English, sensitive)
+			result, err := (ResearchGenerator{Client: client}).Generate(context.Background(), prepared, English, sensitive)
 
 			if len(client.messages) != fixture.Want.Calls {
 				t.Fatalf("calls=%d, want %d", len(client.messages), fixture.Want.Calls)

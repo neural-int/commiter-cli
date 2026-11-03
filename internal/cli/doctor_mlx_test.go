@@ -146,7 +146,7 @@ func TestMLXDoctorJSONKeepsEnvelopeAndUsesSelectedBackend(t *testing.T) {
 	if err := os.MkdirAll(filepath.Join(configHome, "commiter"), 0o700); err != nil {
 		t.Fatal(err)
 	}
-	configText := "[llm]\nplanner = \"single-pass\"\nbackend = \"mlx\"\nmodel = \"owner/model\"\nmodel_revision = \"" + strings.Repeat("a", 40) + "\"\nmodel_quantization = \"4bit\"\n"
+	configText := config.GlobalTemplate
 	if err := os.WriteFile(filepath.Join(configHome, "commiter", "config.toml"), []byte(configText), 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -181,7 +181,7 @@ func TestMLXDoctorJSONKeepsEnvelopeAndUsesSelectedBackend(t *testing.T) {
 	}
 }
 
-func TestDoctorKeepsOllamaBinaryCheckWhenBackendCannotBeResolved(t *testing.T) {
+func TestDoctorDoesNotFallBackWhenConfigurationCannotBeResolved(t *testing.T) {
 	repo := cliRepository(t)
 	chdir(t, repo)
 	configHome := t.TempDir()
@@ -212,8 +212,8 @@ func TestDoctorKeepsOllamaBinaryCheckWhenBackendCannotBeResolved(t *testing.T) {
 	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
 		t.Fatalf("decode doctor JSON: %v", err)
 	}
-	if !result.Doctor["ollama_binary"].OK {
-		t.Fatalf("legacy Ollama check missing from unresolved-backend output: %#v", result.Doctor)
+	if _, exists := result.Doctor["ollama_binary"]; exists {
+		t.Fatalf("unresolved configuration revived removed Ollama backend: %#v", result.Doctor)
 	}
 }
 

@@ -56,7 +56,7 @@ func metadataTemplates() (map[string]phaseTemplate, error) {
 		return nil, err
 	}
 	c := &templateClient{Templates: map[string]phaseTemplate{}}
-	_, err = (planning.ThreePhaseGenerator{Client: c}).Generate(context.Background(), contextinput.Prepared{Document: d, Prompt: prompt, Budget: contextinput.Budget{ContextTokens: 16384}}, planning.English, planning.SensitiveValues{})
+	_, err = (planning.ResearchThreePhaseGenerator{Client: c}).Generate(context.Background(), contextinput.Prepared{Document: d, Prompt: prompt, Budget: contextinput.Budget{ContextTokens: 16384}}, planning.English, planning.SensitiveValues{})
 	return c.Templates, err
 }
 func object(properties map[string]any, ids []string) map[string]any {

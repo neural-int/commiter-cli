@@ -20,7 +20,6 @@ import (
 	runmetrics "github.com/natsuki0413/commiter-cli/internal/metrics"
 	"github.com/natsuki0413/commiter-cli/internal/mlx"
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
-	"github.com/natsuki0413/commiter-cli/internal/ollama"
 	"github.com/natsuki0413/commiter-cli/internal/planning"
 	"github.com/natsuki0413/commiter-cli/internal/relation"
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
@@ -32,6 +31,12 @@ var planFlow planFlowFunc = generateCommitPlan
 var mlxHelperPath = mlx.ResolveBundledHelper
 
 func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snapshot, values config.Values, supplement string) (planning.Plan, error) {
+	if values.Planner != config.CandidatePlanner || !config.SupportedPlannerModel(values) {
+		return planning.Plan{}, exitcode.New(exitcode.Usage, "removed or unsupported planner configuration; migrate to a pinned MLX three-phase model (see docs/migrations/harness004.md)")
+	}
+	if len(snapshot.Changes) > planning.CandidateMaxFiles {
+		return planning.Plan{}, exitcode.New(exitcode.LLM, "three-phase planner supports at most four selected files; select a smaller change set")
+	}
 	var client planning.ChatClient
 	if values.Backend == "mlx" {
 		store, err := newMLXModelStore()
@@ -70,33 +75,8 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 			return planning.Plan{}, err
 		}
 	}
-	fileIDs := make([]string, len(document.Files))
-	for index, file := range document.Files {
-		fileIDs[index] = file.ID
-	}
-	systemMessage, err := planning.InitialSystemMessage(fileIDs)
-	if err != nil {
-		return planning.Plan{}, err
-	}
 	language := planning.Language(values.Language)
-	renderer := planning.Renderer(language)
-	if supplement != "" {
-		renderer = supplementRenderer(renderer, supplement)
-	}
-	var prepared contextinput.Prepared
-	if values.Planner == config.CandidatePlanner {
-		// Harness004 measures the final template with the model's tokenizer.
-		// Do not reject or reduce input using the old renderer's byte estimate.
-		prompt, renderErr := renderer(document)
-		err = renderErr
-		prepared = contextinput.Prepared{Document: document, Prompt: prompt,
-			Budget:       contextinput.Budget{ContextTokens: contextinput.Context64K, ReservedOutputTokens: 4096},
-			SummaryStage: contextinput.SummaryNone, CompressionProfile: contextinput.CompressionNone}
-	} else {
-		prepared, err = contextinput.Prepare(ctx, document, contextinput.BudgetConfig{
-			Context: values.Context, MaxContextTokens: values.MaxTokens, PromptOverheadBytes: len(systemMessage),
-		}, renderer, nil)
-	}
+	prepared, err := planning.PrepareThreePhase(document, supplement)
 	recordSummarization(recorder, prepared)
 	if err != nil {
 		return planning.Plan{}, err
@@ -108,20 +88,17 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 	}
 	recorder.SetContext(values.Model, contextStage)
 	if client == nil {
-		runtime, err := ollama.Open(ctx, values)
-		if err != nil {
-			return planning.Plan{}, err
-		}
-		defer runtime.Close()
-		client = runtime.Client
+		return planning.Plan{}, exitcode.New(exitcode.LLM, "three-phase planning requires MLX")
 	}
-	var generated planning.Result
-	if values.Planner == config.CandidatePlanner {
-		codexRecords := optionalCodexContext(ctx, root, snapshot, values, relationFiles, sensitive)
-		generated, err = (planning.ThreePhaseGenerator{Client: client, CodexContext: codexRecords}).Generate(ctx, prepared, language, sensitive)
-	} else {
-		generated, err = (planning.Generator{Client: client}).Generate(ctx, prepared, language, sensitive)
+	history, err := attributedHistoryForPlan(ctx, root, snapshot, values, prepared.Document, sensitive)
+	if err != nil {
+		return planning.Plan{}, err
 	}
+	generated, err := (planning.ThreePhaseGenerator{Client: client, GroupingHistory: history}).Generate(ctx, prepared, language, sensitive)
+	if verifyErr := verifyAttributionSnapshot(ctx, root, snapshot, values); verifyErr != nil {
+		return planning.Plan{}, verifyErr
+	}
+
 	recordGeneratedTelemetry(recorder, generated)
 	if generated.Telemetry.ContextTokens > 0 {
 		contextStage = fmt.Sprintf("%dk", generated.Telemetry.ContextTokens/1024)

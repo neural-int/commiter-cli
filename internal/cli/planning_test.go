@@ -10,13 +10,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/natsuki0413/commiter-cli/internal/codexcontext"
+	"github.com/natsuki0413/commiter-cli/internal/historyattribution"
 
 	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/contextinput"
 	"github.com/natsuki0413/commiter-cli/internal/gitstate"
 	runmetrics "github.com/natsuki0413/commiter-cli/internal/metrics"
-	"github.com/natsuki0413/commiter-cli/internal/mlx"
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 	"github.com/natsuki0413/commiter-cli/internal/planning"
 	"github.com/natsuki0413/commiter-cli/internal/relation"
@@ -84,10 +83,9 @@ func TestMLXPlanningFailsClosedWithoutModelOrOllamaFallback(t *testing.T) {
 		return mlxmodel.Store{Root: t.TempDir()}, nil
 	}
 	values := config.Defaults().Values
-	values.Planner = "single-pass"
 	values.Backend = "mlx"
-	values.Model = "owner/model"
-	values.ModelRevision = strings.Repeat("a", 40)
+	values.Model = config.CandidateModel
+	values.ModelRevision = config.CandidateRevision
 	values.ModelQuantization = "4bit"
 	_, err := generateCommitPlan(context.Background(), "", gitstate.Snapshot{}, values, "")
 	if err == nil || !strings.Contains(err.Error(), "run commiter setup") {
@@ -95,84 +93,19 @@ func TestMLXPlanningFailsClosedWithoutModelOrOllamaFallback(t *testing.T) {
 	}
 }
 
-func TestMLXPlanningUsesInstalledModelAndHelper(t *testing.T) {
-	repo := cliRepository(t)
-	cliWrite(t, repo, "src/main.ts", "import { helper } from './helper'\nexport const value = helper()\n", 0o644)
-	cliWrite(t, repo, "src/helper.ts", "export function helper() { return 1 }\n", 0o644)
-	cliGit(t, repo, "add", "src/main.ts", "src/helper.ts")
-	cliGit(t, repo, "commit", "-m", "base")
-	cliWrite(t, repo, "src/main.ts", "import { helper } from './helper'\nexport const value = helper() + 1\n", 0o644)
-	cliWrite(t, repo, "src/helper.ts", "export function helper() { return 2 }\n", 0o644)
-	snapshot, err := gitstate.Collect(repo, gitstate.Options{})
-	if err != nil {
-		t.Fatal(err)
+func TestRemovedPlannerCannotStartInstalledHelper(t *testing.T) {
+	oldHelper := mlxHelperPath
+	oldStore := newMLXModelStore
+	t.Cleanup(func() { mlxHelperPath = oldHelper; newMLXModelStore = oldStore })
+	mlxHelperPath = func() (string, error) { t.Fatal("removed planner started helper"); return "", nil }
+	newMLXModelStore = func() (mlxmodel.Store, error) {
+		t.Fatal("removed planner opened model store")
+		return mlxmodel.Store{}, nil
 	}
-
 	values := config.Defaults().Values
 	values.Planner = "single-pass"
-	values.Backend = "mlx"
-	values.Model = "owner/model"
-	values.ModelRevision = strings.Repeat("a", 40)
-	values.ModelQuantization = "4bit"
-	spec := mlxmodel.Spec{Repo: values.Model, Revision: values.ModelRevision, Quantization: values.ModelQuantization}
-	store := mlxmodel.Store{Root: t.TempDir()}
-	modelPath, err := store.Destination(spec)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := os.MkdirAll(modelPath, 0o700); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(modelPath, "config.json"), []byte("{}"), 0o600); err != nil {
-		t.Fatal(err)
-	}
-	metadata, err := json.Marshal(mlxmodel.Plan{Spec: spec, Files: []mlxmodel.File{{Path: "config.json", Size: 2}}})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(modelPath, "commiter-model.json"), metadata, 0o600); err != nil {
-		t.Fatal(err)
-	}
-	oldStore := newMLXModelStore
-	t.Cleanup(func() { newMLXModelStore = oldStore })
-	newMLXModelStore = func() (mlxmodel.Store, error) { return store, nil }
-	oldHelperPath := mlxHelperPath
-	t.Cleanup(func() { mlxHelperPath = oldHelperPath })
-
-	helperDir := t.TempDir()
-	helper := filepath.Join(helperDir, "commiter-mlx-helper")
-	script := `#!/bin/sh
-set -eu
-cat > "$MLX_TEST_REQUEST"
-printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{\"commits\":[{\"type\":\"fix\",\"scope\":\"planner\",\"breaking\":false,\"summary\":\"update planning\",\"file_ids\":[\"F001\",\"F002\"]}]}","model":"owner/model","runtime":"mlx"}'
-`
-	if err := os.WriteFile(helper, []byte(script), 0o700); err != nil {
-		t.Fatal(err)
-	}
-	mlxHelperPath = func() (string, error) { return helper, nil }
-	requestPath := filepath.Join(t.TempDir(), "request.json")
-	t.Setenv("MLX_TEST_REQUEST", requestPath)
-
-	plan, err := generateCommitPlan(context.Background(), repo, snapshot, values, "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(plan.Commits) != 1 || plan.Commits[0].Summary != "update planning" || len(plan.Commits[0].FileIDs) != 2 {
-		t.Fatalf("plan = %#v", plan)
-	}
-	requestData, err := os.ReadFile(requestPath)
-	if err != nil {
-		t.Fatal(err)
-	}
-	var request mlx.Request
-	if err := json.Unmarshal(requestData, &request); err != nil {
-		t.Fatal(err)
-	}
-	if request.Model != values.Model || request.ModelPath != modelPath || len(request.Schema) == 0 || len(request.Messages) != 2 {
-		t.Fatalf("helper request model=%q path=%q schema_bytes=%d messages=%d", request.Model, request.ModelPath, len(request.Schema), len(request.Messages))
-	}
-	if !strings.Contains(request.Messages[1].Content, "relation_context") || !strings.Contains(request.Messages[1].Content, "candidate_components") || !strings.Contains(request.Messages[1].Content, "observed_import_path") {
-		t.Fatalf("planning request did not include extracted relation context: %s", request.Messages[1].Content)
+	if _, err := generateCommitPlan(context.Background(), "", gitstate.Snapshot{}, values, ""); err == nil || !strings.Contains(err.Error(), "migrate") {
+		t.Fatalf("removed planner accepted: %v", err)
 	}
 }
 
@@ -259,13 +192,22 @@ func TestWorktreeDiffTreatsCollectedPathsLiterally(t *testing.T) {
 func TestGemmaThreePhaseDefaultPlanning(t *testing.T) {
 	// Normal tests never read the user's Codex history. Exercise the real CLI
 	// wiring with a synthetic record; preserve the opt-in model smoke baseline.
-	oldCollect := collectCodexContext
-	t.Cleanup(func() { collectCodexContext = oldCollect })
-	collectCodexContext = func(context.Context, codexcontext.Request) codexcontext.Result {
-		if os.Getenv("COMMITER_CANDIDATE_SMOKE_HELPER") != "" {
-			return codexcontext.Result{Status: "absent"}
+	oldCollect := collectAttributedHistory
+	t.Cleanup(func() { collectAttributedHistory = oldCollect })
+	collectAttributedHistory = func(ctx context.Context, request historyattribution.Request) (historyattribution.Result, error) {
+		h := &planning.GroupingHistory{Contexts: []planning.AgentHistoryContext{{ContextRef: "H1", FinalResponses: []string{"Corrected the value"}}}, Acquisition: planning.AgentHistoryAcquisition{Status: "complete"}}
+		for _, file := range request.Files {
+			projected, err := planning.ProjectMetadataFile(file)
+			if err != nil {
+				return historyattribution.Result{}, err
+			}
+			attributed := planning.AttributedFileHistory{FileID: file.ID, RawDiff: projected.RawDiff}
+			for _, block := range projected.ChangeBlocks {
+				attributed.Blocks = append(attributed.Blocks, planning.AttributedBlockHistory{BlockID: block.BlockID, DiffRange: block.DiffRange, Status: "matched", Reasons: []string{}, Candidates: []planning.AgentHistoryCandidate{{ContextRef: "H1", Match: "exact"}}})
+			}
+			h.Files = append(h.Files, attributed)
 		}
-		return codexcontext.Result{Status: "available", Records: []codexcontext.Record{{Paths: []string{"sample.go"}, FinalResponse: "Corrected the value"}}}
+		return historyattribution.Result{History: h, Status: "available", Contexts: 1}, nil
 	}
 	repo := cliRepository(t)
 	cliWrite(t, repo, "sample.go", "package sample\nfunc value() int { return 1 }\n", 0o644)
@@ -313,7 +255,7 @@ case "$request" in
  *) exit 1 ;;
 esac
 case "$request" in
- *'"generation_profile":"bounded-grouping"'*) profile=bounded-grouping; result='{"path:sample.go":"G001"}' ;;
+ *'"generation_profile":"bounded-grouping"'*) profile=bounded-grouping; result='{"F1":"G001"}' ;;
  *'"generation_profile":"bounded-category"'*) profile=bounded-category; result='{"G001":{"type":"fix","breaking_evidence_ref":"none"}}' ;;
  *'"generation_profile":"bounded-text"'*) profile=bounded-text; result='{"G001":{"scope":"sample","summary":"correct value"}}' ;;
  *) exit 1 ;;

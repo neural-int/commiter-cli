@@ -17,7 +17,6 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
 	runmetrics "github.com/natsuki0413/commiter-cli/internal/metrics"
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
-	"github.com/natsuki0413/commiter-cli/internal/ollama"
 	"github.com/natsuki0413/commiter-cli/internal/output"
 	"github.com/natsuki0413/commiter-cli/internal/repository"
 	"github.com/natsuki0413/commiter-cli/internal/trust"
@@ -27,8 +26,6 @@ import (
 var Version = "dev"
 
 var lookPath = exec.LookPath
-var commandFactory = exec.Command
-var statPath = os.Stat
 var newMLXModelStore = mlxmodel.DefaultStore
 var mlxPlatform = func() (string, string) { return runtime.GOOS, runtime.GOARCH }
 var updateCheckInteractive = func() bool {
@@ -41,8 +38,6 @@ var updateCheckInteractive = func() bool {
 }
 
 const doctorCapabilityTimeout = 2 * time.Minute
-
-const officialOllamaAppExecutable = "/Applications/Ollama.app/Contents/Resources/ollama"
 
 type options struct {
 	json            bool
@@ -184,76 +179,15 @@ func runSetup(args []string, printer *output.Printer) int {
 	if err != nil {
 		return fail(printer, exitcode.New(exitcode.Usage, err.Error()))
 	}
-	if effective.Values.Backend == "mlx" {
-		goos, goarch := mlxPlatform()
-		if !mlxPlatformSupported(goos, goarch) {
-			return fail(printer, exitcode.New(exitcode.LLM, mlxUnsupportedPlatformMessage))
-		}
-		helper, err := findMLXHelper()
-		if err != nil {
-			return fail(printer, exitcode.New(exitcode.LLM, "MLX helper is unavailable; install commiter-mlx-helper"))
-		}
-		return runMLXModelSetup(printer, effective.Values, update, helper)
+	goos, goarch := mlxPlatform()
+	if !mlxPlatformSupported(goos, goarch) {
+		return fail(printer, exitcode.New(exitcode.LLM, mlxUnsupportedPlatformMessage))
 	}
-	client, err := ollama.New(effective.Values)
+	helper, err := findMLXHelper()
 	if err != nil {
-		return fail(printer, err)
+		return fail(printer, exitcode.New(exitcode.LLM, "MLX helper is unavailable; reinstall commiter"))
 	}
-	probeCtx, cancel := context.WithTimeout(context.Background(), time.Second)
-	probeErr := client.Compatibility(probeCtx)
-	cancel()
-	executable := ""
-	if probeErr != nil {
-		if !ollama.IsConnectionRefused(probeErr) {
-			return fail(printer, probeErr)
-		}
-		executable = installedOllamaExecutable()
-		if executable == "" {
-			if _, brewErr := lookPath("brew"); brewErr != nil {
-				return fail(printer, exitcode.New(exitcode.LLM, "Ollama is not installed and Homebrew is unavailable"))
-			}
-			if !confirm("Ollama is not installed. Install it with Homebrew? [y/N] ") {
-				return fail(printer, exitcode.New(exitcode.Canceled, "setup canceled"))
-			}
-			command := commandFactory("brew", "install", "ollama")
-			if err := command.Run(); err != nil {
-				return fail(printer, exitcode.New(exitcode.LLM, "Ollama installation failed"))
-			}
-			executable = "ollama"
-		}
-		if !confirm("Ollama daemon is stopped. Start it temporarily? [y/N] ") {
-			return fail(printer, exitcode.New(exitcode.Canceled, "setup canceled"))
-		}
-	}
-	runtime, err := ollama.OpenForSetup(context.Background(), effective.Values, executable)
-	if err != nil {
-		return fail(printer, err)
-	}
-	defer runtime.Close()
-	modelInfo, err := runtime.Client.ModelInfo(context.Background())
-	if err != nil {
-		return fail(printer, err)
-	}
-	present := modelInfo.Installed
-	if present && !update {
-		return finishSetup(printer, "Ollama is ready; model is already installed")
-	}
-	if !present {
-		update = true
-	}
-	if update {
-		if err := printModelUpdateDetails(printer, effective.Values.Model, modelInfo); err != nil {
-			return fail(printer, exitcode.New(exitcode.Internal, "cannot write output"))
-		}
-		if !confirm(fmt.Sprintf("Pull/update model %s? [y/N] ", output.Escape(effective.Values.Model))) {
-			return finishSetup(printer, "setup canceled; model was not changed")
-		}
-		if err := runtime.Client.Pull(context.Background()); err != nil {
-			return fail(printer, err)
-		}
-		return finishSetup(printer, "Ollama setup completed")
-	}
-	return finishSetup(printer, "Ollama is ready")
+	return runMLXModelSetup(printer, effective.Values, update, helper)
 }
 
 func runMLXModelSetup(printer *output.Printer, values config.Values, update bool, helper string) int {
@@ -300,62 +234,11 @@ func runMLXModelSetup(printer *output.Printer, values config.Values, update bool
 	return finishSetup(printer, "MLX model setup completed; tokenizer, JSON Schema grammar, and constrained generation passed")
 }
 
-func printModelUpdateDetails(printer *output.Printer, configuredModel string, info ollama.ModelInfo) error {
-	lines := []string{
-		"Model update details",
-		"configured model: " + configuredModel,
-	}
-	if !info.Installed {
-		lines = append(lines,
-			"installed: no",
-			"operation: download the configured model from its registry after approval",
-		)
-	} else {
-		lines = append(lines, "installed: yes")
-		if info.Name != "" {
-			lines = append(lines, "installed model: "+info.Name)
-		}
-		if info.Digest != "" {
-			lines = append(lines, "local digest: "+info.Digest)
-		}
-		if info.ModifiedAt != "" {
-			lines = append(lines, "local modified at: "+info.ModifiedAt)
-		}
-		if info.Size > 0 {
-			lines = append(lines, fmt.Sprintf("local size: %d bytes", info.Size))
-		}
-		if info.Format != "" {
-			lines = append(lines, "format: "+info.Format)
-		}
-		if info.ParameterSize != "" {
-			lines = append(lines, "parameter size: "+info.ParameterSize)
-		}
-		if info.QuantizationLevel != "" {
-			lines = append(lines, "quantization: "+info.QuantizationLevel)
-		}
-		lines = append(lines, "operation: refresh the configured model tag from its registry after approval")
-	}
-	lines = append(lines, "remote changes and download size: reported by Ollama only after pull starts")
-	return printer.PromptLines(lines...)
-}
-
-func installedOllamaExecutable() string {
-	if path, err := lookPath("ollama"); err == nil {
-		return path
-	}
-	info, err := statPath(officialOllamaAppExecutable)
-	if err == nil && !info.IsDir() && info.Mode().Perm()&0o111 != 0 {
-		return officialOllamaAppExecutable
-	}
-	return ""
-}
-
 func runDoctor(args []string, printer *output.Printer) int {
 	if len(args) != 0 {
 		return fail(printer, exitcode.New(exitcode.Usage, "doctor does not accept arguments"))
 	}
 	checks := map[string]any{}
-	backendResolved := false
 	root, rootErr := repository.Root()
 	checks["git"] = check(rootErr == nil, message(rootErr, "repository detected"))
 	if rootErr == nil {
@@ -365,27 +248,13 @@ func runDoctor(args []string, printer *output.Printer) int {
 			checks["config"] = check(resolveErr == nil, message(resolveErr, "configuration valid"))
 			checks["trust"] = checkTrust(paths.StateDir, root)
 			if resolveErr == nil {
-				backendResolved = true
-				if effective.Values.Backend == "mlx" {
-					for key, value := range doctorMLX(effective.Values) {
-						checks[key] = value
-					}
-				} else {
-					ollamaExecutable := installedOllamaExecutable()
-					checks["ollama_binary"] = check(ollamaExecutable != "", capabilityMessage(ollamaExecutable != "", "Ollama executable available", "Ollama executable unavailable"))
-					ollamaChecks := doctorOllama(effective.Values, ollamaExecutable != "")
-					checks["ollama"] = ollamaChecks["ollama"]
-					checks["structured_output"] = ollamaChecks["structured_output"]
-					checks["thinking"] = ollamaChecks["thinking"]
+				for key, value := range doctorMLX(effective.Values) {
+					checks[key] = value
 				}
 			}
 		} else {
 			checks["config"] = check(false, "configuration paths unavailable")
 		}
-	}
-	if !backendResolved {
-		ollamaExecutable := installedOllamaExecutable()
-		checks["ollama_binary"] = check(ollamaExecutable != "", capabilityMessage(ollamaExecutable != "", "Ollama executable available", "Ollama executable unavailable"))
 	}
 	checks["git_identity"] = doctorGitIdentity()
 	if checks["structured_output"] == nil && checks["mlx_constrained_generation"] == nil {
@@ -451,65 +320,11 @@ func message(err error, success string) string {
 	}
 	return err.Error()
 }
-func doctorOllama(values config.Values, executableAvailable bool) map[string]map[string]any {
-	client, err := ollama.New(values)
-	if err != nil {
-		return doctorOllamaFailure(err, executableAvailable)
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), doctorCapabilityTimeout)
-	defer cancel()
-	if err := client.Compatibility(ctx); err != nil {
-		return doctorOllamaFailure(err, executableAvailable)
-	}
-	present, err := client.HasModel(ctx)
-	if err != nil {
-		return doctorOllamaFailure(err, executableAvailable)
-	}
-	if !present {
-		return map[string]map[string]any{
-			"ollama":            check(false, "configured Ollama model is not installed"),
-			"structured_output": check(false, "configured model is unavailable for capability verification"),
-			"thinking":          check(false, "configured model is unavailable for capability verification"),
-		}
-	}
-	capabilities, err := client.ProbeCapabilities(ctx)
-	if err != nil {
-		return doctorOllamaFailure(err, executableAvailable)
-	}
-	return map[string]map[string]any{
-		"ollama":            check(true, "loopback API and configured model are ready"),
-		"structured_output": check(capabilities.StructuredOutput, capabilityMessage(capabilities.StructuredOutput, "configured model returned valid JSON Schema output", "configured model did not return valid JSON Schema output")),
-		"thinking":          check(capabilities.ThinkingDisabled, capabilityMessage(capabilities.ThinkingDisabled, "configured model honored thinking disabled", "configured model returned thinking output")),
-	}
-}
-
 func capabilityMessage(ok bool, success, failure string) string {
 	if ok {
 		return success
 	}
 	return failure
-}
-
-func doctorOllamaFailure(err error, executableAvailable bool) map[string]map[string]any {
-	if ollama.IsConnectionRefused(err) {
-		if executableAvailable {
-			return map[string]map[string]any{
-				"ollama":            check(false, "Ollama daemon is stopped; normal runs and --dry-run start it temporarily when needed; start Ollama manually and rerun commiter doctor for a complete diagnosis"),
-				"structured_output": check(false, "not verified because the Ollama daemon is stopped; start Ollama and rerun commiter doctor"),
-				"thinking":          check(false, "not verified because the Ollama daemon is stopped; start Ollama and rerun commiter doctor"),
-			}
-		}
-		return map[string]map[string]any{
-			"ollama":            check(false, "Ollama daemon is stopped and the Ollama executable is unavailable; run commiter setup to prepare Ollama"),
-			"structured_output": check(false, "not verified because Ollama is unavailable; run commiter setup, start Ollama, and rerun commiter doctor"),
-			"thinking":          check(false, "not verified because Ollama is unavailable; run commiter setup, start Ollama, and rerun commiter doctor"),
-		}
-	}
-	return map[string]map[string]any{
-		"ollama":            check(false, err.Error()),
-		"structured_output": check(false, "Ollama compatibility could not be verified"),
-		"thinking":          check(false, "Ollama compatibility could not be verified"),
-	}
 }
 func doctorGitIdentity() map[string]any {
 	name := exec.Command("git", "config", "--get", "user.name")

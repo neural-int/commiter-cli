@@ -22,7 +22,7 @@ func TestGeneratorKeepsCompleteFileAssignmentWithRelationContextOnGenerationAndR
 		}
 		t.Run(name, func(t *testing.T) {
 			client := &scriptedChat{steps: steps}
-			result, err := (Generator{Client: client}).Generate(context.Background(), prepared, English, SensitiveValues{})
+			result, err := (ResearchGenerator{Client: client}).Generate(context.Background(), prepared, English, SensitiveValues{})
 			if err != nil || len(result.Plan.Commits) != 1 || !reflect.DeepEqual(result.Plan.Commits[0].FileIDs, []string{"F001", "F002"}) || result.Repaired != repair {
 				t.Fatalf("result=%#v error=%v", result, err)
 			}

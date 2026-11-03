@@ -12,9 +12,10 @@ import (
 
 func TestHistoryFragmentsReproduceTheOriginalDisplayWithoutDuplicatingDiff(t *testing.T) {
 	shared := map[string]any{
-		"agent_history_contexts": []any{},
-		"codex_context":          []any{map[string]any{"paths": []string{"one.go"}, "final_response": "修正\n完了\\n\"引用\""}},
-		"files":                  []any{map[string]any{"file_id": "F10", "raw_diff": "@@ -1 +1 @@\n-old\n+new\n"}},
+		"alpha": []any{},
+
+		"codex_context": []any{map[string]any{"paths": []string{"one.go"}, "final_response": "修正\n完了\\n\"引用\""}},
+		"files":         []any{map[string]any{"file_id": "F10", "raw_diff": "@@ -1 +1 @@\n-old\n+new\n"}},
 	}
 	messages := []llm.Message{{Role: "system", Content: "base" + codexTrustInstruction}, {Role: "user", Content: string(naturalJSON(shared))}}
 	history, err := harness004OptionalHistory(messages)
@@ -48,7 +49,7 @@ func TestHelperSelectedHistoryIsFrozenForTextPrefix(t *testing.T) {
 		return 1000, nil
 	}}
 	records := []codexcontext.Record{{Paths: []string{"one.go"}, FinalResponse: "too large"}, {Paths: []string{"one.go"}, FinalResponse: "fits"}}
-	result, err := (ThreePhaseGenerator{Client: client, CodexContext: records}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
+	result, err := (ThreePhaseGenerator{Client: client, GroupingHistory: syntheticAttributedHistory(t, candidatePrepared(t), records)}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
 	if err != nil || result.Calls != 3 {
 		t.Fatalf("calls=%d err=%v", result.Calls, err)
 	}

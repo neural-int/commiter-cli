@@ -1,3 +1,26 @@
+import Foundation
+
+// The host supplies the exact display and omission alternatives. The helper
+// only selects fragments; it does not attribute history or rewrite Git evidence.
+public struct DisplayTemplate: Decodable, Sendable {
+    public let literal: String?
+    public let parts: [DisplayTemplate]?
+    public let separator: String?
+    public let require: [Int]?
+    public let ifMissing: [DisplayTemplate]?
+    enum CodingKeys: String, CodingKey {
+        case literal, parts, separator, require
+        case ifMissing = "if_missing"
+    }
+    public func render(selected: Set<Int>) -> String {
+        if (require ?? []).contains(where: { !selected.contains($0) }) {
+            return ifMissing?.first?.render(selected: selected) ?? ""
+        }
+        guard let parts, !parts.isEmpty else { return literal ?? "" }
+        return parts.map { $0.render(selected: selected) }.filter { !$0.isEmpty }.joined(separator: separator ?? "")
+    }
+}
+
 /// Host-filtered, already rendered shared-message fragments. No JSON parsing or
 /// reserialization is needed in the helper, and file diffs occur only once on IPC.
 public struct OptionalHistoryInput: Decodable, Sendable {
@@ -5,13 +28,21 @@ public struct OptionalHistoryInput: Decodable, Sendable {
     public let after: String
     public let records: [String]
     public let systemWithoutHistory: String
+    public let recordByteCounts: [Int]?
+    public let sharedTemplate: DisplayTemplate?
+    public let phaseTemplate: DisplayTemplate?
+    public var byteCounts: [Int] { recordByteCounts ?? records.map { $0.utf8.count } }
 
     enum CodingKeys: String, CodingKey {
         case before, after, records
+        case recordByteCounts = "record_byte_counts"
+        case sharedTemplate = "shared_template"
+        case phaseTemplate = "phase_template"
         case systemWithoutHistory = "system_without_history"
     }
 
     public func sharedContent(indices: [Int]) -> String {
+        if let sharedTemplate { return sharedTemplate.render(selected: Set(indices)) }
         var members: [String] = []
         if !before.isEmpty { members.append(before) }
         if !indices.isEmpty {

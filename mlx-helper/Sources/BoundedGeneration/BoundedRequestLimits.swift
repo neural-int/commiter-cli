@@ -20,7 +20,7 @@ public enum BoundedRequestLimits {
     public static func validate(profile: String, context: Int, output: Int, harness004: Bool = false) throws {
         let legacy = try outputBudget(profile: profile)
         let budget = harness004 ? 4096 : legacy
-        guard context > 0, context <= maximumContext else {
+        guard context > 0, context <= maximumContext, !harness004 || context == maximumContext else {
             throw BoundedRequestError.invalidContext
         }
         guard output == budget else {

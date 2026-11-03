@@ -23,8 +23,7 @@ backend = "mlx"
 model = "mlx-community/gemma-4-E4B-it-4bit"
 model_revision = "475b9088d29754a3379866cf5aeb6b41acd313c2"
 model_quantization = "4bit"
-endpoint = "http://127.0.0.1:11434"
-context = "auto"
+context = "64k"
 max_context_tokens = 65536
 
 [analysis]
@@ -50,7 +49,7 @@ backend = "mlx"
 model = "mlx-community/gemma-4-E4B-it-4bit"
 model_revision = "475b9088d29754a3379866cf5aeb6b41acd313c2"
 model_quantization = "4bit"
-context = "auto"
+context = "64k"
 max_context_tokens = 65536
 
 [analysis]

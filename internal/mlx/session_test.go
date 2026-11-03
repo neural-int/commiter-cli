@@ -37,27 +37,41 @@ func TestRealHelperPreservesProfileOnEarlyFailure(t *testing.T) {
 	if helper == "" {
 		t.Skip("set COMMITER_MLX_TEST_HELPER to the built Swift helper")
 	}
-	for _, sessionMode := range []bool{false, true} {
-		t.Run(map[bool]string{false: "single", true: "session"}[sessionMode], func(t *testing.T) {
-			client := NewClient(helper)
-			generate := client.Generate
-			if sessionMode {
-				s, err := client.BeginSession(context.Background())
-				if err != nil {
-					t.Fatal(err)
+	for _, legacy := range []bool{false, true} {
+		executable := helper
+		if legacy {
+			executable = shellHelper(t, "exec '"+strings.ReplaceAll(helper, "'", "'\\''")+"' --research-legacy \"$@\"")
+		}
+		for _, sessionMode := range []bool{false, true} {
+			name := map[bool]string{false: "normal", true: "research-legacy"}[legacy] + "/" + map[bool]string{false: "single", true: "session"}[sessionMode]
+			t.Run(name, func(t *testing.T) {
+				client := NewClient(executable)
+				generate := client.Generate
+				if sessionMode {
+					session, err := client.BeginSession(context.Background())
+					if err != nil {
+						t.Fatal(err)
+					}
+					defer session.Close()
+					generate = session.Generate
 				}
-				defer s.Close()
-				generate = s.Generate
-			}
-			r := validRequest()
-			r.GenerationProfile = "bounded-grouping"
-			r.ModelPath = "/commiter-test-nonexistent-model"
-			response, err := generate(context.Background(), r)
-			var failure *Error
-			if !errors.As(err, &failure) || failure.Kind != FailureStopState || response.StopReason != StopReasonInternal || response.GenerationProfile != r.GenerationProfile {
-				t.Fatalf("session=%v response=%+v err=%v", sessionMode, response, err)
-			}
-		})
+				request := validRequest()
+				request.GenerationProfile = "bounded-grouping"
+				request.ModelPath = "/commiter-test-nonexistent-model"
+				response, err := generate(context.Background(), request)
+				var failure *Error
+				if !errors.As(err, &failure) || failure.Kind != FailureStopState || response.StopReason != StopReasonInternal || response.GenerationProfile != request.GenerationProfile {
+					t.Fatalf("profile/stop lost: response=%+v err=%v", response, err)
+				}
+				want := "malformed_request"
+				if legacy {
+					want = "model_unavailable"
+				}
+				if response.ErrorClass != want {
+					t.Fatalf("normal legacy contract not rejected before model access, or explicit research entry rejected: got %s want %s", response.ErrorClass, want)
+				}
+			})
+		}
 	}
 }
 

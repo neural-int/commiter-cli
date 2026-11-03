@@ -114,8 +114,8 @@ func verifyMLXCapability(helper, model, modelPath string) error {
 }
 
 func verifyMLXPlannerCapability(helper string, values config.Values, modelPath string) error {
-	if values.Planner != config.CandidatePlanner {
-		return verifyMLXCapability(helper, values.Model, modelPath)
+	if values.Planner != config.CandidatePlanner || !config.SupportedPlannerModel(values) {
+		return errors.New("unsupported three-phase model configuration")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), mlxDoctorTimeout)
 	defer cancel()
@@ -130,8 +130,8 @@ func verifyMLXPlannerCapability(helper string, values config.Values, modelPath s
 }
 
 func mlxPlannerCapabilityProbe(ctx context.Context, helper string, values config.Values, modelPath string) (bool, error) {
-	if values.Planner != config.CandidatePlanner {
-		return mlxCapabilityProbe(ctx, helper, values.Model, modelPath)
+	if values.Planner != config.CandidatePlanner || !config.SupportedPlannerModel(values) {
+		return false, errors.New("unsupported three-phase model configuration")
 	}
 	// Public synthetic input only; diagnostic success requires all three profiles.
 	path := "sample.go"
@@ -139,13 +139,10 @@ func mlxPlannerCapabilityProbe(ctx context.Context, helper string, values config
 		ID: "F001", NewPath: &path, Status: "M", ChangeHash: "probe", WorktreeKind: "file", Language: "go", Mode: syntax.ModeRawDiff,
 		RawDiff: "@@ -1 +1 @@\n-func value() int { return 1 }\n+func value() int { return 2 }\n",
 	}}}
-	prompt, err := planning.Renderer(planning.English)(document)
+	prepared, err := planning.PrepareThreePhase(document, "")
 	if err != nil {
 		return false, err
 	}
-	prepared := contextinput.Prepared{Document: document, Prompt: prompt,
-		Budget:       contextinput.Budget{ContextTokens: contextinput.Context64K, ReservedOutputTokens: 4096},
-		SummaryStage: contextinput.SummaryNone, CompressionProfile: contextinput.CompressionNone}
 	backend := &mlx.Backend{Client: mlx.NewClient(helper), Model: values.Model, ModelRevision: values.ModelRevision, ModelPath: modelPath}
 	_, err = (planning.ThreePhaseGenerator{Client: backend}).Generate(ctx, prepared, planning.English, planning.SensitiveValues{})
 	return err == nil, err

@@ -138,7 +138,7 @@ func Defaults() Effective {
 			ModelQuantization: "4bit",
 			Backend:           "mlx",
 			Endpoint:          "http://127.0.0.1:11434",
-			Context:           "auto",
+			Context:           "64k",
 			MaxTokens:         65536,
 			Untracked:         "auto-safe",
 			Include:           []string{},
@@ -200,22 +200,14 @@ func applyFile(effective *Effective, path string, source Source, repoRoot string
 	if err := flatten("", raw, flat); err != nil {
 		return fmt.Errorf("invalid %s configuration: %w", source, err)
 	}
-	// Existing v1 files predate planner selection. Only infer legacy defaults
-	// while no earlier configuration has explicitly selected a planner.
+	// Existing model/backend selections must opt into the new execution contract.
+	// Unrelated commit/verification settings can still use fresh defaults.
 	if _, explicit := flat["llm.planner"]; !explicit && effective.Sources["llm.planner"] == SourceDefault {
-		legacy := map[string]string{"llm.backend": "ollama", "llm.model": "qwen3.5:4b-q4_K_M", "llm.model_revision": "", "llm.model_quantization": "", "llm.context": "auto"}
-		for key, value := range legacy {
-			if effective.Sources[key] == SourceDefault {
-				if err := applyValue(effective, key, "string", value, SourceDefault, repoRoot); err != nil {
-					return err
-				}
+		for _, key := range []string{"llm.model", "llm.backend", "llm.model_revision", "llm.model_quantization"} {
+			if _, exists := flat[key]; exists {
+				return fmt.Errorf("set llm.planner = \"three-phase\" explicitly when migrating model settings (see docs/migrations/harness004.md)")
 			}
 		}
-		if effective.Sources["llm.max_context_tokens"] == SourceDefault {
-			effective.Values.MaxTokens = 65536
-		}
-		effective.Values.Planner = "single-pass"
-		effective.Sources["llm.planner"] = source
 	}
 	keys := make([]string, 0, len(flat))
 	for key := range flat {
@@ -396,14 +388,14 @@ func validateValues(v Values, repoRoot string) error {
 	if v.Timeout <= 0 {
 		return fmt.Errorf("verification.timeout_seconds must be positive")
 	}
-	if v.Planner != "single-pass" && v.Planner != CandidatePlanner {
-		return fmt.Errorf("llm.planner must be single-pass or three-phase")
+	if v.Planner != CandidatePlanner {
+		return fmt.Errorf("single-pass planning has been removed; set llm.planner = \"three-phase\" and configure a supported pinned MLX model (see docs/migrations/harness004.md)")
 	}
 	if v.Model == "" {
 		return fmt.Errorf("llm.model must not be empty")
 	}
-	if v.Backend != "ollama" && v.Backend != "mlx" {
-		return fmt.Errorf("llm.backend must be ollama or mlx")
+	if v.Backend != "mlx" {
+		return fmt.Errorf("planning requires llm.backend = \"mlx\"; migrate legacy Ollama settings (see docs/migrations/harness004.md)")
 	}
 	if v.Backend == "mlx" {
 		if !validMLXModel(v.Model) {
@@ -416,12 +408,11 @@ func validateValues(v Values, repoRoot string) error {
 			return fmt.Errorf("llm.model_quantization must be none or a positive Nbit label for MLX")
 		}
 	}
-	if v.Planner == CandidatePlanner {
-		if v.Backend != "mlx" || v.Model != CandidateModel || v.ModelRevision != CandidateRevision || v.ModelQuantization != "4bit" {
-			return fmt.Errorf("three-phase planner requires the pinned Gemma MLX 4bit candidate; use single-pass for another model or backend")
-		}
-		// Harness004 always requests 64K. Context tiers remain settings for the
-		// legacy planner, not admission estimates for three-phase input.
+	if !SupportedPlannerModel(v) {
+		return fmt.Errorf("three-phase planning requires a supported pinned Gemma or Qwen MLX 4bit model (see docs/migrations/harness004.md)")
+	}
+	if v.MaxTokens != 65536 || (v.Context != "auto" && v.Context != "64k") {
+		return fmt.Errorf("three-phase planning uses a fixed 64k window; set llm.context = \"64k\" and llm.max_context_tokens = 65536")
 	}
 	if err := validateEndpoint(v.Endpoint); err != nil {
 		return err
@@ -658,4 +649,14 @@ func SortedKeys() []string {
 	}
 	sort.Strings(keys)
 	return keys
+}
+
+// SupportedPlannerModel is shared by configuration, setup, and doctor. The
+// helper independently enforces these exact revision/quantization pairs.
+func SupportedPlannerModel(v Values) bool {
+	if v.Backend != "mlx" || v.ModelQuantization != "4bit" {
+		return false
+	}
+	return v.Model == CandidateModel && v.ModelRevision == CandidateRevision ||
+		v.Model == "mlx-community/Qwen3.5-4B-4bit" && v.ModelRevision == "0e7ffd5c629ef7719d4cbc04069232580bfa9d9c"
 }

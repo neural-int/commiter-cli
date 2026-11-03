@@ -28,17 +28,17 @@ func TestHarness004HistoryFitsExactTokenBoundary(t *testing.T) {
 				if options.ContextTokens != contextinput.Context64K {
 					t.Fatal("count did not use fixed 64K")
 				}
-				if strings.Contains(messages[1].Content, "codex_context") {
+				if strings.Contains(messages[1].Content, "Corrected the boundary") {
 					return 61440 + delta, nil
 				}
 				return 1000, nil
 			}}
-			result, err := (ThreePhaseGenerator{Client: client, CodexContext: []codexcontext.Record{record}}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
+			result, err := (ThreePhaseGenerator{Client: client, GroupingHistory: syntheticAttributedHistory(t, candidatePrepared(t), []codexcontext.Record{record})}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
 			if err != nil || result.Calls != 3 {
 				t.Fatalf("calls=%d err=%v", result.Calls, err)
 			}
 			for i, messages := range client.messages {
-				retained := strings.Contains(messages[1].Content, "codex_context")
+				retained := strings.Contains(messages[1].Content, "Corrected the boundary")
 				if retained != (delta <= 0) {
 					t.Fatalf("phase %d optional history retention=%v", i, retained)
 				}

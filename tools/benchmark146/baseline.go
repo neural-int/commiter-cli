@@ -75,7 +75,7 @@ func runBaseline(parent context.Context, f fixture, mode string, backend llm.Opt
 		return o
 	}
 	c := &recordingClient{Backend: backend, IDs: idsFor(f.Graph), Files: f.Files}
-	r, err := (planning.ThreePhaseGenerator{Client: c}).Generate(parent, contextinput.Prepared{Document: d, Prompt: prompt, Budget: contextinput.Budget{ContextTokens: 16384}}, planning.English, planning.SensitiveValues{})
+	r, err := (planning.ResearchThreePhaseGenerator{Client: c}).Generate(parent, contextinput.Prepared{Document: d, Prompt: prompt, Budget: contextinput.Budget{ContextTokens: 16384}}, planning.English, planning.SensitiveValues{})
 	o.Calls = c.Calls
 	o.BackendCalls = len(c.Calls)
 	o.WallMS = float64(time.Since(start)) / float64(time.Millisecond)

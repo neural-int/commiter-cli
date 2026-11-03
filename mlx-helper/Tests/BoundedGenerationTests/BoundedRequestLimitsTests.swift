@@ -38,12 +38,15 @@ struct BoundedRequestLimitsTests {
 struct Harness004OutputLimitTests {
     @Test func onlyOptInUses4096() throws {
         for profile in ["bounded-grouping", "bounded-category", "bounded-text"] {
-            try BoundedRequestLimits.validate(profile: profile, context: 32768, output: 4096, harness004: true)
-            #expect(throws: BoundedRequestError.invalidOutputBudget) {
-                try BoundedRequestLimits.validate(profile: profile, context: 32768, output: 4096)
+            try BoundedRequestLimits.validate(profile: profile, context: 65536, output: 4096, harness004: true)
+            #expect(throws: BoundedRequestError.invalidContext) {
+                try BoundedRequestLimits.validate(profile: profile, context: 32768, output: 4096, harness004: true)
             }
             #expect(throws: BoundedRequestError.invalidOutputBudget) {
-                try BoundedRequestLimits.validate(profile: profile, context: 32768, output: 768, harness004: true)
+                try BoundedRequestLimits.validate(profile: profile, context: 65536, output: 4096)
+            }
+            #expect(throws: BoundedRequestError.invalidOutputBudget) {
+                try BoundedRequestLimits.validate(profile: profile, context: 65536, output: 768, harness004: true)
             }
         }
     }

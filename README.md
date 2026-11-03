@@ -20,9 +20,9 @@ This design is intended to keep repository content local, reduce the amount of w
 ## Features
 
 - **Multi-commit planning** — groups file-level changes by purpose and generates Conventional Commits messages.
-- **Local LLM inference** — MLX uses a local Swift helper and Ollama uses a loopback endpoint; repository content is not sent to a cloud LLM by `commiter`.
+- **Local LLM inference** — MLX uses a local Swift helper; repository content is not sent to a cloud LLM by `commiter`.
 - **Syntax-aware preprocessing** — uses Tree-sitter where supported instead of asking the model to infer syntax from raw text alone.
-- **Bounded context handling** — the provisional three-phase default chooses 16K, 32K, or 64K for each phase within the configured ceiling; explicit single-pass retains adaptive compression and context tiers.
+- **Bounded context handling** — all three phases use a fixed 64K window, with exact token admission by the model tokenizer and a 4,096-token output reservation.
 - **Sensitive-file protection** — clearly sensitive files are always excluded; ambiguous candidates require approval before their contents are read.
 - **Plan validation and approval** — validates model output and, by default, requires approval before commits are created.
 - **Repository-scoped verification** — supports explicit verification commands and package-script autodetection with repository-scoped trust.
@@ -52,7 +52,7 @@ The v1 target environment is:
 - macOS 14 or later
 - Apple Silicon
 - Git
-- Bundled Swift helper for MLX (Ollama 0.31.2 or later for the explicit Ollama single-pass configuration)
+- Bundled Swift helper for MLX
 
 For the current source-build installation path, you also need:
 
@@ -77,9 +77,9 @@ cp dist/commiter-mlx-helper dist/mlx.metallib "$HOME/.local/commiter/libexec/"
 export PATH="$HOME/.local/commiter/bin:$PATH"
 ```
 
-This requires Apple Silicon macOS and Xcode with Swift 6.2 or later. The CLI resides in `bin/` and its private helper and Metal library in the adjacent `libexec/`. Persist the PATH setting in your shell configuration. Existing v1 configuration files without a planner retain single-pass behavior; absent configuration files and new templates use the Gemma three-phase default.
+This requires Apple Silicon macOS and Xcode with Swift 6.2 or later. The CLI resides in `bin/` and its private helper and Metal library in the adjacent `libexec/`. Persist the PATH setting in your shell configuration. Legacy single-pass/Ollama settings require migration; missing planner fields never restore the old backend. See the [migration guide](docs/migrations/harness004.md).
 
-No Ollama model is bundled into the binary.
+Model weights are installed separately after confirmation.
 
 ## Quick Start
 
@@ -92,15 +92,15 @@ commiter --dry-run
 commiter
 ```
 
-`commiter setup` prepares the configured backend. For Ollama, it can install Ollama through Homebrew, start the daemon temporarily, and pull the configured model after separate confirmations. For MLX, it requires macOS on Apple Silicon and an installed `commiter-mlx-helper`; it downloads the configured pinned model only after confirmation, then checks model loading, tokenizer loading, JSON Schema grammar, and constrained generation.
+`commiter setup` displays the pinned MLX model, revision, size, and destination before asking to download. It then checks model/tokenizer loading, JSON Schema grammar, and three-phase constrained generation. It requires Apple Silicon macOS and the bundled helper.
 
-`commiter doctor` is read-only and checks the repository, configuration, Git identity, and the selected backend's capabilities. For Ollama, it checks connectivity, the configured model, and structured-output support without starting or stopping the daemon. If the daemon is stopped, start Ollama manually (for example, with `ollama serve`) and rerun `commiter doctor`. For MLX, it checks platform support, helper availability, the locally installed pinned model, and a probe that loads the model and tokenizer, compiles its JSON Schema grammar, and attempts constrained JSON generation. The probe uses only the local model and does not download or update model files. If the model is missing, run `commiter setup` first.
+`commiter doctor` checks the repository, configuration, Git identity, MLX platform/helper, installed pin, and a three-phase constrained-generation probe. It does not download or update models. If the model is missing, run `commiter setup` first.
 
 When run from an interactive terminal, commiter checks the official GitHub Releases metadata at most once every 24 hours. If a newer stable release is available, it prints the release version and the Homebrew upgrade command. The check stores only its timestamp and latest version in the user state directory. Network failures are ignored so the normal command continues. Update checks are skipped for JSON output and CI environments.
 
-`commiter --dry-run` performs analysis and plan generation without modifying the index, creating commits, or pushing. With the Ollama backend, it temporarily starts Ollama when the daemon is stopped and stops only the daemon it started.
+`commiter --dry-run` performs analysis and plan generation without modifying the index, creating commits, or pushing.
 
-A plain `commiter` run can create commits and push. With the Ollama backend, it temporarily starts Ollama when needed and stops only the daemon it started. Review the displayed plan and prompts before approving mutation.
+A plain `commiter` run can create commits and push. Review the displayed plan and prompts before approving mutation.
 
 ## Usage
 
@@ -147,12 +147,12 @@ commiter --no-push
 
 | Flag | Effect |
 | --- | --- |
-| `--dry-run` | Analyze and plan without modifying Git; temporarily start Ollama when needed. |
+| `--dry-run` | Analyze and plan without modifying Git. |
 | `--no-push` | Disable push for the current run. |
 | `--no-confirm-commit` | Skip the ordinary commit-plan confirmation. Safety-required confirmations still apply. |
 | `--no-confirm-push` | Skip the ordinary push confirmation. Safety-required confirmations still apply. |
 | `--language en\|ja` | Override commit-message language for the current run. |
-| `--model NAME` | Override the Ollama model for the current run. |
+| `--model NAME` | Override the model name; the configured revision must match a supported MLX pin. |
 | `--record-metrics` | Persist local run metrics for the current run. |
 | `--json` | Emit JSON only for `--dry-run` or supported read-only commands. |
 
@@ -196,16 +196,15 @@ Important defaults include:
 | `llm.model` | `"mlx-community/gemma-4-E4B-it-4bit"` |
 | `llm.model_revision` | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` |
 | `llm.model_quantization` | `"4bit"` |
-| `llm.endpoint` | `"http://127.0.0.1:11434"` |
-| `llm.context` | `"auto"` |
+| `llm.context` | `"64k"` |
 | `llm.max_context_tokens` | `65536` |
 | `verification.autodetect` | `true` |
 | `verification.timeout_seconds` | `600` |
 | `metrics.persist` | `false` |
 
-The Ollama endpoint must be a loopback HTTP URL. Verification configuration is repository-scoped and cannot be configured globally.
+Verification configuration is repository-scoped and cannot be configured globally.
 
-The provisional Gemma three-phase default accepts at most four selected files, uncompressed input, per-phase 16K/32K/64K context selection within the configured ceiling (64K by default), and a shared 120-second timeout, with no retry or repair. Select `llm.planner = "single-pass"` explicitly for a different backend, model, revision, or quantization. The [selection record](docs/decisions/issue-143-production-candidate.md) documents evidence, remaining semantic questions, and unmet timing conditions. `commiter setup` displays the repository, pinned revision, quantization, estimated size, and cache destination before asking to download. `commiter setup --update-model` refreshes the configured pin; change the revision in configuration to move to a newer model. Model files are stored under the user's `commiter/mlx-models` cache directory and checked against the pinned file digests. A normal run never contacts the model registry or downloads a model. Packaged macOS releases include the private `commiter-mlx-helper` and `mlx.metallib` side by side under `libexec`; MLX planning locates that bundled helper and never searches `PATH` or falls back to Ollama. A source build must place the helper and Metal library in the same `bin/` and `libexec/` layout.
+Harness 004 is the normal Three-phase Planner: at most four selected files, uncompressed Git diffs, a shared 120-second generation timeout, fixed 65,536-token phase windows, 4,096 output tokens per phase, summary up to 48 characters and scope up to 16. Supported models are the pinned Gemma and Qwen 4bit pairs in the [migration guide](docs/migrations/harness004.md). Single-pass and implicit Ollama fallback have been removed. History is acquired from the current worktree, matched by edit content, and projected as final responses only. Missing, unsafe, or over-budget responses omit the whole record. Packaged releases include the helper and Metal library under `libexec`; normal generation never downloads a model.
 
 For the complete configuration schema and source restrictions, see the [Software Requirements Specification](SOFTWARE_REQUIREMENTS_SPECIFICATION_en.md).
 
@@ -215,9 +214,9 @@ For the complete configuration schema and source restrictions, see the [Software
 
 ### Local LLM boundary
 
-Repository diffs, prompts, LLM responses, and other repository content used by `commiter` are not sent outside loopback for LLM inference, analytics, or telemetry. The configured LLM endpoint is required to be a loopback HTTP URL.
+Repository diffs, prompts, LLM responses, and other repository content are processed by the local MLX helper, with no cloud LLM inference, analytics, or telemetry.
 
-This boundary does not mean every child process is offline: user-approved Git pushes, verification commands, Git hooks, signing operations, and Ollama model downloads may perform their own network access. They are separate from `commiter` sending repository content to a cloud LLM.
+This boundary does not mean every child process is offline: user-approved Git pushes, verification commands, Git hooks, signing operations, and approved model downloads may perform their own network access. They are separate from `commiter` sending repository content to a cloud LLM.
 
 The explicit MLX setup path requests only the configured model repository, revision, and model files from Hugging Face. It does not include a repository diff, prompt, or LLM response in those requests. Normal MLX execution does not make model-registry requests.
 
@@ -243,7 +242,7 @@ The explicit MLX setup path requests only the configured model repository, revis
 
 Push follows normal Git semantics. If the current branch already contains outgoing commits created before the current `commiter` run, those commits may be included in the same push. Pre-existing outgoing commits are not re-analyzed or sensitive-classified by the current run.
 
-For three-phase planning, metrics `context_ceiling` records the configured limit and `context` records the largest context window requested across the phases. For example, a 64K limit with 32K/16K/16K phase requests records `context_ceiling: "64k"` and `context: "32k"`. These are window sizes, not actual prompt-token counts. The doctor capability probe currently checks basic operation at 16K; it does not certify 32K/64K runtime performance.
+For three-phase planning, both `context_ceiling` and `context` report the fixed 64K window. They are window sizes, not actual input-token counts. The helper measures the final template-applied input, including any reused prefix. Short synthetic probes do not certify long-input performance or semantic quality.
 
 Persistent metrics are disabled by default. When enabled, they are local records and are not intended to contain repository paths, messages, diffs, prompts, user feedback, or sensitive values.
 
@@ -285,7 +284,7 @@ The current v1 scope intentionally does not provide:
 - recursive analysis of submodules; only the parent repository's submodule pointer change is handled
 - packaged GitHub Release or Homebrew installation at this time
 
-The project currently targets Ollama on loopback and an Apple Silicon macOS environment.
+Normal planning requires MLX on Apple Silicon macOS.
 
 ## Documentation
 

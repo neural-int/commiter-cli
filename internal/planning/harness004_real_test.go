@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 )
 
 type observed004 struct {
@@ -17,7 +18,10 @@ type observed004 struct {
 }
 
 func (o observed004) ChatWithOptions(c context.Context, m []llm.Message, s json.RawMessage, p llm.Options) (llm.Response, error) {
+	started := time.Now()
 	r, e := o.OptionsBackend.ChatWithOptions(c, m, s, p)
+	r.TotalDuration = int64(time.Since(started))
+
 	*o.rows = append(*o.rows, r)
 	return r, e
 }
@@ -60,7 +64,7 @@ func TestHarness004InstalledModelCycle(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	r, e := (ThreePhaseGenerator{Client: observed004Cycle{backend, &rows}, CodexContext: []codexcontext.Record{{Paths: []string{"one.go"}, FinalResponse: "Corrected the returned value"}}}).Generate(context.Background(), p, English, SensitiveValues{})
+	r, e := (ThreePhaseGenerator{Client: observed004Cycle{backend, &rows}, GroupingHistory: syntheticAttributedHistory(t, p, []codexcontext.Record{{Paths: []string{"one.go"}, FinalResponse: "Corrected the returned value"}})}).Generate(context.Background(), p, English, SensitiveValues{})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -75,6 +79,6 @@ func TestHarness004InstalledModelCycle(t *testing.T) {
 		if row.InputPreparationCalls != 1 || row.PromptEvalCount <= 0 {
 			t.Fatalf("phase %d preparation calls=%d input=%d", i+1, row.InputPreparationCalls, row.PromptEvalCount)
 		}
-		t.Logf("phase %d actual input tokens=%d preparation calls=%d", i+1, row.PromptEvalCount, row.InputPreparationCalls)
+		t.Logf("phase %d actual input tokens=%d preparation calls=%d wall=%s", i+1, row.PromptEvalCount, row.InputPreparationCalls, time.Duration(row.TotalDuration))
 	}
 }

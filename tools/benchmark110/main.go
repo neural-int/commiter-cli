@@ -253,7 +253,7 @@ func main() {
 			measured := &measuredClient{backend: backend, ids: ids, language: fixture.language}
 			runContext, cancel := context.WithTimeout(ctx, *timeout)
 			start := time.Now()
-			result, generateErr := (planning.Generator{Client: measured}).Generate(runContext, prepared, fixture.language, planning.SensitiveValues{})
+			result, generateErr := (planning.ResearchGenerator{Client: measured}).Generate(runContext, prepared, fixture.language, planning.SensitiveValues{})
 			cancel()
 			row := observation{Backend: *backendName, Fixture: fixture.name, Run: run, Model: model, ContextTokens: prepared.Budget.ContextTokens, PromptBytes: prepared.Budget.PromptBytes, OriginalBytes: prepared.OriginalPromptBytes, SummaryStage: string(prepared.SummaryStage), OutputBudget: prepared.Budget.ReservedOutputTokens, WallMS: milliseconds(time.Since(start)), Calls: result.Calls, Repaired: result.Repaired, Succeeded: generateErr == nil, Requests: measured.requests}
 			if generateErr != nil {
