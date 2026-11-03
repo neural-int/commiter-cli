@@ -16,7 +16,7 @@ func TestOptionalFinalResponseCountFailureStopsWithoutSilentOmission(t *testing.
 		return 0, errors.New("count failed")
 	}}
 	_, err := (ThreePhaseGenerator{Client: client, CodexContext: []codexcontext.Record{{Paths: []string{"one.go"}, FinalResponse: "Completed work"}}}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
-	if err == nil || client.calls != 0 {
+	if err == nil || client.calls != 1 {
 		t.Fatal("failed counting was treated as fitting/omittable history")
 	}
 }

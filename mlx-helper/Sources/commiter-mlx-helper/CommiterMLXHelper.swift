@@ -95,7 +95,7 @@ private struct Request: Decodable {
     let modelPath: String?
     let generationProfile: String?
     let inputLayout: String?
-    let countOnly: Bool
+    let historyInput: OptionalHistoryInput?
 
     enum CodingKeys: String, CodingKey {
         case schema
@@ -106,7 +106,7 @@ private struct Request: Decodable {
         case modelPath = "model_path"
         case generationProfile = "generation_profile"
         case inputLayout = "input_layout"
-        case countOnly = "count_only"
+        case historyInput = "history_input"
     }
 
     init(from decoder: Swift.Decoder) throws {
@@ -119,8 +119,8 @@ private struct Request: Decodable {
         modelPath = try container.decodeIfPresent(String.self, forKey: .modelPath)
         generationProfile = try container.decodeIfPresent(String.self, forKey: .generationProfile)
         inputLayout = try container.decodeIfPresent(String.self, forKey: .inputLayout)
-        countOnly = try container.decodeIfPresent(Bool.self, forKey: .countOnly) ?? false
-        guard !countOnly || inputLayout == "harness004" else { throw HelperError.malformedRequest }
+        historyInput = try container.decodeIfPresent(OptionalHistoryInput.self, forKey: .historyInput)
+        guard historyInput == nil || (inputLayout == "harness004" && generationProfile != "bounded-text" && messages.count == 3 && messages[1].content == "{}" && historyInput!.records.count > 0) else { throw HelperError.malformedRequest }
         guard inputLayout == nil || (inputLayout == "harness004" && generationProfile != nil) else { throw HelperError.malformedRequest }
         guard !messages.isEmpty, contextTokens >= 0, outputTokens >= 0 else {
             throw HelperError.malformedRequest
@@ -137,7 +137,7 @@ private struct Response: Encodable {
     let errorClass: String?
     var generationProfile: String? = nil
     var benchmarkMetrics: BenchmarkMetrics? = nil
-    var inputTokens: Int? = nil
+    var selectedHistoryIndices: [Int]? = nil
 
     enum CodingKeys: String, CodingKey {
         case ok
@@ -148,7 +148,7 @@ private struct Response: Encodable {
         case errorClass = "error_class"
         case generationProfile = "generation_profile"
         case benchmarkMetrics = "benchmark_metrics"
-        case inputTokens = "input_tokens"
+        case selectedHistoryIndices = "selected_history_indices"
     }
 }
 
@@ -165,6 +165,7 @@ private enum HelperError: Error {
 }
 
 private final class OutputBox: @unchecked Sendable {
+    var selectedHistoryIndices: [Int]? = nil
     var value = ""
 }
 
@@ -424,6 +425,7 @@ private struct BenchmarkProgressProcessor: LogitProcessor {
 }
 
 private struct BenchmarkMetrics: Encodable {
+    var inputPreparationCalls = 0
     var outputConstraint: String?
     var scopeConstraintRejectedTokens: Int?
     var prefillProtectionEnabled: Bool?
@@ -624,7 +626,7 @@ struct CommiterMLXHelper {
                 try Task.checkCancellation()
                 let chat = messages.map { Chat.Message(role: $0.role, content: $0.content) }
                 if let profile = request.generationProfile {
-                    return try await generateBounded(request, profile: profile, schema: schema, context: context, benchmark: benchmark)
+                    return try await generateBounded(request, profile: profile, schema: schema, context: context, benchmark: benchmark, output: outputBox)
                 }
                 let grammarVocab = TokenizerVocabExtractor.extractForGrammar(from: context.tokenizer)
                 let grammarTokenizer = try GrammarTokenizer(
@@ -671,13 +673,13 @@ struct CommiterMLXHelper {
             return Response(
                 ok: true,
                 stopReason: .completed,
-                generatedJSON: request.countOnly ? nil : generated,
+                generatedJSON: generated,
                 model: modelID,
                 runtime: "mlx",
                 errorClass: nil,
                 generationProfile: request.generationProfile,
                 benchmarkMetrics: benchmark?.metrics,
-                inputTokens: request.countOnly ? Int(generated) : nil
+                selectedHistoryIndices: outputBox.selectedHistoryIndices
             )
         } catch {
             benchmark?.metrics.activeMemoryBytes = Memory.activeMemory
@@ -697,7 +699,7 @@ struct CommiterMLXHelper {
         }
     }
 
-    private static func generateBounded(_ request: Request, profile: String, schema: String, context: ModelContext, benchmark: BenchmarkState? = nil) async throws -> String {
+    private static func generateBounded(_ request: Request, profile: String, schema: String, context: ModelContext, benchmark: BenchmarkState? = nil, output: OutputBox) async throws -> String {
         let research = request.inputLayout == "harness004" ? nil : try ModelBenchmarkConfiguration.load()
         let pipeline = research == nil ? "eager" : (ProcessInfo.processInfo.environment["COMMITER_182_PIPELINE"] ?? "eager")
         guard ["eager", "overlap"].contains(pipeline),
@@ -738,7 +740,7 @@ struct CommiterMLXHelper {
             }
             wireMessages = merged
         }
-        let chat = wireMessages.map { Chat.Message(role: $0.role, content: $0.content) }
+        var chat = wireMessages.map { Chat.Message(role: $0.role, content: $0.content) }
         let prepareStart = ProcessInfo.processInfo.systemUptime
         // Candidate chat templates choose their own default thinking behavior.
         // Gemma preserves the established bounded-profile behavior.
@@ -746,14 +748,32 @@ struct CommiterMLXHelper {
         let officialInput = research?.family == "ministral"
             ? try officialMistralInput(request, messages: wireMessages, reasoning: ministralThinking, tokenizer: context.tokenizer) : nil
         var input: LMInput
-        if let officialInput { input = officialInput }
-        else { input = try await context.processor.prepare(input: UserInput(chat: chat, additionalContext: templateContext)) }
+        if let history = request.historyInput {
+            do {
+                let prepared = try await HistoryInputPreparation.prepare(recordCount: history.records.count,
+                    context: request.contextTokens, output: budget) { indices in
+                    var selected = wireMessages
+                    selected[1].content = history.sharedContent(indices: indices)
+                    if indices.isEmpty { selected[0].content = history.systemWithoutHistory }
+                    let selectedChat = selected.map { Chat.Message(role: $0.role, content: $0.content) }
+                    let prepared = try await context.processor.prepare(input: UserInput(chat: selectedChat, additionalContext: templateContext))
+                    return ((prepared, selectedChat), prepared.text.tokens.size)
+                }
+                input = prepared.input.0
+                chat = prepared.input.1
+                output.selectedHistoryIndices = prepared.indices
+                benchmark?.metrics.inputPreparationCalls = prepared.preparationCalls
+            } catch let error as TokenBudgetError {
+                if error == .exceedsContext { throw HelperError.inputTooLarge }
+                throw HelperError.malformedRequest
+            }
+        } else {
+            if let officialInput { input = officialInput }
+            else { input = try await context.processor.prepare(input: UserInput(chat: chat, additionalContext: templateContext)) }
+            benchmark?.metrics.inputPreparationCalls = 1
+        }
         benchmark?.metrics.prepareSeconds = ProcessInfo.processInfo.systemUptime - prepareStart
         benchmark?.metrics.inputTokens = input.text.tokens.size
-        // Same final chat template as generation, but no grammar, prefill, KV
-        // snapshot, sampling or phase advancement. Oversized candidates may be
-        // counted so the host can omit optional history before generation.
-        if request.countOnly { return String(input.text.tokens.size) }
         if benchmark?.auditOnly == true {
             var audit: [String: Any] = ["token_ids": input.text.tokens.asArray(Int.self), "enable_thinking": nativeLimit > 0]
             if let research {
@@ -1137,7 +1157,7 @@ struct CommiterMLXHelper {
                 state.metrics = BenchmarkMetrics()
                 let response = try await handle(request, benchmark: state)
                 try writeResponse(response)
-                if !request.countOnly { count += 1 }
+                count += 1
                 if !response.ok || mode == "--benchmark-single" || count == profiles.count { return }
             }
         } catch {

@@ -101,10 +101,6 @@ type invalidMembershipBackend struct {
 	Profiles []string
 }
 
-func (b *invalidMembershipBackend) CountInputTokens(context.Context, []llm.Message, json.RawMessage, llm.Options) (int, error) {
-	return 1000, nil
-}
-
 func (b *invalidMembershipBackend) Chat(context.Context, []llm.Message, json.RawMessage) (llm.Response, error) {
 	return llm.Response{}, errors.New("unexpected legacy call")
 }

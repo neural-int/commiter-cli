@@ -146,7 +146,7 @@ func TestSyntheticCodexContextFixturesMatchFrozenCasesAndReachPrompt(t *testing.
 			if err != nil {
 				t.Fatal(err)
 			}
-			encoded, system := addCodexContextWithFit(payload, fixture.Context, files, SensitiveValues{}, base, "test system", func([]byte) bool { return true })
+			encoded, system := addCodexContext(payload, fixture.Context, files, SensitiveValues{}, base, "test system")
 			var actual struct {
 				Context []codexcontext.Record `json:"codex_context"`
 			}

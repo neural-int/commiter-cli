@@ -158,10 +158,6 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 		evidenceByID[e.ID] = e
 	}
 	var common004 map[string]any
-	counter, ok := client.(llm.InputTokenCounter)
-	if !ok {
-		return result, errors.New("three-phase planner requires exact input token counting")
-	}
 	invoke := func(system string, payload any, schema any, profile string, budget int, output any) error {
 		if ctx.Err() != nil {
 			return generationError([]Violation{IncompleteOutput})
@@ -175,54 +171,23 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 			return errors.New("cannot encode candidate schema")
 		}
 		options := llm.Options{ContextTokens: contextinput.Context64K, OutputTokens: budget, GenerationProfile: profile, LiteralNewlines: true, InputLayout: "harness004"}
-		// Count exactly the display and chat template used for generation. This
-		// reuses the same helper/tokenizer, without inference or cache mutation.
-		counts := map[string]int{}
-		countInput := func(candidate []byte, common *map[string]any) ([]llm.Message, int, error) {
-			messages, err := harness004Messages(profile, candidate, shape, common)
-			if err != nil {
-				return nil, 0, err
-			}
-			key, _ := json.Marshal(messages)
-			if count, found := counts[string(key)]; found {
-				return messages, count, nil
-			}
-			count, err := counter.CountInputTokens(ctx, messages, shape, options)
-			if err != nil {
-				return nil, 0, err
-			}
-			if count < 0 {
-				return nil, 0, errors.New("invalid input token count")
-			}
-			counts[string(key)] = count
-			return messages, count, nil
-		}
 		records := g.CodexContext
 		if profile == "bounded-text" {
 			records = nil
-		} // Grouping's frozen history.
-		var countErr error
-		encoded, _ = addCodexContextWithFit(payload, records, files, sensitive, encoded, system, func(candidate []byte) bool {
-			if countErr != nil {
-				return false
-			}
-			trialCommon := common004
-			_, count, err := countInput(candidate, &trialCommon)
-			if err != nil {
-				countErr = err
-				return false
-			}
-			return count <= contextinput.Context64K-budget
-		})
-		if countErr != nil {
-			return countErr
 		}
-		messages, count, e := countInput(encoded, &common004)
+		// Safety, deduplication and the retained-history byte bound remain on
+		// the host. Final token admission occurs during the helper's one normal
+		// preparation, not through count-only IPC.
+		encoded, _ = addCodexContext(payload, records, files, sensitive, encoded, system)
+		messages, e := harness004Messages(profile, encoded, shape, &common004)
 		if e != nil {
 			return e
 		}
-		if count > contextinput.Context64K-budget {
-			return contextinput.ErrTooLarge
+		if profile != "bounded-text" {
+			options.HistoryInput, e = harness004OptionalHistory(messages)
+			if e != nil {
+				return e
+			}
 		}
 		contextTokens := contextinput.Context64K
 
@@ -232,7 +197,23 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 		}
 		response, e := client.ChatWithOptions(ctx, messages, shape, options)
 		if e != nil {
+			if errors.Is(e, llm.ErrInputTooLarge) {
+				return contextinput.ErrTooLarge
+			}
 			return generationError(nil)
+		}
+		if options.HistoryInput != nil {
+			selected, err := selected004History(messages, response.SelectedHistoryIndices)
+			if err != nil {
+				return err
+			}
+			if profile == "bounded-grouping" {
+				if len(selected) == 0 {
+					delete(common004, "codex_context")
+				} else {
+					common004["codex_context"] = selected
+				}
+			}
 		}
 		result.Telemetry.add(response, result.Calls == 1)
 		if ctx.Err() != nil || response.StopReason != "completed" {

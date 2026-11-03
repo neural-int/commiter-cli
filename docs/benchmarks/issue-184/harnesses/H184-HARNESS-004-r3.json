@@ -61,11 +61,13 @@
     "12000 is a provisional boundary; this implementation does not establish optimality or a speed/quality improvement"
   ],
   "input_token_counting": {
-    "operation": "count_only on the same sequential helper process before generation",
+    "operation": "Exactly one normal generation request per phase; use the helper preparation token count and pass the same prepared input into generation",
     "coverage": "same model, literal-newline display, system/phase/schema and chat template as generation; includes reused prefix",
-    "side_effects": "no grammar preparation, prefill, sampling, prefix snapshot changes or phase advancement",
-    "failure": "stop on count failure; omit optional final-only history records that cannot fit; reject mandatory overflow",
+    "side_effects": "No count_only operation or counting-specific IPC; fitting history requires one full-input preparation per phase; mandatory budget checks precede grammar/prefill/sampling",
+    "failure": "Reject mandatory overflow and tokenizer failure without inference; optional history uses full-first admission and ordered whole-record selection only on overflow",
     "maximum_prompt_tokens": 61440,
-    "transport_limits": "unchanged; byte frame and retained-history limits remain resource bounds, not token estimates"
+    "transport_limits": "unchanged; byte frame and retained-history limits remain resource bounds, not token estimates",
+    "history_admission": "Send host-filtered history records and disjoint shared-message display fragments once; retain all if the full input fits; otherwise try whole records in source order inside the helper. Return accepted source indices; preserve Grouping/Text shared data.",
+    "preparation_reuse": "Retain the accepted LMInput; do not apply the chat template or tokenize the same final input again for generation. Existing common-prefix boundary preparation uses a different input and remains unchanged."
   }
 }

@@ -318,11 +318,10 @@ case "$request" in
  *'"generation_profile":"bounded-text"'*) profile=bounded-text; result='{"G001":{"scope":"sample","summary":"correct value"}}' ;;
  *) exit 1 ;;
 esac
-case "$request" in
- *'"count_only":true'*) printf '{"ok":true,"stop_reason":"completed","generation_profile":"%s","input_tokens":1000}\n' "$profile"; continue ;;
-esac
+selection=''
+case "$request" in *'"history_input":'*) selection=',"selected_history_indices":[0]' ;; esac
 escaped=$(printf '%s' "$result" | sed 's/"/\\"/g')
-printf '{"ok":true,"stop_reason":"completed","generation_profile":"%s","generated_json":"%s"}\n' "$profile" "$escaped"
+printf '{"ok":true,"stop_reason":"completed","generation_profile":"%s","generated_json":"%s"%s}\n' "$profile" "$escaped" "$selection"
 done
 `
 		if err := os.WriteFile(helper, []byte(script), 0o700); err != nil {

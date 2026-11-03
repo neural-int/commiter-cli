@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -44,7 +45,7 @@ printf '%s\n' '{"ok":false,"stop_reason":"completed","generated_json":"{\"commit
 	backend := &Backend{Client: NewClient(helper)}
 	response, err := backend.Chat(context.Background(), []llm.Message{{Role: "user", Content: "plan"}}, json.RawMessage(`{"type":"object"}`))
 	var failure *Error
-	if !errors.As(err, &failure) || failure.Kind != FailureStopState || response != (llm.Response{}) {
+	if !errors.As(err, &failure) || failure.Kind != FailureStopState || !reflect.DeepEqual(response, llm.Response{}) {
 		t.Fatalf("response=%#v err=%v", response, err)
 	}
 }

@@ -43,16 +43,18 @@ type Response struct {
 	Content string
 	// StopReason is explicit for backends that report generation completion.
 	// An empty value preserves the existing Ollama contract.
-	StopReason         string
-	TotalDuration      int64
-	LoadDuration       int64
-	PromptEvalCount    int
-	PromptEvalDuration int64
-	EvalCount          int
-	EvalDuration       int64
-	PrefixReuseStatus  string
-	CacheReusedTokens  int
-	Availability       TelemetryAvailability
+	StopReason             string
+	TotalDuration          int64
+	LoadDuration           int64
+	PromptEvalCount        int
+	PromptEvalDuration     int64
+	EvalCount              int
+	EvalDuration           int64
+	PrefixReuseStatus      string
+	SelectedHistoryIndices []int
+	InputPreparationCalls  int
+	CacheReusedTokens      int
+	Availability           TelemetryAvailability
 }
 
 // ChatResponse is a descriptive alias for backend implementations.
@@ -60,8 +62,7 @@ type ChatResponse = Response
 
 // Options contains provider-neutral generation limits.
 type Options struct {
-	// CountOnly prepares the final chat template without prefill or generation.
-	CountOnly     bool
+	HistoryInput  *OptionalHistoryInput
 	ContextTokens int
 	OutputTokens  int
 	// GenerationProfile selects an explicitly supported bounded generation contract.
@@ -102,11 +103,6 @@ type Backend interface {
 type OptionsBackend interface {
 	Backend
 	ChatWithOptions(context.Context, []Message, json.RawMessage, Options) (Response, error)
-}
-
-// InputTokenCounter counts the same rendered/template-applied input as generation.
-type InputTokenCounter interface {
-	CountInputTokens(context.Context, []Message, json.RawMessage, Options) (int, error)
 }
 
 // Retryable marks a backend error that is safe to retry once.

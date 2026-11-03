@@ -36,12 +36,6 @@ func (backend *Backend) Chat(ctx context.Context, messages []llm.Message, schema
 	return backend.ChatWithOptions(ctx, messages, schema, llm.Options{})
 }
 
-func (backend *Backend) CountInputTokens(ctx context.Context, messages []llm.Message, schema json.RawMessage, options llm.Options) (int, error) {
-	options.CountOnly = true
-	response, err := backend.ChatWithOptions(ctx, messages, schema, options)
-	return response.PromptEvalCount, err
-}
-
 func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Message, schema json.RawMessage, options llm.Options) (llm.Response, error) {
 	if backend == nil || backend.Client == nil {
 		return llm.Response{}, errors.New("MLX helper client is required")
@@ -52,6 +46,12 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 	}
 	if options.LiteralNewlines {
 		rendered := append([]llm.Message(nil), messages...)
+		if options.HistoryInput != nil {
+			if options.InputLayout != "harness004" || len(rendered) != 3 {
+				return llm.Response{}, errors.New("invalid history input layout")
+			}
+			rendered[1].Content = "{}" // Shared data travels once, in history fragments.
+		}
 		for i, m := range rendered {
 			if m.Role == "user" {
 				body, prefix := m.Content, ""
@@ -76,14 +76,14 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 		generate = backend.session.Generate
 	}
 	response, err := generate(ctx, Request{
-		CountOnly: options.CountOnly,
-		Schema:    schema, Messages: messages, ContextTokens: options.ContextTokens,
+		HistoryInput: options.HistoryInput,
+		Schema:       schema, Messages: messages, ContextTokens: options.ContextTokens,
 		OutputTokens: options.OutputTokens, Model: model, ModelPath: backend.ModelPath,
 		GenerationProfile: options.GenerationProfile, InputLayout: options.InputLayout,
 	})
 	if err != nil {
-		if options.CountOnly {
-			return llm.Response{}, err
+		if response.ErrorClass == "input_too_large" {
+			return llm.Response{}, llm.ErrInputTooLarge
 		}
 		var failure *Error
 		if errors.As(err, &failure) && failure.Kind == FailureStopState && response.StopReason != StopReasonCompleted {
@@ -94,16 +94,14 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 	if options.GenerationProfile != "" && response.GenerationProfile != options.GenerationProfile {
 		return llm.Response{}, &Error{Kind: FailureProtocol}
 	}
-	if options.CountOnly {
-		if response.InputTokens == nil || *response.InputTokens < 0 || response.GeneratedJSON != "" {
-			return llm.Response{}, &Error{Kind: FailureProtocol}
-		}
-		return llm.Response{PromptEvalCount: *response.InputTokens}, nil
+	if (options.HistoryInput != nil) != (response.SelectedHistoryIndices != nil) {
+		return llm.Response{}, &Error{Kind: FailureProtocol}
 	}
 	var cache struct {
-		InputTokens       *int   `json:"inputTokens"`
-		PrefixReuseStatus string `json:"prefixReuseStatus"`
-		CacheReusedTokens int    `json:"cacheReusedTokens"`
+		InputPreparationCalls int    `json:"inputPreparationCalls"`
+		InputTokens           *int   `json:"inputTokens"`
+		PrefixReuseStatus     string `json:"prefixReuseStatus"`
+		CacheReusedTokens     int    `json:"cacheReusedTokens"`
 	}
 	_ = json.Unmarshal(response.BenchmarkMetrics, &cache)
 	inputCount := 0
@@ -111,9 +109,11 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 		inputCount = *cache.InputTokens
 	}
 	return llm.Response{
-		PromptEvalCount:   inputCount,
-		Availability:      llm.TelemetryAvailability{PromptEvalCount: cache.InputTokens != nil},
-		PrefixReuseStatus: cache.PrefixReuseStatus, CacheReusedTokens: cache.CacheReusedTokens,
+		SelectedHistoryIndices: response.SelectedHistoryIndices,
+		InputPreparationCalls:  cache.InputPreparationCalls,
+		PromptEvalCount:        inputCount,
+		Availability:           llm.TelemetryAvailability{PromptEvalCount: cache.InputTokens != nil},
+		PrefixReuseStatus:      cache.PrefixReuseStatus, CacheReusedTokens: cache.CacheReusedTokens,
 		Backend: "mlx", Model: response.Model, Content: response.GeneratedJSON,
 		StopReason: string(response.StopReason),
 	}, nil

@@ -98,4 +98,4 @@ revision 1は過去の研究条件として保持する。ユーザー指定に�
 
 ## H184-HARNESS-004 / revision 3
 
-[manifest](H184-HARNESS-004-r3.json)・[変更と検証](actual-token-context.md)。3フェーズ64K固定、同一helperで最終表示の実token計数、入力全体が12,000 tokensを超えた場合の毎chunk保護を採用する。旧revision・32Kでの測定記録は保存する。通常Plannerの4ファイル・120秒、summary48文字、各phase出力4096とsamplingは維持する。旧Planner廃止などの別スコープはIssue #187へ分離している。
+[manifest](H184-HARNESS-004-r3.json)・[変更と検証](actual-token-context.md)。3フェーズ64K固定、計数専用IPCを追加せず生成準備で得た実token数を再利用、入力全体が12,000 tokensを超えた場合の毎chunk保護を採用する。旧revision・32Kでの測定記録は保存する。通常Plannerの4ファイル・120秒、summary48文字、各phase出力4096とsamplingは維持する。旧Planner廃止などの別スコープはIssue #187へ分離している。

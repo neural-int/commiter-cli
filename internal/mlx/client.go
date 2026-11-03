@@ -61,11 +61,11 @@ func (reason StopReason) valid() bool {
 // Request is the complete helper input. Message content is sent only through
 // the child's stdin; this package never writes it to logs or diagnostics.
 type Request struct {
-	CountOnly     bool            `json:"count_only,omitempty"`
-	Schema        json.RawMessage `json:"schema"`
-	Messages      []llm.Message   `json:"messages"`
-	ContextTokens int             `json:"context_tokens"`
-	OutputTokens  int             `json:"output_tokens"`
+	HistoryInput  *llm.OptionalHistoryInput `json:"history_input,omitempty"`
+	Schema        json.RawMessage           `json:"schema"`
+	Messages      []llm.Message             `json:"messages"`
+	ContextTokens int                       `json:"context_tokens"`
+	OutputTokens  int                       `json:"output_tokens"`
 	// Model is a display identifier. ModelPath is an already prepared local
 	// model directory; the helper never resolves Model through a network
 	// downloader.
@@ -78,15 +78,15 @@ type Request struct {
 // Response is the machine-readable helper output. GeneratedJSON is accepted
 // by a caller only when StopReason is StopReasonCompleted.
 type Response struct {
-	InputTokens       *int            `json:"input_tokens,omitempty"`
-	BenchmarkMetrics  json.RawMessage `json:"benchmark_metrics,omitempty"`
-	OK                bool            `json:"ok"`
-	StopReason        StopReason      `json:"stop_reason"`
-	GeneratedJSON     string          `json:"generated_json,omitempty"`
-	Model             string          `json:"model,omitempty"`
-	Runtime           string          `json:"runtime,omitempty"`
-	ErrorClass        string          `json:"error_class,omitempty"`
-	GenerationProfile string          `json:"generation_profile,omitempty"`
+	SelectedHistoryIndices []int           `json:"selected_history_indices"`
+	BenchmarkMetrics       json.RawMessage `json:"benchmark_metrics,omitempty"`
+	OK                     bool            `json:"ok"`
+	StopReason             StopReason      `json:"stop_reason"`
+	GeneratedJSON          string          `json:"generated_json,omitempty"`
+	Model                  string          `json:"model,omitempty"`
+	Runtime                string          `json:"runtime,omitempty"`
+	ErrorClass             string          `json:"error_class,omitempty"`
+	GenerationProfile      string          `json:"generation_profile,omitempty"`
 }
 
 // FailureKind identifies failures without exposing helper diagnostics or
@@ -262,13 +262,7 @@ func (client *Client) Generate(ctx context.Context, request Request) (Response, 
 	if !response.OK || response.StopReason != StopReasonCompleted {
 		return response, &Error{Kind: FailureStopState, StopReason: response.StopReason}
 	}
-	if request.CountOnly {
-		if response.InputTokens == nil || *response.InputTokens < 0 || response.GeneratedJSON != "" {
-			return response, &Error{Kind: FailureProtocol}
-		}
-		return response, nil
-	}
-	if strings.TrimSpace(response.GeneratedJSON) == "" || response.InputTokens != nil {
+	if strings.TrimSpace(response.GeneratedJSON) == "" {
 		return response, &Error{Kind: FailureProtocol, Cause: errors.New("completed response has no generated JSON")}
 	}
 	return response, nil

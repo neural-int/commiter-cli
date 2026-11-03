@@ -16,10 +16,6 @@ import (
 
 type groupingFlowClient struct{ messages [][]llm.Message }
 
-func (c *groupingFlowClient) CountInputTokens(context.Context, []llm.Message, json.RawMessage, llm.Options) (int, error) {
-	return 1000, nil
-}
-
 func (c *groupingFlowClient) Chat(context.Context, []llm.Message, json.RawMessage) (llm.Response, error) {
 	return llm.Response{}, errors.New("unexpected legacy call")
 }

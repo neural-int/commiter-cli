@@ -24,17 +24,13 @@ type fixtureBackend struct {
 	Requests       []phaseRequest
 }
 
-func (b *fixtureBackend) CountInputTokens(context.Context, []llm.Message, json.RawMessage, llm.Options) (int, error) {
-	if b.InputTokens > 0 {
-		return b.InputTokens, nil
-	}
-	return 1000, nil
-}
-
 func (b *fixtureBackend) Chat(context.Context, []llm.Message, json.RawMessage) (llm.Response, error) {
 	return llm.Response{}, errors.New("unexpected legacy call")
 }
 func (b *fixtureBackend) ChatWithOptions(ctx context.Context, m []llm.Message, s json.RawMessage, o llm.Options) (llm.Response, error) {
+	if b.InputTokens > o.ContextTokens-o.OutputTokens {
+		return llm.Response{}, llm.ErrInputTooLarge
+	}
 	deadline, ok := ctx.Deadline()
 	if !ok {
 		return llm.Response{}, errors.New("missing deadline")

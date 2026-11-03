@@ -23,19 +23,16 @@ type candidateClient struct {
 	deadline   time.Time
 }
 
-func (c *candidateClient) CountInputTokens(_ context.Context, messages []llm.Message, _ json.RawMessage, options llm.Options) (int, error) {
-	if c.countInput != nil {
-		return c.countInput(messages, options)
-	}
-	// Synthetic token counts for unit tests; never a production estimator.
-	return requiredHarness004Size(messages) - 4096, nil
-}
-
 func (c *candidateClient) Chat(context.Context, []llm.Message, json.RawMessage) (llm.Response, error) {
 	return llm.Response{}, errors.New("unexpected legacy call")
 }
 func (c *candidateClient) ChatWithOptions(ctx context.Context, messages []llm.Message, _ json.RawMessage, options llm.Options) (llm.Response, error) {
 	c.calls++
+	prepared, indices, count, attempts, err := prepareCandidateInput(c, messages, options)
+	if err != nil {
+		return llm.Response{}, err
+	}
+	messages = prepared
 	c.options = append(c.options, options)
 	c.messages = append(c.messages, messages)
 	deadline, ok := ctx.Deadline()
@@ -57,7 +54,7 @@ func (c *candidateClient) ChatWithOptions(ctx context.Context, messages []llm.Me
 	if stop == "" {
 		stop = "completed"
 	}
-	return llm.Response{Content: c.responses[c.calls-1], StopReason: stop}, nil
+	return llm.Response{Content: c.responses[c.calls-1], StopReason: stop, SelectedHistoryIndices: indices, PromptEvalCount: count, InputPreparationCalls: attempts}, nil
 }
 func candidatePrepared(t *testing.T) contextinput.Prepared {
 	t.Helper()
@@ -192,7 +189,7 @@ func TestThreePhaseStopsAtActualTokenOverflowOrCountFailure(t *testing.T) {
 			if err == nil || len(result.Plan.Commits) != 0 {
 				t.Fatal("count failure/overflow accepted")
 			}
-			want := map[string]int{"bounded-grouping": 0, "bounded-category": 1, "bounded-text": 2}[profile]
+			want := map[string]int{"bounded-grouping": 1, "bounded-category": 2, "bounded-text": 3}[profile]
 			if client.calls != want {
 				t.Fatalf("calls=%d want=%d", client.calls, want)
 			}
@@ -275,7 +272,7 @@ func TestThreePhaseRejectsUnsupportedInputBeforeGeneration(t *testing.T) {
 			}
 			c := &candidateClient{responses: candidateResponses()}
 			r, err := (ThreePhaseGenerator{Client: c}).Generate(ctx, p, English, SensitiveValues{})
-			if err == nil || c.calls != 0 || len(r.Plan.Commits) != 0 {
+			if err == nil || (c.calls != 0 && name != "prompt") || len(r.Plan.Commits) != 0 {
 				t.Fatalf("calls=%d result=%#v error=%v", c.calls, r, err)
 			}
 		})
