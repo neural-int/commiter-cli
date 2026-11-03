@@ -157,7 +157,7 @@ func TestCaptureAndCompareFixtureCycle(t *testing.T) {
 	root := gitFixture(t)
 	fixtureServer(t, root, "ok")
 	out := filepath.Join(t.TempDir(), "capture.json")
-	if err := execute([]string{"capture", "--root", root, "--path", "file.go", "--out", out}); err != nil {
+	if err := executeContext(normalMemoryContext(context.Background()), []string{"capture", "--root", root, "--path", "file.go", "--out", out}); err != nil {
 		t.Fatal(err)
 	}
 	in, err := loadInput(out)
@@ -178,7 +178,7 @@ func TestCaptureAndCompareFixtureCycle(t *testing.T) {
 	if info.Mode().Perm() != 0600 {
 		t.Fatal("private artifact mode")
 	}
-	if execute([]string{"capture", "--root", root, "--path", "file.go", "--out", out}) == nil {
+	if executeContext(normalMemoryContext(context.Background()), []string{"capture", "--root", root, "--path", "file.go", "--out", out}) == nil {
 		t.Fatal("overwrite allowed")
 	}
 	report := filepath.Join(t.TempDir(), "comparison.json")
@@ -293,7 +293,7 @@ func TestOptionalHistoryFailurePersistsFixedGitInput(t *testing.T) {
 	root := gitFixture(t)
 	fixtureServer(t, root, "thread/items/list")
 	out := filepath.Join(t.TempDir(), "input.json")
-	err := execute([]string{"capture", "--root", root, "--path", "file.go", "--out", out})
+	err := executeContext(normalMemoryContext(context.Background()), []string{"capture", "--root", root, "--path", "file.go", "--out", out})
 	if err == nil || err.(*StageError).Stage != "history.items" {
 		t.Fatal(err)
 	}

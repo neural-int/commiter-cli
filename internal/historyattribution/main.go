@@ -2,6 +2,7 @@ package historyattribution
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -116,6 +117,10 @@ func outputOutside(root, name string) (string, error) {
 	return dest, nil
 }
 func execute(args []string) error {
+	return executeContext(context.Background(), args)
+}
+
+func executeContext(ctx context.Context, args []string) error {
 	if len(args) == 0 {
 		return failure("arguments", "capture_or_compare_required")
 	}
@@ -157,7 +162,7 @@ func execute(args []string) error {
 			}
 			profile = &HistoryTiming{}
 		}
-		in, err := captureWithTiming(*root, paths, time.Now(), *fetchMode, profile, *unlimited)
+		in, err := captureWithTimingContext(ctx, *root, paths, time.Now(), *fetchMode, profile, *unlimited)
 		if profile != nil {
 			if e := writeNew(timingDest, profile, true); e != nil {
 				return e

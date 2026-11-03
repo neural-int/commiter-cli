@@ -246,11 +246,15 @@ func captureWithMode(root string, paths []string, clock time.Time, mode string, 
 	return captureWithTiming(root, paths, clock, mode, nil, unlimited...)
 }
 func captureWithTiming(root string, paths []string, clock time.Time, mode string, profile *HistoryTiming, unlimited ...bool) (Input, error) {
+	return captureWithTimingContext(context.Background(), root, paths, clock, mode, profile, unlimited...)
+}
+
+func captureWithTimingContext(parent context.Context, root string, paths []string, clock time.Time, mode string, profile *HistoryTiming, unlimited ...bool) (Input, error) {
 	if _, err := historyFetchConfig(mode); err != nil {
 		return Input{}, err
 	}
 	begin := time.Now()
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(parent, 5*time.Second)
 	defer cancel()
 	in := Input{Version: 1}
 	abs, err := filepath.Abs(root)
@@ -312,7 +316,7 @@ func captureWithTiming(root string, paths []string, clock time.Time, mode string
 	in.UntilUnix = clock.Unix()
 	historyCtx := ctx
 	if len(unlimited) > 0 && unlimited[0] {
-		historyCtx = context.WithValue(context.Background(), unlimitedHistoryContext{}, true)
+		historyCtx = context.WithValue(parent, unlimitedHistoryContext{}, true)
 	}
 	historyCtx = context.WithValue(historyCtx, historyFetchModeContext{}, mode)
 	if profile != nil {
