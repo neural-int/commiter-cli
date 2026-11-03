@@ -30,13 +30,17 @@ type historyRPC struct {
 
 type unlimitedHistoryContext struct{}
 type countedReader struct {
-	source io.Reader
-	bytes  int64
+	source   io.Reader
+	bytes    int64
+	progress func()
 }
 
 func (r *countedReader) Read(b []byte) (int, error) {
 	n, e := r.source.Read(b)
 	r.bytes += int64(n)
+	if n > 0 && r.progress != nil {
+		r.progress()
+	}
 	return n, e
 }
 func unlimitedHistory(ctx context.Context) bool {
@@ -106,6 +110,14 @@ func (p *historyRPC) close() {
 	}
 }
 func (p *historyRPC) call(stage, method string, params, result any) (callError error) {
+	idle := newRPCIdleGuard(p.ctx, func() { p.in.Close(); p.out.Close() })
+	p.counter.progress = idle.progress
+	defer func() {
+		p.counter.progress = nil
+		if idle.stop() && p.ctx.Err() == nil {
+			callError = failure(stage, "rpc_idle_timeout")
+		}
+	}()
 	begin := time.Now()
 	row := RPCTiming{Method: method, CallIndex: p.seq + 1}
 	profile := timing(p.ctx)
@@ -162,6 +174,7 @@ func (p *historyRPC) call(stage, method string, params, result any) (callError e
 			return failure(stage, "unexpected_server_request")
 		}
 		if string(reply.ID) != strconv.Itoa(p.seq) {
+			idle.unrelatedMessage()
 			continue
 		}
 		if len(reply.Error) > 0 && string(reply.Error) != "null" {

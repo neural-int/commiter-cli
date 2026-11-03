@@ -79,6 +79,11 @@ func Collect(parent context.Context, request Request) (Result, error) {
 			h.Error = failure("history.request", "invalid_request").(*StageError)
 		} else {
 			h = readHistory(ctx, request.Root, []string{request.Root}, targets, request.Since.Unix(), request.Until.Unix())
+			if h.Error != nil && h.Error.Code == "rpc_idle_timeout" {
+				// A stalled service contributes no optional history, even if
+				// earlier pages completed. Keep the fixed Git input intact.
+				h.Status, h.Operations, h.Turns = "unavailable", nil, nil
+			}
 		}
 	}
 	sources := map[string]ContextSource{}
@@ -203,6 +208,11 @@ func attributeWithSources(request Request, history History, sources map[string]C
 				return nil, failure("history.match", "invalid_schema")
 			}
 			b := planning.AttributedBlockHistory{BlockID: block.BlockID, DiffRange: block.DiffRange, Status: r.Status, Reasons: append([]string{}, r.Reasons...), Candidates: []planning.AgentHistoryCandidate{}}
+			metadataRename := file.Kind == "rename" && len(current[index].Lines) == 0
+			if metadataRename && len(r.Candidates) > 0 {
+				b.Status = "ambiguous"
+				b.Reasons = append(b.Reasons, "rename_content_unverified")
+			}
 			if h.Status == "unavailable" {
 				b.Status = "error"
 				b.Reasons = append([]string{}, out.Acquisition.Reasons...)
@@ -282,6 +292,9 @@ func attributeWithSources(request Request, history History, sources map[string]C
 				match := "partial"
 				if candidate.Exact {
 					match = "exact"
+				}
+				if metadataRename {
+					match = "partial"
 				}
 				op := ops[operationKey(Operation{Thread: candidate.Thread, Turn: candidate.Turn, Item: candidate.Item, Index: candidate.Index})]
 				if op.Diff != nil {

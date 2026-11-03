@@ -36,6 +36,29 @@ func TestHistoryFixture(t *testing.T) {
 		if mode == "timeout" {
 			time.Sleep(time.Minute)
 		}
+		if mode == "notifications" {
+			for {
+				if enc.Encode(map[string]any{"method": "progress"}) != nil {
+					os.Exit(0)
+				}
+				time.Sleep(25 * time.Millisecond)
+			}
+		}
+		if req.Method == "initialize" && mode == "stalled_response" {
+			io.WriteString(os.Stdout, `{"id":1,"result":`)
+			time.Sleep(time.Minute)
+		}
+		if req.Method == "initialize" && mode == "progress_response" {
+			data, _ := json.Marshal(map[string]any{"id": req.ID, "result": map[string]any{"padding": strings.Repeat("a", 8192)}})
+			data = append(data, '\n')
+			for len(data) > 0 {
+				n := min(128, len(data))
+				os.Stdout.Write(data[:n])
+				data = data[n:]
+				time.Sleep(25 * time.Millisecond)
+			}
+			continue
+		}
 		if mode == "limit" {
 			_, _ = io.WriteString(os.Stdout, strings.Repeat("x", int(receiveLimit)+10)+"\n")
 			os.Exit(0)
@@ -44,7 +67,10 @@ func TestHistoryFixture(t *testing.T) {
 			enc.Encode(map[string]any{"id": req.ID, "error": map[string]any{"code": -1, "message": "PRIVATE_DIAGNOSTIC_MUST_NOT_ESCAPE"}})
 			continue
 		}
-		if mode == "fetch_modes" || mode == "full_missing" {
+		if mode == "fetch_modes" || mode == "full_missing" || mode == "fetch_stall" {
+			if mode == "fetch_stall" && req.Method == "thread/items/list" && req.Params["turnId"] == "T2" {
+				time.Sleep(time.Minute)
+			}
 			var done func()
 			if req.Method == "thread/items/list" && os.Getenv("POC_RPC_EVENTS") != "" {
 				done = fixtureRPCEventStart()

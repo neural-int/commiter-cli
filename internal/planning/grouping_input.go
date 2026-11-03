@@ -73,7 +73,12 @@ func groupingProjection(files []contextinput.File) ([]groupingFile, error) {
 				return nil, fmt.Errorf("grouping block parsing failed: %w", err)
 			}
 			item.ChangeBlocks = blocks
-			if len(blocks) == 0 {
+			// A content-preserving rename has metadata but no text hunk. Keep
+			// a block over the actual transmitted metadata for attribution.
+			if len(blocks) == 0 && item.Status == "renamed" && item.OldPath != nil && item.NewPath != nil && strings.Contains(item.RawDiff, "similarity index 100%\n") && !strings.Contains(item.RawDiff, "@@") {
+				item.ChangeBlocks = []groupingChangeBlock{{BlockID: "B1", DiffRange: DiffRange{1, len(strings.Split(strings.TrimSuffix(item.RawDiff, "\n"), "\n"))}, AgentHistoryMatchStatus: "error", AgentHistoryMatchReasons: []string{"history_unavailable"}, AgentHistoryCandidates: []AgentHistoryCandidate{}}}
+			}
+			if len(item.ChangeBlocks) == 0 {
 				item.RawDiff = ""
 			}
 		}

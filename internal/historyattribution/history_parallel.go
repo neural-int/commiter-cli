@@ -274,7 +274,7 @@ func readHistoryParallel(ctx context.Context, root string, targets map[string]bo
 		}
 	}
 	stopGuard()
-	if out.Error != nil {
+	if out.Error != nil && (firstError == nil || firstError.(*StageError).Code != "rpc_idle_timeout") {
 		firstError = out.Error
 	}
 	if e := guard.failure(); e != nil {
