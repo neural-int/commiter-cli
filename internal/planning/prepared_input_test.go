@@ -7,8 +7,8 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/llm"
 )
 
-// Simulate helper-side preparation in scripted planner tests. This is not a
-// tokenizer or a production size estimator; real preparation is tested in Swift.
+// Scripted admission for planner contract tests, not a copy of the runtime
+// shortlist policy or a tokenizer. The real selection policy is tested in Swift.
 func prepareCandidateInput(c *candidateClient, messages []llm.Message, options llm.Options) ([]llm.Message, []int, int, int, error) {
 	count := func(m []llm.Message) (int, error) {
 		if c.countInput != nil {

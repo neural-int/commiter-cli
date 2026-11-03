@@ -750,7 +750,7 @@ struct CommiterMLXHelper {
         var input: LMInput
         if let history = request.historyInput {
             do {
-                let prepared = try await HistoryInputPreparation.prepare(recordCount: history.records.count,
+                let prepared = try await HistoryInputPreparation.prepare(recordByteCounts: history.records.map { $0.utf8.count },
                     context: request.contextTokens, output: budget) { indices in
                     var selected = wireMessages
                     selected[1].content = history.sharedContent(indices: indices)

@@ -64,10 +64,13 @@
     "operation": "Exactly one normal generation request per phase; use the helper preparation token count and pass the same prepared input into generation",
     "coverage": "same model, literal-newline display, system/phase/schema and chat template as generation; includes reused prefix",
     "side_effects": "No count_only operation or counting-specific IPC; fitting history requires one full-input preparation per phase; mandatory budget checks precede grammar/prefill/sampling",
-    "failure": "Reject mandatory overflow and tokenizer failure without inference; optional history uses full-first admission and ordered whole-record selection only on overflow",
+    "failure": "Reject mandatory overflow and tokenizer failure without inference; after at most 3 shortlisted-candidate preparations, reuse the already validated mandatory-only input",
     "maximum_prompt_tokens": 61440,
     "transport_limits": "unchanged; byte frame and retained-history limits remain resource bounds, not token estimates",
-    "history_admission": "Send host-filtered history records and disjoint shared-message display fragments once; retain all if the full input fits; otherwise try whole records in source order inside the helper. Return accepted source indices; preserve Grouping/Text shared data.",
-    "preparation_reuse": "Retain the accepted LMInput; do not apply the chat template or tokenize the same final input again for generation. Existing common-prefix boundary preparation uses a different input and remains unchanged."
+    "history_admission": "Full-first: retain all on exact fit. Otherwise prepare mandatory-only input, estimate a byte budget from the observed history token increment and UTF-8 record sizes, scan records in host priority order, and exactly validate whole-record batches. Failed batches reduce retained bytes by at least half; no per-record tokenization.",
+    "preparation_reuse": "Retain the accepted LMInput; do not apply the chat template or tokenize the same final input again for generation. Existing common-prefix boundary preparation uses a different input and remains unchanged.",
+    "maximum_candidate_preparations": 3,
+    "maximum_full_input_preparations_per_history_request": 5,
+    "estimation_role": "Shortlisting only, never final admission; estimation may omit history that could fit; Git diffs remain mandatory and unchanged"
   }
 }
