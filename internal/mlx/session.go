@@ -142,7 +142,14 @@ func (s *Session) Generate(ctx context.Context, request Request) (Response, erro
 			s.Close()
 			return response, &Error{Kind: FailureStopState, StopReason: response.StopReason}
 		}
-		if response.GeneratedJSON == "" {
+		if request.CountOnly {
+			if response.InputTokens == nil || *response.InputTokens < 0 || response.GeneratedJSON != "" {
+				s.Close()
+				return response, &Error{Kind: FailureProtocol}
+			}
+			return response, nil
+		}
+		if response.GeneratedJSON == "" || response.InputTokens != nil {
 			s.Close()
 			return response, &Error{Kind: FailureProtocol}
 		}

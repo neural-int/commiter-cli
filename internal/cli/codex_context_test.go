@@ -48,7 +48,7 @@ func TestCodexContextCapturesChangedPathsOnceWithoutMutation(t *testing.T) {
 		if request.SafeText("Please use password=private-value") || request.SafeText("Bearer private-value") {
 			t.Fatal("secret context accepted")
 		}
-		return codexcontext.Result{Status: "available", Records: []codexcontext.Record{{Paths: []string{"one.txt"}, UserRequest: "Correct behavior"}}}
+		return codexcontext.Result{Status: "available", Records: []codexcontext.Record{{Paths: []string{"one.txt"}, FinalResponse: "Corrected behavior"}}}
 	}
 	cycle := &codexCycle{started: time.Now()}
 	ctx := context.WithValue(context.Background(), codexCycleKey{}, cycle)

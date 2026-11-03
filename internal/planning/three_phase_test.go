@@ -13,13 +13,22 @@ import (
 )
 
 type candidateClient struct {
-	responses []string
-	stop      string
-	err       error
-	calls     int
-	options   []llm.Options
-	messages  [][]llm.Message
-	deadline  time.Time
+	countInput func([]llm.Message, llm.Options) (int, error)
+	responses  []string
+	stop       string
+	err        error
+	calls      int
+	options    []llm.Options
+	messages   [][]llm.Message
+	deadline   time.Time
+}
+
+func (c *candidateClient) CountInputTokens(_ context.Context, messages []llm.Message, _ json.RawMessage, options llm.Options) (int, error) {
+	if c.countInput != nil {
+		return c.countInput(messages, options)
+	}
+	// Synthetic token counts for unit tests; never a production estimator.
+	return requiredHarness004Size(messages) - 4096, nil
 }
 
 func (c *candidateClient) Chat(context.Context, []llm.Message, json.RawMessage) (llm.Response, error) {
@@ -78,7 +87,7 @@ func TestThreePhaseRestoresIDsAndUsesSharedBoundedProfiles(t *testing.T) {
 		t.Fatalf("commit = %#v", commit)
 	}
 	for i, profile := range []string{"bounded-grouping", "bounded-category", "bounded-text"} {
-		if c.options[i].GenerationProfile != profile || c.options[i].ContextTokens != 16384 || c.options[i].OutputTokens != 4096 {
+		if c.options[i].GenerationProfile != profile || c.options[i].ContextTokens != contextinput.Context64K || c.options[i].OutputTokens != 4096 {
 			t.Fatalf("phase %d options = %#v", i, c.options[i])
 		}
 		if !c.options[i].LiteralNewlines {
@@ -142,27 +151,52 @@ func TestThreePhaseScopesReusableBackendToOneValidatedInvocation(t *testing.T) {
 		t.Fatal("started helper before validating input")
 	}
 }
-func TestThreePhaseScalesRawDiffContextWithinConfiguredCeiling(t *testing.T) {
+func TestThreePhaseFixed64KUsesActualCountForEveryPhase(t *testing.T) {
 	p := candidatePrepared(t)
-	p.Budget.ContextTokens = contextinput.Context32K
-	p.Document.Files[0].GroupingRawDiff = strings.Repeat("+ some changed code\n", 1000)
-	c := &candidateClient{responses: candidateResponses()}
-	result, err := (ThreePhaseGenerator{Client: c}).Generate(context.Background(), p, English, SensitiveValues{})
+	// Larger than 64K in bytes, but 12K real tokens. The former byte check
+	// rejected this input; later phases also need more than the initial 16K.
+	p.Document.Files[0].GroupingRawDiff = strings.Repeat("+ some changed code\n", 4000)
+	client := &candidateClient{responses: candidateResponses(), countInput: func(_ []llm.Message, o llm.Options) (int, error) {
+		if o.GenerationProfile == "bounded-grouping" {
+			return 12000, nil
+		}
+		return 30000, nil
+	}}
+	result, err := (ThreePhaseGenerator{Client: client}).Generate(context.Background(), p, English, SensitiveValues{})
 	if err != nil || result.Calls != 3 {
-		t.Fatalf("adaptive grouping: result=%+v err=%v", result, err)
+		t.Fatalf("calls=%d err=%v", result.Calls, err)
 	}
-	for i, expected := range []int{contextinput.Context32K, contextinput.Context32K, contextinput.Context32K} {
-		if c.options[i].ContextTokens != expected {
-			t.Fatalf("phase %d context=%d, want %d", i, c.options[i].ContextTokens, expected)
+	for _, o := range client.options {
+		if o.ContextTokens != contextinput.Context64K {
+			t.Fatal("phase context not 64K")
 		}
 	}
-	if result.Telemetry.ContextTokens != contextinput.Context32K {
-		t.Fatalf("maximum selected context=%d", result.Telemetry.ContextTokens)
+	if result.Telemetry.ContextTokens != contextinput.Context64K {
+		t.Fatal("incorrect context telemetry")
 	}
-	p.Budget.ContextTokens = contextinput.Context16K
-	c = &candidateClient{responses: candidateResponses()}
-	if _, err := (ThreePhaseGenerator{Client: c}).Generate(context.Background(), p, English, SensitiveValues{}); (err == nil || !strings.Contains(err.Error(), contextinput.ErrTooLarge.Error())) || c.calls != 0 {
-		t.Fatalf("16k user ceiling not enforced: calls=%d err=%v", c.calls, err)
+}
+
+func TestThreePhaseStopsAtActualTokenOverflowOrCountFailure(t *testing.T) {
+	for _, profile := range []string{"bounded-grouping", "bounded-category", "bounded-text"} {
+		for _, fail := range []bool{false, true} {
+			client := &candidateClient{responses: candidateResponses(), countInput: func(_ []llm.Message, o llm.Options) (int, error) {
+				if o.GenerationProfile == profile {
+					if fail {
+						return 0, errors.New("tokenizer unavailable")
+					}
+					return 61441, nil
+				}
+				return 1000, nil
+			}}
+			result, err := (ThreePhaseGenerator{Client: client}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
+			if err == nil || len(result.Plan.Commits) != 0 {
+				t.Fatal("count failure/overflow accepted")
+			}
+			want := map[string]int{"bounded-grouping": 0, "bounded-category": 1, "bounded-text": 2}[profile]
+			if client.calls != want {
+				t.Fatalf("calls=%d want=%d", client.calls, want)
+			}
+		}
 	}
 }
 
@@ -215,7 +249,7 @@ func TestThreePhaseHostWitnessCannotBeIgnored(t *testing.T) {
 	}
 }
 func TestThreePhaseRejectsUnsupportedInputBeforeGeneration(t *testing.T) {
-	for _, name := range []string{"size", "context", "compression", "prompt", "cancelled"} {
+	for _, name := range []string{"size", "compression", "prompt", "cancelled"} {
 		t.Run(name, func(t *testing.T) {
 			p := candidatePrepared(t)
 			ctx := context.Background()
@@ -232,7 +266,7 @@ func TestThreePhaseRejectsUnsupportedInputBeforeGeneration(t *testing.T) {
 			case "compression":
 				p.SummaryCount = 1
 			case "prompt":
-				p.Document.Files[0].GroupingRawDiff = strings.Repeat("x", 16384)
+				p.Document.Files[0].GroupingRawDiff = strings.Repeat("x", 65536)
 				p.Prompt, _ = Renderer(English)(p.Document)
 			case "cancelled":
 				var cancel context.CancelFunc

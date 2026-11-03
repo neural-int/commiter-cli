@@ -10,6 +10,7 @@
   "output_tokens_per_phase": 4096,
   "context_selection": "smallest 16K/32K/64K tier fitting the first phase within the prepared budget; frozen for the cycle; later overflow fails closed",
   "input_layout": "harness004",
+  "history_text_policy": "final responses only; user requests are not retained in the collector projection or model display; missing, unsafe or over-budget final responses omit the record",
   "thinking": false,
   "output_constraint": "json_schema",
   "kv": "native",

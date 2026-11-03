@@ -1,3 +1,5 @@
+> 現行のコンテキスト・prefill方針は[revision 3](H184-HARNESS-004-r3.json)と[実token判定の記録](actual-token-context.md)を参照。以下の16K/32K/64K選択・legacy保護の説明と既存の測定表はrevision 2時点の記録である。
+
 # H184-HARNESS-004 / revision 2 の3-Phase接続
 
 004の混合配置・型別KV prefix再利用をThreePhaseGeneratorに接続する。履歴的なrevision 1の記録は書き換えず、[revision 2](H184-HARNESS-004-r2.json)で実装条件を区別する。本書はローカル実装・検証の記録であり、mainへのマージやCI成功の記録ではない。
@@ -26,13 +28,15 @@
 2. Category: 分類規則を含むsystem、履歴、フェーズ指示・Schema・グループ内の完全なファイル差分。
 3. Text: Groupingと同一の先頭2メッセージ、フェーズ指示・Schema・確定した所属/type/breakingとファイル参照。
 
-表示からだけtask/schema_version、空のuser_requests、block_id/execution_ref等を省く。ホストの元データと出力検証は保持する。Schemaの辞書キーは自然順で整列し、配列の意味的な順序は保持する。raw_diffのヘッダー・hunk・追加削除記号は残す。実改行化はGoのMLX BackendでLLM用本文だけに適用し、Go–Swiftの外側の通信は正規のJSONを維持する。生成時のPython Proxyは不要。
+表示からだけtask/schema_version、user_requests（非空でも省略）、block_id/execution_ref等を省く。保存fixtureの元データと出力検証は保持する。Schemaの辞書キーは自然順で整列し、配列の意味的な順序は保持する。raw_diffのヘッダー・hunk・追加削除記号は残す。実改行化はGoのMLX BackendでLLM用本文だけに適用し、Go–Swiftの外側の通信は正規のJSONを維持する。生成時のPython Proxyは不要。
 
 固定Text指示には、48文字以内で具体的かつ完結した文を選び、非本質的な識別子を省き、識別子や句の途中で終わらせないよう記す。48文字のSchema上限を緩める変更ではない。この指示の採用と、意味品質が実験で改善したこととは区別する。
 
 helperは最初の共通チャット部分を同じtokenizer/templateで処理し、実際の入力token列と先頭から一致する範囲だけを保存する。Grouping用とText用のキャッシュは独立コピーとし、Categoryは独立prefillする。再利用条件はモデル・設定・token列の一致。型の選択は実キャッシュ型を基準とし、未対応型や不一致は通常prefillへ戻る。現在の有効化対象はmanifestのSHA固定Qwen/Gemmaだけである。
 
 通常経路の履歴供給は、既存の任意`codex_context`とパス関連付けを維持する。研究fixtureの`agent_history_contexts`を使う内容照合PoC全体を本番へ移植したという意味ではない。取得や内容照合は本変更の測定範囲外であり、対応関係を推測で補完しない。
+
+2026-11-03のユーザー指示により、履歴本文はfinal-onlyへ変更した。旧CollectorとPlannerの「依頼必須・最終応答を先に省略」という規則を削除し、安全な非空の最終応答だけを保持する。収まらない最終応答は記録全体を除外し、依頼へのフォールバックはしない。旧取得経路と004の完全な契約との差は[整合性監査](004-production-alignment-audit.md)に記録した。取得経路・64K固定・実token計数まで整備済みと扱わない。
 
 ## 保存fixtureの準備・実行
 

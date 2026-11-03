@@ -83,27 +83,23 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 	if supplement != "" {
 		renderer = supplementRenderer(renderer, supplement)
 	}
-	prepared, err := contextinput.Prepare(ctx, document, contextinput.BudgetConfig{
-		Context: values.Context, MaxContextTokens: values.MaxTokens, PromptOverheadBytes: len(systemMessage),
-		RequireUncompressed: values.Planner == config.CandidatePlanner,
-	}, renderer, nil)
+	var prepared contextinput.Prepared
+	if values.Planner == config.CandidatePlanner {
+		// Harness004 measures the final template with the model's tokenizer.
+		// Do not reject or reduce input using the old renderer's byte estimate.
+		prompt, renderErr := renderer(document)
+		err = renderErr
+		prepared = contextinput.Prepared{Document: document, Prompt: prompt,
+			Budget:       contextinput.Budget{ContextTokens: contextinput.Context64K, ReservedOutputTokens: 4096},
+			SummaryStage: contextinput.SummaryNone, CompressionProfile: contextinput.CompressionNone}
+	} else {
+		prepared, err = contextinput.Prepare(ctx, document, contextinput.BudgetConfig{
+			Context: values.Context, MaxContextTokens: values.MaxTokens, PromptOverheadBytes: len(systemMessage),
+		}, renderer, nil)
+	}
 	recordSummarization(recorder, prepared)
 	if err != nil {
 		return planning.Plan{}, err
-	}
-	if values.Planner == config.CandidatePlanner {
-		// Stage 1 carries raw diffs not visible in Prepare's structural prompt.
-		// Pass the configured ceiling; each phase chooses the smallest fitting tier.
-		switch values.Context {
-		case "auto":
-			prepared.Budget.ContextTokens = values.MaxTokens
-		case "16k":
-			prepared.Budget.ContextTokens = contextinput.Context16K
-		case "32k":
-			prepared.Budget.ContextTokens = contextinput.Context32K
-		case "64k":
-			prepared.Budget.ContextTokens = contextinput.Context64K
-		}
 	}
 	contextStage := fmt.Sprintf("%dk", prepared.Budget.ContextTokens/1024)
 	if values.Planner == config.CandidatePlanner {

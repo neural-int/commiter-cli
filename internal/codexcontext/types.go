@@ -13,8 +13,7 @@ const (
 // Record is the only log projection sent to the planner. Source IDs stay local.
 type Record struct {
 	Paths         []string `json:"paths"`
-	UserRequest   string   `json:"user_request"`
-	FinalResponse string   `json:"final_response,omitempty"`
+	FinalResponse string   `json:"final_response"`
 }
 
 // Target identifies a changed path in the fixed planning snapshot.

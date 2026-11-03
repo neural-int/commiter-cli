@@ -380,12 +380,12 @@ func writeTestFile(t *testing.T, path, content string) {
 	}
 }
 
-func TestThreePhaseDefaultRequiresPinnedCandidateAndMinContext(t *testing.T) {
+func TestThreePhaseDefaultRequiresPinnedCandidateWithFixedContext(t *testing.T) {
 	values := Defaults().Values
 	if values.Planner != CandidatePlanner || values.Model != CandidateModel || values.ModelRevision != CandidateRevision || values.ModelQuantization != "4bit" {
 		t.Fatalf("candidate defaults = %#v", values)
 	}
-	for _, field := range []string{"model", "revision", "quantization", "backend", "context"} {
+	for _, field := range []string{"model", "revision", "quantization", "backend"} {
 		t.Run(field, func(t *testing.T) {
 			changed := values
 			switch field {
@@ -406,7 +406,10 @@ func TestThreePhaseDefaultRequiresPinnedCandidateAndMinContext(t *testing.T) {
 			}
 		})
 	}
-	for _, ceiling := range []struct{ context string; max int }{{"16k", 16384}, {"32k", 32768}, {"64k", 65536}, {"auto", 32768}} {
+	for _, ceiling := range []struct {
+		context string
+		max     int
+	}{{"8k", 8192}, {"16k", 16384}, {"32k", 32768}, {"64k", 65536}, {"auto", 32768}} {
 		changed := values
 		changed.Context, changed.MaxTokens = ceiling.context, ceiling.max
 		if err := validateValues(changed, t.TempDir()); err != nil {

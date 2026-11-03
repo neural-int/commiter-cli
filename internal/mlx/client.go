@@ -61,6 +61,7 @@ func (reason StopReason) valid() bool {
 // Request is the complete helper input. Message content is sent only through
 // the child's stdin; this package never writes it to logs or diagnostics.
 type Request struct {
+	CountOnly     bool            `json:"count_only,omitempty"`
 	Schema        json.RawMessage `json:"schema"`
 	Messages      []llm.Message   `json:"messages"`
 	ContextTokens int             `json:"context_tokens"`
@@ -77,6 +78,7 @@ type Request struct {
 // Response is the machine-readable helper output. GeneratedJSON is accepted
 // by a caller only when StopReason is StopReasonCompleted.
 type Response struct {
+	InputTokens       *int            `json:"input_tokens,omitempty"`
 	BenchmarkMetrics  json.RawMessage `json:"benchmark_metrics,omitempty"`
 	OK                bool            `json:"ok"`
 	StopReason        StopReason      `json:"stop_reason"`
@@ -260,7 +262,13 @@ func (client *Client) Generate(ctx context.Context, request Request) (Response, 
 	if !response.OK || response.StopReason != StopReasonCompleted {
 		return response, &Error{Kind: FailureStopState, StopReason: response.StopReason}
 	}
-	if strings.TrimSpace(response.GeneratedJSON) == "" {
+	if request.CountOnly {
+		if response.InputTokens == nil || *response.InputTokens < 0 || response.GeneratedJSON != "" {
+			return response, &Error{Kind: FailureProtocol}
+		}
+		return response, nil
+	}
+	if strings.TrimSpace(response.GeneratedJSON) == "" || response.InputTokens != nil {
 		return response, &Error{Kind: FailureProtocol, Cause: errors.New("completed response has no generated JSON")}
 	}
 	return response, nil

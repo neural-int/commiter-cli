@@ -95,6 +95,7 @@ private struct Request: Decodable {
     let modelPath: String?
     let generationProfile: String?
     let inputLayout: String?
+    let countOnly: Bool
 
     enum CodingKeys: String, CodingKey {
         case schema
@@ -105,6 +106,7 @@ private struct Request: Decodable {
         case modelPath = "model_path"
         case generationProfile = "generation_profile"
         case inputLayout = "input_layout"
+        case countOnly = "count_only"
     }
 
     init(from decoder: Swift.Decoder) throws {
@@ -117,6 +119,8 @@ private struct Request: Decodable {
         modelPath = try container.decodeIfPresent(String.self, forKey: .modelPath)
         generationProfile = try container.decodeIfPresent(String.self, forKey: .generationProfile)
         inputLayout = try container.decodeIfPresent(String.self, forKey: .inputLayout)
+        countOnly = try container.decodeIfPresent(Bool.self, forKey: .countOnly) ?? false
+        guard !countOnly || inputLayout == "harness004" else { throw HelperError.malformedRequest }
         guard inputLayout == nil || (inputLayout == "harness004" && generationProfile != nil) else { throw HelperError.malformedRequest }
         guard !messages.isEmpty, contextTokens >= 0, outputTokens >= 0 else {
             throw HelperError.malformedRequest
@@ -133,6 +137,7 @@ private struct Response: Encodable {
     let errorClass: String?
     var generationProfile: String? = nil
     var benchmarkMetrics: BenchmarkMetrics? = nil
+    var inputTokens: Int? = nil
 
     enum CodingKeys: String, CodingKey {
         case ok
@@ -143,6 +148,7 @@ private struct Response: Encodable {
         case errorClass = "error_class"
         case generationProfile = "generation_profile"
         case benchmarkMetrics = "benchmark_metrics"
+        case inputTokens = "input_tokens"
     }
 }
 
@@ -665,12 +671,13 @@ struct CommiterMLXHelper {
             return Response(
                 ok: true,
                 stopReason: .completed,
-                generatedJSON: generated,
+                generatedJSON: request.countOnly ? nil : generated,
                 model: modelID,
                 runtime: "mlx",
                 errorClass: nil,
                 generationProfile: request.generationProfile,
-                benchmarkMetrics: benchmark?.metrics
+                benchmarkMetrics: benchmark?.metrics,
+                inputTokens: request.countOnly ? Int(generated) : nil
             )
         } catch {
             benchmark?.metrics.activeMemoryBytes = Memory.activeMemory
@@ -743,6 +750,10 @@ struct CommiterMLXHelper {
         else { input = try await context.processor.prepare(input: UserInput(chat: chat, additionalContext: templateContext)) }
         benchmark?.metrics.prepareSeconds = ProcessInfo.processInfo.systemUptime - prepareStart
         benchmark?.metrics.inputTokens = input.text.tokens.size
+        // Same final chat template as generation, but no grammar, prefill, KV
+        // snapshot, sampling or phase advancement. Oversized candidates may be
+        // counted so the host can omit optional history before generation.
+        if request.countOnly { return String(input.text.tokens.size) }
         if benchmark?.auditOnly == true {
             var audit: [String: Any] = ["token_ids": input.text.tokens.asArray(Int.self), "enable_thinking": nativeLimit > 0]
             if let research {
@@ -855,10 +866,12 @@ struct CommiterMLXHelper {
                 benchmark?.metrics.requestedKVBits = bits
             }
         }
-        let prefillPolicy = request.inputLayout == "harness004" ? "legacy" : (ProcessInfo.processInfo.environment["COMMITER_184_PREFILL_POLICY"] ?? "adaptive8k")
-        guard ["adaptive8k", "legacy", "diagnostic-off", "diagnostic-sync-only"].contains(prefillPolicy),
+        let prefillPolicy = request.inputLayout == "harness004" ? "actual12k" : (ProcessInfo.processInfo.environment["COMMITER_184_PREFILL_POLICY"] ?? "adaptive8k")
+        guard ["actual12k", "adaptive8k", "legacy", "diagnostic-off", "diagnostic-sync-only"].contains(prefillPolicy),
               !prefillPolicy.hasPrefix("diagnostic-") || (benchmark != nil && research != nil) else { throw HelperError.malformedRequest }
-        let protectPrefill = prefillPolicy != "diagnostic-off" && request.contextTokens > 16384 && (["legacy", "diagnostic-sync-only"].contains(prefillPolicy) || input.text.tokens.size > 8192)
+        let protectPrefill = request.inputLayout == "harness004"
+            ? PrefillProtection.enabled(inputTokens: input.text.tokens.size)
+            : prefillPolicy != "diagnostic-off" && request.contextTokens > 16384 && (["legacy", "diagnostic-sync-only"].contains(prefillPolicy) || input.text.tokens.size > 8192)
         let clearPrefillCache = protectPrefill && prefillPolicy != "diagnostic-sync-only"
         benchmark?.metrics.prefillProtectionEnabled = protectPrefill
         benchmark?.metrics.prefillSynchronizationEnabled = protectPrefill
@@ -918,7 +931,7 @@ struct CommiterMLXHelper {
         }
         if request.inputLayout == "harness004", kvBits == nil, let benchmark {
             let tokens = input.text.tokens.asArray(Int.self)
-            let identity = "\(modelName)|\(request.modelPath ?? "")|\(request.contextTokens)|\(budget)|native|004-r2"
+            let identity = "\(modelName)|\(request.modelPath ?? "")|\(request.contextTokens)|\(budget)|native|004-r3"
             let verified: Set<String> = ["KVCacheSimple", "RotatingKVCache", "MambaCache"]
             if profile == "bounded-text", let snapshot = benchmark.typedPrefixSnapshot,
                let fork = snapshot.fork(tokens: tokens, identity: identity) {
@@ -941,8 +954,10 @@ struct CommiterMLXHelper {
                         let end = min(start+512, count)
                         _ = context.model(MLXArray(Array(tokens[start..<end])).expandedDimensions(axis: 0), cache: cache)
                         eval(cache)
-                        Stream().synchronize()
-                        Memory.clearCache()
+                        if protectPrefill {
+                            Stream().synchronize()
+                            Memory.clearCache()
+                        }
                     }
                     benchmark.metrics.prefixPrefillSeconds = ProcessInfo.processInfo.systemUptime - started
                     benchmark.typedPrefixSnapshot = PrefixCacheSnapshot(tokens: Array(tokens.prefix(count)), identity: identity, caches: cache, verifiedTypes: verified)
@@ -1122,7 +1137,7 @@ struct CommiterMLXHelper {
                 state.metrics = BenchmarkMetrics()
                 let response = try await handle(request, benchmark: state)
                 try writeResponse(response)
-                count += 1
+                if !request.countOnly { count += 1 }
                 if !response.ok || mode == "--benchmark-single" || count == profiles.count { return }
             }
         } catch {

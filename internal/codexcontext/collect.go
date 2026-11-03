@@ -37,10 +37,6 @@ type turn struct {
 type item struct {
 	ID      string `json:"id"`
 	Type    string `json:"type"`
-	Content []struct {
-		Type string `json:"type"`
-		Text string `json:"text"`
-	} `json:"content"`
 	Text    string `json:"text"`
 	Phase   string `json:"phase"`
 	Status  string `json:"status"`
@@ -225,15 +221,6 @@ func readTurn(client caller, root, sessionCwd, threadID string, tr turn, targets
 			}
 			seenItems[it.ID] = true
 			switch it.Type {
-			case "userMessage":
-				for _, part := range it.Content {
-					if part.Type == "text" {
-						if obs.record.UserRequest != "" {
-							obs.record.UserRequest += "\n"
-						}
-						obs.record.UserRequest += part.Text
-					}
-				}
 			case "agentMessage":
 				if it.Phase == "final_answer" {
 					obs.record.FinalResponse = it.Text
@@ -270,11 +257,8 @@ func readTurn(client caller, root, sessionCwd, threadID string, tr turn, targets
 		}
 		seenCursors[cursor] = true
 	}
-	if unsafe || len(paths) == 0 || strings.TrimSpace(obs.record.UserRequest) == "" || !request.SafeText(obs.record.UserRequest) {
+	if unsafe || len(paths) == 0 || strings.TrimSpace(obs.record.FinalResponse) == "" || !request.SafeText(obs.record.FinalResponse) {
 		return nil, true
-	}
-	if !request.SafeText(obs.record.FinalResponse) {
-		obs.record.FinalResponse = ""
 	}
 	for path := range paths {
 		obs.record.Paths = append(obs.record.Paths, path)
@@ -290,11 +274,6 @@ func selectRecords(observations []observation) Result {
 		record := obs.record
 		candidate := append(append([]Record(nil), records...), record)
 		encoded, _ := json.Marshal(map[string]any{"codex_context": candidate})
-		if len(encoded) > MaxContextBytes {
-			record.FinalResponse = ""
-			candidate = append(append([]Record(nil), records...), record)
-			encoded, _ = json.Marshal(map[string]any{"codex_context": candidate})
-		}
 		if len(encoded) <= MaxContextBytes {
 			records = candidate
 		}

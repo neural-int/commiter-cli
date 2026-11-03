@@ -10,7 +10,7 @@ END='\nChoose values independently from the current Git evidence; enum order is 
 PHASE_INPUT='\n\nPhase input:\n'
 def prune(v):
  if isinstance(v,list):return [prune(x) for x in v]
- if isinstance(v,dict):return {k:prune(x) for k,x in v.items() if k not in {'block_id','execution_ref'} and not (k=='user_requests' and x==[])}
+ if isinstance(v,dict):return {k:prune(x) for k,x in v.items() if k not in {'block_id','execution_ref','user_requests'}}
  return v
 def describe(s,path='$',required=True):
  lines=[f'{path}: type={s["type"]}; '+('required' if required else 'optional')]

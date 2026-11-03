@@ -1,0 +1,71 @@
+{
+  "harness_id": "H184-HARNESS-004",
+  "revision": 3,
+  "status": "implemented_for_three_phase_planner_pending_main_merge",
+  "parent_record": "H184-HARNESS-004-r2.json",
+  "prompt_source": "internal/planning/prompts/harness004.json",
+  "prompt_sha256": "28ead0c5ed9a68b4a06c13fe7fcb0b2da2cfa9ee860590f59f9f12375f4c68fe",
+  "scope": "ThreePhaseGenerator only; ordinary single-pass generator unchanged",
+  "preserved_limits": {
+    "files": 4,
+    "cycle_seconds": 120,
+    "summary_characters": 48
+  },
+  "output_tokens_per_phase": 4096,
+  "context_selection": "All three phases fixed at 65536; each final template-applied prompt plus 4096 output tokens must fit. Legacy context tier settings do not select the three-phase window.",
+  "input_layout": "harness004",
+  "history_text_policy": "final responses only; user requests are not retained in the collector projection or model display; missing, unsafe or over-budget final responses omit the record",
+  "thinking": false,
+  "output_constraint": "json_schema",
+  "kv": "native",
+  "prefill_policy": "Full template-applied input >12000 tokens: synchronize and clear unused allocator cache after every prefill chunk, including common-prefix preparation. <=12000: omit these extra synchronization/reclaim calls. Retain required cache evaluation.",
+  "seed": 144,
+  "models": [
+    {
+      "id": "mlx-community/Qwen3.5-4B-4bit@0e7ffd5c629ef7719d4cbc04069232580bfa9d9c",
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "top_k": 20
+    },
+    {
+      "id": "mlx-community/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2",
+      "temperature": 1.0,
+      "top_p": 0.95,
+      "top_k": 64
+    }
+  ],
+  "prefix_reuse": {
+    "plan": "automatic token-prefix comparison, no external token plan",
+    "phases": [
+      "grouping",
+      "text"
+    ],
+    "category": "independent full prefill",
+    "cache_types": [
+      "KVCacheSimple",
+      "RotatingKVCache",
+      "MambaCache"
+    ],
+    "copy": "immutable snapshot and independent runtime copies",
+    "fallback": "unknown cache type, settings or token-prefix mismatch uses ordinary prefill"
+  },
+  "runtime_dependencies": "mlx-helper/Package.resolved; unchanged by revision 3",
+  "portable_runner": "tools/benchmark184/run004.py",
+  "verification": "actual-token-context.md",
+  "limitations": [
+    "Production retains the existing optional codex_context source and path association; this change does not connect the separate agent-history content-attribution PoC",
+    "Qwen and Gemma installed-model checks use one synthetic file, not the 7/9/11-file quality benchmark",
+    "Revision 2 is not byte-identical to historical private requests: the new 48-character instruction and natural dictionary ordering are intentional",
+    "Cache reuse is not proof of numerical or semantic equivalence; earlier Qwen Text differences remain unresolved",
+    "No CI result or main merge is asserted by this local registration",
+    "12000 is a provisional boundary; this implementation does not establish optimality or a speed/quality improvement"
+  ],
+  "input_token_counting": {
+    "operation": "count_only on the same sequential helper process before generation",
+    "coverage": "same model, literal-newline display, system/phase/schema and chat template as generation; includes reused prefix",
+    "side_effects": "no grammar preparation, prefill, sampling, prefix snapshot changes or phase advancement",
+    "failure": "stop on count failure; omit optional final-only history records that cannot fit; reject mandatory overflow",
+    "maximum_prompt_tokens": 61440,
+    "transport_limits": "unchanged; byte frame and retained-history limits remain resource bounds, not token estimates"
+  }
+}

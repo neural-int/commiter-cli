@@ -20,80 +20,36 @@ func requiredHarness004Size(messages []llm.Message) int {
 	return size
 }
 
-func TestHarness004HistoryFitsFinalMessagesAtContextCeiling(t *testing.T) {
-	for _, ceiling := range []int{contextinput.Context16K, contextinput.Context32K, contextinput.Context64K} {
-		for _, delta := range []int{-1, 0, 1} {
-			t.Run(fmt.Sprintf("%d/%+d", ceiling, delta), func(t *testing.T) {
-				p := candidatePrepared(t)
-				p.Budget.ContextTokens = ceiling
-				record := codexcontext.Record{Paths: []string{"one.go"}, UserRequest: "Correct the observed behavior", FinalResponse: strings.Repeat("result ", 300)}
-				baseline := &candidateClient{responses: candidateResponses()}
-				if _, err := (ThreePhaseGenerator{Client: baseline, CodexContext: []codexcontext.Record{record}}).Generate(context.Background(), p, English, SensitiveValues{}); err != nil {
-					t.Fatal(err)
+func TestHarness004HistoryFitsExactTokenBoundary(t *testing.T) {
+	for _, delta := range []int{-1, 0, 1} {
+		t.Run(fmt.Sprint(delta), func(t *testing.T) {
+			record := codexcontext.Record{Paths: []string{"one.go"}, FinalResponse: "Corrected the boundary"}
+			client := &candidateClient{responses: candidateResponses(), countInput: func(messages []llm.Message, options llm.Options) (int, error) {
+				if options.ContextTokens != contextinput.Context64K {
+					t.Fatal("count did not use fixed 64K")
 				}
-				// Keep mandatory evidence within budget, but put the full history just
-				// immediately below, at, or above the final Grouping message limit.
-				padding := ceiling - requiredHarness004Size(baseline.messages[0]) + delta
-				if padding <= 0 {
-					t.Fatal("invalid boundary fixture")
+				if strings.Contains(messages[1].Content, "codex_context") {
+					return 61440 + delta, nil
 				}
-				p.Document.Files[0].GroupingRawDiff += strings.Repeat("x", padding)
-				p.Prompt, _ = Renderer(English)(p.Document)
-				client := &candidateClient{responses: candidateResponses()}
-				result, err := (ThreePhaseGenerator{Client: client, CodexContext: []codexcontext.Record{record}}).Generate(context.Background(), p, English, SensitiveValues{})
-				if err != nil || result.Calls != 3 {
-					t.Fatalf("optional history prevented the three-phase cycle: calls=%d err=%v", result.Calls, err)
+				return 1000, nil
+			}}
+			result, err := (ThreePhaseGenerator{Client: client, CodexContext: []codexcontext.Record{record}}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
+			if err != nil || result.Calls != 3 {
+				t.Fatalf("calls=%d err=%v", result.Calls, err)
+			}
+			for i, messages := range client.messages {
+				retained := strings.Contains(messages[1].Content, "codex_context")
+				if retained != (delta <= 0) {
+					t.Fatalf("phase %d optional history retention=%v", i, retained)
 				}
-				var shared struct {
-					History []codexcontext.Record `json:"codex_context"`
+				if client.options[i].ContextTokens != contextinput.Context64K {
+					t.Fatal("not fixed 64K")
 				}
-				if err := json.Unmarshal([]byte(client.messages[0][1].Content), &shared); err != nil {
-					t.Fatal(err)
-				}
-				wantFinal := record.FinalResponse
-				if delta > 0 {
-					wantFinal = ""
-				}
-				if len(shared.History) != 1 || shared.History[0].UserRequest != record.UserRequest || shared.History[0].FinalResponse != wantFinal {
-					t.Fatal("history acceptance/final-response fallback differs at the boundary")
-				}
-				if client.messages[0][0] != client.messages[2][0] || client.messages[0][1] != client.messages[2][1] {
-					t.Fatal("Grouping/Text shared history or prefix differs")
-				}
-				for i, messages := range client.messages {
-					if requiredHarness004Size(messages) > client.options[i].ContextTokens || client.options[i].ContextTokens > ceiling {
-						t.Fatalf("phase %d exceeded its final message budget", i)
-					}
-				}
-			})
-		}
-	}
-}
-
-func TestHarness004OmitsHistoryWhenRequestAloneCannotFit(t *testing.T) {
-	p := candidatePrepared(t)
-	p.Budget.ContextTokens = contextinput.Context64K
-	baseline := &candidateClient{responses: candidateResponses()}
-	if _, err := (ThreePhaseGenerator{Client: baseline}).Generate(context.Background(), p, English, SensitiveValues{}); err != nil {
-		t.Fatal(err)
-	}
-	maxSize := 0
-	for _, messages := range baseline.messages {
-		if size := requiredHarness004Size(messages); size > maxSize {
-			maxSize = size
-		}
-	}
-	p.Document.Files[0].GroupingRawDiff += strings.Repeat("x", contextinput.Context64K-maxSize-32)
-	p.Prompt, _ = Renderer(English)(p.Document)
-	client := &candidateClient{responses: candidateResponses()}
-	record := codexcontext.Record{Paths: []string{"one.go"}, UserRequest: strings.Repeat("request ", 100), FinalResponse: "completed"}
-	if _, err := (ThreePhaseGenerator{Client: client, CodexContext: []codexcontext.Record{record}}).Generate(context.Background(), p, English, SensitiveValues{}); err != nil {
-		t.Fatal(err)
-	}
-	for _, messages := range client.messages {
-		if strings.Contains(messages[1].Content, "codex_context") {
-			t.Fatal("unfittable optional request was retained")
-		}
+			}
+			if client.messages[0][0] != client.messages[2][0] || client.messages[0][1] != client.messages[2][1] {
+				t.Fatal("Grouping/Text shared history differs")
+			}
+		})
 	}
 }
 

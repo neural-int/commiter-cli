@@ -102,9 +102,7 @@ func display004(v any) any {
 				continue
 			}
 			if k == "user_requests" {
-				if a, ok := x.([]any); ok && len(a) == 0 {
-					continue
-				}
+				continue
 			}
 			if k == "id" && file {
 				k = "file_id"

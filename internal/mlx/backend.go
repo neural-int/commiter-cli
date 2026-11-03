@@ -36,6 +36,12 @@ func (backend *Backend) Chat(ctx context.Context, messages []llm.Message, schema
 	return backend.ChatWithOptions(ctx, messages, schema, llm.Options{})
 }
 
+func (backend *Backend) CountInputTokens(ctx context.Context, messages []llm.Message, schema json.RawMessage, options llm.Options) (int, error) {
+	options.CountOnly = true
+	response, err := backend.ChatWithOptions(ctx, messages, schema, options)
+	return response.PromptEvalCount, err
+}
+
 func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Message, schema json.RawMessage, options llm.Options) (llm.Response, error) {
 	if backend == nil || backend.Client == nil {
 		return llm.Response{}, errors.New("MLX helper client is required")
@@ -70,11 +76,15 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 		generate = backend.session.Generate
 	}
 	response, err := generate(ctx, Request{
-		Schema: schema, Messages: messages, ContextTokens: options.ContextTokens,
+		CountOnly: options.CountOnly,
+		Schema:    schema, Messages: messages, ContextTokens: options.ContextTokens,
 		OutputTokens: options.OutputTokens, Model: model, ModelPath: backend.ModelPath,
 		GenerationProfile: options.GenerationProfile, InputLayout: options.InputLayout,
 	})
 	if err != nil {
+		if options.CountOnly {
+			return llm.Response{}, err
+		}
 		var failure *Error
 		if errors.As(err, &failure) && failure.Kind == FailureStopState && response.StopReason != StopReasonCompleted {
 			return llm.Response{Backend: "mlx", Model: response.Model, StopReason: string(response.StopReason)}, nil
@@ -84,12 +94,25 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 	if options.GenerationProfile != "" && response.GenerationProfile != options.GenerationProfile {
 		return llm.Response{}, &Error{Kind: FailureProtocol}
 	}
+	if options.CountOnly {
+		if response.InputTokens == nil || *response.InputTokens < 0 || response.GeneratedJSON != "" {
+			return llm.Response{}, &Error{Kind: FailureProtocol}
+		}
+		return llm.Response{PromptEvalCount: *response.InputTokens}, nil
+	}
 	var cache struct {
+		InputTokens       *int   `json:"inputTokens"`
 		PrefixReuseStatus string `json:"prefixReuseStatus"`
 		CacheReusedTokens int    `json:"cacheReusedTokens"`
 	}
 	_ = json.Unmarshal(response.BenchmarkMetrics, &cache)
+	inputCount := 0
+	if cache.InputTokens != nil {
+		inputCount = *cache.InputTokens
+	}
 	return llm.Response{
+		PromptEvalCount:   inputCount,
+		Availability:      llm.TelemetryAvailability{PromptEvalCount: cache.InputTokens != nil},
 		PrefixReuseStatus: cache.PrefixReuseStatus, CacheReusedTokens: cache.CacheReusedTokens,
 		Backend: "mlx", Model: response.Model, Content: response.GeneratedJSON,
 		StopReason: string(response.StopReason),

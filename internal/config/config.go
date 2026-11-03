@@ -420,9 +420,8 @@ func validateValues(v Values, repoRoot string) error {
 		if v.Backend != "mlx" || v.Model != CandidateModel || v.ModelRevision != CandidateRevision || v.ModelQuantization != "4bit" {
 			return fmt.Errorf("three-phase planner requires the pinned Gemma MLX 4bit candidate; use single-pass for another model or backend")
 		}
-		if v.Context == "8k" || (v.Context == "auto" && v.MaxTokens < 16384) {
-			return fmt.Errorf("three-phase planner requires a context ceiling of at least 16k")
-		}
+		// Harness004 always requests 64K. Context tiers remain settings for the
+		// legacy planner, not admission estimates for three-phase input.
 	}
 	if err := validateEndpoint(v.Endpoint); err != nil {
 		return err

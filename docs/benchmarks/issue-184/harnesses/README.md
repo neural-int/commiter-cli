@@ -92,3 +92,10 @@ COMMITER_184_PREFIX_PLANへprivate JSON planを指定する。tokens、profiles�
 revision 1は過去の研究条件として保持する。ユーザー指定に従い、004の固定指示・混合配置・型別prefix再利用をThreePhaseGeneratorへ接続した[revision 2](H184-HARNESS-004-r2.json)を追加する。通常の4ファイル上限・120秒制限とsummary48文字上限は維持する。単一呼び出しの旧Generatorは変更しない。各4096出力、自然順Schema、48文字内で完結する新Text指示を反映した。固定指示は公開コードで管理し、private要求や外部prefix planを本番の前提にしない。
 
 [接続仕様・再実行手順・ローカル検証結果](production-integration.md)を参照。準備専用のrunnerは推論前にvalidatorの実行権限と正常・異常計画を検査する。新revisionの多ファイル意味品質・速度改善、CI成功、mainマージは別の確認事項として残す。
+
+2026-11-03の指示で履歴本文をfinal-onlyへ変更した。現在の004表示では非空のuser_requestsも省き、旧Collectorにも依頼必須・最終応答優先省略の規則を残さない。上記003/revision 1の「非空依頼は保持」は当時の条件として保存する。通常経路に残る旧仕様・未接続項目・最新相談案との区別は[004整合性監査](004-production-alignment-audit.md)を参照。
+
+
+## H184-HARNESS-004 / revision 3
+
+[manifest](H184-HARNESS-004-r3.json)・[変更と検証](actual-token-context.md)。3フェーズ64K固定、同一helperで最終表示の実token計数、入力全体が12,000 tokensを超えた場合の毎chunk保護を採用する。旧revision・32Kでの測定記録は保存する。通常Plannerの4ファイル・120秒、summary48文字、各phase出力4096とsamplingは維持する。旧Planner廃止などの別スコープはIssue #187へ分離している。

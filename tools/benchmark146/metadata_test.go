@@ -15,12 +15,20 @@ import (
 )
 
 type fixtureBackend struct {
+	InputTokens    int
 	Fixture        fixture
 	Profiles       []string
 	Deadline       time.Time
 	Invalid        string
 	MetadataGroups [][]string
 	Requests       []phaseRequest
+}
+
+func (b *fixtureBackend) CountInputTokens(context.Context, []llm.Message, json.RawMessage, llm.Options) (int, error) {
+	if b.InputTokens > 0 {
+		return b.InputTokens, nil
+	}
+	return 1000, nil
 }
 
 func (b *fixtureBackend) Chat(context.Context, []llm.Message, json.RawMessage) (llm.Response, error) {
@@ -139,7 +147,7 @@ func TestMetadataFailureNeverReturnsPartialPlan(t *testing.T) {
 func TestOverflowAndCancellationStopBeforeBackend(t *testing.T) {
 	f := fixtures()[0]
 	f.Files[0].RawDiff = strings.Repeat("x", 16384)
-	b := &fixtureBackend{Fixture: f}
+	b := &fixtureBackend{Fixture: f, InputTokens: 61441}
 	o := run(context.Background(), f, "bridge", "mock", b, 48, time.Second, true)
 	if !o.Unresolved || len(b.Profiles) > 0 || o.PlanSucceeded {
 		t.Fatalf("overflow not closed: %+v", o)

@@ -60,6 +60,8 @@ type ChatResponse = Response
 
 // Options contains provider-neutral generation limits.
 type Options struct {
+	// CountOnly prepares the final chat template without prefill or generation.
+	CountOnly     bool
 	ContextTokens int
 	OutputTokens  int
 	// GenerationProfile selects an explicitly supported bounded generation contract.
@@ -100,6 +102,11 @@ type Backend interface {
 type OptionsBackend interface {
 	Backend
 	ChatWithOptions(context.Context, []Message, json.RawMessage, Options) (Response, error)
+}
+
+// InputTokenCounter counts the same rendered/template-applied input as generation.
+type InputTokenCounter interface {
+	CountInputTokens(context.Context, []Message, json.RawMessage, Options) (int, error)
 }
 
 // Retryable marks a backend error that is safe to retry once.

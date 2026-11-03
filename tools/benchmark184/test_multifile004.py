@@ -1,6 +1,9 @@
 import unittest
 from multifile004 import prune,describe,load_templates,NEW_SUMMARY_INSTRUCTION
 class ProjectionTests(unittest.TestCase):
+ def test_nonempty_requests_are_display_only_omissions(self):
+  source={'user_requests':['past request'],'final_responses':['completed work']};display=prune(source)
+  self.assertNotIn('user_requests',display);self.assertEqual(source['user_requests'],['past request']);self.assertEqual(display['final_responses'],['completed work'])
  def test_host_unchanged_and_uncertainty_preserved(self):
   source={'block_id':'B1','execution_ref':'S1','user_requests':[],'raw_diff':'@@\n-a\n+b\n','agent_history_match_status':'ambiguous','agent_history_candidates':[{'context_ref':'H1','match':'exact'}]};result=prune(source)
   self.assertIn('block_id',source);self.assertNotIn('block_id',result);self.assertEqual(result['raw_diff'],source['raw_diff']);self.assertEqual(result['agent_history_match_status'],'ambiguous');self.assertEqual(result['agent_history_candidates'],source['agent_history_candidates'])

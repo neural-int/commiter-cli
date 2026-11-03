@@ -89,9 +89,6 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 	if !ok {
 		return result, errors.New("three-phase planner requires explicit generation-profile support")
 	}
-	if prepared.Budget.ContextTokens != contextinput.Context16K && prepared.Budget.ContextTokens != contextinput.Context32K && prepared.Budget.ContextTokens != contextinput.Context64K {
-		return result, errors.New("three-phase planner requires a supported context ceiling (16k, 32k, or 64k)")
-	}
 	if prepared.SummaryCount != 0 || prepared.EvidenceReductionCount != 0 || prepared.CompressionProfile != contextinput.CompressionNone {
 		return result, exitcode.New(exitcode.LLM, "provisional three-phase planner does not support compressed input")
 	}
@@ -161,7 +158,10 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 		evidenceByID[e.ID] = e
 	}
 	var common004 map[string]any
-	cycleContext := 0
+	counter, ok := client.(llm.InputTokenCounter)
+	if !ok {
+		return result, errors.New("three-phase planner requires exact input token counting")
+	}
 	invoke := func(system string, payload any, schema any, profile string, budget int, output any) error {
 		if ctx.Err() != nil {
 			return generationError([]Violation{IncompleteOutput})
@@ -174,50 +174,63 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 		if e != nil {
 			return errors.New("cannot encode candidate schema")
 		}
-		requiredSize := func(messages []llm.Message) int {
-			size := contextinput.TemplateReserve + budget
-			for _, message := range messages {
-				size += len(message.Content)
+		options := llm.Options{ContextTokens: contextinput.Context64K, OutputTokens: budget, GenerationProfile: profile, LiteralNewlines: true, InputLayout: "harness004"}
+		// Count exactly the display and chat template used for generation. This
+		// reuses the same helper/tokenizer, without inference or cache mutation.
+		counts := map[string]int{}
+		countInput := func(candidate []byte, common *map[string]any) ([]llm.Message, int, error) {
+			messages, err := harness004Messages(profile, candidate, shape, common)
+			if err != nil {
+				return nil, 0, err
 			}
-			return size
+			key, _ := json.Marshal(messages)
+			if count, found := counts[string(key)]; found {
+				return messages, count, nil
+			}
+			count, err := counter.CountInputTokens(ctx, messages, shape, options)
+			if err != nil {
+				return nil, 0, err
+			}
+			if count < 0 {
+				return nil, 0, errors.New("invalid input token count")
+			}
+			counts[string(key)] = count
+			return messages, count, nil
 		}
-		// Trial projection must not replace the Grouping snapshot. Compare the
-		// complete final contract against the prepared ceiling before choosing
-		// the smallest context tier, preserving the existing history policy.
 		records := g.CodexContext
 		if profile == "bounded-text" {
-			// Text uses Grouping's frozen shared history, not a new selection.
 			records = nil
-		}
+		} // Grouping's frozen history.
+		var countErr error
 		encoded, _ = addCodexContextWithFit(payload, records, files, sensitive, encoded, system, func(candidate []byte) bool {
+			if countErr != nil {
+				return false
+			}
 			trialCommon := common004
-			messages, err := harness004Messages(profile, candidate, shape, &trialCommon)
-			return err == nil && requiredSize(messages) <= prepared.Budget.ContextTokens
+			_, count, err := countInput(candidate, &trialCommon)
+			if err != nil {
+				countErr = err
+				return false
+			}
+			return count <= contextinput.Context64K-budget
 		})
-		messages, e := harness004Messages(profile, encoded, shape, &common004)
+		if countErr != nil {
+			return countErr
+		}
+		messages, count, e := countInput(encoded, &common004)
 		if e != nil {
 			return e
 		}
-		// Exact tokenized prompt+output is additionally checked by the helper.
-		requiredTokens := requiredSize(messages)
-		if cycleContext == 0 {
-			for _, tier := range []int{contextinput.Context16K, contextinput.Context32K, contextinput.Context64K} {
-				if tier <= prepared.Budget.ContextTokens && requiredTokens <= tier {
-					cycleContext = tier
-					break
-				}
-			}
-		}
-		contextTokens := cycleContext
-		if contextTokens == 0 || requiredTokens > contextTokens {
+		if count > contextinput.Context64K-budget {
 			return contextinput.ErrTooLarge
 		}
+		contextTokens := contextinput.Context64K
 
 		result.Calls++
 		if contextTokens > result.Telemetry.ContextTokens {
 			result.Telemetry.ContextTokens = contextTokens
 		}
-		response, e := client.ChatWithOptions(ctx, messages, shape, llm.Options{ContextTokens: contextTokens, OutputTokens: budget, GenerationProfile: profile, LiteralNewlines: true, InputLayout: "harness004"})
+		response, e := client.ChatWithOptions(ctx, messages, shape, options)
 		if e != nil {
 			return generationError(nil)
 		}

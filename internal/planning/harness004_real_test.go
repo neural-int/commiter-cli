@@ -3,6 +3,7 @@ package planning
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/natsuki0413/commiter-cli/internal/llm"
 	"github.com/natsuki0413/commiter-cli/internal/mlx"
 	"os"
@@ -12,11 +13,23 @@ import (
 
 type observed004 struct {
 	llm.OptionsBackend
-	rows *[]llm.Response
+	rows   *[]llm.Response
+	counts map[string]int
+}
+
+func (o observed004) CountInputTokens(c context.Context, m []llm.Message, s json.RawMessage, p llm.Options) (int, error) {
+	n, err := o.OptionsBackend.(llm.InputTokenCounter).CountInputTokens(c, m, s, p)
+	if err == nil {
+		o.counts[p.GenerationProfile] = n
+	}
+	return n, err
 }
 
 func (o observed004) ChatWithOptions(c context.Context, m []llm.Message, s json.RawMessage, p llm.Options) (llm.Response, error) {
 	r, e := o.OptionsBackend.ChatWithOptions(c, m, s, p)
+	if e == nil && (!r.Availability.PromptEvalCount || r.PromptEvalCount != o.counts[p.GenerationProfile]) {
+		return r, fmt.Errorf("counted input %d differs from generated input %d", o.counts[p.GenerationProfile], r.PromptEvalCount)
+	}
 	*o.rows = append(*o.rows, r)
 	return r, e
 }
@@ -37,7 +50,7 @@ func (o observed004Cycle) BeginCycle(c context.Context) (llm.OptionsBackend, fun
 	if e != nil {
 		return nil, nil, e
 	}
-	return observed004{b, o.rows}, close, nil
+	return observed004{b, o.rows, map[string]int{}}, close, nil
 }
 
 // Explicit installed assets only: never downloads weights or mutates a Git repository.
@@ -70,4 +83,7 @@ func TestHarness004InstalledModelCycle(t *testing.T) {
 		t.Fatalf("cycle/prefix contract: calls=%d statuses=%v/%v/%v reused=%d", r.Calls, rows[0].PrefixReuseStatus, rows[1].PrefixReuseStatus, rows[2].PrefixReuseStatus, rows[2].CacheReusedTokens)
 	}
 	t.Logf("three phase final validator accepted; Text reused %d tokens", rows[2].CacheReusedTokens)
+	for i, row := range rows {
+		t.Logf("phase %d actual input tokens=%d", i+1, row.PromptEvalCount)
+	}
 }
