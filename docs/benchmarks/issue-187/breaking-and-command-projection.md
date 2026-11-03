@@ -1,0 +1,27 @@
+# PR #188: 通常経路のbreakingとcommand投影の保護
+
+基点: `cf980914`。確認日: 2026-11-04。
+
+## 通常CLIのbreaking
+
+変更前は、ホストの確認済み証拠を手動注入しなければCategoryの参照enumはnone/unresolvedだけだった。手動Evidenceなしの回帰テストで、Git変更を根拠としたbreaking参照が拒否されることを再現した。
+
+通常のThreePhaseGenerator自身が、固定した現在Git差分の各変更ブロックから入力内参照git:F番号:B番号を構築する。候補のFactは対象パスとraw_diffの行範囲を示し、差分本文は既に渡しているファイルデータから参照する。差分を二重に複製せず、依頼本文・履歴・モデル出力から根拠を作らない。各候補はホストのファイルIDに結び付け、Categoryへ渡す際には可視IDへ変換する。
+
+これは「観測した変更」であって「非互換性の確認済み証拠」ではない。Categoryが差分に公開API・CLI・設定・保存形式の非互換性を認めた場合に選択する。非破壊ならnone、根拠が足りなければunresolvedを選べる。ホストが既に確認したEvidenceのnone禁止は維持し、自動候補との区別を保つ。git:は自動候補の予約接頭辞とする。
+
+Categoryの参照は対象グループに属するものだけを許可し、架空参照・他グループの参照・unresolvedは停止する。Textには確定type/breakingを渡し、候補・Factは再送しない。ブロックを持たないopaque等に架空の根拠は作らない。
+
+実Gitに公開CLIオプションの削除を用意し、generateCommitPlanから模擬helperを通すテストでbreaking/nonbreakingの完了と、unresolved/架空参照での停止を確認した。モデル資産とhelper応答・任意履歴だけを模擬し、Evidenceは手動注入していない。モデルが意味的に正しく分類することまで保証する実モデル評価ではない。
+
+Categoryの動的参照enumと指示が増えるため、過去の保存測定と同一入力とは扱わない。過去fixture・要求・応答・測定値を変更せず、今回の指示での意味品質・性能比較は未実施。
+
+## commandExecution投影
+
+CollectからappendCommandContextsContextへ同じcontextとメモリ保護を渡し、uniqueHistorySourcesContextを使う。Turn・コマンドの検証と投影、安全性検査後、パス言及の候補探索内でmatchingCheckpointを呼ぶ。停止はCollectへ返し、途中結果を正常な履歴として返さない。メモリ監視による停止理由も保持する。
+
+500件の合成コマンドを使い、検証中と投影中それぞれのキャンセル・メモリ上限停止を、処理内のチェックポイント／安全性callbackで決定的に発生させる。既存の重複排除・競合検出・安全性・パス言及のみという規則と、Grouping限定の投影を維持する。
+
+## 最終検証
+
+Go全体テスト、go vet、CLIビルド、履歴取得・Planner・CLIのrace検査、差分検査、prompt JSONと公開資料の個人パス検査が成功した。実モデル再生成と今回のremote CIは未実施。変更はローカルで、commit・push・PR更新は行っていない。

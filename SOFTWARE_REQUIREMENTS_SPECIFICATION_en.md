@@ -384,6 +384,8 @@ The output schema must have the following form:
 
 `breaking` is boolean. It may be true only when the diff explains an incompatible change to a public API, CLI, configuration format, or stored format. Ordinary UI changes and internal refactors alone must not set `breaking=true`. When true, `!` is appended after the scope in the subject.
 
+The normal path derives evidence references from fixed Git change blocks for Category to assess incompatibility. Observed changes are distinct from confirmed breaking witnesses and do not force breaking merely by existing. References are restricted to their finalized groups; Text receives finalized values only.
+
 `perf` may be used only when performance improvement is the purpose of the change and performance evidence is present in the diff or corresponding verification. Structural changes such as JSX cleanup or responsibility moves without performance evidence must use `refactor`.
 
 `summary` must be a single line. Commit bodies, multiline summaries, unassigned file IDs, and duplicate file IDs are not allowed.

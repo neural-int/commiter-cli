@@ -1,6 +1,7 @@
 package historyattribution
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"path/filepath"
@@ -14,15 +15,26 @@ type commandHistoryContext struct{}
 
 // Literal path mentions are neither shell interpretation nor edit evidence.
 func mentionedPaths(root, cwd, command string, targets map[string]bool) []string {
+	paths, _ := mentionedPathsContext(context.Background(), root, cwd, command, targets)
+	return paths
+}
+func mentionedPathsContext(ctx context.Context, root, cwd, command string, targets map[string]bool) ([]string, error) {
 	paths := []string{}
 	for path := range targets {
+		if err := matchingCheckpoint(ctx); err != nil {
+			return nil, err
+		}
 		variants := []string{filepath.Join(root, filepath.FromSlash(path))}
 		if cwd != "" && filepath.Clean(cwd) == filepath.Clean(root) {
 			variants = append(variants, path, "./"+path)
 		}
 		found := false
 		for _, v := range variants {
-			if pathMention(command, v) {
+			matched, err := pathMentionContext(ctx, command, v)
+			if err != nil {
+				return nil, err
+			}
+			if matched {
 				found = true
 				break
 			}
@@ -32,23 +44,30 @@ func mentionedPaths(root, cwd, command string, targets map[string]bool) []string
 		}
 	}
 	sort.Strings(paths)
-	return paths
+	return paths, nil
 }
 func pathMention(command, path string) bool {
+	matched, _ := pathMentionContext(context.Background(), command, path)
+	return matched
+}
+func pathMentionContext(ctx context.Context, command, path string) (bool, error) {
 	boundary := func(b byte) bool { return strings.ContainsRune(" \t\r\n\"'`=;|&(){}<>", rune(b)) }
 	for offset := 0; offset < len(command); {
+		if err := matchingCheckpoint(ctx); err != nil {
+			return false, err
+		}
 		index := strings.Index(command[offset:], path)
 		if index < 0 {
-			return false
+			return false, nil
 		}
 		index += offset
 		end := index + len(path)
 		if (index == 0 || boundary(command[index-1])) && (end == len(command) || boundary(command[end])) {
-			return true
+			return true, nil
 		}
 		offset = index + 1
 	}
-	return false
+	return false, nil
 }
 
 func commandSafetyPaths(root string, targets map[string]bool) []string {
@@ -63,13 +82,22 @@ func safeCommandText(command, root string, targets map[string]bool) bool {
 }
 
 func appendCommandContexts(request Request, h History, out *planning.GroupingHistory, sources map[string]ContextSource, commandSources map[string]CommandSource) {
-	unique, err := uniqueHistorySources(h)
+	_ = appendCommandContextsContext(context.Background(), request, h, out, sources, commandSources)
+}
+func appendCommandContextsContext(ctx context.Context, request Request, h History, out *planning.GroupingHistory, sources map[string]ContextSource, commandSources map[string]CommandSource) error {
+	if err := matchingCheckpoint(ctx); err != nil {
+		return err
+	}
+	unique, err := uniqueHistorySourcesContext(ctx, h)
 	if err != nil {
-		return
+		return matchingCheckpoint(ctx)
 	}
 	safe := func(s string) bool { return safeText(s) && (request.SafeText == nil || request.SafeText(s)) }
 	refs := map[string]string{}
 	for ref, s := range sources {
+		if err := matchingCheckpoint(ctx); err != nil {
+			return err
+		}
 		refs[sourceTurnKey(s.ThreadID, s.TurnID)] = ref
 	}
 	targets := map[string]bool{}
@@ -83,21 +111,33 @@ func appendCommandContexts(request Request, h History, out *planning.GroupingHis
 	// Validate every command source before emitting any auxiliary evidence.
 	fingerprints := map[string]string{}
 	for _, turn := range unique.Turns {
+		if err := matchingCheckpoint(ctx); err != nil {
+			return err
+		}
 		for _, c := range turn.Commands {
+			if err := matchingCheckpoint(ctx); err != nil {
+				return err
+			}
 			keyBytes, _ := json.Marshal([]string{turn.Thread, turn.Turn, c.ItemID})
 			key := string(keyBytes)
 			body, _ := json.Marshal(c)
 			if c.ItemID == "" || (fingerprints[key] != "" && fingerprints[key] != string(body)) {
 				out.Acquisition.Status = "partial"
 				out.Acquisition.Reasons = append(out.Acquisition.Reasons, "history_parse_failed")
-				return
+				return nil
 			}
 			fingerprints[key] = string(body)
 		}
 	}
 	seen := map[string]bool{}
 	for _, turn := range unique.Turns {
+		if err := matchingCheckpoint(ctx); err != nil {
+			return err
+		}
 		for _, command := range turn.Commands {
+			if err := matchingCheckpoint(ctx); err != nil {
+				return err
+			}
 			keyBytes, _ := json.Marshal([]string{turn.Thread, turn.Turn, command.ItemID})
 			key := string(keyBytes)
 			if seen[key] {
@@ -108,10 +148,16 @@ func appendCommandContexts(request Request, h History, out *planning.GroupingHis
 			if request.SafeCommand != nil {
 				commandOK = commandOK && request.SafeCommand(command.Command, commandSafetyPaths(request.Root, targets))
 			}
+			if err := matchingCheckpoint(ctx); err != nil {
+				return err
+			}
 			if !commandOK || len(safeFinalResponses(turn, safe)) == 0 {
 				continue
 			}
-			paths := mentionedPaths(request.Root, command.Cwd, command.Command, targets)
+			paths, err := mentionedPathsContext(ctx, request.Root, command.Cwd, command.Command, targets)
+			if err != nil {
+				return err
+			}
 			ids := []string{}
 			for _, f := range request.Files {
 				for _, path := range paths {
@@ -138,4 +184,5 @@ func appendCommandContexts(request Request, h History, out *planning.GroupingHis
 			commandSources[execution] = CommandSource{ThreadID: turn.Thread, TurnID: turn.Turn, ItemID: command.ItemID, Cwd: command.Cwd, Status: command.Status, ItemOrder: command.ItemOrder, ExitCode: command.ExitCode}
 		}
 	}
+	return matchingCheckpoint(ctx)
 }

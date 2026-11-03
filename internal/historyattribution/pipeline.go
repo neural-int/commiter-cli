@@ -107,7 +107,12 @@ func Collect(parent context.Context, request Request) (Result, error) {
 		return Result{}, err
 	}
 	commandSources := map[string]CommandSource{}
-	appendCommandContexts(request, h, attributed, sources, commandSources)
+	if err := appendCommandContextsContext(ctx, request, h, attributed, sources, commandSources); err != nil {
+		if resourceError := guard.failure(); resourceError != nil {
+			return Result{}, resourceError
+		}
+		return Result{}, err
+	}
 	if err := matchingCheckpoint(ctx); err != nil {
 		return Result{}, err
 	}

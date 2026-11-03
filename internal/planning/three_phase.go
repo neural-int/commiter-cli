@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"sort"
+	"strings"
 	"time"
 	"unicode/utf8"
 
@@ -111,7 +112,7 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 	// Evidence must be host-provided, unique, nonempty and bound to selected IDs.
 	evidenceByID := map[string]BreakingEvidence{}
 	for _, e := range g.Evidence {
-		if e.ID == "" || e.ID == "none" || e.ID == "unresolved" || e.Fact == "" || len(e.FileIDs) == 0 {
+		if e.ID == "" || e.ID == "none" || e.ID == "unresolved" || strings.HasPrefix(e.ID, "git:") || e.Fact == "" || len(e.FileIDs) == 0 {
 			return result, errors.New("invalid host breaking evidence")
 		}
 		if _, exists := evidenceByID[e.ID]; exists {
@@ -195,6 +196,18 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 	if err != nil {
 		return result, err
 	}
+	// Observed Git blocks are candidates for Category's semantic decision,
+	// not confirmed incompatibilities. The normal CLI needs no injected witness.
+	allEvidence := append([]BreakingEvidence(nil), g.Evidence...)
+	for fileIndex, file := range groupingFiles {
+		for _, block := range file.ChangeBlocks {
+			allEvidence = append(allEvidence, BreakingEvidence{
+				ID:      "git:" + file.FileID + ":" + block.BlockID,
+				FileIDs: []string{inverse[file.FileID]},
+				Fact:    fmt.Sprintf("Observed current Git change %s in %s, raw_diff lines %d-%d; incompatibility is not preclassified", block.BlockID, candidatePath(files[fileIndex]), block.DiffRange.StartLine, block.DiffRange.EndLine),
+			})
+		}
+	}
 	payload, err := groupingPayload(groupingFiles, inverse, g.GroupingHistory)
 	if err != nil {
 		return result, err
@@ -239,7 +252,8 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 		names[i] = group.ID
 		refs := []string{"none", "unresolved"}
 		types := allowedTypes
-		for _, e := range g.Evidence {
+		confirmedWitness := false
+		for _, e := range allEvidence {
 			applies := false
 			for _, id := range e.FileIDs {
 				if containsString(group.FileIDs, id) {
@@ -248,9 +262,12 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 			}
 			if applies {
 				refs = append(refs, e.ID)
+				if _, confirmed := evidenceByID[e.ID]; confirmed {
+					confirmedWitness = true
+				}
 			}
 		}
-		if len(refs) > 2 {
+		if confirmedWitness {
 			refs = refs[1:]
 		} // A positive host witness rules out none.
 		allowedRefs[group.ID] = refs
@@ -272,7 +289,7 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 	// Group file_ids stay host-only; bind witnesses to the visible file IDs
 	// instead so the model can still associate each witness with its files.
 	visibleEvidence := []metadataBreakingEvidence{}
-	for _, evidence := range g.Evidence {
+	for _, evidence := range allEvidence {
 		projected := metadataBreakingEvidence{ID: evidence.ID, Fact: evidence.Fact}
 		for _, originalID := range evidence.FileIDs {
 			for visibleID, restoredID := range inverse {

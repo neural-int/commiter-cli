@@ -87,8 +87,16 @@ func TestHarness004CategoryHasNoUnconfirmedBreaking(t *testing.T) {
 					t.Fatalf("invalid phase input: %v", err)
 				}
 				// one.go (host F001) sorts after asset.bin and is displayed as F2.
-				if phase == 1 && breaking && (len(payload.Evidence) != 1 || payload.Evidence[0].ID != "observed-api" || payload.Evidence[0].Fact != "public signature removed" || len(payload.Evidence[0].FileIDs) != 1 || payload.Evidence[0].FileIDs[0] != "F2") {
-					t.Fatal("Category evidence ID, file binding or fact changed")
+				if phase == 1 && breaking {
+					found := false
+					for _, e := range payload.Evidence {
+						if e.ID == "observed-api" && e.Fact == "public signature removed" && len(e.FileIDs) == 1 && e.FileIDs[0] == "F2" {
+							found = true
+						}
+					}
+					if !found {
+						t.Fatal("Category evidence ID, file binding or fact changed")
+					}
 				}
 				value, exists := payload.Groups[0]["breaking"]
 				if phase == 1 && exists {
