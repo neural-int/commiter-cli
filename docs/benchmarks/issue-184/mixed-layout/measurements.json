@@ -1,0 +1,487 @@
+{
+  "study_key": "H184-005/mixed-layout",
+  "plan": {
+    "study_key": "H184-005/mixed-layout",
+    "arms": [
+      "shared_all",
+      "mixed"
+    ],
+    "persistent_both": true,
+    "helper_sha256": "4d04c82b0ef8b4987fea8f3e4d7cf91363b60a76310c86b44eab9c8550cc0291",
+    "runner_sha256": "5549d14782edf0e5de68f533af460dd1448f09cba211ff1a832e4133048629e2",
+    "only_setting_difference": "Only Category layout changes: shared files vs group-local files; Grouping and Text wire identical; 3 independent fixed phases, no KV reuse"
+  },
+  "completion": {
+    "state": "complete",
+    "arms": [
+      {
+        "arm": "shared_all",
+        "process_wall_seconds": 59.480642292000994,
+        "cells": 3,
+        "persistent": true,
+        "state": "complete",
+        "wall_seconds": 59.472532708
+      },
+      {
+        "arm": "mixed",
+        "process_wall_seconds": 56.94761691700114,
+        "cells": 3,
+        "persistent": true,
+        "state": "complete",
+        "wall_seconds": 56.942053666
+      }
+    ],
+    "monitor_fatal": [],
+    "monitor_samples": 59
+  },
+  "generation_calls": 6,
+  "category_expanded_evidence_equal": true,
+  "grouping_text_byte_identical": true,
+  "arms": [
+    {
+      "arm": "shared_all",
+      "grouping_correct": 3,
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "docs"
+        },
+        "G002": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        },
+        "G003": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        }
+      },
+      "evaluation": {
+        "category_correct": 2,
+        "category_total": 3,
+        "host_validator_accepted": true,
+        "note": "Independent fixed-phase outputs assembled with original fixed group membership; Text input Category is fixed gold, not newly generated Category. Not E2E.",
+        "plan": {
+          "schema_version": 1,
+          "commits": [
+            {
+              "type": "docs",
+              "scope": "ドキュメント",
+              "breaking": false,
+              "summary": "品質チェックと失敗時の確認セクションを追加",
+              "file_ids": [
+                "F1"
+              ]
+            },
+            {
+              "type": "feat",
+              "scope": "UI",
+              "breaking": false,
+              "summary": "期限日のツールチップと日付計算を実装",
+              "file_ids": [
+                "F2",
+                "F4"
+              ]
+            },
+            {
+              "type": "feat",
+              "scope": "正規化",
+              "breaking": false,
+              "summary": "空の角括弧を含むMessage-IDを正規化",
+              "file_ids": [
+                "F3",
+                "F5"
+              ]
+            }
+          ]
+        },
+        "violations": []
+      },
+      "text": {
+        "G001": {
+          "scope": "ドキュメント",
+          "summary": "品質チェックと失敗時の確認セクションを追加"
+        },
+        "G002": {
+          "scope": "UI",
+          "summary": "期限日のツールチップと日付計算を実装"
+        },
+        "G003": {
+          "scope": "正規化",
+          "summary": "空の角括弧を含むMessage-IDを正規化"
+        }
+      },
+      "phases": [
+        {
+          "phase": "01",
+          "wall_seconds": 25.0210095,
+          "decode_tokens_per_second": 26.319812112887696,
+          "metrics": {
+            "diagnosticCPUSeconds": {
+              "responseMaskPreparationSeconds": 0.0176902916864492,
+              "responseReadSeconds": 1.93470862495451,
+              "responseUpdateAndProgressSeconds": 0.0005531250280910172
+            },
+            "prefixPrefillSeconds": 0,
+            "outputConstraint": "json_schema",
+            "generationWallSeconds": 21.88936245833611,
+            "prefixKVLayers": [],
+            "prefixMemorySamples": [],
+            "grammarSetupSeconds": 0.6889143333319225,
+            "diagnosticEventCounts": {
+              "responseMaskPreparationSeconds": 54,
+              "responseReadSeconds": 53,
+              "responseUpdateAndProgressSeconds": 54
+            },
+            "prepareSeconds": 0.05783674999838695,
+            "grammarPreparationSeconds": 0.687552166666137,
+            "grammarPreparationReused": false,
+            "inputTokens": 5121,
+            "runtimePromptSeconds": 19.913007974624634,
+            "generatedTokens": 52,
+            "prefixReclaimCount": 0,
+            "peakMemoryBytes": 3389042256,
+            "prefixSynchronizeSeconds": 0,
+            "runtimeGenerationSeconds": 1.9756979942321777,
+            "prefixClearCacheSeconds": 0,
+            "phaseEndKVLayers": [],
+            "loadSeconds": 1.654137791665562,
+            "activeMemoryBytes": 2564845154,
+            "diagnosticFirstReadSeconds": 0.057704250000824686,
+            "modelReused": false,
+            "benchmarkCacheMode": "native",
+            "prefillProtectionEnabled": true,
+            "cacheMemoryBytes": 90899720,
+            "prefixChunkCount": 0,
+            "cacheReusedTokens": 0
+          }
+        },
+        {
+          "phase": "02",
+          "wall_seconds": 15.988664625,
+          "decode_tokens_per_second": 26.81914093721589,
+          "metrics": {
+            "diagnosticCPUSeconds": {
+              "responseReadSeconds": 2.5158346249736496,
+              "responseUpdateAndProgressSeconds": 0.0008439167067990638,
+              "responseMaskPreparationSeconds": 0.03124116665276233
+            },
+            "prefixPrefillSeconds": 0,
+            "outputConstraint": "json_schema",
+            "generationWallSeconds": 15.938593458333344,
+            "prefixKVLayers": [],
+            "prefixMemorySamples": [],
+            "grammarSetupSeconds": 0.0026926249993266538,
+            "diagnosticEventCounts": {
+              "responseReadSeconds": 72,
+              "responseUpdateAndProgressSeconds": 73,
+              "responseMaskPreparationSeconds": 73
+            },
+            "prepareSeconds": 0.04499658333224943,
+            "grammarPreparationSeconds": 3.333334461785853e-07,
+            "grammarPreparationReused": true,
+            "inputTokens": 4107,
+            "runtimePromptSeconds": 13.29094111919403,
+            "generatedTokens": 71,
+            "prefixReclaimCount": 0,
+            "peakMemoryBytes": 3389042256,
+            "prefixSynchronizeSeconds": 0,
+            "runtimeGenerationSeconds": 2.6473629474639893,
+            "prefixClearCacheSeconds": 0,
+            "phaseEndKVLayers": [],
+            "loadSeconds": 2.500019036233425e-07,
+            "activeMemoryBytes": 2559929954,
+            "diagnosticFirstReadSeconds": 0.048760083329398185,
+            "modelReused": true,
+            "benchmarkCacheMode": "native",
+            "prefillProtectionEnabled": true,
+            "cacheMemoryBytes": 208426530,
+            "prefixChunkCount": 0,
+            "cacheReusedTokens": 0
+          }
+        },
+        {
+          "phase": "03",
+          "wall_seconds": 18.459708666,
+          "decode_tokens_per_second": 21.397389095330084,
+          "metrics": {
+            "diagnosticCPUSeconds": {
+              "responseUpdateAndProgressSeconds": 0.000873291639436502,
+              "responseMaskPreparationSeconds": 1.041768666691496,
+              "responseReadSeconds": 3.192702916720009
+            },
+            "prefixPrefillSeconds": 0,
+            "outputConstraint": "json_schema",
+            "generationWallSeconds": 17.181904666664195,
+            "prefixKVLayers": [],
+            "scopeConstraintRejectedTokens": 0,
+            "prefixMemorySamples": [],
+            "grammarSetupSeconds": 1.1655598750003264,
+            "diagnosticEventCounts": {
+              "responseUpdateAndProgressSeconds": 94,
+              "responseReadSeconds": 93,
+              "responseMaskPreparationSeconds": 94
+            },
+            "prepareSeconds": 0.05599700000311714,
+            "grammarPreparationSeconds": 3.333334461785853e-07,
+            "grammarPreparationReused": true,
+            "inputTokens": 3991,
+            "runtimePromptSeconds": 12.88200306892395,
+            "generatedTokens": 92,
+            "prefixReclaimCount": 0,
+            "peakMemoryBytes": 3389042256,
+            "prefixSynchronizeSeconds": 0,
+            "runtimeGenerationSeconds": 4.299589991569519,
+            "prefixClearCacheSeconds": 0,
+            "phaseEndKVLayers": [],
+            "loadSeconds": 7.083363016135991e-07,
+            "activeMemoryBytes": 2367696454,
+            "diagnosticFirstReadSeconds": 0.04987020833505085,
+            "modelReused": true,
+            "benchmarkCacheMode": "native",
+            "prefillProtectionEnabled": true,
+            "cacheMemoryBytes": 387542596,
+            "prefixChunkCount": 0,
+            "cacheReusedTokens": 0
+          }
+        }
+      ],
+      "resources": {
+        "helper_rss_max_mib": 677.78125,
+        "helper_cpu_percent_max": 160.8,
+        "system_swap_min_mib": 1173.38,
+        "system_swap_max_mib": 1189.38,
+        "thermal_counts": {
+          "nominal": 30
+        },
+        "gpu_samples_available": 30,
+        "monitor_samples": 30
+      }
+    },
+    {
+      "arm": "mixed",
+      "grouping_correct": 3,
+      "category": {
+        "G001": {
+          "breaking_evidence_ref": "none",
+          "type": "docs"
+        },
+        "G002": {
+          "breaking_evidence_ref": "none",
+          "type": "feat"
+        },
+        "G003": {
+          "breaking_evidence_ref": "none",
+          "type": "fix"
+        }
+      },
+      "evaluation": {
+        "category_correct": 3,
+        "category_total": 3,
+        "host_validator_accepted": true,
+        "note": "Independent fixed-phase outputs assembled with original fixed group membership; Text input Category is fixed gold, not newly generated Category. Not E2E.",
+        "plan": {
+          "schema_version": 1,
+          "commits": [
+            {
+              "type": "docs",
+              "scope": "ドキュメント",
+              "breaking": false,
+              "summary": "品質チェックと失敗時の確認セクションを追加",
+              "file_ids": [
+                "F1"
+              ]
+            },
+            {
+              "type": "feat",
+              "scope": "UI",
+              "breaking": false,
+              "summary": "期限日のツールチップと日付計算を実装",
+              "file_ids": [
+                "F2",
+                "F4"
+              ]
+            },
+            {
+              "type": "fix",
+              "scope": "正規化",
+              "breaking": false,
+              "summary": "空の角括弧を含むMessage-IDを正規化",
+              "file_ids": [
+                "F3",
+                "F5"
+              ]
+            }
+          ]
+        },
+        "violations": []
+      },
+      "text": {
+        "G001": {
+          "scope": "ドキュメント",
+          "summary": "品質チェックと失敗時の確認セクションを追加"
+        },
+        "G002": {
+          "scope": "UI",
+          "summary": "期限日のツールチップと日付計算を実装"
+        },
+        "G003": {
+          "scope": "正規化",
+          "summary": "空の角括弧を含むMessage-IDを正規化"
+        }
+      },
+      "phases": [
+        {
+          "phase": "01",
+          "wall_seconds": 20.833409125,
+          "decode_tokens_per_second": 26.343145792574237,
+          "metrics": {
+            "runtimeGenerationSeconds": 1.9739480018615723,
+            "generationWallSeconds": 18.90263108333602,
+            "grammarSetupSeconds": 0.6855578750037239,
+            "prefixChunkCount": 0,
+            "loadSeconds": 1.1534841249958845,
+            "peakMemoryBytes": 3389042256,
+            "activeMemoryBytes": 2549542498,
+            "prefixPrefillSeconds": 0,
+            "cacheMemoryBytes": 106202376,
+            "grammarPreparationReused": false,
+            "prefixClearCacheSeconds": 0,
+            "prefillProtectionEnabled": true,
+            "phaseEndKVLayers": [],
+            "prefixSynchronizeSeconds": 0,
+            "benchmarkCacheMode": "native",
+            "prefixReclaimCount": 0,
+            "prepareSeconds": 0.05627204166376032,
+            "runtimePromptSeconds": 16.92828893661499,
+            "diagnosticCPUSeconds": {
+              "responseReadSeconds": 1.9263407500111498,
+              "responseMaskPreparationSeconds": 0.018235999952594284,
+              "responseUpdateAndProgressSeconds": 0.0006940416715224274
+            },
+            "generatedTokens": 52,
+            "inputTokens": 5121,
+            "prefixMemorySamples": [],
+            "outputConstraint": "json_schema",
+            "grammarPreparationSeconds": 0.6844729999938863,
+            "modelReused": false,
+            "cacheReusedTokens": 0,
+            "diagnosticFirstReadSeconds": 0.060044583333365154,
+            "diagnosticEventCounts": {
+              "responseReadSeconds": 53,
+              "responseMaskPreparationSeconds": 54,
+              "responseUpdateAndProgressSeconds": 54
+            },
+            "prefixKVLayers": []
+          }
+        },
+        {
+          "phase": "02",
+          "wall_seconds": 16.542249958,
+          "decode_tokens_per_second": 26.809994892701262,
+          "metrics": {
+            "runtimeGenerationSeconds": 2.648266077041626,
+            "generationWallSeconds": 16.499176458339207,
+            "grammarSetupSeconds": 0.0023957500015967526,
+            "prefixChunkCount": 0,
+            "loadSeconds": 4.1666498873382807e-07,
+            "peakMemoryBytes": 3389042256,
+            "activeMemoryBytes": 2556964450,
+            "prefixPrefillSeconds": 0,
+            "cacheMemoryBytes": 203048488,
+            "grammarPreparationReused": true,
+            "prefixClearCacheSeconds": 0,
+            "prefillProtectionEnabled": true,
+            "phaseEndKVLayers": [],
+            "prefixSynchronizeSeconds": 0,
+            "benchmarkCacheMode": "native",
+            "prefixReclaimCount": 0,
+            "prepareSeconds": 0.03887737500190269,
+            "runtimePromptSeconds": 13.850624084472656,
+            "diagnosticCPUSeconds": {
+              "responseUpdateAndProgressSeconds": 0.0006492500106105581,
+              "responseMaskPreparationSeconds": 0.027623833280813415,
+              "responseReadSeconds": 2.5490722916656523
+            },
+            "generatedTokens": 71,
+            "inputTokens": 4072,
+            "prefixMemorySamples": [],
+            "outputConstraint": "json_schema",
+            "grammarPreparationSeconds": 2.0833249436691403e-07,
+            "modelReused": true,
+            "cacheReusedTokens": 0,
+            "diagnosticFirstReadSeconds": 0.048548791666689795,
+            "diagnosticEventCounts": {
+              "responseUpdateAndProgressSeconds": 73,
+              "responseMaskPreparationSeconds": 73,
+              "responseReadSeconds": 72
+            },
+            "prefixKVLayers": []
+          }
+        },
+        {
+          "phase": "03",
+          "wall_seconds": 19.563981583,
+          "decode_tokens_per_second": 21.423708111307842,
+          "metrics": {
+            "runtimeGenerationSeconds": 4.2943079471588135,
+            "generationWallSeconds": 18.166414999999688,
+            "grammarSetupSeconds": 1.293486041664437,
+            "prefixChunkCount": 0,
+            "loadSeconds": 5.833353498019278e-07,
+            "peakMemoryBytes": 3389042256,
+            "activeMemoryBytes": 2367696454,
+            "scopeConstraintRejectedTokens": 0,
+            "prefixPrefillSeconds": 0,
+            "cacheMemoryBytes": 387542596,
+            "grammarPreparationReused": true,
+            "prefixClearCacheSeconds": 0,
+            "prefillProtectionEnabled": true,
+            "phaseEndKVLayers": [],
+            "prefixSynchronizeSeconds": 0,
+            "benchmarkCacheMode": "native",
+            "prefixReclaimCount": 0,
+            "prepareSeconds": 0.057117416661640164,
+            "runtimePromptSeconds": 13.87180209159851,
+            "diagnosticCPUSeconds": {
+              "responseMaskPreparationSeconds": 1.0934403333376395,
+              "responseReadSeconds": 3.1326743749377783,
+              "responseUpdateAndProgressSeconds": 0.0007909166597528383
+            },
+            "generatedTokens": 92,
+            "inputTokens": 3991,
+            "prefixMemorySamples": [],
+            "outputConstraint": "json_schema",
+            "grammarPreparationSeconds": 4.5833439799025655e-07,
+            "modelReused": true,
+            "cacheReusedTokens": 0,
+            "diagnosticFirstReadSeconds": 0.04891491666785441,
+            "diagnosticEventCounts": {
+              "responseMaskPreparationSeconds": 94,
+              "responseReadSeconds": 93,
+              "responseUpdateAndProgressSeconds": 94
+            },
+            "prefixKVLayers": []
+          }
+        }
+      ],
+      "resources": {
+        "helper_rss_max_mib": 2407.96875,
+        "helper_cpu_percent_max": 143.6,
+        "system_swap_min_mib": 1165.38,
+        "system_swap_max_mib": 1173.38,
+        "thermal_counts": {
+          "nominal": 16,
+          "fair": 13
+        },
+        "gpu_samples_available": 29,
+        "monitor_samples": 29
+      }
+    }
+  ],
+  "limitations": [
+    "one fixture/seed, shared_all then mixed, one run each",
+    "independent fixed phases, no upstream propagation; assembled validator is not E2E",
+    "no KV reuse; no cached speedup measured",
+    "thermal and system load may confound speed differences"
+  ]
+}

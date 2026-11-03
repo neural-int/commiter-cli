@@ -88,7 +88,7 @@ func TestCollectUsesDirectEditsAndDeduplicatesSharedRequest(t *testing.T) {
 		t.Fatalf("status=%s records=%d", result.Status, len(result.Records))
 	}
 	got := result.Records[0]
-	if strings.Join(got.Paths, ",") != "one.go,two.go" || got.UserRequest != "Correct the boundary" || got.FinalResponse != "Corrected the boundary" {
+	if strings.Join(got.Paths, ",") != "one.go,two.go" || got.FinalResponse != "Corrected the boundary" {
 		t.Fatal("incorrect or duplicated projection")
 	}
 	raw, _ := json.Marshal(result.Records)
@@ -147,12 +147,12 @@ func TestSessionInSiblingWorktreeMustEditSelectedWorktree(t *testing.T) {
 	}
 }
 
-func TestCollectAllowsActiveAndArchivedTurnsWithoutFinalAnswer(t *testing.T) {
+func TestCollectOmitsArchivedTurnsWithoutFinalAnswer(t *testing.T) {
 	f, r := testHistory(t)
 	f.archived = true
 	f.items["turn"] = f.items["turn"][:2]
 	result := collect(f, r)
-	if result.Status != "available" || len(result.Records) != 1 || result.Records[0].FinalResponse != "" {
+	if result.Status != "no_related_evidence" || len(result.Records) != 0 {
 		t.Fatalf("result=%+v", result)
 	}
 }
@@ -166,7 +166,7 @@ func TestCollectPartialFailureDoesNotAdoptIncompleteTurn(t *testing.T) {
 	}
 }
 
-func TestCollectKeepsMultipleRequestsForSamePath(t *testing.T) {
+func TestCollectKeepsMultipleFinalResponsesForSamePath(t *testing.T) {
 	for _, conflict := range []bool{false, true} {
 		f, r := testHistory(t)
 		f.turns = append(f.turns, map[string]any{"id": "another", "startedAt": 130})
@@ -175,7 +175,7 @@ func TestCollectKeepsMultipleRequestsForSamePath(t *testing.T) {
 			path = "one.go"
 		}
 		r.Targets = append(r.Targets, Target{Path: path})
-		f.items["another"] = []map[string]any{logItem("another", "request2", "userMessage", map[string]any{"content": []map[string]string{{"type": "text", "text": "Correct the boundary"}}}), editItem("another", "patch2", path, testDiff, "completed")}
+		f.items["another"] = []map[string]any{editItem("another", "patch2", path, testDiff, "completed"), logItem("another", "answer2", "agentMessage", map[string]any{"phase": "final_answer", "text": "Corrected another boundary"})}
 		result := collect(f, r)
 		want := 2
 		if len(result.Records) != want {
@@ -184,12 +184,12 @@ func TestCollectKeepsMultipleRequestsForSamePath(t *testing.T) {
 	}
 }
 
-func TestContextBudgetKeepsRequestAndOmitsLargeFinalWithoutTruncating(t *testing.T) {
+func TestContextBudgetOmitsLargeFinalWithoutRequestFallback(t *testing.T) {
 	f, r := testHistory(t)
 	f.items["turn"][3] = logItem("turn", "answer", "agentMessage", map[string]any{"phase": "final_answer", "text": strings.Repeat("あ", MaxContextBytes)})
 	result := collect(f, r)
-	if len(result.Records) != 1 || result.Records[0].FinalResponse != "" || result.Records[0].UserRequest != "Correct the boundary" {
-		t.Fatal("optional text budget changed request")
+	if len(result.Records) != 0 {
+		t.Fatal("oversized final response fell back to a user request")
 	}
 	encoded, _ := json.Marshal(map[string]any{"codex_context": result.Records})
 	if len(encoded) > MaxContextBytes {

@@ -1,0 +1,41 @@
+{
+  "harness_id": "H184-HARNESS-004",
+  "revision": 2,
+  "status": "implemented_for_three_phase_planner_pending_main_merge",
+  "parent_record": "H184-HARNESS-004.json",
+  "prompt_source": "internal/planning/prompts/harness004.json",
+  "prompt_sha256": "28ead0c5ed9a68b4a06c13fe7fcb0b2da2cfa9ee860590f59f9f12375f4c68fe",
+  "scope": "ThreePhaseGenerator only; ordinary single-pass generator unchanged",
+  "preserved_limits": {"files": 4, "cycle_seconds": 120, "summary_characters": 48},
+  "output_tokens_per_phase": 4096,
+  "context_selection": "smallest 16K/32K/64K tier fitting the first phase within the prepared budget; frozen for the cycle; later overflow fails closed",
+  "input_layout": "harness004",
+  "history_text_policy": "final responses only; user requests are not retained in the collector projection or model display; missing, unsafe or over-budget final responses omit the record",
+  "thinking": false,
+  "output_constraint": "json_schema",
+  "kv": "native",
+  "prefill_policy": "legacy: synchronize and clear allocator cache after each chunk",
+  "seed": 144,
+  "models": [
+    {"id": "mlx-community/Qwen3.5-4B-4bit@0e7ffd5c629ef7719d4cbc04069232580bfa9d9c", "temperature": 0.6, "top_p": 0.95, "top_k": 20},
+    {"id": "mlx-community/gemma-4-E4B-it-4bit@475b9088d29754a3379866cf5aeb6b41acd313c2", "temperature": 1.0, "top_p": 0.95, "top_k": 64}
+  ],
+  "prefix_reuse": {
+    "plan": "automatic token-prefix comparison, no external token plan",
+    "phases": ["grouping", "text"],
+    "category": "independent full prefill",
+    "cache_types": ["KVCacheSimple", "RotatingKVCache", "MambaCache"],
+    "copy": "immutable snapshot and independent runtime copies",
+    "fallback": "unknown cache type, settings or token-prefix mismatch uses ordinary prefill"
+  },
+  "runtime_dependencies": "mlx-helper/Package.resolved; unchanged by revision 2",
+  "portable_runner": "tools/benchmark184/run004.py",
+  "verification": "production-integration.md",
+  "limitations": [
+    "Production retains the existing optional codex_context source and path association; this change does not connect the separate agent-history content-attribution PoC",
+    "Qwen and Gemma installed-model checks use one synthetic file, not the 7/9/11-file quality benchmark",
+    "Revision 2 is not byte-identical to historical private requests: the new 48-character instruction and natural dictionary ordering are intentional",
+    "Cache reuse is not proof of numerical or semantic equivalence; earlier Qwen Text differences remain unresolved",
+    "No CI result or main merge is asserted by this local registration"
+  ]
+}

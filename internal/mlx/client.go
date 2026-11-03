@@ -61,28 +61,32 @@ func (reason StopReason) valid() bool {
 // Request is the complete helper input. Message content is sent only through
 // the child's stdin; this package never writes it to logs or diagnostics.
 type Request struct {
-	Schema        json.RawMessage `json:"schema"`
-	Messages      []llm.Message   `json:"messages"`
-	ContextTokens int             `json:"context_tokens"`
-	OutputTokens  int             `json:"output_tokens"`
+	HistoryInput  *llm.OptionalHistoryInput `json:"history_input,omitempty"`
+	Schema        json.RawMessage           `json:"schema"`
+	Messages      []llm.Message             `json:"messages"`
+	ContextTokens int                       `json:"context_tokens"`
+	OutputTokens  int                       `json:"output_tokens"`
 	// Model is a display identifier. ModelPath is an already prepared local
 	// model directory; the helper never resolves Model through a network
 	// downloader.
 	Model             string `json:"model,omitempty"`
 	ModelPath         string `json:"model_path,omitempty"`
 	GenerationProfile string `json:"generation_profile,omitempty"`
+	InputLayout       string `json:"input_layout,omitempty"`
 }
 
 // Response is the machine-readable helper output. GeneratedJSON is accepted
 // by a caller only when StopReason is StopReasonCompleted.
 type Response struct {
-	OK                bool       `json:"ok"`
-	StopReason        StopReason `json:"stop_reason"`
-	GeneratedJSON     string     `json:"generated_json,omitempty"`
-	Model             string     `json:"model,omitempty"`
-	Runtime           string     `json:"runtime,omitempty"`
-	ErrorClass        string     `json:"error_class,omitempty"`
-	GenerationProfile string     `json:"generation_profile,omitempty"`
+	SelectedHistoryIndices []int           `json:"selected_history_indices"`
+	BenchmarkMetrics       json.RawMessage `json:"benchmark_metrics,omitempty"`
+	OK                     bool            `json:"ok"`
+	StopReason             StopReason      `json:"stop_reason"`
+	GeneratedJSON          string          `json:"generated_json,omitempty"`
+	Model                  string          `json:"model,omitempty"`
+	Runtime                string          `json:"runtime,omitempty"`
+	ErrorClass             string          `json:"error_class,omitempty"`
+	GenerationProfile      string          `json:"generation_profile,omitempty"`
 }
 
 // FailureKind identifies failures without exposing helper diagnostics or
@@ -135,9 +139,8 @@ func (err *Error) Error() string {
 
 func (err *Error) Unwrap() error { return err.Cause }
 
-// Client launches one helper per Generate call. A helper must not be reused:
-// this prevents one malformed request or stale model state from contaminating
-// a later planning run.
+// Client launches one helper per Generate call. BeginSession explicitly scopes
+// reuse to a sequential three-phase cycle; no session crosses planning runs.
 type Client struct {
 	Executable       string
 	MaxRequestBytes  int

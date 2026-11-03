@@ -265,7 +265,7 @@ func TestGemmaThreePhaseDefaultPlanning(t *testing.T) {
 		if os.Getenv("COMMITER_CANDIDATE_SMOKE_HELPER") != "" {
 			return codexcontext.Result{Status: "absent"}
 		}
-		return codexcontext.Result{Status: "available", Records: []codexcontext.Record{{Paths: []string{"sample.go"}, UserRequest: "Correct the existing value", FinalResponse: "Corrected the value"}}}
+		return codexcontext.Result{Status: "available", Records: []codexcontext.Record{{Paths: []string{"sample.go"}, FinalResponse: "Corrected the value"}}}
 	}
 	repo := cliRepository(t)
 	cliWrite(t, repo, "sample.go", "package sample\nfunc value() int { return 1 }\n", 0o644)
@@ -307,9 +307,9 @@ func TestGemmaThreePhaseDefaultPlanning(t *testing.T) {
 		helper := filepath.Join(t.TempDir(), "helper")
 		script := `#!/bin/sh
 set -eu
-request=$(cat)
+while IFS= read -r request; do
 case "$request" in
- *'"context_tokens":16384'*) ;;
+ *'"context_tokens":65536'*) ;;
  *) exit 1 ;;
 esac
 case "$request" in
@@ -318,8 +318,11 @@ case "$request" in
  *'"generation_profile":"bounded-text"'*) profile=bounded-text; result='{"G001":{"scope":"sample","summary":"correct value"}}' ;;
  *) exit 1 ;;
 esac
+selection=''
+case "$request" in *'"history_input":'*) selection=',"selected_history_indices":[0]' ;; esac
 escaped=$(printf '%s' "$result" | sed 's/"/\\"/g')
-printf '{"ok":true,"stop_reason":"completed","generation_profile":"%s","generated_json":"%s"}\n' "$profile" "$escaped"
+printf '{"ok":true,"stop_reason":"completed","generation_profile":"%s","generated_json":"%s"%s}\n' "$profile" "$escaped" "$selection"
+done
 `
 		if err := os.WriteFile(helper, []byte(script), 0o700); err != nil {
 			t.Fatal(err)
@@ -335,7 +338,7 @@ printf '{"ok":true,"stop_reason":"completed","generation_profile":"%s","generate
 	if len(plan.Commits) != 1 || strings.Join(plan.Commits[0].FileIDs, ",") != "F001" {
 		t.Fatalf("invalid assignment: %#v", plan)
 	}
-	if record := recorder.Finish("success"); record.Context != "16k" || record.ContextCeiling != "64k" {
+	if record := recorder.Finish("success"); record.Context != "64k" || record.ContextCeiling != "64k" {
 		t.Fatalf("context metrics=%s ceiling=%s", record.Context, record.ContextCeiling)
 	}
 	if realHelper == "" {

@@ -13,13 +13,14 @@ import (
 )
 
 type candidateClient struct {
-	responses []string
-	stop      string
-	err       error
-	calls     int
-	options   []llm.Options
-	messages  [][]llm.Message
-	deadline  time.Time
+	countInput func([]llm.Message, llm.Options) (int, error)
+	responses  []string
+	stop       string
+	err        error
+	calls      int
+	options    []llm.Options
+	messages   [][]llm.Message
+	deadline   time.Time
 }
 
 func (c *candidateClient) Chat(context.Context, []llm.Message, json.RawMessage) (llm.Response, error) {
@@ -27,6 +28,11 @@ func (c *candidateClient) Chat(context.Context, []llm.Message, json.RawMessage) 
 }
 func (c *candidateClient) ChatWithOptions(ctx context.Context, messages []llm.Message, _ json.RawMessage, options llm.Options) (llm.Response, error) {
 	c.calls++
+	prepared, indices, count, attempts, err := prepareCandidateInput(c, messages, options)
+	if err != nil {
+		return llm.Response{}, err
+	}
+	messages = prepared
 	c.options = append(c.options, options)
 	c.messages = append(c.messages, messages)
 	deadline, ok := ctx.Deadline()
@@ -48,7 +54,7 @@ func (c *candidateClient) ChatWithOptions(ctx context.Context, messages []llm.Me
 	if stop == "" {
 		stop = "completed"
 	}
-	return llm.Response{Content: c.responses[c.calls-1], StopReason: stop}, nil
+	return llm.Response{Content: c.responses[c.calls-1], StopReason: stop, SelectedHistoryIndices: indices, PromptEvalCount: count, InputPreparationCalls: attempts}, nil
 }
 func candidatePrepared(t *testing.T) contextinput.Prepared {
 	t.Helper()
@@ -78,8 +84,11 @@ func TestThreePhaseRestoresIDsAndUsesSharedBoundedProfiles(t *testing.T) {
 		t.Fatalf("commit = %#v", commit)
 	}
 	for i, profile := range []string{"bounded-grouping", "bounded-category", "bounded-text"} {
-		if c.options[i].GenerationProfile != profile || c.options[i].ContextTokens != 16384 || c.options[i].OutputTokens != []int{768, 512, 768}[i] {
+		if c.options[i].GenerationProfile != profile || c.options[i].ContextTokens != contextinput.Context64K || c.options[i].OutputTokens != 4096 {
 			t.Fatalf("phase %d options = %#v", i, c.options[i])
+		}
+		if !c.options[i].LiteralNewlines {
+			t.Fatal("planner did not opt into model-only display")
 		}
 	}
 	if time.Until(c.deadline) > CandidateCycleTimeout {
@@ -89,27 +98,102 @@ func TestThreePhaseRestoresIDsAndUsesSharedBoundedProfiles(t *testing.T) {
 		t.Fatal("generated category fed back into text phase")
 	}
 }
-func TestThreePhaseScalesRawDiffContextWithinConfiguredCeiling(t *testing.T) {
-	p := candidatePrepared(t)
-	p.Budget.ContextTokens = contextinput.Context32K
-	p.Document.Files[0].GroupingRawDiff = strings.Repeat("+ some changed code\n", 1000)
-	c := &candidateClient{responses: candidateResponses()}
-	result, err := (ThreePhaseGenerator{Client: c}).Generate(context.Background(), p, English, SensitiveValues{})
-	if err != nil || result.Calls != 3 {
-		t.Fatalf("adaptive grouping: result=%+v err=%v", result, err)
+
+type cycleCandidateClient struct {
+	candidateClient
+	cycle           *candidateClient
+	started, closed int
+	startErr        error
+}
+
+func (c *cycleCandidateClient) BeginCycle(ctx context.Context) (llm.OptionsBackend, func(), error) {
+	c.started++
+	if _, ok := ctx.Deadline(); !ok {
+		return nil, nil, errors.New("missing cycle deadline")
 	}
-	for i, expected := range []int{contextinput.Context32K, contextinput.Context32K, contextinput.Context32K} {
-		if c.options[i].ContextTokens != expected {
-			t.Fatalf("phase %d context=%d, want %d", i, c.options[i].ContextTokens, expected)
+	if c.startErr != nil {
+		return nil, nil, c.startErr
+	}
+	return c.cycle, func() { c.closed++ }, nil
+}
+
+func TestThreePhaseScopesReusableBackendToOneValidatedInvocation(t *testing.T) {
+	for _, failurePhase := range []int{-1, 0, 1, 2} {
+		t.Run(string(rune('A'+failurePhase+1)), func(t *testing.T) {
+			responses := candidateResponses()
+			if failurePhase >= 0 {
+				responses[failurePhase] = `{}`
+			}
+			cycle := &candidateClient{responses: responses}
+			client := &cycleCandidateClient{cycle: cycle}
+			result, err := (ThreePhaseGenerator{Client: client}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
+			wantCalls := 3
+			if failurePhase >= 0 {
+				wantCalls = failurePhase + 1
+			}
+			if (err != nil) != (failurePhase >= 0) || cycle.calls != wantCalls || client.started != 1 || client.closed != 1 || client.calls != 0 {
+				t.Fatalf("result=%+v err=%v cycle=%+v client=%+v", result, err, cycle, client)
+			}
+			if failurePhase >= 0 && len(result.Plan.Commits) != 0 {
+				t.Fatal("partial plan accepted")
+			}
+		})
+	}
+	client := &cycleCandidateClient{startErr: errors.New("start failed")}
+	if _, err := (ThreePhaseGenerator{Client: client}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{}); err == nil || client.calls != 0 || client.closed != 0 {
+		t.Fatal("session start failure did not stop planner")
+	}
+	client = &cycleCandidateClient{}
+	if _, err := (ThreePhaseGenerator{Client: client}).Generate(context.Background(), contextinput.Prepared{}, English, SensitiveValues{}); err == nil || client.started != 0 {
+		t.Fatal("started helper before validating input")
+	}
+}
+func TestThreePhaseFixed64KUsesActualCountForEveryPhase(t *testing.T) {
+	p := candidatePrepared(t)
+	// Larger than 64K in bytes, but 12K real tokens. The former byte check
+	// rejected this input; later phases also need more than the initial 16K.
+	p.Document.Files[0].GroupingRawDiff = strings.Repeat("+ some changed code\n", 4000)
+	client := &candidateClient{responses: candidateResponses(), countInput: func(_ []llm.Message, o llm.Options) (int, error) {
+		if o.GenerationProfile == "bounded-grouping" {
+			return 12000, nil
+		}
+		return 30000, nil
+	}}
+	result, err := (ThreePhaseGenerator{Client: client}).Generate(context.Background(), p, English, SensitiveValues{})
+	if err != nil || result.Calls != 3 {
+		t.Fatalf("calls=%d err=%v", result.Calls, err)
+	}
+	for _, o := range client.options {
+		if o.ContextTokens != contextinput.Context64K {
+			t.Fatal("phase context not 64K")
 		}
 	}
-	if result.Telemetry.ContextTokens != contextinput.Context32K {
-		t.Fatalf("maximum selected context=%d", result.Telemetry.ContextTokens)
+	if result.Telemetry.ContextTokens != contextinput.Context64K {
+		t.Fatal("incorrect context telemetry")
 	}
-	p.Budget.ContextTokens = contextinput.Context16K
-	c = &candidateClient{responses: candidateResponses()}
-	if _, err := (ThreePhaseGenerator{Client: c}).Generate(context.Background(), p, English, SensitiveValues{}); (err == nil || !strings.Contains(err.Error(), contextinput.ErrTooLarge.Error())) || c.calls != 0 {
-		t.Fatalf("16k user ceiling not enforced: calls=%d err=%v", c.calls, err)
+}
+
+func TestThreePhaseStopsAtActualTokenOverflowOrCountFailure(t *testing.T) {
+	for _, profile := range []string{"bounded-grouping", "bounded-category", "bounded-text"} {
+		for _, fail := range []bool{false, true} {
+			client := &candidateClient{responses: candidateResponses(), countInput: func(_ []llm.Message, o llm.Options) (int, error) {
+				if o.GenerationProfile == profile {
+					if fail {
+						return 0, errors.New("tokenizer unavailable")
+					}
+					return 61441, nil
+				}
+				return 1000, nil
+			}}
+			result, err := (ThreePhaseGenerator{Client: client}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
+			if err == nil || len(result.Plan.Commits) != 0 {
+				t.Fatal("count failure/overflow accepted")
+			}
+			want := map[string]int{"bounded-grouping": 1, "bounded-category": 2, "bounded-text": 3}[profile]
+			if client.calls != want {
+				t.Fatalf("calls=%d want=%d", client.calls, want)
+			}
+		}
 	}
 }
 
@@ -162,7 +246,7 @@ func TestThreePhaseHostWitnessCannotBeIgnored(t *testing.T) {
 	}
 }
 func TestThreePhaseRejectsUnsupportedInputBeforeGeneration(t *testing.T) {
-	for _, name := range []string{"size", "context", "compression", "prompt", "cancelled"} {
+	for _, name := range []string{"size", "compression", "prompt", "cancelled"} {
 		t.Run(name, func(t *testing.T) {
 			p := candidatePrepared(t)
 			ctx := context.Background()
@@ -179,7 +263,7 @@ func TestThreePhaseRejectsUnsupportedInputBeforeGeneration(t *testing.T) {
 			case "compression":
 				p.SummaryCount = 1
 			case "prompt":
-				p.Document.Files[0].GroupingRawDiff = strings.Repeat("x", 16384)
+				p.Document.Files[0].GroupingRawDiff = strings.Repeat("x", 65536)
 				p.Prompt, _ = Renderer(English)(p.Document)
 			case "cancelled":
 				var cancel context.CancelFunc
@@ -188,7 +272,7 @@ func TestThreePhaseRejectsUnsupportedInputBeforeGeneration(t *testing.T) {
 			}
 			c := &candidateClient{responses: candidateResponses()}
 			r, err := (ThreePhaseGenerator{Client: c}).Generate(ctx, p, English, SensitiveValues{})
-			if err == nil || c.calls != 0 || len(r.Plan.Commits) != 0 {
+			if err == nil || (c.calls != 0 && name != "prompt") || len(r.Plan.Commits) != 0 {
 				t.Fatalf("calls=%d result=%#v error=%v", c.calls, r, err)
 			}
 		})

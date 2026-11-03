@@ -43,14 +43,18 @@ type Response struct {
 	Content string
 	// StopReason is explicit for backends that report generation completion.
 	// An empty value preserves the existing Ollama contract.
-	StopReason         string
-	TotalDuration      int64
-	LoadDuration       int64
-	PromptEvalCount    int
-	PromptEvalDuration int64
-	EvalCount          int
-	EvalDuration       int64
-	Availability       TelemetryAvailability
+	StopReason             string
+	TotalDuration          int64
+	LoadDuration           int64
+	PromptEvalCount        int
+	PromptEvalDuration     int64
+	EvalCount              int
+	EvalDuration           int64
+	PrefixReuseStatus      string
+	SelectedHistoryIndices []int
+	InputPreparationCalls  int
+	CacheReusedTokens      int
+	Availability           TelemetryAvailability
 }
 
 // ChatResponse is a descriptive alias for backend implementations.
@@ -58,10 +62,16 @@ type ChatResponse = Response
 
 // Options contains provider-neutral generation limits.
 type Options struct {
+	HistoryInput  *OptionalHistoryInput
 	ContextTokens int
 	OutputTokens  int
 	// GenerationProfile selects an explicitly supported bounded generation contract.
 	GenerationProfile string
+	// LiteralNewlines opts canonical JSON user bodies into model-only display
+	// projection. GenerationProfile alone never changes the message contract.
+	LiteralNewlines bool
+	// InputLayout opts only three-phase requests into the registered model display.
+	InputLayout string
 }
 
 // ChatOptions is a descriptive alias for callers that use chat terminology.

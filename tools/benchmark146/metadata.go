@@ -31,7 +31,7 @@ func (c *templateClient) ChatWithOptions(_ context.Context, m []llm.Message, s j
 	if err := json.Unmarshal(s, &shape); err != nil {
 		return llm.Response{}, err
 	}
-	if err := json.Unmarshal([]byte(m[1].Content), &payload); err != nil {
+	if err := json.Unmarshal(benchmarkPayload(m), &payload); err != nil {
 		return llm.Response{}, err
 	}
 	c.Templates[o.GenerationProfile] = phaseTemplate{System: strings.TrimSuffix(m[0].Content, string(s)), Schema: shape, Payload: payload}
@@ -240,7 +240,7 @@ func finalMetadata(ctx context.Context, f fixture, p partition, backend llm.Opti
 			}
 			var r llm.Response
 			if backend != nil {
-				r, err = recorder.ChatWithOptions(ctx, []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: string(encoded)}}, shape, llm.Options{ContextTokens: 16384, OutputTokens: budget, GenerationProfile: profile})
+				r, err = recorder.ChatWithOptions(ctx, []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: string(encoded)}}, shape, llm.Options{ContextTokens: 16384, OutputTokens: budget, GenerationProfile: profile, LiteralNewlines: true})
 			} else {
 				answers := map[string]any{}
 				for _, g := range batch {

@@ -26,7 +26,7 @@ func (c *groupingFlowClient) ChatWithOptions(_ context.Context, m []llm.Message,
 	case "bounded-grouping":
 		var input struct {
 			Files []struct {
-				ID string `json:"id"`
+				ID string `json:"file_id"`
 			} `json:"files"`
 		}
 		if err := json.Unmarshal([]byte(m[1].Content), &input); err != nil {
@@ -112,7 +112,7 @@ func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
 			}
 			var input struct {
 				Files []struct {
-					ID            string `json:"id"`
+					ID            string `json:"file_id"`
 					Mode          string `json:"mode"`
 					RawDiff       string `json:"raw_diff"`
 					SyntaxContext []struct {
@@ -138,23 +138,37 @@ func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
 				t.Fatalf("context lost: %+v", input.Files[0])
 			}
 			for phase := 1; phase <= 2; phase++ {
+				_, body, ok := strings.Cut(client.messages[phase][2].Content, "\n\nPhase input:\n")
+				if !ok {
+					t.Fatal("missing phase input")
+				}
 				var metadata struct {
 					Groups []struct {
-						Files []contextinput.File `json:"files"`
-						Type  string              `json:"type"`
+						Files []map[string]any `json:"files"`
+						Type  string           `json:"type"`
 					} `json:"groups"`
 				}
-				if err := json.Unmarshal([]byte(client.messages[phase][1].Content), &metadata); err != nil {
+				if err := json.Unmarshal([]byte(body), &metadata); err != nil {
 					t.Fatal(err)
 				}
-				file := metadata.Groups[0].Files[0]
-				if file.Mode != "raw_diff" || file.RawDiff != document.Files[0].GroupingRawDiff || len(file.Evidence) != 0 || strings.Contains(client.messages[phase][1].Content, `"syntax_context"`) {
-					t.Fatalf("phase %d violated raw-diff contract", phase)
+				f := metadata.Groups[0].Files[0]
+				if f["file_id"] != "path:"+path {
+					t.Fatal("file reference lost")
 				}
-				if phase == 2 && metadata.Groups[0].Type != "fix" {
-					t.Fatal("Text lost finalized category")
+				if phase == 1 {
+					if f["raw_diff"] != document.Files[0].GroupingRawDiff {
+						t.Fatal("category diff lost")
+					}
+				} else {
+					if client.messages[phase][0] != client.messages[0][0] || client.messages[phase][1] != client.messages[0][1] {
+						t.Fatal("text shared evidence drift")
+					}
+					if metadata.Groups[0].Type != "fix" {
+						t.Fatal("Text lost finalized type")
+					}
 				}
 			}
+
 			final, err := gitstate.Collect(root, gitstate.Options{})
 			if err != nil {
 				t.Fatal(err)

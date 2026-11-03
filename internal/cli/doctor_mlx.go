@@ -139,11 +139,13 @@ func mlxPlannerCapabilityProbe(ctx context.Context, helper string, values config
 		ID: "F001", NewPath: &path, Status: "M", ChangeHash: "probe", WorktreeKind: "file", Language: "go", Mode: syntax.ModeRawDiff,
 		RawDiff: "@@ -1 +1 @@\n-func value() int { return 1 }\n+func value() int { return 2 }\n",
 	}}}
-	prepared, err := contextinput.Prepare(ctx, document, contextinput.BudgetConfig{Context: "16k", MaxContextTokens: 16384}, planning.Renderer(planning.English), nil)
+	prompt, err := planning.Renderer(planning.English)(document)
 	if err != nil {
 		return false, err
 	}
-	prepared.Budget.ContextTokens = contextinput.Context16K
+	prepared := contextinput.Prepared{Document: document, Prompt: prompt,
+		Budget:       contextinput.Budget{ContextTokens: contextinput.Context64K, ReservedOutputTokens: 4096},
+		SummaryStage: contextinput.SummaryNone, CompressionProfile: contextinput.CompressionNone}
 	backend := &mlx.Backend{Client: mlx.NewClient(helper), Model: values.Model, ModelRevision: values.ModelRevision, ModelPath: modelPath}
 	_, err = (planning.ThreePhaseGenerator{Client: backend}).Generate(ctx, prepared, planning.English, planning.SensitiveValues{})
 	return err == nil, err

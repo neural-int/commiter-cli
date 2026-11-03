@@ -77,7 +77,7 @@ func (c *capture) ChatWithOptions(ctx context.Context, m []llm.Message, s json.R
 				Files []contextinput.File `json:"files"`
 			} `json:"groups"`
 		}
-		if err := json.Unmarshal([]byte(m[1].Content), &payload); err != nil {
+		if err := json.Unmarshal(benchmarkPayload(m), &payload); err != nil {
 			return llm.Response{}, err
 		}
 		for _, g := range payload.Groups {
@@ -98,7 +98,7 @@ func (c *capture) ChatWithOptions(ctx context.Context, m []llm.Message, s json.R
 		var payload struct {
 			Files []contextinput.File `json:"files"`
 		}
-		if err = json.Unmarshal([]byte(m[1].Content), &payload); err == nil {
+		if err = json.Unmarshal(benchmarkPayload(m), &payload); err == nil {
 			labels := map[string]string{}
 			membership := map[string]string{}
 			for _, f := range payload.Files {

@@ -4,6 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"os"
+	"path/filepath"
+	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/natsuki0413/commiter-cli/internal/llm"
@@ -41,7 +45,7 @@ printf '%s\n' '{"ok":false,"stop_reason":"completed","generated_json":"{\"commit
 	backend := &Backend{Client: NewClient(helper)}
 	response, err := backend.Chat(context.Background(), []llm.Message{{Role: "user", Content: "plan"}}, json.RawMessage(`{"type":"object"}`))
 	var failure *Error
-	if !errors.As(err, &failure) || failure.Kind != FailureStopState || response != (llm.Response{}) {
+	if !errors.As(err, &failure) || failure.Kind != FailureStopState || !reflect.DeepEqual(response, llm.Response{}) {
 		t.Fatalf("response=%#v err=%v", response, err)
 	}
 }
@@ -57,7 +61,7 @@ esac
 printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{}","generation_profile":"`+echo+`"}'
 `)
 			b := &Backend{Client: NewClient(helper), Model: "candidate", ModelRevision: "pinned", ModelPath: "/local/model"}
-			response, err := b.ChatWithOptions(context.Background(), []llm.Message{{Role: "user", Content: "plan"}}, json.RawMessage(`{"type":"object"}`), llm.Options{GenerationProfile: "bounded-grouping"})
+			response, err := b.ChatWithOptions(context.Background(), []llm.Message{{Role: "user", Content: `{"task":"plan"}`}}, json.RawMessage(`{"type":"object"}`), llm.Options{GenerationProfile: "bounded-grouping"})
 			if echo == "bounded-grouping" {
 				if err != nil || response.Content != "{}" {
 					t.Fatalf("response=%#v error=%v", response, err)
@@ -66,5 +70,73 @@ printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{}","gener
 				t.Fatalf("ignored profile accepted: %#v %v", response, err)
 			}
 		})
+	}
+}
+
+func TestBoundedBackendRendersOnlyModelBodyAndKeepsHostJSON(t *testing.T) {
+	marker := filepath.Join(t.TempDir(), "request.json")
+	helper := shellHelper(t, "IFS= read -r request\nprintf '%s' \"$request\" > "+shellQuote(marker)+"\nprintf '%s\\n' '{\"ok\":true,\"stop_reason\":\"completed\",\"generated_json\":\"{}\",\"generation_profile\":\"bounded-grouping\"}'")
+	original := `{"raw_diff":"@@ -1 +1 @@\n-old\n+new\n"}`
+	messages := []llm.Message{{Role: "user", Content: original}}
+	b := &Backend{Client: NewClient(helper), Model: "candidate", ModelRevision: "pinned"}
+	_, err := b.ChatWithOptions(context.Background(), messages, json.RawMessage(`{"type":"object"}`), llm.Options{GenerationProfile: "bounded-grouping", LiteralNewlines: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(marker)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !json.Valid(data) {
+		t.Fatal("invalid outer IPC JSON")
+	}
+	var request Request
+	if err = json.Unmarshal(data, &request); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(request.Messages[0].Content, "@@ -1 +1 @@\n-old\n+new\n") || messages[0].Content != original {
+		t.Fatal("model display or original host changed")
+	}
+}
+
+func TestBoundedBackendPreservesPlainTextInput(t *testing.T) {
+	helper := shellHelper(t, `IFS= read -r request
+case "$request" in *'"content":"plain text"'*) ;; *) exit 1 ;; esac
+printf '%s\n' '{"ok":true,"stop_reason":"completed","generated_json":"{}","generation_profile":"bounded-grouping"}'`)
+	b := &Backend{Client: NewClient(helper), Model: "candidate", ModelRevision: "pinned"}
+	_, err := b.ChatWithOptions(context.Background(), []llm.Message{{Role: "user", Content: "plain text"}}, json.RawMessage(`{"type":"object"}`), llm.Options{GenerationProfile: "bounded-grouping"})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestHarness004BackendProjectsOnlyJSONBodies(t *testing.T) {
+	marker := filepath.Join(t.TempDir(), "request.json")
+	helper := shellHelper(t, "IFS= read -r request\nprintf '%s' \"$request\" > "+shellQuote(marker)+"\nprintf '%s\\n' '{\"ok\":true,\"stop_reason\":\"completed\",\"generated_json\":\"{}\",\"generation_profile\":\"bounded-text\",\"benchmark_metrics\":{\"prefixReuseStatus\":\"reused\",\"cacheReusedTokens\":23}}'")
+	messages := []llm.Message{
+		{Role: "system", Content: "fixed system"},
+		{Role: "user", Content: `{"raw_diff":"-old\n+new\n"}`},
+		{Role: "user", Content: "fixed instructions\n\nPhase input:\n" + `{"groups":[]}`},
+	}
+	before, _ := json.Marshal(messages)
+	b := &Backend{Client: NewClient(helper)}
+	response, err := b.ChatWithOptions(context.Background(), messages, json.RawMessage(`{"type":"object"}`), llm.Options{GenerationProfile: "bounded-text", InputLayout: "harness004", LiteralNewlines: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(marker)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var request Request
+	if err = json.Unmarshal(data, &request); err != nil {
+		t.Fatal("outer IPC must remain JSON:", err)
+	}
+	after, _ := json.Marshal(messages)
+	if string(before) != string(after) || request.InputLayout != "harness004" || request.Messages[2] != messages[2] || !strings.Contains(request.Messages[1].Content, "-old\n+new\n") {
+		t.Fatal("projection changed instructions/host or failed to render body")
+	}
+	if response.PrefixReuseStatus != "reused" || response.CacheReusedTokens != 23 {
+		t.Fatalf("prefix telemetry lost: %#v", response)
 	}
 }
