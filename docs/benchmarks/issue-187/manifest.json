@@ -4,6 +4,7 @@
   "parent": "../issue-184/harnesses/H184-HARNESS-004-r3.json",
   "issue": 187,
   "date": "2026-11-03",
+  "category_quality_review": "category-environment-audit.md",
   "status": "local_implementation_pending_quality_and_ci",
   "normal_planner": "three-phase",
   "legacy_planners": "research_only_no_configuration_route",
@@ -78,6 +79,7 @@
     "mlx-helper/Sources/commiter-mlx-helper/CommiterMLXHelper.swift": "c03f277bcab90727a8676091ae61bd70557574bff7be3d4aac5ced9590559fd8"
   },
   "limitations": [
+    "Category scoring was reviewed after discovering original gold mislabeled a Message-ID bug fix as feat. See category-gold-review.json; reviewed scores are 4/4, 5/5, 5/6 per track. Frozen oracle Text still uses the original type.",
     "One synthetic normal-CLI case merged independent documentation in both baseline and migration; semantic quality is not certified",
     "Model smoke is not a long-input performance comparison",
     "Remote CI and release are not performed",

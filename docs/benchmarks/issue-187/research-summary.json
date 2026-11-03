@@ -2,6 +2,7 @@
   "date": "2026-11-03",
   "model": "Qwen3.5-4B-4bit",
   "runs_per_case": 1,
+  "category_gold_review": "category-gold-review.json",
   "cases": [
     {
       "files": 7,
@@ -40,10 +41,11 @@
       "swapouts_delta": 105508,
       "compressions_delta": 700032,
       "all_preparations_one": true,
-      "category_correct": {
+      "category_correct_original_gold": {
         "oracle": 3,
         "propagated": 3
       },
+      "category_correct_reviewed_gold": {"oracle": 4, "propagated": 4},
       "category_total": 4,
       "gpu_alloc_observed_peak_mib": 11777.56,
       "five_request_wait_sum_seconds": 85.707,
@@ -87,10 +89,11 @@
       "swapouts_delta": 95480,
       "compressions_delta": 461846,
       "all_preparations_one": true,
-      "category_correct": {
+      "category_correct_original_gold": {
         "oracle": 4,
         "propagated": 4
       },
+      "category_correct_reviewed_gold": {"oracle": 5, "propagated": 5},
       "category_total": 5,
       "gpu_alloc_observed_peak_mib": 12827.31,
       "five_request_wait_sum_seconds": 112.214,
@@ -134,10 +137,11 @@
       "swapouts_delta": 173268,
       "compressions_delta": 650472,
       "all_preparations_one": true,
-      "category_correct": {
+      "category_correct_original_gold": {
         "oracle": 6,
         "propagated": 6
       },
+      "category_correct_reviewed_gold": {"oracle": 5, "propagated": 5},
       "category_total": 6,
       "gpu_alloc_observed_peak_mib": 14977.47,
       "five_request_wait_sum_seconds": 188.656,
@@ -146,6 +150,8 @@
     }
   ],
   "limits": [
+    "Original Category gold mislabeled the Message-ID bug fix as feat. Original and reviewed scores are kept separately; raw fixtures and responses are unchanged.",
+    "Oracle Text requests retain the original feat for G003 and are not an oracle of the reviewed fix classification.",
     "Oracle Category/Text requests are interleaved with propagated phases",
     "Wait sums are not normal-CLI or isolated three-phase TAT",
     "GPU allocation, swap and compression counters include other processes",

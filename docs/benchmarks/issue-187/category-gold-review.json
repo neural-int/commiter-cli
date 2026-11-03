@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-03",
+  "status": "reviewed_overlay_original_gold_unchanged",
+  "scope": "Category type only; does not certify breaking classification or Text semantics",
+  "reviewer_independence": "limited_agent_review_with_frozen_behavior_reproduction_and_prior_review",
+  "reason": "F3/F5 correct empty Message-ID normalization and avoid treating empty IDs as a shared valid identifier; the existing implementation already supports missing-ID fallback",
+  "prior_review": "../issue-184/harnesses/multifile004-comparison.md",
+  "overrides": [
+    {"files": 7, "group_id": "G003", "file_ids": ["F3", "F5"], "original_type": "feat", "reviewed_type": "fix", "measured_gold_sha256": "05b8a31e3d7b143dafc1dd47e2fabd2f87562c593191feb1ab945a90c30e52d4"},
+    {"files": 9, "group_id": "G003", "file_ids": ["F3", "F5"], "original_type": "feat", "reviewed_type": "fix", "measured_gold_sha256": "47ed24ea085da0ab26ab8446ff8ccbaeb12713872aa50d5eb53f138273a2660b"},
+    {"files": 11, "group_id": "G003", "file_ids": ["F3", "F5"], "original_type": "feat", "reviewed_type": "fix", "measured_gold_sha256": "fb47db13e636c1c1cf9f01db1941db37b52b221c84ad2cddcb0a20633ef13a5e"}
+  ],
+  "frozen_normalization_reproduction": {
+    "before_empty_angles": "<>",
+    "after_empty_angles": null,
+    "before_padded_empty_angles": "<>",
+    "after_padded_empty_angles": null,
+    "before_space_inside_angles": null,
+    "after_space_inside_angles": null,
+    "valid_id_behavior_unchanged": true,
+    "execution_scope": "AST-extracted frozen regex and normalize_message_id, valid string inputs only"
+  },
+  "case_results": [
+    {"files": 7, "total": 4, "observed_g003_type": "fix", "original_gold_correct": {"oracle": 3, "propagated": 3}, "reviewed_gold_correct": {"oracle": 4, "propagated": 4}},
+    {"files": 9, "total": 5, "observed_g003_type": "fix", "original_gold_correct": {"oracle": 4, "propagated": 4}, "reviewed_gold_correct": {"oracle": 5, "propagated": 5}},
+    {"files": 11, "total": 6, "observed_g003_type": "feat", "original_gold_correct": {"oracle": 6, "propagated": 6}, "reviewed_gold_correct": {"oracle": 5, "propagated": 5}}
+  ],
+  "oracle_text_input_caveat": "Frozen oracle Text requests contain the original feat for G003 in all cases. They are not an oracle of the reviewed type. Existing responses are retained; no corrected Text generation was performed."
+}
