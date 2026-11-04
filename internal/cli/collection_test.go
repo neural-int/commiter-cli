@@ -50,7 +50,7 @@ func TestMLXDryRunDoesNotContactRegistryOrFallbackToOllama(t *testing.T) {
 	t.Cleanup(func() { newMLXModelStore = oldStore })
 	newMLXModelStore = func() (mlxmodel.Store, error) { return mlxmodel.Store{Root: t.TempDir()}, nil }
 	var stdout, stderr bytes.Buffer
-	if code := Run([]string{"--dry-run"}, &stdout, &stderr); code != exitcode.LLM ||
+	if code := Run([]string{"--model", "mlx-community/Qwen3.5-4B-4bit", "--dry-run"}, &stdout, &stderr); code != exitcode.LLM ||
 		!strings.Contains(stderr.String(), "run commiter setup") {
 		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
 	}

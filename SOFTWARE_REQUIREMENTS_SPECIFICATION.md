@@ -114,7 +114,7 @@ pathspec を指定した場合は、Git の pathspec セマンティクスに従
 
 メトリクスの永続化はデフォルトで無効とし、明示的な設定または `--record-metrics` フラグが指定された場合のみ、state ディレクトリ配下の `metrics.jsonl` に記録します。
 
-コミット確認および自動プッシュ（auto push）の設定は、グローバル設定または明示的な CLI オプションでのみ変更可能とします。また、機密判定に追加するパターンおよび Ollama エンドポイントは、グローバル設定からのみ変更可能とします。対象外ファイルのステージング内容および選択状態の保護は v1 における不変条件（invariant）であり、設定や CLI から無効化することはできません。
+コミット確認および自動プッシュ（auto push）の設定は、グローバル設定または明示的な CLI オプションでのみ変更可能とします。また、機密判定に追加するパターンは、グローバル設定からのみ変更可能とします。対象外ファイルのステージング内容および選択状態の保護は v1 における不変条件（invariant）であり、設定や CLI から無効化することはできません。
 
 検証（verification）に関する設定全体はリポジトリスコープ（repo-scoped）とし、検証コマンド、自動検出、タイムアウトはリポジトリ設定でのみ指定可能とします。グローバル設定から検証設定を指定してはなりません。
 
@@ -135,10 +135,9 @@ glob、言語、モデル、および分類補助の設定は、リポジトリ�
 | `push.confirm` | boolean | `true` | global、CLI |
 | `llm.planner` | string | `"three-phase"` | global、repo |
 | `llm.backend` | string | `"mlx"` | global、repo |
-| `llm.model_revision` | string | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` | global、repo |
-| `llm.model_quantization` | string | `"4bit"` | global、repo |
+| `llm.model_revision` | string | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` | global、repo、CLI（`--model`で選択） |
+| `llm.model_quantization` | string | `"4bit"` | global、repo、CLI（`--model`で選択） |
 | `llm.model` | string | `"mlx-community/gemma-4-E4B-it-4bit"` | global、repo、CLI |
-| `llm.endpoint` | string | `"http://127.0.0.1:11434"` | global | （旧研究用。通常生成では未使用）
 | `llm.context` | string | `"64k"` | global、repo |
 | `llm.max_context_tokens` | integer | `65536` | global、repo |
 | `analysis.untracked` | string | `"auto-safe"` | global |

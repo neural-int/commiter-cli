@@ -284,10 +284,8 @@ func main() {
 
 func openBackend(name, helper, ollamaModel string, spec mlxmodel.Spec) (llm.OptionsBackend, string, error) {
 	if name == "ollama" {
-		values := config.Defaults().Values
-		values.Model = ollamaModel
-		client, err := ollama.New(values)
-		return client, values.Model, err
+		client, err := ollama.New("http://127.0.0.1:11434", ollamaModel)
+		return client, ollamaModel, err
 	}
 	if name == "mlx" {
 		if helper == "" {

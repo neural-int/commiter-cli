@@ -179,7 +179,6 @@ func TestResolveRejectsEveryForbiddenSourceKey(t *testing.T) {
 		{"repo commit confirm", SourceRepo, "[commit]\nconfirm = false\n"},
 		{"repo push enabled", SourceRepo, "[push]\nenabled = false\n"},
 		{"repo push confirm", SourceRepo, "[push]\nconfirm = false\n"},
-		{"repo endpoint", SourceRepo, "[llm]\nendpoint = \"http://127.0.0.1:11434\"\n"},
 		{"repo untracked", SourceRepo, "[analysis]\nuntracked = \"auto-safe\"\n"},
 		{"repo metrics", SourceRepo, "[metrics]\npersist = true\n"},
 		{"repo sensitive patterns", SourceRepo, "[safety]\nadditional_sensitive_patterns = []\n"},
@@ -202,7 +201,7 @@ func TestResolveRejectsEveryForbiddenSourceKey(t *testing.T) {
 }
 
 func TestCLIOverridesOnlySupportedKeys(t *testing.T) {
-	language, model := "ja", CandidateModel
+	language, model := "ja", "mlx-community/Qwen3.5-4B-4bit"
 	commitConfirm, pushEnabled, pushConfirm, metrics := false, false, false, true
 	root := t.TempDir()
 	global := filepath.Join(root, "config.toml")
@@ -221,10 +220,35 @@ backend = "mlx"
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, key := range []string{"commit.language", "commit.confirm", "push.enabled", "push.confirm", "llm.model", "metrics.persist"} {
+	if effective.Values.Model != model || effective.Values.ModelRevision != "0e7ffd5c629ef7719d4cbc04069232580bfa9d9c" ||
+		effective.Values.ModelQuantization != "4bit" {
+		t.Fatalf("unexpected CLI model pin: %#v", effective.Values)
+	}
+	for _, key := range []string{"commit.language", "commit.confirm", "push.enabled", "push.confirm", "llm.model", "llm.model_revision", "llm.model_quantization", "metrics.persist"} {
 		if effective.Sources[key] != SourceCLI {
 			t.Errorf("%s source = %s", key, effective.Sources[key])
 		}
+	}
+}
+
+func TestModelOverrideReplacesConfiguredQwenPin(t *testing.T) {
+	root := t.TempDir()
+	global := filepath.Join(root, "global.toml")
+	repo := filepath.Join(root, "repo.toml")
+	writeTestFile(t, repo, `[llm]
+planner = "three-phase"
+model = "mlx-community/Qwen3.5-4B-4bit"
+model_revision = "0e7ffd5c629ef7719d4cbc04069232580bfa9d9c"
+`)
+	model := CandidateModel
+	effective, err := Resolve(global, repo, root, CLIOverrides{Model: &model})
+	if err != nil || effective.Values.Model != CandidateModel || effective.Values.ModelRevision != CandidateRevision ||
+		effective.Values.ModelQuantization != "4bit" {
+		t.Fatalf("expected Gemma pin: %#v, %v", effective.Values, err)
+	}
+	model = "owner/model"
+	if _, err := Resolve(global, repo, root, CLIOverrides{Model: &model}); err == nil || !strings.Contains(err.Error(), "--model requires a supported pinned") {
+		t.Fatalf("unsupported model override error = %v", err)
 	}
 }
 
@@ -242,7 +266,8 @@ func TestResolveRejectsInvalidConfigurationWithoutRawValue(t *testing.T) {
 		{"unsupported version", SourceGlobal, "schema_version = 2\n", "unsupported schema_version"},
 		{"empty commands", SourceRepo, "schema_version = 1\nverification.commands = []\n", "at least one command"},
 		{"outside glob", SourceRepo, "schema_version = 1\n[analysis]\ninclude = [\"../secret\"]\n", "must not escape"},
-		{"remote endpoint", SourceGlobal, "schema_version = 1\n[llm]\nendpoint = \"http://example.com:11434\"\n", "loopback HTTP URL"},
+		{"global endpoint only", SourceGlobal, "[llm]\nendpoint = \"http://127.0.0.1:11434\"\n", "remove llm.endpoint from global configuration"},
+		{"repo endpoint with migrated planner", SourceRepo, "[llm]\nplanner = \"three-phase\"\nendpoint = \"RAW_SECRET\"\n", "remove llm.endpoint from repo configuration"},
 		{"empty unknown table", SourceGlobal, "schema_version = 1\n[completely_unknown]\n", "unknown configuration key"},
 		{"empty unknown nested table", SourceGlobal, "schema_version = 1\n[commit.unknown]\n", "unknown configuration key"},
 	}
@@ -261,24 +286,6 @@ func TestResolveRejectsInvalidConfigurationWithoutRawValue(t *testing.T) {
 			}
 			if strings.Contains(err.Error(), "RAW_SECRET") {
 				t.Fatalf("error exposed raw value: %v", err)
-			}
-		})
-	}
-}
-
-func TestResolveAcceptsOnlyLoopbackEndpoints(t *testing.T) {
-	for _, endpoint := range []string{
-		"http://127.0.0.1:11434",
-		"http://127.255.255.254:11434",
-		"http://[::1]:11434",
-		"http://LOCALHOST:11434",
-	} {
-		t.Run(endpoint, func(t *testing.T) {
-			root := t.TempDir()
-			global := filepath.Join(root, "global.toml")
-			writeTestFile(t, global, "[llm]\nendpoint = \""+endpoint+"\"\n")
-			if _, err := Resolve(global, filepath.Join(root, "missing"), root, CLIOverrides{}); err != nil {
-				t.Fatalf("Resolve() error = %v", err)
 			}
 		})
 	}

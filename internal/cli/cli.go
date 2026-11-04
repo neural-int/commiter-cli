@@ -84,9 +84,9 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	case "trust":
 		return runTrust(opts, printer)
 	case "setup":
-		return runSetup(opts.args, printer)
+		return runSetup(opts.args, opts.model, printer)
 	case "doctor":
-		return runDoctor(opts.args, printer)
+		return runDoctor(opts.args, opts.model, printer)
 	case "":
 		return runMain(opts, printer)
 	default:
@@ -162,7 +162,7 @@ func parseInitArgs(args []string) ([]string, error) {
 	return patterns, nil
 }
 
-func runSetup(args []string, printer *output.Printer) int {
+func runSetup(args []string, model *string, printer *output.Printer) int {
 	if len(args) > 1 || (len(args) == 1 && args[0] != "--update-model") {
 		return fail(printer, exitcode.New(exitcode.Usage, "setup accepts only --update-model"))
 	}
@@ -175,7 +175,7 @@ func runSetup(args []string, printer *output.Printer) int {
 	if err != nil {
 		return fail(printer, exitcode.New(exitcode.Usage, err.Error()))
 	}
-	effective, err := config.Resolve(paths.GlobalConfig, paths.RepoConfig, root, config.CLIOverrides{})
+	effective, err := config.Resolve(paths.GlobalConfig, paths.RepoConfig, root, config.CLIOverrides{Model: model})
 	if err != nil {
 		return fail(printer, exitcode.New(exitcode.Usage, err.Error()))
 	}
@@ -234,7 +234,7 @@ func runMLXModelSetup(printer *output.Printer, values config.Values, update bool
 	return finishSetup(printer, "MLX model setup completed; tokenizer, JSON Schema grammar, and constrained generation passed")
 }
 
-func runDoctor(args []string, printer *output.Printer) int {
+func runDoctor(args []string, model *string, printer *output.Printer) int {
 	if len(args) != 0 {
 		return fail(printer, exitcode.New(exitcode.Usage, "doctor does not accept arguments"))
 	}
@@ -244,7 +244,7 @@ func runDoctor(args []string, printer *output.Printer) int {
 	if rootErr == nil {
 		paths, err := config.DefaultPaths(root)
 		if err == nil {
-			effective, resolveErr := config.Resolve(paths.GlobalConfig, paths.RepoConfig, root, config.CLIOverrides{})
+			effective, resolveErr := config.Resolve(paths.GlobalConfig, paths.RepoConfig, root, config.CLIOverrides{Model: model})
 			checks["config"] = check(resolveErr == nil, message(resolveErr, "configuration valid"))
 			checks["trust"] = checkTrust(paths.StateDir, root)
 			if resolveErr == nil {
@@ -745,6 +745,8 @@ func printHelp(printer *output.Printer) error {
 	lines := []string{
 		"Usage: commiter [flags] [--] [pathspec...]",
 		"       commiter init [--ignore PATTERN]...",
+		"       commiter [--model NAME] setup [--update-model]",
+		"       commiter [--model NAME] doctor",
 		"Commands: init, setup, doctor, config, trust, version",
 		"Flags: --dry-run --no-push --no-confirm-commit --no-confirm-push",
 		"       --language en|ja --model NAME --record-metrics --json",

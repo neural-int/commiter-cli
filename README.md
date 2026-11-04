@@ -134,8 +134,8 @@ commiter --no-push
 
 | Command | Purpose |
 | --- | --- |
-| `commiter setup [--update-model]` | Prepare the selected backend and its configured local model. |
-| `commiter doctor` | Run read-only environment and capability checks for the selected backend. |
+| `commiter [--model NAME] setup [--update-model]` | Prepare the selected pinned MLX model. |
+| `commiter [--model NAME] doctor` | Run read-only environment and capability checks for the selected MLX model. |
 | `commiter config init --global\|--repo` | Create a global or repository configuration template. |
 | `commiter config show [--effective]` | Show resolved configuration and its sources. |
 | `commiter config path --global\|--repo` | Show a configuration path. |
@@ -152,7 +152,7 @@ commiter --no-push
 | `--no-confirm-commit` | Skip the ordinary commit-plan confirmation. Safety-required confirmations still apply. |
 | `--no-confirm-push` | Skip the ordinary push confirmation. Safety-required confirmations still apply. |
 | `--language en\|ja` | Override commit-message language for the current run. |
-| `--model NAME` | Override the model name; the configured revision must match a supported MLX pin. |
+| `--model NAME` | Select a supported MLX model with its pinned revision and 4-bit quantization for this invocation. |
 | `--record-metrics` | Persist local run metrics for the current run. |
 | `--json` | Emit JSON only for `--dry-run` or supported read-only commands. |
 

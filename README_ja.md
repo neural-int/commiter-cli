@@ -131,8 +131,8 @@ commiter --no-push
 
 | コマンド | 用途 |
 | --- | --- |
-| `commiter setup [--update-model]` | 選択された backend と指定されたローカルモデルの準備 |
-| `commiter doctor` | 選択された backend の読み取り専用診断 |
+| `commiter [--model NAME] setup [--update-model]` | 選択した固定MLXモデルの準備 |
+| `commiter [--model NAME] doctor` | 選択したMLXモデルと実行環境の読み取り専用診断 |
 | `commiter config init --global\|--repo` | グローバル設定またはリポジトリ用設定ファイルのテンプレート生成 |
 | `commiter config show [--effective]` | 実際に適用されている設定値とその読み込み元の表示 |
 | `commiter config path --global\|--repo` | 設定ファイルの配置パスの表示 |
@@ -149,7 +149,7 @@ commiter --no-push
 | `--no-confirm-commit` | 通常のコミット計画承認プロンプトをスキップ（安全上不可欠な確認はスキップされません） |
 | `--no-confirm-push` | 通常の push 承認プロンプトをスキップ（安全上不可欠な確認はスキップされません） |
 | `--language en\|ja` | 今回の実行で使用するコミットメッセージ言語を一時的に変更 |
-| `--model NAME` | モデル名を変更（設定revisionと対応する固定MLXモデルの組が必要） |
+| `--model NAME` | 今回の実行で使う対応MLXモデルを、固定revisionと4bit量子化の組で選択 |
 | `--record-metrics` | 今回の実行のメトリクスログをローカルに保存 |
 | `--json` | `--dry-run` または対応する読み取り専用コマンドの出力を JSON 形式で表示 |
 

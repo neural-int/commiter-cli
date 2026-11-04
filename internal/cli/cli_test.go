@@ -254,9 +254,15 @@ func TestJSONDoctorIsStableAndReadOnly(t *testing.T) {
 }
 
 func TestMLXSetupShowsPinnedDownloadPlanBeforeApproval(t *testing.T) {
+	root := cliRepository(t)
+	chdir(t, root)
+	const model = "mlx-community/Qwen3.5-4B-4bit"
+	const revision = "0e7ffd5c629ef7719d4cbc04069232580bfa9d9c"
 	requests, downloads := 0, 0
+	var treePath string
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		requests++
+		treePath = request.URL.Path
 		if strings.Contains(request.URL.Path, "/resolve/") {
 			downloads++
 		}
@@ -288,17 +294,22 @@ func TestMLXSetupShowsPinnedDownloadPlanBeforeApproval(t *testing.T) {
 	var stdout bytes.Buffer
 	confirmFunc = func(string) bool {
 		if !strings.Contains(stdout.String(), "estimated download size: 2 bytes") ||
-			!strings.Contains(stdout.String(), "pinned revision:") ||
+			!strings.Contains(stdout.String(), "model repository: "+model) ||
+			!strings.Contains(stdout.String(), "pinned revision: "+revision) ||
+			!strings.Contains(stdout.String(), "quantization label: 4bit") ||
 			!strings.Contains(stdout.String(), "destination:") {
-			t.Fatal("model download details were not shown before approval")
+			t.Fatalf("unexpected download details before approval: %s", stdout.String())
 		}
 		return false
 	}
-	if code := Run([]string{"setup"}, &stdout, io.Discard); code != 0 {
+	if code := Run([]string{"--model", model, "setup"}, &stdout, io.Discard); code != 0 {
 		t.Fatalf("setup code = %d, output = %q", code, stdout.String())
 	}
 	if requests != 1 || downloads != 0 {
 		t.Fatalf("requests = %d, downloads = %d", requests, downloads)
+	}
+	if want := "/api/models/" + model + "/tree/" + revision; treePath != want {
+		t.Fatalf("tree path = %q, want %q", treePath, want)
 	}
 }
 

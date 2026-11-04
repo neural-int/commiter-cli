@@ -114,7 +114,7 @@ State and trust are stored under `$XDG_STATE_HOME/commiter/`, or `~/.local/state
 
 Persistent metrics are disabled by default and are written to `metrics.jsonl` under the state directory only when explicitly configured or when `--record-metrics` is supplied.
 
-Commit confirmation and auto push may be changed only by global configuration or explicit CLI flags. Additional patterns for sensitive classification and the Ollama endpoint may be changed only in global configuration. Protection of out-of-scope staged contents and staged selection is an immutable v1 invariant and cannot be disabled by configuration or CLI.
+Commit confirmation and auto push may be changed only by global configuration or explicit CLI flags. Additional patterns for sensitive classification may be changed only in global configuration. Protection of out-of-scope staged contents and staged selection is an immutable v1 invariant and cannot be disabled by configuration or CLI.
 
 The entire verification configuration is repository-scoped. Verification commands, autodetection, and timeout may be specified only in repository configuration. Verification must not be configured globally.
 
@@ -135,10 +135,9 @@ Configuration files use TOML and the following v1 schema:
 | `push.confirm` | boolean | `true` | global, CLI |
 | `llm.planner` | string | `"three-phase"` | global, repo |
 | `llm.backend` | string | `"mlx"` | global, repo |
-| `llm.model_revision` | string | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` | global, repo |
-| `llm.model_quantization` | string | `"4bit"` | global, repo |
+| `llm.model_revision` | string | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` | global, repo, CLI (selected by `--model`) |
+| `llm.model_quantization` | string | `"4bit"` | global, repo, CLI (selected by `--model`) |
 | `llm.model` | string | `"mlx-community/gemma-4-E4B-it-4bit"` | global, repo, CLI |
-| `llm.endpoint` | string | `"http://127.0.0.1:11434"` | global | (deprecated; unused by normal planning)
 | `llm.context` | string | `"64k"` | global, repo |
 | `llm.max_context_tokens` | integer | `65536` | global, repo |
 | `analysis.untracked` | string | `"auto-safe"` | global |

@@ -19,9 +19,9 @@ context = "64k"
 max_context_tokens = 65536
 ```
 
-検証済みの別構成は、`model = "mlx-community/Qwen3.5-4B-4bit"`と`model_revision = "0e7ffd5c629ef7719d4cbc04069232580bfa9d9c"`の組です。量子化は同じ`4bit`です。モデル名だけの変更、可変revision、任意のモデルの指定は受け付けません。`--model`もこの組の整合性検査を受けるため、モデルを切り替える場合は設定のrevisionも合わせて変更してください。
+検証済みの別構成は、`model = "mlx-community/Qwen3.5-4B-4bit"`と`model_revision = "0e7ffd5c629ef7719d4cbc04069232580bfa9d9c"`の組です。量子化は同じ`4bit`です。設定ファイルでモデルを変更する場合は、対応する固定revisionも指定してください。一時的に切り替える場合は`--model NAME`で対応モデルを指定すると、固定revisionと量子化も選択されます。`setup`と`doctor`で使う場合は、`commiter --model mlx-community/Qwen3.5-4B-4bit setup`のようにサブコマンドの前に指定します。
 
-`llm.context = "auto"`も64K固定の別表記として受け付けます。8K/16K/32K枠や65,536以外の`max_context_tokens`は移行エラーになります。旧`endpoint`は通常MLX生成に使いません。設定に残す必要はありません。
+`llm.context = "auto"`も64K固定の別表記として受け付けます。8K/16K/32K枠や65,536以外の`max_context_tokens`は移行エラーになります。旧`llm.endpoint`がある場合は移行エラーになるため、グローバル設定とリポジトリ設定から削除してください。
 
 変更後は、次の順に確認します。
 

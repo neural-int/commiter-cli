@@ -11,9 +11,49 @@ import (
 	"testing"
 
 	"github.com/natsuki0413/commiter-cli/internal/config"
+	"github.com/natsuki0413/commiter-cli/internal/exitcode"
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 	"github.com/natsuki0413/commiter-cli/internal/planning"
 )
+
+func TestDoctorChecksCacheForModelOverride(t *testing.T) {
+	chdir(t, cliRepository(t))
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+	t.Setenv("XDG_STATE_HOME", t.TempDir())
+	spec := mlxmodel.Spec{
+		Repo: "mlx-community/Qwen3.5-4B-4bit", Revision: "0e7ffd5c629ef7719d4cbc04069232580bfa9d9c", Quantization: "4bit",
+	}
+	store := mlxmodel.Store{Root: t.TempDir()}
+	dir, err := store.Destination(spec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		t.Fatal(err)
+	}
+	// Only Qwen has cache metadata. Invalid metadata must stop before the helper is run.
+	cliWrite(t, dir, "commiter-model.json", "{}", 0600)
+	oldStore, oldPlatform, oldBundled := newMLXModelStore, mlxPlatform, resolveBundledMLXHelper
+	t.Cleanup(func() {
+		newMLXModelStore, mlxPlatform, resolveBundledMLXHelper = oldStore, oldPlatform, oldBundled
+	})
+	newMLXModelStore = func() (mlxmodel.Store, error) { return store, nil }
+	mlxPlatform = func() (string, string) { return "darwin", "arm64" }
+	resolveBundledMLXHelper = func() (string, error) { return "/test/commiter-mlx-helper", nil }
+	var stdout, stderr bytes.Buffer
+	if code := Run([]string{"--json", "--model=" + spec.Repo, "doctor"}, &stdout, &stderr); code != exitcode.LLM {
+		t.Fatalf("code = %d, stdout = %s, stderr = %s", code, &stdout, &stderr)
+	}
+	var result struct {
+		Doctor map[string]doctorCheck `json:"doctor"`
+	}
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatal(err)
+	}
+	if !result.Doctor["config"].OK || !strings.Contains(result.Doctor["mlx_model"].Message, "metadata is invalid") {
+		t.Fatalf("doctor did not check Qwen cache: %s", &stdout)
+	}
+}
 
 func TestFindMLXHelperPrefersBundledHelperAndFallsBackToPath(t *testing.T) {
 	oldBundled, oldLookPath := resolveBundledMLXHelper, lookPath
