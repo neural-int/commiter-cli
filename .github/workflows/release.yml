@@ -88,12 +88,6 @@ jobs:
       - name: Run go vet
         run: go vet ./...
 
-      - name: Run Swift helper tests
-        run: |
-          xcodebuild -version
-          swift --version
-          swift test --package-path mlx-helper --triple arm64-apple-macosx14.0
-
       - name: Run release preflight
         shell: bash
         env:
@@ -103,6 +97,9 @@ jobs:
           xcodebuild -version
           swift --version
           bash .github/scripts/release-preflight.sh "$VERSION" "$ARCHIVE"
+
+      - name: Run Swift helper tests with Metal library
+        run: bash .github/scripts/test-mlx-helper.sh --triple arm64-apple-macosx14.0
 
       - name: Archive validated MLX helper
         shell: bash
@@ -168,7 +165,18 @@ jobs:
         run: |
           set -euo pipefail
 
-          previous_tag="$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)"
+          # Unpublished tags (for example, a failed release run) are not a release baseline.
+          published_tags="$(gh api --paginate --slurp \
+            "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+            | jq -r '[.[][] | select(.draft == false and .prerelease == false and .published_at != null)] | sort_by(.published_at) | reverse | .[].tag_name')"
+          previous_tag=""
+          while IFS= read -r candidate; do
+            if [[ "$candidate" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ && "$candidate" != "$TAG" ]] &&
+              git merge-base --is-ancestor "refs/tags/${candidate}" "${TAG}^" 2>/dev/null; then
+              previous_tag="$candidate"
+              break
+            fi
+          done <<< "$published_tags"
           if [[ -n "$previous_tag" ]]; then
             git rev-list "${previous_tag}..${TAG}" > "$RUNNER_TEMP/release-commits.txt"
           else
