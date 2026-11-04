@@ -114,7 +114,7 @@ func TestDefaultsCoverEverySchemaKey(t *testing.T) {
 	if effective.Values.Backend != "mlx" {
 		t.Fatalf("default backend = %q", effective.Values.Backend)
 	}
-	if effective.Values.Context != "auto" || effective.Values.MaxTokens != 65536 {
+	if effective.Values.Context != "64k" || effective.Values.MaxTokens != 65536 {
 		t.Fatalf("adaptive context defaults = %q/%d", effective.Values.Context, effective.Values.MaxTokens)
 	}
 	entries := effective.Entries()
@@ -137,26 +137,19 @@ func TestDefaultsCoverEverySchemaKey(t *testing.T) {
 	}
 }
 
-func TestResolveMLXRequiresPinnedModelForExplicitSinglePass(t *testing.T) {
+func TestResolveRejectsRemovedSinglePassAndUnverifiedModels(t *testing.T) {
 	root := t.TempDir()
 	global := filepath.Join(root, "global.toml")
-	repo := filepath.Join(root, ".commiter.toml")
-	writeTestFile(t, repo, "[llm]\nplanner = \"single-pass\"\nbackend = \"mlx\"\nmodel = \"owner/model\"\nmodel_revision = \""+strings.Repeat("a", 40)+"\"\nmodel_quantization = \"4bit\"\n")
-	effective, err := Resolve(global, repo, root, CLIOverrides{})
-	if err != nil {
-		t.Fatal(err)
+	repo := filepath.Join(root, "repo.toml")
+	for _, body := range []string{"[llm]\nplanner = \"single-pass\"\n", "[llm]\nbackend = \"ollama\"\n", "[llm]\nmodel = \"owner/model\"\n"} {
+		writeTestFile(t, repo, body)
+		if _, err := Resolve(global, repo, root, CLIOverrides{}); err == nil {
+			t.Fatal("legacy or unverified model accepted")
+		}
 	}
-	if effective.Values.Backend != "mlx" || effective.Values.Model != "owner/model" ||
-		effective.Sources["llm.backend"] != SourceRepo {
-		t.Fatalf("unexpected MLX configuration: %#v", effective)
-	}
-	writeTestFile(t, repo, "[llm]\nplanner = \"single-pass\"\nbackend = \"mlx\"\nmodel = \"owner/model\"\nmodel_revision = \"main\"\nmodel_quantization = \"4bit\"\n")
-	if _, err := Resolve(global, repo, root, CLIOverrides{}); err == nil || !strings.Contains(err.Error(), "model_revision") {
-		t.Fatalf("mutable revision accepted: %v", err)
-	}
-	writeTestFile(t, repo, "[llm]\nbackend = \"auto\"\n")
-	if _, err := Resolve(global, repo, root, CLIOverrides{}); err == nil || !strings.Contains(err.Error(), "llm.backend") {
-		t.Fatalf("auto backend accepted: %v", err)
+	writeTestFile(t, repo, "[llm]\nplanner = \"three-phase\"\nmodel = \"mlx-community/Qwen3.5-4B-4bit\"\nmodel_revision = \"0e7ffd5c629ef7719d4cbc04069232580bfa9d9c\"\n")
+	if e, err := Resolve(global, repo, root, CLIOverrides{}); err != nil || !SupportedPlannerModel(e.Values) {
+		t.Fatalf("validated Qwen pin rejected: %v", err)
 	}
 }
 
@@ -164,7 +157,7 @@ func TestResolveAccepts64KContextCeiling(t *testing.T) {
 	root := t.TempDir()
 	global := filepath.Join(t.TempDir(), "config.toml")
 	repo := filepath.Join(root, ".commiter.toml")
-	writeTestFile(t, repo, "schema_version = 1\n[llm]\nplanner = \"single-pass\"\ncontext = \"64k\"\nmax_context_tokens = 65536\n")
+	writeTestFile(t, repo, "schema_version = 1\n[llm]\nplanner = \"three-phase\"\ncontext = \"64k\"\nmax_context_tokens = 65536\n")
 	effective, err := Resolve(global, repo, root, CLIOverrides{})
 	if err != nil {
 		t.Fatal(err)
@@ -186,7 +179,6 @@ func TestResolveRejectsEveryForbiddenSourceKey(t *testing.T) {
 		{"repo commit confirm", SourceRepo, "[commit]\nconfirm = false\n"},
 		{"repo push enabled", SourceRepo, "[push]\nenabled = false\n"},
 		{"repo push confirm", SourceRepo, "[push]\nconfirm = false\n"},
-		{"repo endpoint", SourceRepo, "[llm]\nendpoint = \"http://127.0.0.1:11434\"\n"},
 		{"repo untracked", SourceRepo, "[analysis]\nuntracked = \"auto-safe\"\n"},
 		{"repo metrics", SourceRepo, "[metrics]\npersist = true\n"},
 		{"repo sensitive patterns", SourceRepo, "[safety]\nadditional_sensitive_patterns = []\n"},
@@ -209,13 +201,13 @@ func TestResolveRejectsEveryForbiddenSourceKey(t *testing.T) {
 }
 
 func TestCLIOverridesOnlySupportedKeys(t *testing.T) {
-	language, model := "ja", "local-model"
+	language, model := "ja", "mlx-community/Qwen3.5-4B-4bit"
 	commitConfirm, pushEnabled, pushConfirm, metrics := false, false, false, true
 	root := t.TempDir()
 	global := filepath.Join(root, "config.toml")
 	writeTestFile(t, global, `[llm]
-planner = "single-pass"
-backend = "ollama"
+planner = "three-phase"
+backend = "mlx"
 `)
 	effective, err := Resolve(global, "missing-repo", root, CLIOverrides{
 		Language:       &language,
@@ -228,10 +220,35 @@ backend = "ollama"
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, key := range []string{"commit.language", "commit.confirm", "push.enabled", "push.confirm", "llm.model", "metrics.persist"} {
+	if effective.Values.Model != model || effective.Values.ModelRevision != "0e7ffd5c629ef7719d4cbc04069232580bfa9d9c" ||
+		effective.Values.ModelQuantization != "4bit" {
+		t.Fatalf("unexpected CLI model pin: %#v", effective.Values)
+	}
+	for _, key := range []string{"commit.language", "commit.confirm", "push.enabled", "push.confirm", "llm.model", "llm.model_revision", "llm.model_quantization", "metrics.persist"} {
 		if effective.Sources[key] != SourceCLI {
 			t.Errorf("%s source = %s", key, effective.Sources[key])
 		}
+	}
+}
+
+func TestModelOverrideReplacesConfiguredQwenPin(t *testing.T) {
+	root := t.TempDir()
+	global := filepath.Join(root, "global.toml")
+	repo := filepath.Join(root, "repo.toml")
+	writeTestFile(t, repo, `[llm]
+planner = "three-phase"
+model = "mlx-community/Qwen3.5-4B-4bit"
+model_revision = "0e7ffd5c629ef7719d4cbc04069232580bfa9d9c"
+`)
+	model := CandidateModel
+	effective, err := Resolve(global, repo, root, CLIOverrides{Model: &model})
+	if err != nil || effective.Values.Model != CandidateModel || effective.Values.ModelRevision != CandidateRevision ||
+		effective.Values.ModelQuantization != "4bit" {
+		t.Fatalf("expected Gemma pin: %#v, %v", effective.Values, err)
+	}
+	model = "owner/model"
+	if _, err := Resolve(global, repo, root, CLIOverrides{Model: &model}); err == nil || !strings.Contains(err.Error(), "--model requires a supported pinned") {
+		t.Fatalf("unsupported model override error = %v", err)
 	}
 }
 
@@ -249,7 +266,8 @@ func TestResolveRejectsInvalidConfigurationWithoutRawValue(t *testing.T) {
 		{"unsupported version", SourceGlobal, "schema_version = 2\n", "unsupported schema_version"},
 		{"empty commands", SourceRepo, "schema_version = 1\nverification.commands = []\n", "at least one command"},
 		{"outside glob", SourceRepo, "schema_version = 1\n[analysis]\ninclude = [\"../secret\"]\n", "must not escape"},
-		{"remote endpoint", SourceGlobal, "schema_version = 1\n[llm]\nendpoint = \"http://example.com:11434\"\n", "loopback HTTP URL"},
+		{"global endpoint only", SourceGlobal, "[llm]\nendpoint = \"http://127.0.0.1:11434\"\n", "remove llm.endpoint from global configuration"},
+		{"repo endpoint with migrated planner", SourceRepo, "[llm]\nplanner = \"three-phase\"\nendpoint = \"RAW_SECRET\"\n", "remove llm.endpoint from repo configuration"},
 		{"empty unknown table", SourceGlobal, "schema_version = 1\n[completely_unknown]\n", "unknown configuration key"},
 		{"empty unknown nested table", SourceGlobal, "schema_version = 1\n[commit.unknown]\n", "unknown configuration key"},
 	}
@@ -268,24 +286,6 @@ func TestResolveRejectsInvalidConfigurationWithoutRawValue(t *testing.T) {
 			}
 			if strings.Contains(err.Error(), "RAW_SECRET") {
 				t.Fatalf("error exposed raw value: %v", err)
-			}
-		})
-	}
-}
-
-func TestResolveAcceptsOnlyLoopbackEndpoints(t *testing.T) {
-	for _, endpoint := range []string{
-		"http://127.0.0.1:11434",
-		"http://127.255.255.254:11434",
-		"http://[::1]:11434",
-		"http://LOCALHOST:11434",
-	} {
-		t.Run(endpoint, func(t *testing.T) {
-			root := t.TempDir()
-			global := filepath.Join(root, "global.toml")
-			writeTestFile(t, global, "[llm]\nendpoint = \""+endpoint+"\"\n")
-			if _, err := Resolve(global, filepath.Join(root, "missing"), root, CLIOverrides{}); err != nil {
-				t.Fatalf("Resolve() error = %v", err)
 			}
 		})
 	}
@@ -412,8 +412,10 @@ func TestThreePhaseDefaultRequiresPinnedCandidateWithFixedContext(t *testing.T) 
 	}{{"8k", 8192}, {"16k", 16384}, {"32k", 32768}, {"64k", 65536}, {"auto", 32768}} {
 		changed := values
 		changed.Context, changed.MaxTokens = ceiling.context, ceiling.max
-		if err := validateValues(changed, t.TempDir()); err != nil {
-			t.Fatalf("three-phase rejected supported context %s/%d: %v", ceiling.context, ceiling.max, err)
+		err := validateValues(changed, t.TempDir())
+		valid := ceiling.max == 65536 && (ceiling.context == "64k" || ceiling.context == "auto")
+		if (err == nil) != valid {
+			t.Fatalf("context admission %s/%d: %v", ceiling.context, ceiling.max, err)
 		}
 	}
 }
@@ -428,12 +430,8 @@ func TestLegacyV1PlannerCompatibility(t *testing.T) {
 				path = repo
 			}
 			writeTestFile(t, path, "schema_version = 1\n[llm]\nmodel = \"qwen3.5:4b-q4_K_M\"\ncontext = \"auto\"\n")
-			e, err := Resolve(global, repo, root, CLIOverrides{})
-			if err != nil {
-				t.Fatal(err)
-			}
-			if e.Values.Planner != "single-pass" || e.Values.Backend != "ollama" || e.Values.MaxTokens != 65536 {
-				t.Fatalf("legacy config = %#v", e.Values)
+			if _, err := Resolve(global, repo, root, CLIOverrides{}); err == nil {
+				t.Fatal("legacy config silently recovered")
 			}
 		})
 	}
@@ -449,9 +447,10 @@ func TestLegacyMLXAndExplicitCandidateCompatibility(t *testing.T) {
 	global, repo := filepath.Join(root, "global.toml"), filepath.Join(root, "repo.toml")
 	writeTestFile(t, global, "[llm]\nbackend = \"mlx\"\nmodel = \"owner/model\"\nmodel_revision = \""+strings.Repeat("a", 40)+"\"\nmodel_quantization = \"4bit\"\n")
 	e, err := Resolve(global, repo, root, CLIOverrides{})
-	if err != nil || e.Values.Planner != "single-pass" || e.Values.Model != "owner/model" {
-		t.Fatalf("legacy MLX: %#v %v", e.Values, err)
+	if err == nil {
+		t.Fatal("unverified legacy model accepted")
 	}
+	writeTestFile(t, global, GlobalTemplate)
 	writeTestFile(t, repo, RepoTemplate)
 	e, err = Resolve(global, repo, root, CLIOverrides{})
 	if err != nil || e.Values.Planner != CandidatePlanner || e.Values.Model != CandidateModel {
@@ -462,5 +461,14 @@ func TestLegacyMLXAndExplicitCandidateCompatibility(t *testing.T) {
 	e, err = Resolve(global, repo, root, CLIOverrides{})
 	if err != nil || e.Values.Planner != CandidatePlanner {
 		t.Fatalf("explicit global planner overridden: %#v %v", e.Values, err)
+	}
+}
+
+func TestPinnedModelWithoutExplicitPlannerRequiresMigration(t *testing.T) {
+	root := t.TempDir()
+	path := filepath.Join(root, "global.toml")
+	writeTestFile(t, path, "[llm]\nbackend = \"mlx\"\nmodel = \""+CandidateModel+"\"\n")
+	if _, err := Resolve(path, filepath.Join(root, "missing"), root, CLIOverrides{}); err == nil || !strings.Contains(err.Error(), "explicitly") {
+		t.Fatalf("implicit migration: %v", err)
 	}
 }

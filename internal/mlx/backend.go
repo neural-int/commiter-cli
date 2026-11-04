@@ -51,6 +51,13 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 				return llm.Response{}, errors.New("invalid history input layout")
 			}
 			rendered[1].Content = "{}" // Shared data travels once, in history fragments.
+			if options.HistoryInput.PhaseTemplate != nil {
+				prefix, _, ok := strings.Cut(rendered[2].Content, "\n\nPhase input:\n")
+				if !ok {
+					return llm.Response{}, errors.New("missing phase input")
+				}
+				rendered[2].Content = prefix + "\n\nPhase input:\n{}"
+			}
 		}
 		for i, m := range rendered {
 			if m.Role == "user" {
@@ -71,16 +78,55 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 		}
 		messages = rendered
 	}
+	if options.HistoryInput != nil && options.HistoryInput.SharedTemplate != nil {
+		if options.HistoryInput.PhaseTemplate == nil {
+			return llm.Response{}, errors.New("invalid attributed history display")
+		}
+		history := *options.HistoryInput
+		shared, err := history.SharedTemplate.LiteralNewlines()
+		if err != nil {
+			return llm.Response{}, err
+		}
+		phase, err := history.PhaseTemplate.LiteralNewlines()
+		if err != nil {
+			return llm.Response{}, err
+		}
+		history.SharedTemplate, history.PhaseTemplate = &shared, &phase
+		options.HistoryInput = &history
+	}
 	generate := backend.Client.Generate
 	if backend.session != nil {
 		generate = backend.session.Generate
 	}
-	response, err := generate(ctx, Request{
+	request := Request{
 		HistoryInput: options.HistoryInput,
 		Schema:       schema, Messages: messages, ContextTokens: options.ContextTokens,
 		OutputTokens: options.OutputTokens, Model: model, ModelPath: backend.ModelPath,
 		GenerationProfile: options.GenerationProfile, InputLayout: options.InputLayout,
-	})
+	}
+	// The existing IPC byte bound is a resource limit, not a token estimate.
+	// If optional attributed history exceeds it, use the host-compiled whole-
+	// record omission display. The helper still validates exact mandatory tokens.
+	transportOmission := false
+	if history := request.HistoryInput; history != nil && history.SharedTemplate != nil {
+		limit := backend.Client.MaxRequestBytes
+		if limit <= 0 {
+			limit = DefaultMaxRequestBytes
+		}
+		if _, err := marshalRequest(request, limit); errors.Is(err, errMessageTooLarge) {
+			request.Messages = append([]llm.Message(nil), request.Messages...)
+			request.Messages[0].Content = history.SystemWithoutHistory
+			request.Messages[1].Content = history.SharedTemplate.Render([]int{})
+			prefix, _, ok := strings.Cut(request.Messages[2].Content, "\n\nPhase input:\n")
+			if !ok {
+				return llm.Response{}, errors.New("missing phase input")
+			}
+			request.Messages[2].Content = prefix + "\n\nPhase input:\n" + history.PhaseTemplate.Render([]int{})
+			request.HistoryInput = nil
+			transportOmission = true
+		}
+	}
+	response, err := generate(ctx, request)
 	if err != nil {
 		if response.ErrorClass == "input_too_large" {
 			return llm.Response{}, llm.ErrInputTooLarge
@@ -94,8 +140,11 @@ func (backend *Backend) ChatWithOptions(ctx context.Context, messages []llm.Mess
 	if options.GenerationProfile != "" && response.GenerationProfile != options.GenerationProfile {
 		return llm.Response{}, &Error{Kind: FailureProtocol}
 	}
-	if (options.HistoryInput != nil) != (response.SelectedHistoryIndices != nil) {
+	if (request.HistoryInput != nil) != (response.SelectedHistoryIndices != nil) {
 		return llm.Response{}, &Error{Kind: FailureProtocol}
+	}
+	if transportOmission {
+		response.SelectedHistoryIndices = []int{}
 	}
 	var cache struct {
 		InputPreparationCalls int    `json:"inputPreparationCalls"`

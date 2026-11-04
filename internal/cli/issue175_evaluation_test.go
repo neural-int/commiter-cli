@@ -167,7 +167,7 @@ func TestIssue175Evaluation(t *testing.T) {
 				records = fixture.Context
 			}
 			started := time.Now()
-			result, genErr := (planning.ThreePhaseGenerator{Client: backend, CodexContext: records}).Generate(context.Background(), prepared, planning.Japanese, sensitive)
+			result, genErr := (planning.ResearchThreePhaseGenerator{Client: backend, CodexContext: records}).Generate(context.Background(), prepared, planning.Japanese, sensitive)
 			reason := ""
 			if genErr != nil {
 				reason = genErr.Error()

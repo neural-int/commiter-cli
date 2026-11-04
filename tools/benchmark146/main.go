@@ -154,7 +154,7 @@ func local(ctx context.Context, f fixture, w []string, backend llm.OptionsBacken
 		}
 	}
 	c := &capture{Backend: backend, Truth: truth, Window: w, Files: d.Files}
-	_, err = (planning.ThreePhaseGenerator{Client: c}).Generate(ctx, p, planning.English, planning.SensitiveValues{})
+	_, err = (planning.ResearchThreePhaseGenerator{Client: c}).Generate(ctx, p, planning.English, planning.SensitiveValues{})
 	if !c.Reached {
 		return windowResult{}, c.Metrics, err
 	}

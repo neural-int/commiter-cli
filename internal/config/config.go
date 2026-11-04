@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net"
-	"net/url"
 	"os"
 	"path/filepath"
 	"sort"
@@ -21,6 +19,7 @@ const MaxFileSize int64 = 1 << 20
 const CandidateModel = "mlx-community/gemma-4-E4B-it-4bit"
 const CandidateRevision = "475b9088d29754a3379866cf5aeb6b41acd313c2"
 const CandidatePlanner = "three-phase"
+const plannerModelQuantization = "4bit"
 
 type Source string
 
@@ -49,7 +48,6 @@ type Values struct {
 	Backend           string
 	ModelRevision     string
 	ModelQuantization string
-	Endpoint          string
 	Context           string
 	MaxTokens         int
 	Untracked         string
@@ -98,7 +96,6 @@ var schema = map[string]schemaEntry{
 	"llm.backend":                          {"string", allow(SourceGlobal, SourceRepo)},
 	"llm.model_revision":                   {"string", allow(SourceGlobal, SourceRepo)},
 	"llm.model_quantization":               {"string", allow(SourceGlobal, SourceRepo)},
-	"llm.endpoint":                         {"string", allow(SourceGlobal)},
 	"llm.context":                          {"string", allow(SourceGlobal, SourceRepo)},
 	"llm.max_context_tokens":               {"integer", allow(SourceGlobal, SourceRepo)},
 	"analysis.untracked":                   {"string", allow(SourceGlobal)},
@@ -135,10 +132,9 @@ func Defaults() Effective {
 			Planner:           CandidatePlanner,
 			Model:             CandidateModel,
 			ModelRevision:     CandidateRevision,
-			ModelQuantization: "4bit",
+			ModelQuantization: plannerModelQuantization,
 			Backend:           "mlx",
-			Endpoint:          "http://127.0.0.1:11434",
-			Context:           "auto",
+			Context:           "64k",
 			MaxTokens:         65536,
 			Untracked:         "auto-safe",
 			Include:           []string{},
@@ -166,7 +162,9 @@ func Resolve(globalPath, repoPath, repoRoot string, cli CLIOverrides) (Effective
 	if err := validateValues(effective.Values, repoRoot); err != nil {
 		return Effective{}, fmt.Errorf("invalid repo configuration: %w", err)
 	}
-	applyCLI(&effective, cli)
+	if err := applyCLI(&effective, cli); err != nil {
+		return Effective{}, fmt.Errorf("invalid CLI configuration: %w", err)
+	}
 	if err := validateValues(effective.Values, repoRoot); err != nil {
 		return Effective{}, fmt.Errorf("invalid CLI configuration: %w", err)
 	}
@@ -200,22 +198,17 @@ func applyFile(effective *Effective, path string, source Source, repoRoot string
 	if err := flatten("", raw, flat); err != nil {
 		return fmt.Errorf("invalid %s configuration: %w", source, err)
 	}
-	// Existing v1 files predate planner selection. Only infer legacy defaults
-	// while no earlier configuration has explicitly selected a planner.
+	if _, exists := flat["llm.endpoint"]; exists {
+		return fmt.Errorf("remove llm.endpoint from %s configuration; Ollama settings are no longer supported (see docs/migrations/harness004.md)", source)
+	}
+	// Existing model/backend selections must opt into the new execution contract.
+	// Unrelated commit/verification settings can still use fresh defaults.
 	if _, explicit := flat["llm.planner"]; !explicit && effective.Sources["llm.planner"] == SourceDefault {
-		legacy := map[string]string{"llm.backend": "ollama", "llm.model": "qwen3.5:4b-q4_K_M", "llm.model_revision": "", "llm.model_quantization": "", "llm.context": "auto"}
-		for key, value := range legacy {
-			if effective.Sources[key] == SourceDefault {
-				if err := applyValue(effective, key, "string", value, SourceDefault, repoRoot); err != nil {
-					return err
-				}
+		for _, key := range []string{"llm.model", "llm.backend", "llm.model_revision", "llm.model_quantization"} {
+			if _, exists := flat[key]; exists {
+				return fmt.Errorf("set llm.planner = \"three-phase\" explicitly when migrating model settings (see docs/migrations/harness004.md)")
 			}
 		}
-		if effective.Sources["llm.max_context_tokens"] == SourceDefault {
-			effective.Values.MaxTokens = 65536
-		}
-		effective.Values.Planner = "single-pass"
-		effective.Sources["llm.planner"] = source
 	}
 	keys := make([]string, 0, len(flat))
 	for key := range flat {
@@ -243,7 +236,7 @@ func flatten(prefix string, table map[string]any, flat map[string]any) error {
 		if prefix != "" {
 			path = prefix + "." + key
 		}
-		if path == "verification.commands" {
+		if path == "verification.commands" || path == "llm.endpoint" {
 			flat[path] = value
 			continue
 		}
@@ -315,8 +308,6 @@ func applyValue(e *Effective, key, kind string, raw any, source Source, repoRoot
 			e.Values.ModelRevision = value
 		case "llm.model_quantization":
 			e.Values.ModelQuantization = value
-		case "llm.endpoint":
-			e.Values.Endpoint = value
 		case "llm.context":
 			e.Values.Context = value
 		case "analysis.untracked":
@@ -359,7 +350,7 @@ func applyValue(e *Effective, key, kind string, raw any, source Source, repoRoot
 	return nil
 }
 
-func applyCLI(e *Effective, cli CLIOverrides) {
+func applyCLI(e *Effective, cli CLIOverrides) error {
 	if cli.Language != nil {
 		e.Values.Language, e.Sources["commit.language"] = *cli.Language, SourceCLI
 	}
@@ -373,11 +364,18 @@ func applyCLI(e *Effective, cli CLIOverrides) {
 		e.Values.PushConfirm, e.Sources["push.confirm"] = *cli.PushConfirm, SourceCLI
 	}
 	if cli.Model != nil {
+		revision := pinnedPlannerRevision(*cli.Model)
+		if revision == "" {
+			return fmt.Errorf("--model requires a supported pinned Gemma or Qwen MLX model (see docs/migrations/harness004.md)")
+		}
 		e.Values.Model, e.Sources["llm.model"] = *cli.Model, SourceCLI
+		e.Values.ModelRevision, e.Sources["llm.model_revision"] = revision, SourceCLI
+		e.Values.ModelQuantization, e.Sources["llm.model_quantization"] = plannerModelQuantization, SourceCLI
 	}
 	if cli.MetricsPersist != nil {
 		e.Values.MetricsPersist, e.Sources["metrics.persist"] = *cli.MetricsPersist, SourceCLI
 	}
+	return nil
 }
 
 func validateValues(v Values, repoRoot string) error {
@@ -396,14 +394,14 @@ func validateValues(v Values, repoRoot string) error {
 	if v.Timeout <= 0 {
 		return fmt.Errorf("verification.timeout_seconds must be positive")
 	}
-	if v.Planner != "single-pass" && v.Planner != CandidatePlanner {
-		return fmt.Errorf("llm.planner must be single-pass or three-phase")
+	if v.Planner != CandidatePlanner {
+		return fmt.Errorf("single-pass planning has been removed; set llm.planner = \"three-phase\" and configure a supported pinned MLX model (see docs/migrations/harness004.md)")
 	}
 	if v.Model == "" {
 		return fmt.Errorf("llm.model must not be empty")
 	}
-	if v.Backend != "ollama" && v.Backend != "mlx" {
-		return fmt.Errorf("llm.backend must be ollama or mlx")
+	if v.Backend != "mlx" {
+		return fmt.Errorf("planning requires llm.backend = \"mlx\"; migrate legacy Ollama settings (see docs/migrations/harness004.md)")
 	}
 	if v.Backend == "mlx" {
 		if !validMLXModel(v.Model) {
@@ -416,15 +414,11 @@ func validateValues(v Values, repoRoot string) error {
 			return fmt.Errorf("llm.model_quantization must be none or a positive Nbit label for MLX")
 		}
 	}
-	if v.Planner == CandidatePlanner {
-		if v.Backend != "mlx" || v.Model != CandidateModel || v.ModelRevision != CandidateRevision || v.ModelQuantization != "4bit" {
-			return fmt.Errorf("three-phase planner requires the pinned Gemma MLX 4bit candidate; use single-pass for another model or backend")
-		}
-		// Harness004 always requests 64K. Context tiers remain settings for the
-		// legacy planner, not admission estimates for three-phase input.
+	if !SupportedPlannerModel(v) {
+		return fmt.Errorf("three-phase planning requires a supported pinned Gemma or Qwen MLX 4bit model (see docs/migrations/harness004.md)")
 	}
-	if err := validateEndpoint(v.Endpoint); err != nil {
-		return err
+	if v.MaxTokens != 65536 || (v.Context != "auto" && v.Context != "64k") {
+		return fmt.Errorf("three-phase planning uses a fixed 64k window; set llm.context = \"64k\" and llm.max_context_tokens = 65536")
 	}
 	for _, pattern := range append(append([]string{}, v.Include...), v.Exclude...) {
 		if err := validateRepoPattern(pattern); err != nil {
@@ -440,22 +434,6 @@ func validateValues(v Values, repoRoot string) error {
 				return err
 			}
 		}
-	}
-	return nil
-}
-
-func validateEndpoint(raw string) error {
-	endpoint, err := url.Parse(raw)
-	if err != nil || endpoint.Scheme != "http" || endpoint.Host == "" {
-		return fmt.Errorf("llm.endpoint must be a loopback HTTP URL")
-	}
-	host := endpoint.Hostname()
-	if strings.EqualFold(host, "localhost") {
-		return nil
-	}
-	ip := net.ParseIP(host)
-	if ip == nil || !ip.IsLoopback() {
-		return fmt.Errorf("llm.endpoint must be a loopback HTTP URL")
 	}
 	return nil
 }
@@ -632,7 +610,6 @@ func (e Effective) Entries() map[string]Entry {
 		"llm.backend":                          v.Backend,
 		"llm.model_revision":                   v.ModelRevision,
 		"llm.model_quantization":               v.ModelQuantization,
-		"llm.endpoint":                         v.Endpoint,
 		"llm.context":                          v.Context,
 		"llm.max_context_tokens":               v.MaxTokens,
 		"analysis.untracked":                   v.Untracked,
@@ -658,4 +635,22 @@ func SortedKeys() []string {
 	}
 	sort.Strings(keys)
 	return keys
+}
+
+// SupportedPlannerModel is shared by configuration, setup, and doctor. The
+// helper independently enforces these exact revision/quantization pairs.
+func SupportedPlannerModel(v Values) bool {
+	revision := pinnedPlannerRevision(v.Model)
+	return v.Backend == "mlx" && v.ModelQuantization == plannerModelQuantization && revision != "" && v.ModelRevision == revision
+}
+
+func pinnedPlannerRevision(model string) string {
+	switch model {
+	case CandidateModel:
+		return CandidateRevision
+	case "mlx-community/Qwen3.5-4B-4bit":
+		return "0e7ffd5c629ef7719d4cbc04069232580bfa9d9c"
+	default:
+		return ""
+	}
 }

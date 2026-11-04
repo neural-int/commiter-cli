@@ -15,7 +15,7 @@ func TestOptionalFinalResponseCountFailureStopsWithoutSilentOmission(t *testing.
 	client := &candidateClient{responses: candidateResponses(), countInput: func([]llm.Message, llm.Options) (int, error) {
 		return 0, errors.New("count failed")
 	}}
-	_, err := (ThreePhaseGenerator{Client: client, CodexContext: []codexcontext.Record{{Paths: []string{"one.go"}, FinalResponse: "Completed work"}}}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
+	_, err := (ThreePhaseGenerator{Client: client, GroupingHistory: syntheticAttributedHistory(t, candidatePrepared(t), []codexcontext.Record{{Paths: []string{"one.go"}, FinalResponse: "Completed work"}})}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
 	if err == nil || client.calls != 1 {
 		t.Fatal("failed counting was treated as fitting/omittable history")
 	}
@@ -24,13 +24,13 @@ func TestOptionalFinalResponseCountFailureStopsWithoutSilentOmission(t *testing.
 func TestThreePhaseFinalOnlyHistoryHasNoRequestField(t *testing.T) {
 	client := &candidateClient{responses: candidateResponses()}
 	record := codexcontext.Record{Paths: []string{"one.go"}, FinalResponse: "Corrected the boundary"}
-	result, err := (ThreePhaseGenerator{Client: client, CodexContext: []codexcontext.Record{record, record}}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
+	result, err := (ThreePhaseGenerator{Client: client, GroupingHistory: syntheticAttributedHistory(t, candidatePrepared(t), []codexcontext.Record{record, record})}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
 	if err != nil || result.Calls != 3 {
 		t.Fatalf("final-only cycle failed: %v", err)
 	}
 	for _, messages := range client.messages {
 		var payload struct {
-			Records []map[string]json.RawMessage `json:"codex_context"`
+			Records []map[string]json.RawMessage `json:"agent_history_contexts"`
 		}
 		if err := json.Unmarshal([]byte(messages[1].Content), &payload); err != nil || len(payload.Records) != 1 {
 			t.Fatal("final-only history was lost or duplicated")
@@ -38,7 +38,7 @@ func TestThreePhaseFinalOnlyHistoryHasNoRequestField(t *testing.T) {
 		if _, exists := payload.Records[0]["user_request"]; exists {
 			t.Fatal("request field remains in model input")
 		}
-		if string(payload.Records[0]["final_response"]) != `"Corrected the boundary"` || strings.Contains(messages[0].Content, "past user requests") {
+		if string(payload.Records[0]["final_responses"]) != `["Corrected the boundary"]` || strings.Contains(messages[0].Content, "past user requests") {
 			t.Fatal("final-only content or instruction mismatch")
 		}
 	}

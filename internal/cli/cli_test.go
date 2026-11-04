@@ -4,21 +4,62 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
-	"time"
 
+	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 	"github.com/natsuki0413/commiter-cli/internal/trust"
 )
+
+type doctorCheck struct {
+	OK      bool   `json:"ok"`
+	Message string `json:"message"`
+}
+
+func TestRemovedPlannerConfigurationNeverPromptsOrStartsBackend(t *testing.T) {
+	root := cliRepository(t)
+	chdir(t, root)
+	for _, legacy := range []string{"[llm]\nplanner = \"single-pass\"\n", "[llm]\nbackend = \"ollama\"\n"} {
+		for _, args := range [][]string{{"setup"}, {"setup", "--update-model"}, {"--dry-run"}, {"--json", "doctor"}} {
+			configHome := t.TempDir()
+			t.Setenv("XDG_CONFIG_HOME", configHome)
+			t.Setenv("XDG_STATE_HOME", t.TempDir())
+			path := filepath.Join(configHome, "commiter", "config.toml")
+			if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.WriteFile(path, []byte(legacy), 0600); err != nil {
+				t.Fatal(err)
+			}
+			previousConfirm, previousStore := confirmFunc, newMLXModelStore
+			confirmFunc = func(string) bool { t.Fatal("legacy settings requested an operation"); return false }
+			newMLXModelStore = func() (mlxmodel.Store, error) {
+				t.Fatal("legacy settings opened model store")
+				return mlxmodel.Store{}, nil
+			}
+			var stdout, stderr bytes.Buffer
+			code := Run(args, &stdout, &stderr)
+			confirmFunc, newMLXModelStore = previousConfirm, previousStore
+			if code == 0 {
+				t.Fatalf("legacy settings accepted: %v", args)
+			}
+			if args[len(args)-1] != "doctor" && code != exitcode.Usage {
+				t.Fatalf("migration error code=%d", code)
+			}
+			after, err := os.ReadFile(path)
+			if err != nil || string(after) != legacy {
+				t.Fatal("configuration changed during rejected migration")
+			}
+		}
+	}
+}
 
 func TestVersionHumanAndJSON(t *testing.T) {
 	oldVersion := Version
@@ -177,7 +218,7 @@ func TestJSONDoctorIsStableAndReadOnly(t *testing.T) {
 		t.Fatal(err)
 	}
 	configPath := filepath.Join(configDirectory, "config.toml")
-	configBefore := []byte("[llm]\nplanner = \"single-pass\"\nbackend = \"ollama\"\nmodel = \"qwen3.5:4b-q4_K_M\"\nendpoint = \"" + server.URL + "\"\n")
+	configBefore := []byte(config.GlobalTemplate)
 	if err := os.WriteFile(configPath, configBefore, 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -193,7 +234,7 @@ func TestJSONDoctorIsStableAndReadOnly(t *testing.T) {
 	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
 		t.Fatalf("JSON = %q, error = %v", stdout.String(), err)
 	}
-	if !result.ReadOnly || result.Doctor["git"] == nil || result.Doctor["config"] == nil || result.Doctor["ollama"] == nil {
+	if !result.ReadOnly || result.Doctor["git"] == nil || result.Doctor["config"] == nil || result.Doctor["mlx_backend"] == nil {
 		t.Fatalf("doctor JSON = %#v", result)
 	}
 	configAfter, err := os.ReadFile(configPath)
@@ -212,168 +253,16 @@ func TestJSONDoctorIsStableAndReadOnly(t *testing.T) {
 	}
 }
 
-func TestSetupConfirmationRejectionDoesNotInvokeOperation(t *testing.T) {
-	writeOllamaConfig(t, closedLoopbackEndpoint(t), "qwen3.5:4b-q4_K_M")
-	tests := []struct {
-		name            string
-		ollamaErr, brew bool
-	}{{"install", true, true}, {"daemon", false, true}}
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			oldLookPath, oldCommand, oldConfirm, oldStat := lookPath, commandFactory, confirmFunc, statPath
-			t.Cleanup(func() { lookPath, commandFactory, confirmFunc, statPath = oldLookPath, oldCommand, oldConfirm, oldStat })
-			commandCalled := false
-			statPath = func(string) (os.FileInfo, error) { return nil, os.ErrNotExist }
-			lookPath = func(name string) (string, error) {
-				if name == "ollama" && test.ollamaErr {
-					return "", os.ErrNotExist
-				}
-				if name == "brew" && test.brew {
-					return "/brew", nil
-				}
-				return "/" + name, nil
-			}
-			commandFactory = func(string, ...string) *exec.Cmd { commandCalled = true; return exec.Command("false") }
-			confirmFunc = func(string) bool { return false }
-			if code := Run([]string{"setup"}, io.Discard, io.Discard); code != exitcode.Canceled || commandCalled {
-				t.Fatalf("code=%d commandCalled=%v", code, commandCalled)
-			}
-		})
-	}
-}
-
-func TestSetupReusesStoppedOfficialAppWithoutHomebrewInstall(t *testing.T) {
-	writeOllamaConfig(t, closedLoopbackEndpoint(t), "qwen3.5:4b-q4_K_M")
-	oldLookPath, oldConfirm, oldStat := lookPath, confirmFunc, statPath
-	t.Cleanup(func() { lookPath, confirmFunc, statPath = oldLookPath, oldConfirm, oldStat })
-	lookPath = func(name string) (string, error) {
-		if name == "brew" {
-			t.Fatal("Homebrew was checked for an installed Ollama App")
-		}
-		return "", os.ErrNotExist
-	}
-	statPath = func(path string) (os.FileInfo, error) {
-		if path != officialOllamaAppExecutable {
-			t.Fatalf("unexpected app path: %s", path)
-		}
-		return executableFileInfo{}, nil
-	}
-	prompts := []string{}
-	confirmFunc = func(prompt string) bool {
-		prompts = append(prompts, prompt)
-		return false
-	}
-
-	if code := Run([]string{"setup"}, io.Discard, io.Discard); code != exitcode.Canceled {
-		t.Fatalf("code=%d prompts=%v", code, prompts)
-	}
-	if len(prompts) != 1 || !strings.Contains(prompts[0], "daemon") {
-		t.Fatalf("prompts=%v", prompts)
-	}
-}
-
-type executableFileInfo struct{}
-
-func (executableFileInfo) Name() string       { return "ollama" }
-func (executableFileInfo) Size() int64        { return 0 }
-func (executableFileInfo) Mode() os.FileMode  { return 0o755 }
-func (executableFileInfo) ModTime() time.Time { return time.Time{} }
-func (executableFileInfo) IsDir() bool        { return false }
-func (executableFileInfo) Sys() any           { return nil }
-
-func TestSetupUpdateModelPullsOnlyAfterApproval(t *testing.T) {
-	pulled := false
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		switch request.URL.Path {
-		case "/api/version":
-			_, _ = io.WriteString(w, `{"version":"0.31.2"}`)
-		case "/api/tags":
-			_, _ = io.WriteString(w, `{"models":[{"name":"qwen3.5:4b-q4_K_M","model":"qwen3.5:4b-q4_K_M","modified_at":"2026-09-09T13:47:35+09:00","size":3389983735,"digest":"abc123","details":{"format":"gguf","parameter_size":"4.7B","quantization_level":"Q4_K_M"}}]}`)
-		case "/api/pull":
-			pulled = true
-			_, _ = io.WriteString(w, `{"status":"success"}`)
-		default:
-			http.NotFound(w, request)
-		}
-	}))
-	defer server.Close()
-	configHome := t.TempDir()
-	t.Setenv("XDG_CONFIG_HOME", configHome)
-	t.Setenv("XDG_STATE_HOME", t.TempDir())
-	if err := os.MkdirAll(filepath.Join(configHome, "commiter"), 0o700); err != nil {
-		t.Fatal(err)
-	}
-	configText := "[llm]\nplanner = \"single-pass\"\nbackend = \"ollama\"\nmodel = \"qwen3.5:4b-q4_K_M\"\nendpoint = \"" + server.URL + "\"\n"
-	if err := os.WriteFile(filepath.Join(configHome, "commiter", "config.toml"), []byte(configText), 0o600); err != nil {
-		t.Fatal(err)
-	}
-	oldLookPath, oldConfirm := lookPath, confirmFunc
-	t.Cleanup(func() { lookPath, confirmFunc = oldLookPath, oldConfirm })
-	lookPath = func(name string) (string, error) { return "/" + name, nil }
-	promptDisplayed := false
-	confirmFunc = func(prompt string) bool {
-		promptDisplayed = strings.Contains(prompt, "Pull/update model")
-		return promptDisplayed
-	}
-	var stdout, stderr bytes.Buffer
-	if code := Run([]string{"setup", "--update-model"}, &stdout, &stderr); code != 0 {
-		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
-	}
-	if !promptDisplayed || !pulled {
-		t.Fatalf("promptDisplayed=%v pulled=%v", promptDisplayed, pulled)
-	}
-	for _, expected := range []string{
-		"Model update details", "configured model: qwen3.5:4b-q4_K_M",
-		"installed: yes", "local digest: abc123", "local modified at: 2026-09-09T13:47:35+09:00",
-		"local size: 3389983735 bytes", "format: gguf", "parameter size: 4.7B", "quantization: Q4_K_M",
-		"operation: refresh the configured model tag from its registry after approval",
-		"remote changes and download size: reported by Ollama only after pull starts",
-	} {
-		if !strings.Contains(stdout.String(), expected) {
-			t.Fatalf("stdout does not contain %q: %q", expected, stdout.String())
-		}
-	}
-}
-
-func TestSetupUpdateModelRejectsAfterDetailsWithoutPull(t *testing.T) {
-	pullCalls := 0
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		switch request.URL.Path {
-		case "/api/version":
-			_, _ = io.WriteString(w, `{"version":"0.31.2"}`)
-		case "/api/tags":
-			_, _ = io.WriteString(w, `{"models":[{"name":"qwen3.5:4b-q4_K_M","digest":"abc123","size":42}]}`)
-		case "/api/pull":
-			pullCalls++
-			_, _ = io.WriteString(w, `{"status":"success"}`)
-		default:
-			http.NotFound(w, request)
-		}
-	}))
-	defer server.Close()
-	writeOllamaConfig(t, server.URL, "qwen3.5:4b-q4_K_M")
-	oldLookPath, oldConfirm := lookPath, confirmFunc
-	t.Cleanup(func() { lookPath, confirmFunc = oldLookPath, oldConfirm })
-	lookPath = func(name string) (string, error) { return "/" + name, nil }
-	detailsWereShown := false
-	var stdout bytes.Buffer
-	confirmFunc = func(string) bool {
-		detailsWereShown = strings.Contains(stdout.String(), "local digest: abc123")
-		return false
-	}
-
-	if code := Run([]string{"setup", "--update-model"}, &stdout, io.Discard); code != 0 {
-		t.Fatalf("code=%d stdout=%q", code, stdout.String())
-	}
-	if !detailsWereShown || pullCalls != 0 {
-		t.Fatalf("detailsWereShown=%v pullCalls=%d stdout=%q", detailsWereShown, pullCalls, stdout.String())
-	}
-}
-
 func TestMLXSetupShowsPinnedDownloadPlanBeforeApproval(t *testing.T) {
+	root := cliRepository(t)
+	chdir(t, root)
+	const model = "mlx-community/Qwen3.5-4B-4bit"
+	const revision = "0e7ffd5c629ef7719d4cbc04069232580bfa9d9c"
 	requests, downloads := 0, 0
+	var treePath string
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		requests++
+		treePath = request.URL.Path
 		if strings.Contains(request.URL.Path, "/resolve/") {
 			downloads++
 		}
@@ -386,234 +275,37 @@ func TestMLXSetupShowsPinnedDownloadPlanBeforeApproval(t *testing.T) {
 	if err := os.MkdirAll(filepath.Join(configHome, "commiter"), 0o700); err != nil {
 		t.Fatal(err)
 	}
-	configText := "[llm]\nplanner = \"single-pass\"\nbackend = \"mlx\"\nmodel = \"owner/model\"\nmodel_revision = \"" +
-		strings.Repeat("a", 40) + "\"\nmodel_quantization = \"4bit\"\n"
+	configText := config.GlobalTemplate
 	if err := os.WriteFile(filepath.Join(configHome, "commiter", "config.toml"), []byte(configText), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	oldStore, oldConfirm, oldPlatform, oldLookPath := newMLXModelStore, confirmFunc, mlxPlatform, lookPath
+	oldStore, oldConfirm, oldPlatform, oldHelper := newMLXModelStore, confirmFunc, mlxPlatform, mlxHelperPath
 	t.Cleanup(func() {
-		newMLXModelStore, confirmFunc, mlxPlatform, lookPath = oldStore, oldConfirm, oldPlatform, oldLookPath
+		newMLXModelStore, confirmFunc, mlxPlatform, mlxHelperPath = oldStore, oldConfirm, oldPlatform, oldHelper
 	})
 	newMLXModelStore = func() (mlxmodel.Store, error) { return store, nil }
 	mlxPlatform = func() (string, string) { return "darwin", "arm64" }
-	lookPath = func(name string) (string, error) {
-		if name == "commiter-mlx-helper" {
-			return "/test/commiter-mlx-helper", nil
-		}
-		return oldLookPath(name)
-	}
+	mlxHelperPath = func() (string, error) { return "/test/commiter-mlx-helper", nil }
 	var stdout bytes.Buffer
 	confirmFunc = func(string) bool {
 		if !strings.Contains(stdout.String(), "estimated download size: 2 bytes") ||
-			!strings.Contains(stdout.String(), "pinned revision:") ||
+			!strings.Contains(stdout.String(), "model repository: "+model) ||
+			!strings.Contains(stdout.String(), "pinned revision: "+revision) ||
+			!strings.Contains(stdout.String(), "quantization label: 4bit") ||
 			!strings.Contains(stdout.String(), "destination:") {
-			t.Fatal("model download details were not shown before approval")
+			t.Fatalf("unexpected download details before approval: %s", stdout.String())
 		}
 		return false
 	}
-	if code := Run([]string{"setup"}, &stdout, io.Discard); code != 0 {
+	if code := Run([]string{"--model", model, "setup"}, &stdout, io.Discard); code != 0 {
 		t.Fatalf("setup code = %d, output = %q", code, stdout.String())
 	}
 	if requests != 1 || downloads != 0 {
 		t.Fatalf("requests = %d, downloads = %d", requests, downloads)
 	}
-}
-
-func TestSetupReusesRunningAPIWhenCLIIsNotOnPath(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		switch request.URL.Path {
-		case "/api/version":
-			_, _ = io.WriteString(w, `{"version":"0.31.2"}`)
-		case "/api/tags":
-			_, _ = io.WriteString(w, `{"models":[{"name":"qwen3.5:4b-q4_K_M"}]}`)
-		default:
-			http.NotFound(w, request)
-		}
-	}))
-	defer server.Close()
-	writeOllamaConfig(t, server.URL, "qwen3.5:4b-q4_K_M")
-	oldLookPath, oldConfirm := lookPath, confirmFunc
-	t.Cleanup(func() { lookPath, confirmFunc = oldLookPath, oldConfirm })
-	lookPath = func(string) (string, error) { return "", os.ErrNotExist }
-	confirmFunc = func(prompt string) bool { t.Fatalf("unexpected prompt: %s", prompt); return false }
-
-	var stdout, stderr bytes.Buffer
-	if code := Run([]string{"setup"}, &stdout, &stderr); code != 0 {
-		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
+	if want := "/api/models/" + model + "/tree/" + revision; treePath != want {
+		t.Fatalf("tree path = %q, want %q", treePath, want)
 	}
-}
-
-func TestSetupReturnsCompatibilityErrorWithoutDaemonPrompt(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		if request.URL.Path == "/api/version" {
-			_, _ = io.WriteString(w, `{"version":"0.31.1"}`)
-			return
-		}
-		http.NotFound(w, request)
-	}))
-	defer server.Close()
-	writeOllamaConfig(t, server.URL, "qwen3.5:4b-q4_K_M")
-	oldConfirm := confirmFunc
-	t.Cleanup(func() { confirmFunc = oldConfirm })
-	confirmCalls := 0
-	confirmFunc = func(string) bool { confirmCalls++; return false }
-
-	var stdout, stderr bytes.Buffer
-	if code := Run([]string{"setup"}, &stdout, &stderr); code != exitcode.LLM || confirmCalls != 0 {
-		t.Fatalf("code=%d confirmCalls=%d stderr=%q", code, confirmCalls, stderr.String())
-	}
-}
-
-func TestSetupEscapesRepoControlledModelInPrompt(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		switch request.URL.Path {
-		case "/api/version":
-			_, _ = io.WriteString(w, `{"version":"0.31.2"}`)
-		case "/api/tags":
-			_, _ = io.WriteString(w, `{"models":[]}`)
-		default:
-			http.NotFound(w, request)
-		}
-	}))
-	defer server.Close()
-	writeOllamaConfig(t, server.URL, "unsafe\\u001b[31m")
-	oldConfirm := confirmFunc
-	t.Cleanup(func() { confirmFunc = oldConfirm })
-	prompt := ""
-	confirmFunc = func(value string) bool { prompt = value; return false }
-
-	if code := Run([]string{"setup", "--update-model"}, io.Discard, io.Discard); code != 0 {
-		t.Fatalf("code=%d", code)
-	}
-	if strings.ContainsRune(prompt, '\x1b') || !strings.Contains(prompt, `\x1b`) {
-		t.Fatalf("unsafe prompt = %q", prompt)
-	}
-}
-
-func TestDoctorProbesStructuredOutputAndThinking(t *testing.T) {
-	var probe map[string]any
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		switch request.URL.Path {
-		case "/api/version":
-			_, _ = io.WriteString(w, `{"version":"0.31.2"}`)
-		case "/api/tags":
-			_, _ = io.WriteString(w, `{"models":[{"name":"qwen3.5:4b-q4_K_M"}]}`)
-		case "/api/chat":
-			if err := json.NewDecoder(request.Body).Decode(&probe); err != nil {
-				t.Fatal(err)
-			}
-			_, _ = io.WriteString(w, `{"message":{"content":"{\"ok\":true}","thinking":""},"done":true}`)
-		default:
-			http.NotFound(w, request)
-		}
-	}))
-	defer server.Close()
-	writeOllamaConfig(t, server.URL, "qwen3.5:4b-q4_K_M")
-	oldLookPath, oldStat := lookPath, statPath
-	t.Cleanup(func() { lookPath, statPath = oldLookPath, oldStat })
-	lookPath = func(string) (string, error) { return "", exec.ErrNotFound }
-	statPath = func(path string) (os.FileInfo, error) {
-		if path != officialOllamaAppExecutable {
-			return nil, os.ErrNotExist
-		}
-		return executableFileInfo{}, nil
-	}
-
-	var stdout, stderr bytes.Buffer
-	if code := Run([]string{"--json", "doctor"}, &stdout, &stderr); code == exitcode.Usage {
-		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
-	}
-	var result struct {
-		Doctor map[string]struct {
-			OK bool `json:"ok"`
-		} `json:"doctor"`
-	}
-	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
-		t.Fatal(err)
-	}
-	if !result.Doctor["ollama_binary"].OK || !result.Doctor["structured_output"].OK || !result.Doctor["thinking"].OK || probe["think"] != false {
-		t.Fatalf("doctor=%#v probe=%#v", result.Doctor, probe)
-	}
-}
-
-func TestDoctorExplainsStoppedOllamaWithExecutable(t *testing.T) {
-	writeOllamaConfig(t, closedLoopbackEndpoint(t), "qwen3.5:4b-q4_K_M")
-	oldLookPath, oldStat, oldCommand := lookPath, statPath, commandFactory
-	t.Cleanup(func() { lookPath, statPath, commandFactory = oldLookPath, oldStat, oldCommand })
-	lookPath = func(name string) (string, error) {
-		if name == "ollama" {
-			return "/usr/local/bin/ollama", nil
-		}
-		return oldLookPath(name)
-	}
-	statPath = func(string) (os.FileInfo, error) { return nil, os.ErrNotExist }
-	commandFactory = func(string, ...string) *exec.Cmd {
-		t.Fatal("doctor must not start Ollama")
-		return nil
-	}
-
-	code, doctor := runJSONDoctor(t)
-	if code != exitcode.LLM {
-		t.Fatalf("code=%d doctor=%#v", code, doctor)
-	}
-	ollamaMessage := doctor["ollama"].Message
-	if !strings.Contains(ollamaMessage, "normal runs and --dry-run start it temporarily") ||
-		!strings.Contains(ollamaMessage, "start Ollama manually and rerun commiter doctor") {
-		t.Fatalf("ollama message=%q", ollamaMessage)
-	}
-	for _, name := range []string{"structured_output", "thinking"} {
-		if doctor[name].OK || !strings.Contains(doctor[name].Message, "not verified because the Ollama daemon is stopped") {
-			t.Fatalf("%s=%#v", name, doctor[name])
-		}
-	}
-}
-
-func TestDoctorExplainsStoppedOllamaWithoutExecutable(t *testing.T) {
-	writeOllamaConfig(t, closedLoopbackEndpoint(t), "qwen3.5:4b-q4_K_M")
-	oldLookPath, oldStat := lookPath, statPath
-	t.Cleanup(func() { lookPath, statPath = oldLookPath, oldStat })
-	lookPath = func(string) (string, error) { return "", exec.ErrNotFound }
-	statPath = func(string) (os.FileInfo, error) { return nil, os.ErrNotExist }
-
-	code, doctor := runJSONDoctor(t)
-	if code != exitcode.LLM {
-		t.Fatalf("code=%d doctor=%#v", code, doctor)
-	}
-	ollamaMessage := doctor["ollama"].Message
-	if !strings.Contains(ollamaMessage, "run commiter setup") || strings.Contains(ollamaMessage, "start it temporarily") {
-		t.Fatalf("ollama message=%q", ollamaMessage)
-	}
-}
-
-func TestDoctorDoesNotMisclassifyAPIErrorAsStoppedDaemon(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		http.Error(w, "unavailable", http.StatusServiceUnavailable)
-	}))
-	defer server.Close()
-	writeOllamaConfig(t, server.URL, "qwen3.5:4b-q4_K_M")
-	oldLookPath, oldStat := lookPath, statPath
-	t.Cleanup(func() { lookPath, statPath = oldLookPath, oldStat })
-	lookPath = func(name string) (string, error) {
-		if name == "ollama" {
-			return "/usr/local/bin/ollama", nil
-		}
-		return oldLookPath(name)
-	}
-	statPath = func(string) (os.FileInfo, error) { return nil, os.ErrNotExist }
-
-	code, doctor := runJSONDoctor(t)
-	if code != exitcode.LLM {
-		t.Fatalf("code=%d doctor=%#v", code, doctor)
-	}
-	if message := doctor["ollama"].Message; strings.Contains(message, "daemon is stopped") || strings.Contains(message, "start it temporarily") {
-		t.Fatalf("ollama message=%q", message)
-	}
-}
-
-type doctorCheck struct {
-	OK      bool   `json:"ok"`
-	Message string `json:"message"`
 }
 
 func runJSONDoctor(t *testing.T) (int, map[string]doctorCheck) {
@@ -630,33 +322,6 @@ func runJSONDoctor(t *testing.T) (int, map[string]doctorCheck) {
 		t.Fatalf("JSON=%q error=%v", stdout.String(), err)
 	}
 	return code, result.Doctor
-}
-
-func writeOllamaConfig(t *testing.T, endpoint, model string) {
-	t.Helper()
-	configHome := t.TempDir()
-	t.Setenv("XDG_CONFIG_HOME", configHome)
-	t.Setenv("XDG_STATE_HOME", t.TempDir())
-	if err := os.MkdirAll(filepath.Join(configHome, "commiter"), 0o700); err != nil {
-		t.Fatal(err)
-	}
-	configText := "[llm]\nplanner = \"single-pass\"\nbackend = \"ollama\"\nmodel = \"" + model + "\"\nendpoint = \"" + endpoint + "\"\n"
-	if err := os.WriteFile(filepath.Join(configHome, "commiter", "config.toml"), []byte(configText), 0o600); err != nil {
-		t.Fatal(err)
-	}
-}
-
-func closedLoopbackEndpoint(t *testing.T) string {
-	t.Helper()
-	listener, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal(err)
-	}
-	address := listener.Addr().String()
-	if err := listener.Close(); err != nil {
-		t.Fatal(err)
-	}
-	return "http://" + address
 }
 
 func TestUnimplementedCommandArgumentsAreValidated(t *testing.T) {

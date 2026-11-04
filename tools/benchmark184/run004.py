@@ -66,7 +66,7 @@ def run(args):
    payload=json.loads(q['messages'][1]['content'])
    assert all(not h.get('user_requests') for h in payload['agent_history_contexts']),'expected final-only history'
   derived={p:adapt(q,p,shared_files=files) for p,q in qs.items()}
-  for q in derived.values():q['input_layout']='harness004'
+  for q in derived.values():q.update(input_layout='harness004',context_tokens=65536)
   assert derived['grouping']['messages'][:2]==derived['text']['messages'][:2]
   groups=json.loads(qs['text']['messages'][1]['content'])['groups'];cats={g['group_id']:{'type':g['type'],'breaking_evidence_ref':'none'} for g in groups};texts={g['group_id']:{'scope':'fixture','summary':'変更内容とテストを更新'} for g in groups};assert host(args.validator,groups,cats,texts)['accepted']
   groups_missing=copy.deepcopy(groups);groups_missing[-1]['files'].pop()
@@ -75,7 +75,7 @@ def run(args):
   assert not json.loads(invoke([str(args.validator)],input=json.dumps(good)).stdout)['accepted']
   prepared.append((case,qs,derived,gold))
  args.output.mkdir(mode=0o700);save(args.output/'manifest.json',manifest)
- save(args.output/'provenance.json',{'helper_sha256':hashlib.sha256(args.helper.read_bytes()).hexdigest(),'prompt_sha256':hashlib.sha256((pathlib.Path(__file__).resolve().parents[2]/'internal/planning/prompts/harness004.json').read_bytes()).hexdigest(),'revision':'004-r2','prepared_only':not args.execute})
+ save(args.output/'provenance.json',{'helper_sha256':hashlib.sha256(args.helper.read_bytes()).hexdigest(),'prompt_sha256':hashlib.sha256((pathlib.Path(__file__).resolve().parents[2]/'internal/planning/prompts/harness004.json').read_bytes()).hexdigest(),'revision':'004-r3-issue187','prepared_only':not args.execute})
  for index,(case,qs,derived,gold) in enumerate(prepared):
   dest=args.output/f'{index+1:02d}';dest.mkdir();save(dest/'source.json',qs);save(dest/'gold.json',gold)
   for p,q in derived.items():save(dest/(p+'.request.json'),q)
@@ -95,7 +95,7 @@ def run(args):
      value=json.loads(r['generated_json']);validate(value,q['schema']);return value
     try:
      g=call('shared','grouping',derived['grouping']);result['grouping']=score_groups(g,gold);c=call('oracle','category',derived['category']);t=call('oracle','text',derived['text']);og=json.loads(qs['text']['messages'][1]['content'])['groups'];oc={x['group_id']:{'type':x['type'],'breaking_evidence_ref':'none'} for x in og};result['oracle']={'category':c,'text_validator':host(args.validator,og,oc,t)}
-     groups=groups_from_membership(g,[f for x in og for f in x['files']]);ids=[x['group_id'] for x in groups];p=payload_for(json.loads(qs['category']['messages'][1]['content']),groups);q=adapt(request_for(qs['category'],p,ids),'category',shared_files=[f for x in og for f in x['files']]);q['input_layout']='harness004';c=call('propagated','category',q);p=payload_for(json.loads(qs['text']['messages'][1]['content']),groups,c);q=adapt(request_for(qs['text'],p,ids),'text',shared_files=[f for x in og for f in x['files']]);q['input_layout']='harness004';assert q['messages'][:2]==derived['grouping']['messages'][:2];t=call('propagated','text',q);result['propagated']={'category':c,'validator':host(args.validator,groups,c,t)}
+     groups=groups_from_membership(g,[f for x in og for f in x['files']]);ids=[x['group_id'] for x in groups];p=payload_for(json.loads(qs['category']['messages'][1]['content']),groups);q=adapt(request_for(qs['category'],p,ids),'category',shared_files=[f for x in og for f in x['files']]);q.update(input_layout='harness004',context_tokens=65536);c=call('propagated','category',q);p=payload_for(json.loads(qs['text']['messages'][1]['content']),groups,c);q=adapt(request_for(qs['text'],p,ids),'text',shared_files=[f for x in og for f in x['files']]);q.update(input_layout='harness004',context_tokens=65536);assert q['messages'][:2]==derived['grouping']['messages'][:2];t=call('propagated','text',q);result['propagated']={'category':c,'validator':host(args.validator,groups,c,t)}
     except (RuntimeError,ValueError,BrokenPipeError) as e:result['failure']=str(e)
     finally:process.stdin.close();process.wait();monitor.active=None
    save(dest/'evaluation.json',result);case_results.append(result)

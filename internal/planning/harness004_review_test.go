@@ -28,17 +28,17 @@ func TestHarness004HistoryFitsExactTokenBoundary(t *testing.T) {
 				if options.ContextTokens != contextinput.Context64K {
 					t.Fatal("count did not use fixed 64K")
 				}
-				if strings.Contains(messages[1].Content, "codex_context") {
+				if strings.Contains(messages[1].Content, "Corrected the boundary") {
 					return 61440 + delta, nil
 				}
 				return 1000, nil
 			}}
-			result, err := (ThreePhaseGenerator{Client: client, CodexContext: []codexcontext.Record{record}}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
+			result, err := (ThreePhaseGenerator{Client: client, GroupingHistory: syntheticAttributedHistory(t, candidatePrepared(t), []codexcontext.Record{record})}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
 			if err != nil || result.Calls != 3 {
 				t.Fatalf("calls=%d err=%v", result.Calls, err)
 			}
 			for i, messages := range client.messages {
-				retained := strings.Contains(messages[1].Content, "codex_context")
+				retained := strings.Contains(messages[1].Content, "Corrected the boundary")
 				if retained != (delta <= 0) {
 					t.Fatalf("phase %d optional history retention=%v", i, retained)
 				}
@@ -68,15 +68,35 @@ func TestHarness004CategoryHasNoUnconfirmedBreaking(t *testing.T) {
 				t.Fatal(err)
 			}
 			for _, phase := range []int{1, 2} {
+				visible := strings.Join([]string{client.messages[phase][0].Content, client.messages[phase][1].Content, client.messages[phase][2].Content}, "\n")
+				if phase == 1 && breaking && !strings.Contains(visible, `"fact":"public signature removed"`) {
+					t.Fatal("Category lost the meaning of the breaking evidence")
+				}
+				if phase == 2 && (strings.Contains(visible, "public signature removed") || strings.Contains(visible, "breaking_evidence_candidates")) {
+					t.Fatal("Text received evidence instead of finalized values")
+				}
 				_, body, ok := strings.Cut(client.messages[phase][2].Content, "\n\nPhase input:\n")
 				if !ok {
 					t.Fatal("missing phase input")
 				}
 				var payload struct {
-					Groups []map[string]json.RawMessage `json:"groups"`
+					Groups   []map[string]json.RawMessage `json:"groups"`
+					Evidence []metadataBreakingEvidence   `json:"breaking_evidence_candidates"`
 				}
 				if err := json.Unmarshal([]byte(body), &payload); err != nil || len(payload.Groups) != 1 {
 					t.Fatalf("invalid phase input: %v", err)
+				}
+				// one.go (host F001) sorts after asset.bin and is displayed as F2.
+				if phase == 1 && breaking {
+					found := false
+					for _, e := range payload.Evidence {
+						if e.ID == "observed-api" && e.Fact == "public signature removed" && len(e.FileIDs) == 1 && e.FileIDs[0] == "F2" {
+							found = true
+						}
+					}
+					if !found {
+						t.Fatal("Category evidence ID, file binding or fact changed")
+					}
 				}
 				value, exists := payload.Groups[0]["breaking"]
 				if phase == 1 && exists {

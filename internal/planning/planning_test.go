@@ -165,7 +165,7 @@ func TestValidateRejectsNullLegacySchemaVersion(t *testing.T) {
 
 func TestGeneratorRejectsIncompleteStopStateWithoutPartialPlanOrRepair(t *testing.T) {
 	client := &scriptedChat{steps: []chatStep{{content: validPlan(), stopReason: "max_tokens"}, {content: validPlan()}}}
-	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	result, err := (ResearchGenerator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
 	if err == nil || result.Calls != 1 || len(result.Plan.Commits) != 0 || len(client.messages) != 1 {
 		t.Fatalf("result=%#v err=%v calls=%d", result, err, len(client.messages))
 	}
@@ -184,7 +184,7 @@ func TestGeneratorRejectsIncompleteMLXHelperOutputAsStopViolation(t *testing.T) 
 		t.Fatal(err)
 	}
 	backend := &mlx.Backend{Client: mlx.NewClient(helper)}
-	result, err := (Generator{Client: backend}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	result, err := (ResearchGenerator{Client: backend}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
 	if err == nil || !strings.Contains(err.Error(), string(IncompleteOutput)) || result.Calls != 1 || len(result.Plan.Commits) != 0 {
 		t.Fatalf("result=%#v err=%v", result, err)
 	}
@@ -195,7 +195,7 @@ func TestGeneratorRejectsIncompleteRepairEvenWhenJSONIsValid(t *testing.T) {
 		{content: `{"commits":[]}`, stopReason: "completed"},
 		{content: validPlan(), stopReason: "max_tokens"},
 	}}
-	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	result, err := (ResearchGenerator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
 	if err == nil || result.Calls != 2 || result.Repaired || len(result.Plan.Commits) != 0 {
 		t.Fatalf("result=%#v err=%v", result, err)
 	}
@@ -205,7 +205,7 @@ func TestGeneratorRepairsGrammarThenValidatesDomainAgain(t *testing.T) {
 	invalidGrammar := `{"commits":[{"type":"fix","scope":"planner","breaking":false,"summary":"fix planning","file_ids":["F001","F002"],"unexpected":true}]}`
 	invalidDomain := `{"commits":[{"type":"fix","scope":"planner","breaking":false,"summary":"fix planning","file_ids":["F001"]}]}`
 	client := &scriptedChat{steps: []chatStep{{content: invalidGrammar, stopReason: "completed"}, {content: invalidDomain, stopReason: "completed"}}}
-	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	result, err := (ResearchGenerator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
 	if err == nil || result.Calls != 2 || len(result.Plan.Commits) != 0 {
 		t.Fatalf("result=%#v err=%v", result, err)
 	}
@@ -292,7 +292,7 @@ func TestGeneratorRepairsTypeScopeDuplication(t *testing.T) {
 	invalid := `{"schema_version":1,"commits":[{"type":"feat","scope":"feat","breaking":false,"summary":"add CLI option","file_ids":["F001","F002"]}]}`
 	valid := `{"schema_version":1,"commits":[{"type":"feat","scope":"cli","breaking":false,"summary":"add CLI option","file_ids":["F001","F002"]}]}`
 	client := &scriptedChat{steps: []chatStep{{content: invalid}, {content: valid}}}
-	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	result, err := (ResearchGenerator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -490,7 +490,7 @@ func TestGeneratorRepairsOnceAndSharesTransportRetryBudget(t *testing.T) {
 		{content: valid},
 	}}
 	prepared := preparedInput(t, English)
-	result, err := (Generator{Client: client}).Generate(context.Background(), prepared, English, ExtractSensitiveValues([]byte("token="+secret)))
+	result, err := (ResearchGenerator{Client: client}).Generate(context.Background(), prepared, English, ExtractSensitiveValues([]byte("token="+secret)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -517,7 +517,7 @@ func TestGeneratorRepairsOnceAndSharesTransportRetryBudget(t *testing.T) {
 func TestGeneratorPassesPreparedContextAndOutputLimitToInitialAndRepair(t *testing.T) {
 	client := &optionsScriptedChat{scriptedChat: scriptedChat{steps: []chatStep{{content: "invalid"}, {content: validPlan()}}}}
 	prepared := preparedInput(t, English)
-	if _, err := (Generator{Client: client}).Generate(context.Background(), prepared, English, SensitiveValues{}); err != nil {
+	if _, err := (ResearchGenerator{Client: client}).Generate(context.Background(), prepared, English, SensitiveValues{}); err != nil {
 		t.Fatal(err)
 	}
 	if !reflect.DeepEqual(client.contexts, []int{contextinput.Context8K, contextinput.Context8K}) {
@@ -531,7 +531,7 @@ func TestGeneratorPassesPreparedContextAndOutputLimitToInitialAndRepair(t *testi
 func TestGeneratorIncludesFormatSchemaInInitialSystemMessage(t *testing.T) {
 	client := &scriptedChat{steps: []chatStep{{content: validPlan()}}}
 	prepared := preparedInput(t, English)
-	if _, err := (Generator{Client: client}).Generate(context.Background(), prepared, English, SensitiveValues{}); err != nil {
+	if _, err := (ResearchGenerator{Client: client}).Generate(context.Background(), prepared, English, SensitiveValues{}); err != nil {
 		t.Fatal(err)
 	}
 	schema, err := Schema([]string{"F001", "F002"})
@@ -554,7 +554,7 @@ func TestGeneratorStopsAtThreeCallsAndNeverRepairsTwice(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			client := &scriptedChat{steps: test.steps}
-			_, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+			_, err := (ResearchGenerator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
 			if exitcode.Code(err) != exitcode.LLM || len(client.messages) != test.calls {
 				t.Fatalf("error=%v code=%d calls=%d", err, exitcode.Code(err), len(client.messages))
 			}
@@ -566,7 +566,7 @@ func TestGeneratorReportsOnlyFinalViolationCodes(t *testing.T) {
 	candidate := `{"schema_version":1,"commits":[{"type":"fix","scope":"x","breaking":false,"summary":"s","file_ids":["F001"]}]}`
 	client := &scriptedChat{steps: []chatStep{{content: candidate}, {content: candidate}}}
 
-	_, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	_, err := (ResearchGenerator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
 	if exitcode.Code(err) != exitcode.LLM || !strings.Contains(err.Error(), "violations: invalid_assignment") {
 		t.Fatalf("error=%v code=%d", err, exitcode.Code(err))
 	}
@@ -580,7 +580,7 @@ func TestGeneratorReportsOnlyFinalViolationCodes(t *testing.T) {
 
 func TestGeneratorRejectsPreparedPromptWithDifferentLanguage(t *testing.T) {
 	client := &scriptedChat{steps: []chatStep{{content: validPlan()}}}
-	_, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), Japanese, SensitiveValues{})
+	_, err := (ResearchGenerator{Client: client}).Generate(context.Background(), preparedInput(t, English), Japanese, SensitiveValues{})
 	if err == nil || len(client.messages) != 0 {
 		t.Fatalf("error=%v calls=%d", err, len(client.messages))
 	}
@@ -588,7 +588,7 @@ func TestGeneratorRejectsPreparedPromptWithDifferentLanguage(t *testing.T) {
 
 func TestGeneratorKeepsSchemaForJapaneseSummary(t *testing.T) {
 	client := &scriptedChat{steps: []chatStep{{content: `{"schema_version":1,"commits":[{"type":"feat","scope":"planner","breaking":false,"summary":"コミット計画を生成する","file_ids":["F001","F002"]}]}`}}}
-	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, Japanese), Japanese, SensitiveValues{})
+	result, err := (ResearchGenerator{Client: client}).Generate(context.Background(), preparedInput(t, Japanese), Japanese, SensitiveValues{})
 	if err != nil || result.Plan.SchemaVersion != SchemaVersion || result.Plan.Commits[0].Summary != "コミット計画を生成する" {
 		t.Fatalf("result=%#v error=%v", result, err)
 	}
@@ -600,7 +600,7 @@ func TestGeneratorKeepsSchemaForJapaneseSummary(t *testing.T) {
 func TestGeneratorRejectsEnglishOnlySummaryWhenJapaneseRequested(t *testing.T) {
 	english := validPlan()
 	client := &scriptedChat{steps: []chatStep{{content: english}, {content: english}}}
-	_, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, Japanese), Japanese, SensitiveValues{})
+	_, err := (ResearchGenerator{Client: client}).Generate(context.Background(), preparedInput(t, Japanese), Japanese, SensitiveValues{})
 	if exitcode.Code(err) != exitcode.LLM || len(client.messages) != 2 {
 		t.Fatalf("error=%v code=%d calls=%d", err, exitcode.Code(err), len(client.messages))
 	}
@@ -624,7 +624,7 @@ func TestGeneratorRejectsEnglishOnlySummaryWhenJapaneseRequested(t *testing.T) {
 func TestGeneratorRepairsEnglishOnlySummaryToJapanese(t *testing.T) {
 	japanese := `{"schema_version":1,"commits":[{"type":"feat","scope":"planner","breaking":false,"summary":"CLIの設定を修正する","file_ids":["F001","F002"]}]}`
 	client := &scriptedChat{steps: []chatStep{{content: validPlan()}, {content: japanese}}}
-	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, Japanese), Japanese, SensitiveValues{})
+	result, err := (ResearchGenerator{Client: client}).Generate(context.Background(), preparedInput(t, Japanese), Japanese, SensitiveValues{})
 	if err != nil || !result.Repaired || result.Plan.Commits[0].Summary != "CLIの設定を修正する" {
 		t.Fatalf("result=%#v error=%v", result, err)
 	}
@@ -639,7 +639,7 @@ func TestGeneratorAggregatesOnlyNonContentTelemetry(t *testing.T) {
 			PromptEvalCount: true, EvalCount: true,
 		},
 	}}}
-	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	result, err := (ResearchGenerator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -668,7 +668,7 @@ func TestGeneratorKeepsTelemetryWhenRepairRequestFails(t *testing.T) {
 		},
 		{err: errors.New("repair transport failed")},
 	}}
-	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	result, err := (ResearchGenerator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
 	if exitcode.Code(err) != exitcode.LLM || result.Calls != 2 {
 		t.Fatalf("error=%v code=%d calls=%d", err, exitcode.Code(err), result.Calls)
 	}
@@ -690,7 +690,7 @@ func TestGeneratorPreservesTelemetryAvailabilityAcrossAggregation(t *testing.T) 
 		loadDuration: 0, evalDuration: 0,
 		availability: llm.TelemetryAvailability{LoadDuration: true, EvalDuration: true},
 	}}}
-	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	result, err := (ResearchGenerator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -714,7 +714,7 @@ func TestGeneratorMarksPartialRepairTelemetryUnavailable(t *testing.T) {
 		},
 		{content: validPlan()},
 	}}
-	result, err := (Generator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
+	result, err := (ResearchGenerator{Client: client}).Generate(context.Background(), preparedInput(t, English), English, SensitiveValues{})
 	if err != nil || !result.Repaired {
 		t.Fatalf("result=%+v error=%v", result, err)
 	}

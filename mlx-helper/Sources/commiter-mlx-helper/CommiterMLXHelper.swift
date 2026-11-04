@@ -120,7 +120,7 @@ private struct Request: Decodable {
         generationProfile = try container.decodeIfPresent(String.self, forKey: .generationProfile)
         inputLayout = try container.decodeIfPresent(String.self, forKey: .inputLayout)
         historyInput = try container.decodeIfPresent(OptionalHistoryInput.self, forKey: .historyInput)
-        guard historyInput == nil || (inputLayout == "harness004" && generationProfile != "bounded-text" && messages.count == 3 && messages[1].content == "{}" && historyInput!.records.count > 0) else { throw HelperError.malformedRequest }
+        guard historyInput == nil || (inputLayout == "harness004" && generationProfile != "bounded-text" && messages.count == 3 && messages[1].content == "{}" && historyInput!.byteCounts.count > 0) else { throw HelperError.malformedRequest }
         guard inputLayout == nil || (inputLayout == "harness004" && generationProfile != nil) else { throw HelperError.malformedRequest }
         guard !messages.isEmpty, contextTokens >= 0, outputTokens >= 0 else {
             throw HelperError.malformedRequest
@@ -471,7 +471,8 @@ private struct BenchmarkMetrics: Encodable {
 @main
 struct CommiterMLXHelper {
     static func main() async {
-        if CommandLine.arguments == [CommandLine.arguments[0], "--smoke-metal"] {
+        let arguments = CommandLine.arguments.filter { $0 != "--research-legacy" }
+        if arguments == [arguments[0], "--smoke-metal"] {
             let ready = Device.withDefaultDevice(.gpu) {
                 let result = add(MLXArray([1.0 as Float]), MLXArray([2.0 as Float]))
                 eval(result)
@@ -481,7 +482,7 @@ struct CommiterMLXHelper {
             FileHandle.standardOutput.write(Data("metal_ok\n".utf8))
             return
         }
-        if CommandLine.arguments.count == 2, CommandLine.arguments[1] == "--benchmark-output-contract" {
+        if arguments.count == 2, arguments[1] == "--benchmark-output-contract" {
             do {
                 guard let config = try ModelBenchmarkConfiguration.load(), let mode = config.output_constraint else { throw HelperError.malformedRequest }
                 let request = try decodeRequest(try readBoundedRequest())
@@ -496,9 +497,9 @@ struct CommiterMLXHelper {
             } catch { exit(1) }
             return
         }
-        if CommandLine.arguments.count == 2,
-           ["--three-phase", "--benchmark-single", "--benchmark-cycle", "--benchmark-multifile", "--benchmark-text-replay", "--benchmark-token-audit", "--benchmark-input-audit", "--benchmark-cache", "--benchmark-model-defaults"].contains(CommandLine.arguments[1]) {
-            await benchmarkMain(mode: CommandLine.arguments[1])
+        if arguments.count == 2,
+           ["--three-phase", "--benchmark-single", "--benchmark-cycle", "--benchmark-multifile", "--benchmark-text-replay", "--benchmark-token-audit", "--benchmark-input-audit", "--benchmark-cache", "--benchmark-model-defaults"].contains(arguments[1]) {
+            await benchmarkMain(mode: arguments[1])
             return
         }
         var decodedRequest: Request?
@@ -574,6 +575,7 @@ struct CommiterMLXHelper {
     }
 
     private static func handle(_ request: Request, benchmark: BenchmarkState? = nil) async throws -> Response {
+        guard request.generationProfile == nil || request.inputLayout == "harness004" || CommandLine.arguments.contains("--research-legacy") else { throw HelperError.malformedRequest }
         guard let modelPath = request.modelPath?.trimmingCharacters(in: .whitespacesAndNewlines),
               !modelPath.isEmpty,
               isModelDirectory(modelPath) else {
@@ -750,10 +752,14 @@ struct CommiterMLXHelper {
         var input: LMInput
         if let history = request.historyInput {
             do {
-                let prepared = try await HistoryInputPreparation.prepare(recordByteCounts: history.records.map { $0.utf8.count },
+                let prepared = try await HistoryInputPreparation.prepare(recordByteCounts: history.byteCounts,
                     context: request.contextTokens, output: budget) { indices in
                     var selected = wireMessages
                     selected[1].content = history.sharedContent(indices: indices)
+                    if let phase = history.phaseTemplate {
+                        guard let range = selected[2].content.range(of: "\n\nPhase input:\n") else { throw HelperError.malformedRequest }
+                        selected[2].content = String(selected[2].content[..<range.upperBound]) + phase.render(selected: Set(indices))
+                    }
                     if indices.isEmpty { selected[0].content = history.systemWithoutHistory }
                     let selectedChat = selected.map { Chat.Message(role: $0.role, content: $0.content) }
                     let prepared = try await context.processor.prepare(input: UserInput(chat: selectedChat, additionalContext: templateContext))

@@ -13,7 +13,6 @@ import (
 	"syscall"
 	"testing"
 
-	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
 )
 
@@ -27,7 +26,7 @@ func TestNewRejectsNonLoopbackAndEndpointDecorations(t *testing.T) {
 	}
 	for _, endpoint := range tests {
 		t.Run(endpoint, func(t *testing.T) {
-			_, err := New(config.Values{Endpoint: endpoint, Model: "model"})
+			_, err := New(endpoint, "model")
 			if exitcode.Code(err) != exitcode.LLM {
 				t.Fatalf("New() error = %v, code = %d", err, exitcode.Code(err))
 			}
@@ -83,7 +82,7 @@ func TestChatFixesSafetyFieldsAndReturnsContent(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client, err := New(config.Values{Endpoint: server.URL, Model: "model:tag"})
+	client, err := New(server.URL, "model:tag")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -137,7 +136,7 @@ func TestChatWithOptionsSendsSelectedContextAndOutputLimit(t *testing.T) {
 				_, _ = io.WriteString(w, `{"model":"model","message":{"content":"{}"},"done":true}`)
 			}))
 			defer server.Close()
-			client, err := New(config.Values{Endpoint: server.URL, Model: "model"})
+			client, err := New(server.URL, "model")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -211,7 +210,7 @@ func TestChatRejectsRedirectWithoutSendingContentToTarget(t *testing.T) {
 	}))
 	defer source.Close()
 
-	client, err := New(config.Values{Endpoint: source.URL, Model: "model"})
+	client, err := New(source.URL, "model")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -290,7 +289,7 @@ func TestPullUsesConfiguredModelAndNonStreamingRequest(t *testing.T) {
 		_, _ = io.WriteString(w, `{"status":"success"}`)
 	}))
 	defer server.Close()
-	client, err := New(config.Values{Endpoint: server.URL, Model: "model:tag"})
+	client, err := New(server.URL, "model:tag")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -340,7 +339,7 @@ func TestCompatibilityRequiresVersionWithNeededFeatures(t *testing.T) {
 }
 
 func testClient(transport http.RoundTripper) *Client {
-	client, err := New(config.Values{Endpoint: "http://127.0.0.1:11434", Model: "model"})
+	client, err := New("http://127.0.0.1:11434", "model")
 	if err != nil {
 		panic(err)
 	}

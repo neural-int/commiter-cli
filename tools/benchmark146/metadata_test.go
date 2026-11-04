@@ -172,7 +172,7 @@ type phaseRequest struct {
 	Options  llm.Options
 }
 
-func TestFourFileMetadataMatchesProductionRequests(t *testing.T) {
+func TestFourFileMetadataMatchesFrozenResearchRequests(t *testing.T) {
 	for _, f := range []fixture{fixtures()[0], contractFixtures()[0]} {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		original := &fixtureBackend{Fixture: f}
@@ -181,7 +181,7 @@ func TestFourFileMetadataMatchesProductionRequests(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		production, err := (planning.ThreePhaseGenerator{Client: original}).Generate(ctx, contextinput.Prepared{Document: d, Prompt: prompt, Budget: contextinput.Budget{ContextTokens: 16384}}, planning.English, planning.SensitiveValues{})
+		production, err := (planning.ResearchThreePhaseGenerator{Client: original}).Generate(ctx, contextinput.Prepared{Document: d, Prompt: prompt, Budget: contextinput.Budget{ContextTokens: 16384}}, planning.English, planning.SensitiveValues{})
 		if err != nil {
 			t.Fatal(err)
 		}

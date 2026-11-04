@@ -1,7 +1,6 @@
 package planning
 
 import (
-	"encoding/json"
 	"strings"
 
 	"github.com/natsuki0413/commiter-cli/internal/llm"
@@ -26,11 +25,8 @@ func prepareCandidateInput(c *candidateClient, messages []llm.Message, options l
 		}
 		return messages, nil, n, 1, nil
 	}
-	var shared map[string]any
-	_ = json.Unmarshal([]byte(messages[1].Content), &shared)
-	records := shared["codex_context"].([]any)
 	all := []int{}
-	for i := range records {
+	for i := range options.HistoryInput.RecordByteCounts {
 		all = append(all, i)
 	}
 	if n <= options.ContextTokens-options.OutputTokens {
@@ -38,17 +34,9 @@ func prepareCandidateInput(c *candidateClient, messages []llm.Message, options l
 	}
 	with := func(indices []int) []llm.Message {
 		m := append([]llm.Message(nil), messages...)
-		if len(indices) == 0 {
-			delete(shared, "codex_context")
-			m[0].Content = strings.TrimSuffix(m[0].Content, codexTrustInstruction)
-		} else {
-			selected := []any{}
-			for _, i := range indices {
-				selected = append(selected, records[i])
-			}
-			shared["codex_context"] = selected
-		}
-		m[1].Content = string(naturalJSON(shared))
+		m[1].Content = options.HistoryInput.SharedTemplate.Render(indices)
+		prefix, _, _ := strings.Cut(m[2].Content, "\n\nPhase input:\n")
+		m[2].Content = prefix + "\n\nPhase input:\n" + options.HistoryInput.PhaseTemplate.Render(indices)
 		return m
 	}
 	selected := []int{}
@@ -61,7 +49,7 @@ func prepareCandidateInput(c *candidateClient, messages []llm.Message, options l
 		return nil, nil, 0, 2, llm.ErrInputTooLarge
 	}
 	attempts := 2
-	for i := range records {
+	for i := range options.HistoryInput.RecordByteCounts {
 		trial := append(append([]int(nil), selected...), i)
 		m := with(trial)
 		tokens, err := count(m)

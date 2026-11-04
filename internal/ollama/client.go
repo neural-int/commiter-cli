@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
 	"github.com/natsuki0413/commiter-cli/internal/llm"
 )
@@ -68,17 +67,17 @@ func (c *Client) Pull(ctx context.Context) error {
 	return c.post(ctx, "/api/pull", payload, &response)
 }
 
-func New(values config.Values) (*Client, error) {
-	endpoint, err := validateEndpoint(values.Endpoint)
+func New(rawEndpoint, model string) (*Client, error) {
+	endpoint, err := validateEndpoint(rawEndpoint)
 	if err != nil {
 		return nil, llmError("Ollama endpoint must be a loopback HTTP URL")
 	}
-	if strings.TrimSpace(values.Model) == "" {
+	if strings.TrimSpace(model) == "" {
 		return nil, llmError("Ollama model is not configured")
 	}
 	return &Client{
 		endpoint: endpoint,
-		model:    values.Model,
+		model:    model,
 		http: &http.Client{
 			Transport:     loopbackTransport(endpoint),
 			CheckRedirect: rejectRedirect,

@@ -48,7 +48,7 @@ def adapt(canonical,phase,templates=None,shared_files=None):
  fixed=instruction.split(FIELDS)[0]
  assert fixed.endswith('When thinking is enabled, think freely in the model\'s native thinking section; apply this contract only after that section ends. When thinking is disabled, begin the JSON answer directly.\n')
  instruction=fixed+FIELDS+'\n'.join(describe(r['schema']))+'\n'+EXACT+json.dumps(ordered(r['schema']),ensure_ascii=False,separators=(',',':'))+END
- render=lambda x:multiline_view(json.dumps(prune(x),ensure_ascii=False,separators=(',',':')))
+ render=lambda x:multiline_view(json.dumps(ordered(prune(x)),ensure_ascii=False,separators=(',',':')))
  r['messages']=[copy.deepcopy(template['messages'][0]),{'role':'user','content':render(shared)},{'role':'user','content':instruction+PHASE_INPUT+render(payload)}]
  # Every full schema occurs exactly once, plus runtime's separate schema object.
  for key in ['"block_id":','"execution_ref":','"user_requests":[]']:

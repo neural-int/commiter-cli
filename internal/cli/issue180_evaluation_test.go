@@ -184,7 +184,7 @@ func TestIssue180Evaluation(t *testing.T) {
 	client := &evaluation180Client{t: t, out: out, arm: arm, mode: mode, modelPath: modelPath, fixed: fixed}
 	defer client.close()
 	start := time.Now()
-	result, genErr := (planning.ThreePhaseGenerator{Client: client, CodexContext: fixture.Context}).Generate(ctx, prepared, planning.Japanese, sensitive)
+	result, genErr := (planning.ResearchThreePhaseGenerator{Client: client, CodexContext: fixture.Context}).Generate(ctx, prepared, planning.Japanese, sensitive)
 	reason := ""
 	if genErr != nil {
 		reason = genErr.Error()

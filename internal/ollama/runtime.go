@@ -10,8 +10,6 @@ import (
 	"sync"
 	"syscall"
 	"time"
-
-	"github.com/natsuki0413/commiter-cli/internal/config"
 )
 
 const (
@@ -40,8 +38,8 @@ type urlEndpoint struct {
 	host string
 }
 
-func Open(ctx context.Context, values config.Values) (*Runtime, error) {
-	client, err := New(values)
+func Open(ctx context.Context, endpoint, model string) (*Runtime, error) {
+	client, err := New(endpoint, model)
 	if err != nil {
 		return nil, err
 	}
@@ -50,8 +48,8 @@ func Open(ctx context.Context, values config.Values) (*Runtime, error) {
 
 // OpenForSetup connects to Ollama and starts a temporary daemon when needed,
 // but intentionally does not require the configured model to be installed.
-func OpenForSetup(ctx context.Context, values config.Values, executable string) (*Runtime, error) {
-	client, err := New(values)
+func OpenForSetup(ctx context.Context, endpoint, model, executable string) (*Runtime, error) {
+	client, err := New(endpoint, model)
 	if err != nil {
 		return nil, err
 	}

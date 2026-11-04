@@ -127,15 +127,8 @@ func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
 			if input.Files[0].RawDiff != document.Files[0].GroupingRawDiff {
 				t.Fatal("grouping changed the complete raw diff")
 			}
-			if input.Files[0].RawDiff == "" || input.Files[0].Mode != "raw_diff" || input.Files[0].ID != "path:"+path {
+			if input.Files[0].RawDiff == "" || input.Files[0].ID != "F1" {
 				t.Fatalf("bad grouping input: %s", client.messages[0][1].Content)
-			}
-			if kind == "unsupported" || kind == "split rename" {
-				if len(input.Files[0].SyntaxContext) != 0 {
-					t.Fatal("unsupported context guessed")
-				}
-			} else if len(input.Files[0].SyntaxContext) != 1 || input.Files[0].SyntaxContext[0].EnclosingDeclaration != "Value" {
-				t.Fatalf("context lost: %+v", input.Files[0])
 			}
 			for phase := 1; phase <= 2; phase++ {
 				_, body, ok := strings.Cut(client.messages[phase][2].Content, "\n\nPhase input:\n")
@@ -152,7 +145,7 @@ func TestGroupingContextConnectsGitChangesToThreePhase(t *testing.T) {
 					t.Fatal(err)
 				}
 				f := metadata.Groups[0].Files[0]
-				if f["file_id"] != "path:"+path {
+				if f["file_id"] != "F1" {
 					t.Fatal("file reference lost")
 				}
 				if phase == 1 {

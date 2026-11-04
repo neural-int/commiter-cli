@@ -44,38 +44,29 @@ func TestThreePhaseUsesRawDiffInAllPhasesAndPreservesHostInput(t *testing.T) {
 		}
 	}
 	changed, opaque := payload.Files[1], payload.Files[0]
-	if string(changed["mode"]) != `"raw_diff"` || len(changed["raw_diff"]) == 0 || len(changed["syntax_context"]) == 0 {
+	if len(changed["raw_diff"]) == 0 || string(changed["change_blocks"]) == "[]" || len(changed["file_id"]) == 0 {
 		t.Fatalf("raw/context projection missing: %v", changed)
 	}
-	if string(opaque["mode"]) != `"metadata_only"` || len(opaque["raw_diff"])+len(opaque["syntax_context"]) != 0 {
+	if string(opaque["raw_diff"]) != `""` || string(opaque["change_blocks"]) != "[]" {
 		t.Fatal("opaque content leaked")
 	}
-	for phase := 1; phase <= 2; phase++ {
-		var body map[string]any
-		if phase == 1 {
-			_, data, ok := strings.Cut(c.messages[phase][2].Content, "\n\nPhase input:\n")
-			if !ok {
-				t.Fatal("missing phase payload")
-			}
-			if err := json.Unmarshal([]byte(data), &body); err != nil {
-				t.Fatal(err)
-			}
-			groups := body["groups"].([]any)
-			fs := groups[0].(map[string]any)["files"].([]any)
-			changed := fs[1].(map[string]any)
-			if changed["raw_diff"] != file.GroupingRawDiff {
-				t.Fatal("category diff lost")
-			}
-			if _, ok := changed["head_identity"]; ok {
-				t.Fatal("host identity exposed")
-			}
-		} else {
-			if c.messages[phase][0].Content != c.messages[0][0].Content || c.messages[phase][1].Content != c.messages[0][1].Content {
-				t.Fatal("common prefix drift")
-			}
-		}
+	_, body, _ := strings.Cut(c.messages[1][2].Content, "\n\nPhase input:\n")
+	var metadata struct {
+		Groups []struct {
+			Files []struct {
+				RawDiff string `json:"raw_diff"`
+			} `json:"files"`
+		} `json:"groups"`
 	}
-
+	if err := json.Unmarshal([]byte(body), &metadata); err != nil {
+		t.Fatal(err)
+	}
+	if len(metadata.Groups) != 1 || metadata.Groups[0].Files[1].RawDiff != file.GroupingRawDiff {
+		t.Fatal("Category lost diff")
+	}
+	if c.messages[0][1] != c.messages[2][1] {
+		t.Fatal("Text shared evidence drift")
+	}
 	after, _ := json.Marshal(p.Document)
 	if string(after) != string(original) || !reflect.DeepEqual(file.GroupingSyntaxContext, originalContext) {
 		t.Fatal("projection mutated host input")

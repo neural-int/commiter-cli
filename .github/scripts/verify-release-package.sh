@@ -35,19 +35,14 @@ fi
 
 config_home="$package_check/config"
 state_home="$package_check/state"
+smoke_home="$package_check/home"
 doctor_output="$package_check/doctor.json"
-mkdir -p "$config_home/commiter" "$state_home"
-cat > "$config_home/commiter/config.toml" <<'EOF'
-[llm]
-planner = "single-pass"
-backend = "mlx"
-model = "owner/model"
-model_revision = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-model_quantization = "4bit"
-EOF
+mkdir -p "$config_home/commiter" "$state_home" "$smoke_home"
+# Use the packaged CLI defaults and isolate the macOS model cache.
+: > "$config_home/commiter/config.toml"
 
 set +e
-XDG_CONFIG_HOME="$config_home" XDG_STATE_HOME="$state_home" \
+HOME="$smoke_home" XDG_CONFIG_HOME="$config_home" XDG_STATE_HOME="$state_home" \
   "$package_check/bin/commiter" --json doctor > "$doctor_output"
 doctor_status=$?
 set -e
@@ -61,8 +56,8 @@ import json
 import sys
 
 with open(sys.argv[1], encoding="utf-8") as stream:
-    checks = json.load(stream)["doctor"]
-if checks["mlx_helper"]["ok"] is not True or checks["mlx_model"]["ok"] is not False:
+    checks = json.load(stream).get("doctor", {})
+if checks.get("mlx_helper", {}).get("ok") is not True or checks.get("mlx_model", {}).get("ok") is not False:
     raise SystemExit("packaged commiter did not resolve its private MLX helper")
 PY
 

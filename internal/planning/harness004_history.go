@@ -13,6 +13,9 @@ func harness004OptionalHistory(messages []llm.Message) (*llm.OptionalHistoryInpu
 	if err := json.Unmarshal([]byte(messages[1].Content), &shared); err != nil {
 		return nil, err
 	}
+	if _, exists := shared["agent_history_contexts"]; exists {
+		return attributed004History(messages)
+	}
 	value, exists := shared["codex_context"]
 	if !exists {
 		return nil, nil
