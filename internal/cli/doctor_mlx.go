@@ -15,23 +15,26 @@ import (
 )
 
 const mlxUnsupportedPlatformMessage = "MLX requires macOS on Apple Silicon (darwin/arm64)"
+const mlxHelperUnavailableMessage = "bundled MLX helper is unavailable; reinstall commiter"
 
 const mlxDoctorTimeout = 2 * time.Minute
 
-var resolveBundledMLXHelper = mlx.ResolveBundledHelper
+// Setup, doctor, and generation use the same private libexec helper.
+var mlxHelperPath = mlx.ResolveBundledHelper
 
 func mlxPlatformSupported(goos, goarch string) bool {
 	return goos == "darwin" && goarch == "arm64"
 }
 
-// findMLXHelper is the single lookup boundary used by setup and doctor. Package
-// distribution may resolve a bundled helper here while retaining PATH lookup
-// for development builds.
-func findMLXHelper() (string, error) {
-	if helper, err := resolveBundledMLXHelper(); err == nil {
-		return helper, nil
+func skippedMLXChecks(reason string) map[string]map[string]any {
+	return map[string]map[string]any{
+		"mlx_backend":                check(false, reason),
+		"mlx_helper":                 check(false, reason),
+		"mlx_model":                  check(false, reason),
+		"mlx_model_runtime":          check(false, reason),
+		"mlx_json_schema_grammar":    check(false, reason),
+		"mlx_constrained_generation": check(false, reason),
 	}
-	return lookPath("commiter-mlx-helper")
 }
 
 func doctorMLX(values config.Values) map[string]map[string]any {
@@ -40,19 +43,16 @@ func doctorMLX(values config.Values) map[string]map[string]any {
 }
 
 func doctorMLXFor(values config.Values, goos, goarch string) map[string]map[string]any {
-	checks := map[string]map[string]any{}
-	platformOK := mlxPlatformSupported(goos, goarch)
-	checks["mlx_backend"] = check(platformOK, capabilityMessage(platformOK, "MLX is supported on macOS Apple Silicon", mlxUnsupportedPlatformMessage))
-	if !platformOK {
-		checks["mlx_helper"] = check(false, "not checked because this platform does not support MLX")
-		checks["mlx_model"] = check(false, "not checked because this platform does not support MLX")
-		checks["mlx_model_runtime"] = check(false, "not checked because this platform does not support MLX")
-		checks["mlx_json_schema_grammar"] = check(false, "not checked because this platform does not support MLX")
-		checks["mlx_constrained_generation"] = check(false, "not checked because this platform does not support MLX")
+	if !mlxPlatformSupported(goos, goarch) {
+		checks := skippedMLXChecks("not checked because this platform does not support MLX")
+		checks["mlx_backend"] = check(false, mlxUnsupportedPlatformMessage)
 		return checks
 	}
-	helper, err := findMLXHelper()
-	checks["mlx_helper"] = check(err == nil, capabilityMessage(err == nil, "MLX helper is executable", "MLX helper is unavailable; install commiter-mlx-helper"))
+	checks := map[string]map[string]any{
+		"mlx_backend": check(true, "MLX is supported on macOS Apple Silicon"),
+	}
+	helper, err := mlxHelperPath()
+	checks["mlx_helper"] = check(err == nil, capabilityMessage(err == nil, "bundled MLX helper is executable", mlxHelperUnavailableMessage))
 	if err != nil {
 		checks["mlx_model"] = check(false, "not checked because the MLX helper is unavailable")
 		checks["mlx_model_runtime"] = check(false, "not checked because the MLX helper is unavailable")

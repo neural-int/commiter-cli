@@ -33,13 +33,13 @@ func TestDoctorChecksCacheForModelOverride(t *testing.T) {
 	}
 	// Only Qwen has cache metadata. Invalid metadata must stop before the helper is run.
 	cliWrite(t, dir, "commiter-model.json", "{}", 0600)
-	oldStore, oldPlatform, oldBundled := newMLXModelStore, mlxPlatform, resolveBundledMLXHelper
+	oldStore, oldPlatform, oldBundled := newMLXModelStore, mlxPlatform, mlxHelperPath
 	t.Cleanup(func() {
-		newMLXModelStore, mlxPlatform, resolveBundledMLXHelper = oldStore, oldPlatform, oldBundled
+		newMLXModelStore, mlxPlatform, mlxHelperPath = oldStore, oldPlatform, oldBundled
 	})
 	newMLXModelStore = func() (mlxmodel.Store, error) { return store, nil }
 	mlxPlatform = func() (string, string) { return "darwin", "arm64" }
-	resolveBundledMLXHelper = func() (string, error) { return "/test/commiter-mlx-helper", nil }
+	mlxHelperPath = func() (string, error) { return "/test/commiter-mlx-helper", nil }
 	var stdout, stderr bytes.Buffer
 	if code := Run([]string{"--json", "--model=" + spec.Repo, "doctor"}, &stdout, &stderr); code != exitcode.LLM {
 		t.Fatalf("code = %d, stdout = %s, stderr = %s", code, &stdout, &stderr)
@@ -55,45 +55,30 @@ func TestDoctorChecksCacheForModelOverride(t *testing.T) {
 	}
 }
 
-func TestFindMLXHelperPrefersBundledHelperAndFallsBackToPath(t *testing.T) {
-	oldBundled, oldLookPath := resolveBundledMLXHelper, lookPath
+func TestSetupAndDoctorRejectHelperOnlyOnPath(t *testing.T) {
+	chdir(t, cliRepository(t))
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+	t.Setenv("XDG_STATE_HOME", t.TempDir())
+	helper := writeDoctorHelper(t, "{}")
+	t.Setenv("PATH", filepath.Dir(helper)+string(os.PathListSeparator)+os.Getenv("PATH"))
+	oldBundled, oldPlatform, oldStore := mlxHelperPath, mlxPlatform, newMLXModelStore
 	t.Cleanup(func() {
-		resolveBundledMLXHelper = oldBundled
-		lookPath = oldLookPath
+		mlxHelperPath, mlxPlatform, newMLXModelStore = oldBundled, oldPlatform, oldStore
 	})
-
-	pathLookups := 0
-	resolveBundledMLXHelper = func() (string, error) {
-		return "/package/libexec/commiter-mlx-helper", nil
+	mlxHelperPath = func() (string, error) { return "", os.ErrNotExist }
+	mlxPlatform = func() (string, string) { return "darwin", "arm64" }
+	newMLXModelStore = func() (mlxmodel.Store, error) {
+		t.Error("accepted PATH helper and opened model store")
+		return mlxmodel.Store{}, errors.New("unexpected model store access")
 	}
-	lookPath = func(name string) (string, error) {
-		pathLookups++
-		return "/usr/local/bin/" + name, nil
+	var stdout, stderr bytes.Buffer
+	if code := Run([]string{"setup"}, &stdout, &stderr); code != exitcode.LLM ||
+		!strings.Contains(stderr.String(), "bundled MLX helper is unavailable") {
+		t.Errorf("setup code=%d stderr=%q", code, &stderr)
 	}
-
-	helper, err := findMLXHelper()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if helper != "/package/libexec/commiter-mlx-helper" {
-		t.Fatalf("helper = %q, want bundled helper", helper)
-	}
-	if pathLookups != 0 {
-		t.Fatalf("PATH lookups = %d, want 0 when bundled helper exists", pathLookups)
-	}
-
-	resolveBundledMLXHelper = func() (string, error) {
-		return "", errors.New("bundled helper unavailable")
-	}
-	helper, err = findMLXHelper()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if helper != "/usr/local/bin/commiter-mlx-helper" {
-		t.Fatalf("helper = %q, want PATH helper", helper)
-	}
-	if pathLookups != 1 {
-		t.Fatalf("PATH lookups = %d, want 1 after bundled lookup fails", pathLookups)
+	if code, checks := runJSONDoctor(t); code != exitcode.LLM || checks["mlx_helper"].OK ||
+		!strings.Contains(checks["mlx_helper"].Message, "bundled MLX helper is unavailable") {
+		t.Errorf("doctor code=%d helper=%#v", code, checks["mlx_helper"])
 	}
 }
 
@@ -156,14 +141,9 @@ func TestMLXCapabilityProbeUsesPlanningSchema(t *testing.T) {
 func TestDoctorMLXMissingModelDoesNotStartHelperOrContactRegistry(t *testing.T) {
 	marker := filepath.Join(t.TempDir(), "started")
 	helper := writeDoctorHelper(t, `{"ok":true,"stop_reason":"completed","generated_json":"{\"ok\":true}"}`, marker)
-	oldLookPath, oldStore := lookPath, newMLXModelStore
-	t.Cleanup(func() { lookPath, newMLXModelStore = oldLookPath, oldStore })
-	lookPath = func(name string) (string, error) {
-		if name == "commiter-mlx-helper" {
-			return helper, nil
-		}
-		return "", os.ErrNotExist
-	}
+	oldHelper, oldStore := mlxHelperPath, newMLXModelStore
+	t.Cleanup(func() { mlxHelperPath, newMLXModelStore = oldHelper, oldStore })
+	mlxHelperPath = func() (string, error) { return helper, nil }
 	newMLXModelStore = func() (mlxmodel.Store, error) { return mlxmodel.Store{Root: t.TempDir()}, nil }
 
 	checks := doctorMLXFor(config.Values{
@@ -177,7 +157,7 @@ func TestDoctorMLXMissingModelDoesNotStartHelperOrContactRegistry(t *testing.T) 
 	}
 }
 
-func TestMLXDoctorJSONKeepsEnvelopeAndUsesSelectedBackend(t *testing.T) {
+func TestMLXDoctorJSONKeepsEnvelope(t *testing.T) {
 	repo := cliRepository(t)
 	chdir(t, repo)
 	configHome := t.TempDir()
@@ -190,15 +170,10 @@ func TestMLXDoctorJSONKeepsEnvelopeAndUsesSelectedBackend(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(configHome, "commiter", "config.toml"), []byte(configText), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	oldStore, oldPath, oldPlatform := newMLXModelStore, lookPath, mlxPlatform
-	t.Cleanup(func() { newMLXModelStore, lookPath, mlxPlatform = oldStore, oldPath, oldPlatform })
+	oldStore, oldHelper, oldPlatform := newMLXModelStore, mlxHelperPath, mlxPlatform
+	t.Cleanup(func() { newMLXModelStore, mlxHelperPath, mlxPlatform = oldStore, oldHelper, oldPlatform })
 	newMLXModelStore = func() (mlxmodel.Store, error) { return mlxmodel.Store{Root: t.TempDir()}, nil }
-	lookPath = func(name string) (string, error) {
-		if name == "commiter-mlx-helper" {
-			return "/test/commiter-mlx-helper", nil
-		}
-		return "", os.ErrNotExist
-	}
+	mlxHelperPath = func() (string, error) { return "/test/commiter-mlx-helper", nil }
 	mlxPlatform = func() (string, string) { return "darwin", "arm64" }
 
 	var stdout, stderr bytes.Buffer
@@ -221,7 +196,7 @@ func TestMLXDoctorJSONKeepsEnvelopeAndUsesSelectedBackend(t *testing.T) {
 	}
 }
 
-func TestDoctorDoesNotFallBackWhenConfigurationCannotBeResolved(t *testing.T) {
+func TestDoctorReportsSkippedMLXChecksWhenConfigurationCannotBeResolved(t *testing.T) {
 	repo := cliRepository(t)
 	chdir(t, repo)
 	configHome := t.TempDir()
@@ -233,12 +208,10 @@ func TestDoctorDoesNotFallBackWhenConfigurationCannotBeResolved(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(configHome, "commiter", "config.toml"), []byte("[llm\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	oldPath := lookPath
-	t.Cleanup(func() { lookPath = oldPath })
-	lookPath = func(name string) (string, error) {
-		if name == "ollama" {
-			return "/test/ollama", nil
-		}
+	oldHelper := mlxHelperPath
+	t.Cleanup(func() { mlxHelperPath = oldHelper })
+	mlxHelperPath = func() (string, error) {
+		t.Error("invalid configuration reached helper lookup")
 		return "", os.ErrNotExist
 	}
 
@@ -254,6 +227,16 @@ func TestDoctorDoesNotFallBackWhenConfigurationCannotBeResolved(t *testing.T) {
 	}
 	if _, exists := result.Doctor["ollama_binary"]; exists {
 		t.Fatalf("unresolved configuration revived removed Ollama backend: %#v", result.Doctor)
+	}
+	for _, key := range []string{"mlx_backend", "mlx_helper", "mlx_model", "mlx_model_runtime", "mlx_json_schema_grammar", "mlx_constrained_generation"} {
+		if check, exists := result.Doctor[key]; !exists || check.OK || !strings.Contains(check.Message, "configuration") {
+			t.Errorf("check %s = %#v, want skipped MLX check", key, check)
+		}
+	}
+	for _, key := range []string{"structured_output", "thinking"} {
+		if _, exists := result.Doctor[key]; exists {
+			t.Errorf("unexpected legacy check %s", key)
+		}
 	}
 }
 

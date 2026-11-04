@@ -25,7 +25,6 @@ import (
 
 var Version = "dev"
 
-var lookPath = exec.LookPath
 var newMLXModelStore = mlxmodel.DefaultStore
 var mlxPlatform = func() (string, string) { return runtime.GOOS, runtime.GOARCH }
 var updateCheckInteractive = func() bool {
@@ -183,9 +182,9 @@ func runSetup(args []string, model *string, printer *output.Printer) int {
 	if !mlxPlatformSupported(goos, goarch) {
 		return fail(printer, exitcode.New(exitcode.LLM, mlxUnsupportedPlatformMessage))
 	}
-	helper, err := findMLXHelper()
+	helper, err := mlxHelperPath()
 	if err != nil {
-		return fail(printer, exitcode.New(exitcode.LLM, "MLX helper is unavailable; reinstall commiter"))
+		return fail(printer, exitcode.New(exitcode.LLM, mlxHelperUnavailableMessage))
 	}
 	return runMLXModelSetup(printer, effective.Values, update, helper)
 }
@@ -257,11 +256,10 @@ func runDoctor(args []string, model *string, printer *output.Printer) int {
 		}
 	}
 	checks["git_identity"] = doctorGitIdentity()
-	if checks["structured_output"] == nil && checks["mlx_constrained_generation"] == nil {
-		checks["structured_output"] = check(false, "configured backend capability could not be verified")
-	}
-	if checks["thinking"] == nil && checks["mlx_constrained_generation"] == nil {
-		checks["thinking"] = check(false, "configured backend capability could not be verified")
+	if checks["mlx_backend"] == nil {
+		for key, value := range skippedMLXChecks("not checked because the configuration is unavailable") {
+			checks[key] = value
+		}
 	}
 	ok := true
 	for _, value := range checks {
