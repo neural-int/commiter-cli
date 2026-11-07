@@ -217,6 +217,10 @@ require a validated profile and are distinguished from managed artifacts.
 setup/generation refuse it and doctor marks its capabilities as not checked.
 See the [implementation status and remaining gates](docs/runtime/llamacpp.md).
 
+The explicit [Qwen3.5-4B Q4_K_M native trial](docs/runtime/llamacpp-trial-2026-11-07.md)
+passed CLI dry-run E2E with Metal. Its separate invalid-grammar test reproduced
+continued generation after an LLGuidance error, so release activation stays closed.
+
 ## Privacy & Safety
 
 `commiter` treats local-only analysis and conservative Git mutation as core invariants rather than optional modes.

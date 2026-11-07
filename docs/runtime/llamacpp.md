@@ -1,7 +1,8 @@
 # llama.cpp adapter implementation status
 
-The llama.cpp runtime is **unavailable**. This change implements contracts that
-can be established before selecting an upstream build. It does not complete
+The normal release llama.cpp runtime is **unavailable**. An explicit native
+trial now implements and exercises real server/CLI integration with Qwen3.5-4B
+Q4_K_M. See the [2026-11-07 trial results](llamacpp-trial-2026-11-07.md). It does not complete
 [Issue #190](https://github.com/neural-int/commiter-cli/issues/190). The
 [v0.3.1 design](https://github.com/neural-int/commiter-cli/issues/190#issuecomment-6676772042)
 requires qualification before normal CLI activation and forbids independent
@@ -9,19 +10,22 @@ upstream patches and silent GBNF, CPU, MLX or external-server fallback.
 
 ## Upstream evidence and activation gate
 
-On 2026-11-07, upstream master resolved to
-`cf659f240b232e15700b1721bbb43c1d973c52e9`. This is an investigation reference,
-not an adopted runtime. Its
-[LLGuidance sampler](https://github.com/ggml-org/llama.cpp/blob/cf659f240b232e15700b1721bbb43c1d973c52e9/common/llguidance.cpp#L46-L59)
+The user-requested latest upstream trial is pinned to
+`80d2c0c2c56e4a1bbf74be98f64b99927bf230bc`, with LLGuidance
+`d795912fedc7d393de740177ea9ea761e7905774`. It is an experimental adoption,
+not a qualified release runtime. The fixed trial's
+[LLGuidance sampler](https://github.com/ggml-org/llama.cpp/blob/80d2c0c2c56e4a1bbf74be98f64b99927bf230bc/common/llguidance.cpp#L46-L59)
 frees the grammar and returns after a mask-computation error without stopping
-generation. Its [documentation](https://github.com/ggml-org/llama.cpp/blob/cf659f240b232e15700b1721bbb43c1d973c52e9/docs/llguidance.md#error-handling)
-also describes continued generation after errors. This is static source evidence;
-no runtime failure injection or Metal inference was run against this SHA.
+generation. Its [documentation](https://github.com/ggml-org/llama.cpp/blob/80d2c0c2c56e4a1bbf74be98f64b99927bf230bc/docs/llguidance.md#error-handling)
+also describes continued generation after errors. The latest trial additionally
+reproduced HTTP 200 and valid JSON after an invalid LLGuidance grammar triggered
+an engine error. Real Metal inference and CLI E2E passed in a separate cycle.
 
-No build is qualified or bundled, no GGUF profile is registered, and no build or
-activation override is exposed. Logs or an output that happens to pass schema
+No release build is qualified or bundled, no production GGUF profile is
+registered, and no public activation override is exposed. Logs or valid schema
 validation cannot establish that LLGuidance enforced constraints throughout
-generation. The adapter always refuses activation, even when called directly.
+generation. The production `Backend` refuses activation even when called
+directly; only an explicit internal `TrialBackend` executes the native trial.
 
 ## Implemented components and verification
 
@@ -31,15 +35,17 @@ generation. The adapter always refuses activation, even when called directly.
 | Selection | `runtime`, legacy `backend` alias, explicit model path, global/repo/CLI precedence, inherited-path invalidation, local/managed origin | Config and CLI contract tests |
 | CLI gate | Execution/setup refuse llamacpp; doctor lists bundle/model/Metal/UDS/LLGuidance/three-phase checks as unperformed | CLI and adapter refusal tests |
 | GGUF storage | Canonical cache identity, trusted size/content digest, stable shared/exclusive flock, cancellation, staged install, explicit repair, recovery | Synthetic artifacts, concurrent setup subprocesses, killed writers, rename/restore/sync failure injection |
-| UDS transport | Fixed operation paths, Unix-only dialing, no proxy or redirect, owner/mode/inode and OS peer-PID checks before transmission, 1 MiB request/4 MiB response/32 KiB header limits | Local test HTTP server on macOS; Linux support exists for CI, not as product support |
-| Input admission | Exact retained native tokens, 65,536 context/4,096 output reservation, whole-record history selection, at most five preparations, validated mandatory-input fallback | Synthetic tokenizer callbacks |
-| Schema validation | Closed object/string vocabulary, required/allowed fields, enum, Unicode lengths, unknown-keyword/duplicate-key/trailing-data rejection | Grouping/text-shaped synthetic responses |
+| UDS transport | Fixed operation paths, Unix-only dialing, no proxy or redirect, owner/mode/inode and OS peer-PID checks before transmission, 1 MiB request/4 MiB response/32 KiB header limits | Local test server and real native E2E on macOS; Linux support is for CI |
+| Input admission | Exact retained native tokens, 65,536 context/4,096 output reservation, whole-record history selection, at most five preparations, validated mandatory-input fallback | Synthetic tokenizer callbacks and real native token counts |
+| Schema validation | Closed object/string vocabulary, required/allowed fields, enum, Unicode lengths, unknown-keyword/duplicate-key/trailing-data rejection | Synthetic invalid responses and real three-phase schema validation |
 
 The GGUF store has no production model catalog or network fetcher. Setup does not
-invoke it while the runtime is unqualified. The transport, native-input admission
-and schema helpers are not connected to a real llama-server. These tests establish
-component contracts, not E2E inference, semantic quality, performance or packaging
-readiness. The existing 4-file and 120-second planner limits remain unchanged.
+invoke it while the runtime is unqualified. `TrialBackend` now connects the
+transport, native-input admission and schema helpers to a real fixed server.
+The internal test factory exercises the actual CLI dry-run path; the release
+factory remains closed. Nominal E2E success, semantic quality and production
+failure handling are reported separately. The existing 4-file and 120-second
+planner limits remain unchanged.
 
 ## Configuration
 
@@ -127,19 +133,19 @@ telemetry are reported by the gated adapter.
 1. Qualify an unmodified upstream SHA that fails closed on LLGuidance compile and
    runtime errors. Freeze native API fixtures, BOS/EOS behavior, template/thinking
    control and observable constraint-engine status.
-2. Implement the process supervisor and production API integration: private
-   directory ownership, one model load/cycle, one slot, phase KV isolation,
-   readiness/Metal/context checks, bounded private logs, environment allowlist,
-   timeout/cancel/crash cleanup, and parent-death resource recovery.
+2. Connect the experimentally verified supervisor/API to a trusted release
+   bundle only after qualification. The trial covers one model load/cycle, one
+   slot, independent prefill, Metal/context checks, bounded logs, environment
+   allowlist and cancellation cleanup. Parent-death recovery remains unqualified.
 3. Qualify managed profiles/local metadata, trusted artifact digests and input,
    thinking and context behavior. Connect explicit setup downloads and reader
    leases after qualification.
-4. Run packaged CLI → adapter → real llama-server → validators E2E, negative
-   constraint tests, MLX regression and separate structural/semantic/latency/memory
-   comparisons using the same fixtures.
-5. Pin llama.cpp/LLGuidance/toolchain/options/licenses and verify the relative
-   `libexec/commiter/llamacpp/` bundle, manifest, dylib/rpath/Metal resources, minimum
-   OS, sizes, signature, notarization and Homebrew relocation.
+4. Extend the passing experimental CLI E2E to a packaged release and broader
+   fixtures. Compare structural/semantic/latency/memory results separately from
+   the current single-fixture observation and retain MLX regression checks.
+5. Distribution/signature/notarization checks are deferred to subsequent CI/CD
+   per the user's instruction. They are not prerequisites to this native trial
+   and are not claimed as completed here.
 
 No release workflow or distribution dependency is changed here. Issue #190 stays
 open until these gates and the issue's completion criteria are met.
