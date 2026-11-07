@@ -37,7 +37,7 @@ func (o observed004Cycle) Chat(c context.Context, m []llm.Message, s json.RawMes
 func (o observed004Cycle) ChatWithOptions(c context.Context, m []llm.Message, s json.RawMessage, p llm.Options) (llm.Response, error) {
 	return o.backend.ChatWithOptions(c, m, s, p)
 }
-func (o observed004Cycle) BeginCycle(c context.Context) (llm.OptionsBackend, func(), error) {
+func (o observed004Cycle) BeginCycle(c context.Context) (llm.OptionsBackend, func() error, error) {
 	b, close, e := o.backend.BeginCycle(c)
 	if e != nil {
 		return nil, nil, e

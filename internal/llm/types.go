@@ -105,6 +105,13 @@ type OptionsBackend interface {
 	ChatWithOptions(context.Context, []Message, json.RawMessage, Options) (Response, error)
 }
 
+// CycleBackend owns resources for one planner invocation. Close is idempotent;
+// a cleanup failure invalidates an otherwise successful plan.
+type CycleBackend interface {
+	OptionsBackend
+	BeginCycle(context.Context) (OptionsBackend, func() error, error)
+}
+
 // Retryable marks a backend error that is safe to retry once.
 type Retryable interface {
 	Retryable() bool
