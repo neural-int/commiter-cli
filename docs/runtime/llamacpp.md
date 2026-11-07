@@ -1,0 +1,145 @@
+# llama.cpp adapter implementation status
+
+The llama.cpp runtime is **unavailable**. This change implements contracts that
+can be established before selecting an upstream build. It does not complete
+[Issue #190](https://github.com/neural-int/commiter-cli/issues/190). The
+[v0.3.1 design](https://github.com/neural-int/commiter-cli/issues/190#issuecomment-6676772042)
+requires qualification before normal CLI activation and forbids independent
+upstream patches and silent GBNF, CPU, MLX or external-server fallback.
+
+## Upstream evidence and activation gate
+
+On 2026-11-07, upstream master resolved to
+`cf659f240b232e15700b1721bbb43c1d973c52e9`. This is an investigation reference,
+not an adopted runtime. Its
+[LLGuidance sampler](https://github.com/ggml-org/llama.cpp/blob/cf659f240b232e15700b1721bbb43c1d973c52e9/common/llguidance.cpp#L46-L59)
+frees the grammar and returns after a mask-computation error without stopping
+generation. Its [documentation](https://github.com/ggml-org/llama.cpp/blob/cf659f240b232e15700b1721bbb43c1d973c52e9/docs/llguidance.md#error-handling)
+also describes continued generation after errors. This is static source evidence;
+no runtime failure injection or Metal inference was run against this SHA.
+
+No build is qualified or bundled, no GGUF profile is registered, and no build or
+activation override is exposed. Logs or an output that happens to pass schema
+validation cannot establish that LLGuidance enforced constraints throughout
+generation. The adapter always refuses activation, even when called directly.
+
+## Implemented components and verification
+
+| Area | Behavior | Evidence |
+| --- | --- | --- |
+| Cycle ownership | Named `llm.CycleBackend`, error-returning close; cleanup failure discards a plan and preserves a preceding generation error | Existing MLX/planner tests and cleanup failure injection |
+| Selection | `runtime`, legacy `backend` alias, explicit model path, global/repo/CLI precedence, inherited-path invalidation, local/managed origin | Config and CLI contract tests |
+| CLI gate | Execution/setup refuse llamacpp; doctor lists bundle/model/Metal/UDS/LLGuidance/three-phase checks as unperformed | CLI and adapter refusal tests |
+| GGUF storage | Canonical cache identity, trusted size/content digest, stable shared/exclusive flock, cancellation, staged install, explicit repair, recovery | Synthetic artifacts, concurrent setup subprocesses, killed writers, rename/restore/sync failure injection |
+| UDS transport | Fixed operation paths, Unix-only dialing, no proxy or redirect, owner/mode/inode and OS peer-PID checks before transmission, 1 MiB request/4 MiB response/32 KiB header limits | Local test HTTP server on macOS; Linux support exists for CI, not as product support |
+| Input admission | Exact retained native tokens, 65,536 context/4,096 output reservation, whole-record history selection, at most five preparations, validated mandatory-input fallback | Synthetic tokenizer callbacks |
+| Schema validation | Closed object/string vocabulary, required/allowed fields, enum, Unicode lengths, unknown-keyword/duplicate-key/trailing-data rejection | Grouping/text-shaped synthetic responses |
+
+The GGUF store has no production model catalog or network fetcher. Setup does not
+invoke it while the runtime is unqualified. The transport, native-input admission
+and schema helpers are not connected to a real llama-server. These tests establish
+component contracts, not E2E inference, semantic quality, performance or packaging
+readiness. The existing 4-file and 120-second planner limits remain unchanged.
+
+## Configuration
+
+MLX remains the default. `runtime` and `backend` in the same layer must agree.
+Legacy pinned MLX settings and the existing MLX cache layout remain valid. Context
+may be omitted; the old `auto`/`64k` and 65,536 settings remain readable. Other
+budgets are rejected. New templates omit these fixed context settings.
+
+```toml
+[llm]
+planner = "three-phase"
+runtime = "mlx"
+model = "mlx-community/gemma-4-E4B-it-4bit"
+# Global configuration only:
+# model_path = "/absolute/path/to/mlx-model-directory"
+```
+
+Flags precede the command:
+
+```sh
+commiter --runtime mlx --model mlx-community/gemma-4-E4B-it-4bit \
+  --model-path /absolute/path/to/mlx-model-directory setup
+```
+
+A local path requires an explicitly selected nonempty model identifier. Matching
+a registered name still has local origin; the name does not establish artifact
+identity. Local MLX trials use the existing validated profile and helper probe.
+Unknown profiles fail because input format, thinking control and context have not
+been established. Local setup never downloads, copies, moves or installs into the
+managed cache. A probe success does not register the artifact or prove quality.
+
+The parser can represent a future local GGUF trial:
+
+```toml
+[llm]
+planner = "three-phase"
+runtime = "llamacpp"
+model = "my-trial"
+model_path = "/absolute/path/to/model.gguf"
+```
+
+`config show --effective` shows its local origin. Execution/setup return a
+qualification error without reading the model or starting a server. Doctor marks
+each capability as not checked. No GGUF metadata check, load, inference or
+download is attempted. Explicit MLX-only revision/quantization settings conflict
+with another runtime. A runtime-only change never selects another model. A
+model/runtime change clears an inherited path before applying a new path.
+
+## GGUF cache ownership and recovery
+
+Identity hashes `commiter-gguf-cache-v1`, `llamacpp`, repository, lowercase
+revision, quantization and sorted relative filenames, each terminated by NUL.
+Expected size and digest come from the trusted registration. The initial format
+accepts one GGUF file. Install holds an exclusive stable `.locks/<key>.lock`;
+Open holds a shared lock until its lease closes. A future server cycle must keep
+the lease until the process exits. Lock contention waits at most 30 seconds and
+honors cancellation. Different keys progress independently.
+
+Only verified `.stage-<key>/` content becomes `<key>/` by rename. Explicit repair
+preserves `.previous-<key>/` until the new destination and parent are synced.
+Setup restores an interrupted previous directory, discards uncommitted stage
+content, or adopts a verified destination according to the design's recovery
+table. Contradictory state and unexpected symlinks/file types are refused. Open
+never repairs models. Same-UID malicious modification is not fully isolated.
+
+## Constraint guarantees
+
+| Constraint | LLGuidance generation | Post-generation helper | Existing Go planner/validator |
+| --- | --- | --- | --- |
+| Object/string, required/allowed keys | Unqualified | Enforced | Phase key checks retained |
+| Grouping IDs and allowed labels | Unqualified | Required keys/enum | Complete assignment and ID restoration retained |
+| Category type/evidence reference | Unqualified | Dynamic enum supported; not integrated | Evidence/group correspondence and unresolved rejection retained |
+| Scope 1–16, summary 1–48 Unicode code points | Unqualified | Enforced | Language, one-line and forbidden-scope checks retained |
+| Duplicate keys/trailing data | Unqualified | Rejected before validation | Existing strict parsing retained |
+| Semantic correctness/privacy/Git snapshot | No claim | No semantic claim | Existing validators and snapshot checks retained |
+
+Supported vocabulary is `type` (`object`/`string`), `properties`, `required`,
+`additionalProperties: false`, string `enum`, `minLength` and `maxLength`.
+Unknown keywords fail before generation. MLX scope token filtering and prefix/KV
+optimization are not claimed for llamacpp. No cache hits or unobserved numeric
+telemetry are reported by the gated adapter.
+
+## Remaining work before activation and distribution
+
+1. Qualify an unmodified upstream SHA that fails closed on LLGuidance compile and
+   runtime errors. Freeze native API fixtures, BOS/EOS behavior, template/thinking
+   control and observable constraint-engine status.
+2. Implement the process supervisor and production API integration: private
+   directory ownership, one model load/cycle, one slot, phase KV isolation,
+   readiness/Metal/context checks, bounded private logs, environment allowlist,
+   timeout/cancel/crash cleanup, and parent-death resource recovery.
+3. Qualify managed profiles/local metadata, trusted artifact digests and input,
+   thinking and context behavior. Connect explicit setup downloads and reader
+   leases after qualification.
+4. Run packaged CLI → adapter → real llama-server → validators E2E, negative
+   constraint tests, MLX regression and separate structural/semantic/latency/memory
+   comparisons using the same fixtures.
+5. Pin llama.cpp/LLGuidance/toolchain/options/licenses and verify the relative
+   `libexec/commiter/llamacpp/` bundle, manifest, dylib/rpath/Metal resources, minimum
+   OS, sizes, signature, notarization and Homebrew relocation.
+
+No release workflow or distribution dependency is changed here. Issue #190 stays
+open until these gates and the issue's completion criteria are met.

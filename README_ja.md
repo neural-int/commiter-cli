@@ -188,6 +188,8 @@ commiter config show --effective
 | `push.enabled` | `true` |
 | `push.confirm` | `true` |
 | `llm.backend` | `"mlx"` |
+| `llm.runtime` | `"mlx"`（共通名。`backend` は互換名） |
+| `llm.model_path` | 未指定（任意の絶対パス。global/CLI のみ） |
 | `llm.planner` | `"three-phase"` |
 | `llm.model` | `"mlx-community/gemma-4-E4B-it-4bit"` |
 | `llm.model_revision` | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` |
@@ -199,6 +201,8 @@ commiter config show --effective
 | `metrics.persist` | `false` |
 
 検証処理の設定はリポジトリ固有のスコープに限定します。グローバル設定には記述できません。
+
+`--runtime`、`--model`、`--model-path` でランタイム、モデル名、ローカルパスを指定できます。上位設定でモデルまたはランタイムを変更すると、継承したローカルパスを解除します。MLX のローカル試用には既存の検証済み profile が必要で、管理モデルとは取得元を区別します。`llamacpp` は上流適合確認待ちのため利用できません。通常実行と setup は停止し、doctor は各機能を未確認と表示します。[実装状況と残る条件](docs/runtime/llamacpp.md)を参照してください。
 
 通常の計画生成をHarness 004の3フェーズへ統一します。最大4ファイル、完全なGit差分、生成サイクル120秒、全フェーズ65,536 tokens、出力各4,096 tokens、summary48文字、scope16文字を維持します。対応するGemma/Qwenの固定4bitモデルと旧設定の変更方法は[移行手順](docs/migrations/harness004.md)を参照してください。single-passとOllamaへの暗黙復帰は廃止します。履歴は現在worktreeから取得し、編集内容と差分ブロックを照合したうえで、安全な非空の最終応答だけを渡します。欠落・危険・予算超過では記録全体を省きます。通常生成中のモデル取得は行いません。
 
