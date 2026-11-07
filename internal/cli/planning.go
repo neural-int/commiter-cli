@@ -17,9 +17,9 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/contextinput"
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
 	"github.com/natsuki0413/commiter-cli/internal/gitstate"
+	"github.com/natsuki0413/commiter-cli/internal/llamacpp"
 	runmetrics "github.com/natsuki0413/commiter-cli/internal/metrics"
 	"github.com/natsuki0413/commiter-cli/internal/mlx"
-	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 	"github.com/natsuki0413/commiter-cli/internal/planning"
 	"github.com/natsuki0413/commiter-cli/internal/relation"
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
@@ -30,6 +30,9 @@ type planFlowFunc func(context.Context, string, gitstate.Snapshot, config.Values
 var planFlow planFlowFunc = generateCommitPlan
 
 func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snapshot, values config.Values, supplement string) (planning.Plan, error) {
+	if values.Backend == "llamacpp" {
+		return planning.Plan{}, exitcode.New(exitcode.LLM, llamacpp.QualificationMessage)
+	}
 	if values.Planner != config.CandidatePlanner || !config.SupportedPlannerModel(values) {
 		return planning.Plan{}, exitcode.New(exitcode.Usage, "removed or unsupported planner configuration; migrate to a pinned MLX three-phase model (see docs/migrations/harness004.md)")
 	}
@@ -38,11 +41,7 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 	}
 	var client planning.ChatClient
 	if values.Backend == "mlx" {
-		store, err := newMLXModelStore()
-		if err != nil {
-			return planning.Plan{}, exitcode.New(exitcode.LLM, err.Error())
-		}
-		modelPath, err := store.Ready(mlxmodel.Spec{Repo: values.Model, Revision: values.ModelRevision, Quantization: values.ModelQuantization})
+		modelPath, err := resolveMLXModelPath(values)
 		if err != nil {
 			return planning.Plan{}, exitcode.New(exitcode.LLM, err.Error())
 		}

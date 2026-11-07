@@ -19,12 +19,10 @@ confirm = true
 
 [llm]
 planner = "three-phase"
-backend = "mlx"
+runtime = "mlx"
 model = "mlx-community/gemma-4-E4B-it-4bit"
 model_revision = "475b9088d29754a3379866cf5aeb6b41acd313c2"
 model_quantization = "4bit"
-context = "64k"
-max_context_tokens = 65536
 
 [analysis]
 untracked = "auto-safe"
@@ -45,12 +43,10 @@ language = "en"
 
 [llm]
 planner = "three-phase"
-backend = "mlx"
+runtime = "mlx"
 model = "mlx-community/gemma-4-E4B-it-4bit"
 model_revision = "475b9088d29754a3379866cf5aeb6b41acd313c2"
 model_quantization = "4bit"
-context = "64k"
-max_context_tokens = 65536
 
 [analysis]
 include = []

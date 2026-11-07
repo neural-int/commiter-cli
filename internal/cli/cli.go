@@ -15,6 +15,7 @@ import (
 
 	"github.com/natsuki0413/commiter-cli/internal/config"
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
+	"github.com/natsuki0413/commiter-cli/internal/llamacpp"
 	runmetrics "github.com/natsuki0413/commiter-cli/internal/metrics"
 	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 	"github.com/natsuki0413/commiter-cli/internal/output"
@@ -47,6 +48,8 @@ type options struct {
 	recordMetrics   bool
 	language        *string
 	model           *string
+	runtime         *string
+	modelPath       *string
 	command         string
 	args            []string
 	pathspecs       []string
@@ -83,9 +86,9 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	case "trust":
 		return runTrust(opts, printer)
 	case "setup":
-		return runSetup(opts.args, opts.model, printer)
+		return runSetup(opts, printer)
 	case "doctor":
-		return runDoctor(opts.args, opts.model, printer)
+		return runDoctor(opts, printer)
 	case "":
 		return runMain(opts, printer)
 	default:
@@ -161,7 +164,8 @@ func parseInitArgs(args []string) ([]string, error) {
 	return patterns, nil
 }
 
-func runSetup(args []string, model *string, printer *output.Printer) int {
+func runSetup(opts options, printer *output.Printer) int {
+	args := opts.args
 	if len(args) > 1 || (len(args) == 1 && args[0] != "--update-model") {
 		return fail(printer, exitcode.New(exitcode.Usage, "setup accepts only --update-model"))
 	}
@@ -174,9 +178,12 @@ func runSetup(args []string, model *string, printer *output.Printer) int {
 	if err != nil {
 		return fail(printer, exitcode.New(exitcode.Usage, err.Error()))
 	}
-	effective, err := config.Resolve(paths.GlobalConfig, paths.RepoConfig, root, config.CLIOverrides{Model: model})
+	effective, err := config.Resolve(paths.GlobalConfig, paths.RepoConfig, root, overrides(opts))
 	if err != nil {
 		return fail(printer, exitcode.New(exitcode.Usage, err.Error()))
+	}
+	if effective.Values.Backend == "llamacpp" {
+		return fail(printer, exitcode.New(exitcode.LLM, llamacpp.QualificationMessage))
 	}
 	goos, goarch := mlxPlatform()
 	if !mlxPlatformSupported(goos, goarch) {
@@ -190,6 +197,15 @@ func runSetup(args []string, model *string, printer *output.Printer) int {
 }
 
 func runMLXModelSetup(printer *output.Printer, values config.Values, update bool, helper string) int {
+	if values.ModelSource == "local" {
+		if err := validateLocalMLXModel(values); err != nil {
+			return fail(printer, exitcode.New(exitcode.LLM, err.Error()))
+		}
+		if err := verifyMLXPlannerCapability(helper, values, values.ModelPath); err != nil {
+			return fail(printer, exitcode.New(exitcode.LLM, "local MLX model capability check failed; no model was downloaded or moved"))
+		}
+		return finishSetup(printer, "local MLX trial passed the model, tokenizer and constrained generation probe; this does not register the artifact as a managed model")
+	}
 	store, err := newMLXModelStore()
 	if err != nil {
 		return fail(printer, exitcode.New(exitcode.LLM, err.Error()))
@@ -233,7 +249,8 @@ func runMLXModelSetup(printer *output.Printer, values config.Values, update bool
 	return finishSetup(printer, "MLX model setup completed; tokenizer, JSON Schema grammar, and constrained generation passed")
 }
 
-func runDoctor(args []string, model *string, printer *output.Printer) int {
+func runDoctor(opts options, printer *output.Printer) int {
+	args := opts.args
 	if len(args) != 0 {
 		return fail(printer, exitcode.New(exitcode.Usage, "doctor does not accept arguments"))
 	}
@@ -243,11 +260,15 @@ func runDoctor(args []string, model *string, printer *output.Printer) int {
 	if rootErr == nil {
 		paths, err := config.DefaultPaths(root)
 		if err == nil {
-			effective, resolveErr := config.Resolve(paths.GlobalConfig, paths.RepoConfig, root, config.CLIOverrides{Model: model})
+			effective, resolveErr := config.Resolve(paths.GlobalConfig, paths.RepoConfig, root, overrides(opts))
 			checks["config"] = check(resolveErr == nil, message(resolveErr, "configuration valid"))
 			checks["trust"] = checkTrust(paths.StateDir, root)
 			if resolveErr == nil {
-				for key, value := range doctorMLX(effective.Values) {
+				runtimeChecks := doctorMLX
+				if effective.Values.Backend == "llamacpp" {
+					runtimeChecks = doctorLlamaCPP
+				}
+				for key, value := range runtimeChecks(effective.Values) {
 					checks[key] = value
 				}
 			}
@@ -256,7 +277,7 @@ func runDoctor(args []string, model *string, printer *output.Printer) int {
 		}
 	}
 	checks["git_identity"] = doctorGitIdentity()
-	if checks["mlx_backend"] == nil {
+	if checks["mlx_backend"] == nil && checks["llamacpp_backend"] == nil {
 		for key, value := range skippedMLXChecks("not checked because the configuration is unavailable") {
 			checks[key] = value
 		}
@@ -374,7 +395,7 @@ func parse(args []string) (options, error) {
 			opts.noConfirmPush = true
 		case "--record-metrics":
 			opts.recordMetrics = true
-		case "--language", "--model":
+		case "--language", "--model", "--runtime", "--model-path":
 			if i+1 >= len(args) {
 				return opts, fmt.Errorf("%s requires a value", arg)
 			}
@@ -382,6 +403,12 @@ func parse(args []string) (options, error) {
 			if arg == "--language" {
 				value := args[i]
 				opts.language = &value
+			} else if arg == "--runtime" {
+				value := args[i]
+				opts.runtime = &value
+			} else if arg == "--model-path" {
+				value := args[i]
+				opts.modelPath = &value
 			} else {
 				value := args[i]
 				opts.model = &value
@@ -393,6 +420,12 @@ func parse(args []string) (options, error) {
 			} else if strings.HasPrefix(arg, "--model=") {
 				value := strings.TrimPrefix(arg, "--model=")
 				opts.model = &value
+			} else if strings.HasPrefix(arg, "--runtime=") {
+				value := strings.TrimPrefix(arg, "--runtime=")
+				opts.runtime = &value
+			} else if strings.HasPrefix(arg, "--model-path=") {
+				value := strings.TrimPrefix(arg, "--model-path=")
+				opts.modelPath = &value
 			} else if strings.HasPrefix(arg, "-") {
 				return opts, fmt.Errorf("unknown flag")
 			} else {
@@ -505,7 +538,7 @@ func configShow(args []string, opts options, printer *output.Printer) int {
 	}
 	entries := effective.Entries()
 	if printer.JSON() {
-		if err := printer.Value(map[string]any{"config": entries}); err != nil {
+		if err := printer.Value(map[string]any{"config": entries, "model_selection": map[string]string{"runtime": effective.Values.Backend, "id": effective.Values.Model, "source": effective.Values.ModelSource}}); err != nil {
 			return fail(printer, exitcode.New(exitcode.Internal, "cannot write output"))
 		}
 		return exitcode.Success
@@ -516,6 +549,7 @@ func configShow(args []string, opts options, printer *output.Printer) int {
 		entry := entries[key]
 		lines = append(lines, fmt.Sprintf("%s = %v (source: %s)", key, entry.Value, entry.Source))
 	}
+	lines = append(lines, "model source: "+effective.Values.ModelSource)
 	if err := printer.Lines(lines...); err != nil {
 		return fail(printer, exitcode.New(exitcode.Internal, "cannot write output"))
 	}
@@ -624,6 +658,9 @@ func runMain(opts options, printer *output.Printer) int {
 	if err != nil {
 		return fail(printer, exitcode.New(exitcode.Usage, err.Error()))
 	}
+	if effective.Values.Backend == "llamacpp" {
+		return fail(printer, exitcode.New(exitcode.LLM, llamacpp.QualificationMessage))
+	}
 	if !printer.JSON() && updateCheckInteractive() {
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 		latest, checkErr := updatecheck.Check(ctx, paths.StateDir, Version)
@@ -712,7 +749,7 @@ func exitClassification(code int) string {
 }
 
 func overrides(opts options) config.CLIOverrides {
-	overrides := config.CLIOverrides{Language: opts.language, Model: opts.model}
+	overrides := config.CLIOverrides{Language: opts.language, Model: opts.model, Runtime: opts.runtime, ModelPath: opts.modelPath}
 	if opts.noConfirmCommit {
 		value := false
 		overrides.CommitConfirm = &value
@@ -748,6 +785,8 @@ func printHelp(printer *output.Printer) error {
 		"Commands: init, setup, doctor, config, trust, version",
 		"Flags: --dry-run --no-push --no-confirm-commit --no-confirm-push",
 		"       --language en|ja --model NAME --record-metrics --json",
+		"       --runtime mlx|llamacpp --model-path ABSOLUTE_PATH",
+		"llamacpp is reserved and unavailable pending runtime qualification; see docs/runtime/llamacpp.md",
 	}
 	if printer.JSON() {
 		sort.Strings(lines)
