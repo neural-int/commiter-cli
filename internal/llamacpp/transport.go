@@ -68,7 +68,7 @@ func socketIdentity(socket string) (os.FileInfo, error) {
 func (t *localTransport) close() { t.transport.CloseIdleConnections() }
 
 func (t *localTransport) request(ctx context.Context, method, path string, body []byte) ([]byte, error) {
-	valid := method == http.MethodGet && path == "/health" || method == http.MethodPost && (path == "/apply-template" || path == "/tokenize" || path == "/completion")
+	valid := method == http.MethodGet && (path == "/health" || path == "/props") || method == http.MethodPost && (path == "/apply-template" || path == "/tokenize" || path == "/completion")
 	if !valid || len(body) > MaxRequestBytes {
 		return nil, errTransport
 	}
