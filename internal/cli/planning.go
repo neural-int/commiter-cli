@@ -18,6 +18,7 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/exitcode"
 	"github.com/natsuki0413/commiter-cli/internal/gitstate"
 	"github.com/natsuki0413/commiter-cli/internal/llamacpp"
+	"github.com/natsuki0413/commiter-cli/internal/llm"
 	runmetrics "github.com/natsuki0413/commiter-cli/internal/metrics"
 	"github.com/natsuki0413/commiter-cli/internal/mlx"
 	"github.com/natsuki0413/commiter-cli/internal/planning"
@@ -29,17 +30,28 @@ type planFlowFunc func(context.Context, string, gitstate.Snapshot, config.Values
 
 var planFlow planFlowFunc = generateCommitPlan
 
+// The production factory stays closed while upstream runtime-error handling is
+// unqualified. Native integration tests inject an explicit TrialBackend; no CLI
+// flag, endpoint or environment variable can open this gate in a release binary.
+var newLlamaCPPBackend = func(config.Values) (llm.OptionsBackend, error) {
+	return nil, llamacpp.ErrUnqualifiedRuntime
+}
+
 func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snapshot, values config.Values, supplement string) (planning.Plan, error) {
-	if values.Backend == "llamacpp" {
-		return planning.Plan{}, exitcode.New(exitcode.LLM, llamacpp.QualificationMessage)
-	}
-	if values.Planner != config.CandidatePlanner || !config.SupportedPlannerModel(values) {
+	if values.Planner != config.CandidatePlanner || (values.Backend != "llamacpp" && !config.SupportedPlannerModel(values)) {
 		return planning.Plan{}, exitcode.New(exitcode.Usage, "removed or unsupported planner configuration; migrate to a pinned MLX three-phase model (see docs/migrations/harness004.md)")
 	}
 	if len(snapshot.Changes) > planning.CandidateMaxFiles {
 		return planning.Plan{}, exitcode.New(exitcode.LLM, "three-phase planner supports at most four selected files; select a smaller change set")
 	}
 	var client planning.ChatClient
+	if values.Backend == "llamacpp" {
+		backend, err := newLlamaCPPBackend(values)
+		if err != nil {
+			return planning.Plan{}, exitcode.New(exitcode.LLM, err.Error())
+		}
+		client = backend
+	}
 	if values.Backend == "mlx" {
 		modelPath, err := resolveMLXModelPath(values)
 		if err != nil {
@@ -86,7 +98,7 @@ func generateCommitPlan(ctx context.Context, root string, snapshot gitstate.Snap
 	}
 	recorder.SetContext(values.Model, contextStage)
 	if client == nil {
-		return planning.Plan{}, exitcode.New(exitcode.LLM, "three-phase planning requires MLX")
+		return planning.Plan{}, exitcode.New(exitcode.LLM, "three-phase planning requires a configured local backend")
 	}
 	history, err := attributedHistoryForPlan(ctx, root, snapshot, values, prepared.Document, sensitive)
 	if err != nil {

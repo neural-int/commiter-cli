@@ -659,7 +659,9 @@ func runMain(opts options, printer *output.Printer) int {
 		return fail(printer, exitcode.New(exitcode.Usage, err.Error()))
 	}
 	if effective.Values.Backend == "llamacpp" {
-		return fail(printer, exitcode.New(exitcode.LLM, llamacpp.QualificationMessage))
+		if _, err := newLlamaCPPBackend(effective.Values); err != nil {
+			return fail(printer, exitcode.New(exitcode.LLM, err.Error()))
+		}
 	}
 	if !printer.JSON() && updateCheckInteractive() {
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
