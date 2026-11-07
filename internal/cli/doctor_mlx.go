@@ -9,7 +9,6 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/contextinput"
 	"github.com/natsuki0413/commiter-cli/internal/llm"
 	"github.com/natsuki0413/commiter-cli/internal/mlx"
-	"github.com/natsuki0413/commiter-cli/internal/mlxmodel"
 	"github.com/natsuki0413/commiter-cli/internal/planning"
 	"github.com/natsuki0413/commiter-cli/internal/syntax"
 )
@@ -60,17 +59,12 @@ func doctorMLXFor(values config.Values, goos, goarch string) map[string]map[stri
 		checks["mlx_constrained_generation"] = check(false, "not checked because the MLX helper is unavailable")
 		return checks
 	}
-	store, err := newMLXModelStore()
-	if err != nil {
-		checks["mlx_model"] = check(false, err.Error())
-		checks["mlx_model_runtime"] = check(false, "not checked because the model cache is unavailable")
-		checks["mlx_json_schema_grammar"] = check(false, "not checked because the model cache is unavailable")
-		checks["mlx_constrained_generation"] = check(false, "not checked because the model cache is unavailable")
-		return checks
+	modelPath, err := resolveMLXModelPath(values)
+	modelMessage := "configured pinned MLX model is installed and complete"
+	if values.ModelSource == "local" {
+		modelMessage = "local MLX trial directory exists; its name does not establish artifact identity"
 	}
-	spec := mlxmodel.Spec{Repo: values.Model, Revision: values.ModelRevision, Quantization: values.ModelQuantization}
-	modelPath, err := store.Ready(spec)
-	checks["mlx_model"] = check(err == nil, message(err, "configured pinned MLX model is installed and complete"))
+	checks["mlx_model"] = check(err == nil, message(err, modelMessage))
 	if err != nil {
 		checks["mlx_model_runtime"] = check(false, "not checked because the configured MLX model is unavailable")
 		checks["mlx_json_schema_grammar"] = check(false, "not checked because the configured MLX model is unavailable")

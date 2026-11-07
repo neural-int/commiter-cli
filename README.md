@@ -192,6 +192,8 @@ Important defaults include:
 | `push.enabled` | `true` |
 | `push.confirm` | `true` |
 | `llm.backend` | `"mlx"` |
+| `llm.runtime` | `"mlx"` (canonical name; `backend` is a compatibility alias) |
+| `llm.model_path` | unset (optional absolute local path; global/CLI only) |
 | `llm.planner` | `"three-phase"` |
 | `llm.model` | `"mlx-community/gemma-4-E4B-it-4bit"` |
 | `llm.model_revision` | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` |
@@ -207,6 +209,17 @@ Verification configuration is repository-scoped and cannot be configured globall
 Harness 004 is the normal Three-phase Planner: at most four selected files, uncompressed Git diffs, a shared 120-second generation timeout, fixed 65,536-token phase windows, 4,096 output tokens per phase, summary up to 48 characters and scope up to 16. Supported models are the pinned Gemma and Qwen 4bit pairs in the [migration guide](docs/migrations/harness004.md). Single-pass and implicit Ollama fallback have been removed. History is acquired from the current worktree, matched by edit content, and projected as final responses only. Missing, unsafe, or over-budget responses omit the whole record. Packaged releases include the helper and Metal library under `libexec`; normal generation never downloads a model.
 
 For the complete configuration schema and source restrictions, see the [Software Requirements Specification](SOFTWARE_REQUIREMENTS_SPECIFICATION_en.md).
+
+`--runtime`, `--model` and `--model-path` select the runtime, identifier and local
+path. A model/runtime change clears an inherited local path. Local MLX trials
+require a validated profile and are distinguished from managed artifacts.
+`llamacpp` is reserved but **unavailable** pending upstream qualification:
+setup/generation refuse it and doctor marks its capabilities as not checked.
+See the [implementation status and remaining gates](docs/runtime/llamacpp.md).
+
+The explicit [Qwen3.5-4B Q4_K_M native trial](docs/runtime/llamacpp-trial-2026-11-07.md)
+passed CLI dry-run E2E with Metal. Its separate invalid-grammar test reproduced
+continued generation after an LLGuidance error, so release activation stays closed.
 
 ## Privacy & Safety
 

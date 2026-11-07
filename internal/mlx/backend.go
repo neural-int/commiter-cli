@@ -20,16 +20,17 @@ type Backend struct {
 }
 
 var _ llm.OptionsBackend = (*Backend)(nil)
+var _ llm.CycleBackend = (*Backend)(nil)
 
 // BeginCycle scopes process reuse to one planner invocation.
-func (backend *Backend) BeginCycle(ctx context.Context) (llm.OptionsBackend, func(), error) {
+func (backend *Backend) BeginCycle(ctx context.Context) (llm.OptionsBackend, func() error, error) {
 	session, err := backend.Client.BeginSession(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
 	cycle := *backend
 	cycle.session = session
-	return &cycle, session.Close, nil
+	return &cycle, func() error { session.Close(); return nil }, nil
 }
 
 func (backend *Backend) Chat(ctx context.Context, messages []llm.Message, schema json.RawMessage) (llm.Response, error) {

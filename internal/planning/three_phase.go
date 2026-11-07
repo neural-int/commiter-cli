@@ -66,16 +66,19 @@ func (g ThreePhaseGenerator) Generate(parent context.Context, prepared contextin
 	}
 	ctx, cancel := context.WithTimeout(parent, CandidateCycleTimeout)
 	defer cancel()
-	// MLX intentionally retains model preparation for this invocation only.
-	// Each phase still validates independently; every exit closes the cycle.
-	if lifecycle, ok := g.Client.(interface {
-		BeginCycle(context.Context) (llm.OptionsBackend, func(), error)
-	}); ok {
+	// Model preparation is retained for this invocation only. A successful plan
+	// is returned only after the backend confirms that its resources are closed.
+	if lifecycle, ok := g.Client.(llm.CycleBackend); ok {
 		cycle, closeCycle, e := lifecycle.BeginCycle(ctx)
 		if e != nil {
 			return result, e
 		}
-		defer closeCycle()
+		defer func() {
+			if closeErr := closeCycle(); closeErr != nil {
+				result = Result{}
+				err = errors.Join(err, closeErr)
+			}
+		}()
 		client = cycle
 	}
 	var original map[string]json.RawMessage

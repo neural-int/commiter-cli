@@ -135,6 +135,8 @@ glob、言語、モデル、および分類補助の設定は、リポジトリ�
 | `push.confirm` | boolean | `true` | global、CLI |
 | `llm.planner` | string | `"three-phase"` | global、repo |
 | `llm.backend` | string | `"mlx"` | global、repo |
+| `llm.runtime` | string | `"mlx"` | global、repo、CLI（`backend` は互換名） |
+| `llm.model_path` | string | unset | global、CLI（絶対パスのみ） |
 | `llm.model_revision` | string | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` | global、repo、CLI（`--model`で選択） |
 | `llm.model_quantization` | string | `"4bit"` | global、repo、CLI（`--model`で選択） |
 | `llm.model` | string | `"mlx-community/gemma-4-E4B-it-4bit"` | global、repo、CLI |
@@ -225,6 +227,8 @@ v1 における Tree-sitter 対応言語は Go、JavaScript、JSX、TypeScript�
 ### FR-008 コミット計画の生成
 
 通常生成はMLXのHarness 004 Three-phase Plannerだけを使用します。設定は検証済みのGemma/Qwen 4bitモデルと固定revisionの組に限定します。既定のGemmaと対応するQwenの組は[移行手順](docs/migrations/harness004.md)を参照してください。single-pass、Ollama生成、planner省略からの旧設定復帰は廃止し、利用不能な設定は移行方法の分かるエラーにします。
+
+Issue #190 の共通設定では runtime/model/model_path を解決し、同一階層の backend/runtime の矛盾、repo のローカルパス、モデル変更時のパス継承を拒否します。model_path の指定は管理モデルと別のローカル試用として扱い、既存の検証済み MLX profile で検査します。llamacpp は上流適合条件が未達のため、通常実行と setup を停止し、doctor では bundle/model/Metal/UDS/LLGuidance/3フェーズを未確認と表示します。実装済みの内部契約と有効化前の残作業は[実装状況](docs/runtime/llamacpp.md)を参照してください。
 
 Grouping、Category、Textの順に同じhelperで生成します。Grouping/Textの型別KV prefix再利用では独立した実行用コピーを作り、Categoryは独立prefillにします。未対応cache型やprefix不一致では通常prefillへ戻します。
 

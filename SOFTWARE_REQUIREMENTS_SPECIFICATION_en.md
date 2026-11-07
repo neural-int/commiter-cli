@@ -135,6 +135,8 @@ Configuration files use TOML and the following v1 schema:
 | `push.confirm` | boolean | `true` | global, CLI |
 | `llm.planner` | string | `"three-phase"` | global, repo |
 | `llm.backend` | string | `"mlx"` | global, repo |
+| `llm.runtime` | string | `"mlx"` | global, repo, CLI (`backend` is a compatibility alias) |
+| `llm.model_path` | string | unset | global, CLI (absolute paths only) |
 | `llm.model_revision` | string | `"475b9088d29754a3379866cf5aeb6b41acd313c2"` | global, repo, CLI (selected by `--model`) |
 | `llm.model_quantization` | string | `"4bit"` | global, repo, CLI (selected by `--model`) |
 | `llm.model` | string | `"mlx-community/gemma-4-E4B-it-4bit"` | global, repo, CLI |
@@ -225,6 +227,8 @@ Normal planning preserves complete Git diffs without hierarchical summarization,
 ### FR-008 Commit Plan Generation
 
 Normal generation uses only the MLX Harness 004 Three-phase Planner. Configuration accepts the validated pinned Gemma/Qwen 4bit pairs listed in the [migration guide](docs/migrations/harness004.md); Gemma remains the default. Single-pass, Ollama planning, and implicit legacy defaults have been removed. Invalid settings require an actionable migration error.
+
+Issue #190 adds common runtime/model/model_path resolution. Conflicting backend/runtime aliases, repository-local paths and inherited paths after model/runtime changes are rejected or cleared. An explicit model path has local-trial origin and requires an existing validated MLX profile. Llamacpp remains unqualified: execution/setup refuse activation and doctor marks bundle/model/Metal/UDS/LLGuidance/three-phase checks as unperformed. See the [implemented contracts and remaining activation gates](docs/runtime/llamacpp.md).
 
 Grouping, Category, and Text share one helper per cycle. Grouping/Text typed KV-prefix reuse uses independent runtime copies; Category has independent prefill. Unsupported cache types or prefix mismatch use ordinary prefill.
 
