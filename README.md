@@ -213,13 +213,16 @@ For the complete configuration schema and source restrictions, see the [Software
 `--runtime`, `--model` and `--model-path` select the runtime, identifier and local
 path. A model/runtime change clears an inherited local path. Local MLX trials
 require a validated profile and are distinguished from managed artifacts.
-`llamacpp` is reserved but **unavailable** pending upstream qualification:
+`llamacpp` is reserved but **unavailable** pending release qualification:
 setup/generation refuse it and doctor marks its capabilities as not checked.
 See the [implementation status and remaining gates](docs/runtime/llamacpp.md).
 
 The explicit [Qwen3.5-4B Q4_K_M native trial](docs/runtime/llamacpp-trial-2026-11-07.md)
-passed CLI dry-run E2E with Metal. Its separate invalid-grammar test reproduced
-continued generation after an LLGuidance error, so release activation stays closed.
+passed CLI dry-run E2E with Metal. Its original invalid-grammar test reproduced
+continued generation after an LLGuidance error. The approved
+[fixed-SHA local patch](docs/runtime/llamacpp-fail-closed-2026-11-08.md) stops the
+owned server on constraint failures and passes native failure regressions and
+CLI E2E. Release activation remains closed while the other gates are incomplete.
 
 ## Privacy & Safety
 

@@ -1,5 +1,11 @@
 # Qwen3.5-4B Q4_K_M native trial — 2026-11-07
 
+This is the historical **unpatched** trial. The subsequent approved local patch,
+failure regressions and new native results are recorded in the
+[2026-11-08 follow-up](llamacpp-fail-closed-2026-11-08.md). The current build
+recipe and negative test enforce the patched behavior rather than accepting
+the continuation reproduced here.
+
 The user requested the latest upstream revision, a real server connection, and
 Qwen3.5-4B Q4 GGUF CLI E2E. The explicit native trial **passed all three phases
 and the final validator**. Normal release CLI activation remains closed because
@@ -23,7 +29,9 @@ the negative test also reproduced generation continuing after a grammar error.
 
 Build options: Release, static libraries, `LLAMA_LLGUIDANCE=ON`,
 `GGML_METAL=ON`, `GGML_METAL_EMBED_LIBRARY=ON`, tests/examples/UI/OpenSSL disabled.
-The [build recipe](../../tools/llamacpp-trial/build.sh) pins both source revisions.
+The original build used both pinned source revisions. The current
+[build recipe](../../tools/llamacpp-trial/build.sh) additionally applies the
+approved patch; it no longer produces this historical unmodified binary.
 Rust/CMake are build tools; no Go module dependency was added.
 
 | Model profile | Observed value |

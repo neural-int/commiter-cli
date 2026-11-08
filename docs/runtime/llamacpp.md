@@ -5,26 +5,45 @@ trial now implements and exercises real server/CLI integration with Qwen3.5-4B
 Q4_K_M. See the [2026-11-07 trial results](llamacpp-trial-2026-11-07.md). It does not complete
 [Issue #190](https://github.com/neural-int/commiter-cli/issues/190). The
 [v0.3.1 design](https://github.com/neural-int/commiter-cli/issues/190#issuecomment-6676772042)
-requires qualification before normal CLI activation and forbids independent
-upstream patches and silent GBNF, CPU, MLX or external-server fallback.
+requires qualification before normal CLI activation. The user subsequently
+approved one local LLGuidance failure-handling patch against the fixed SHA;
+this explicitly replaces the design's prohibition on independent patches only
+for this repair. Silent GBNF, CPU, MLX or external-server fallback stays forbidden.
+See the [patched build and regression results](llamacpp-fail-closed-2026-11-08.md).
 
 ## Upstream evidence and activation gate
 
 The user-requested latest upstream trial is pinned to
 `80d2c0c2c56e4a1bbf74be98f64b99927bf230bc`, with LLGuidance
 `d795912fedc7d393de740177ea9ea761e7905774`. It is an experimental adoption,
-not a qualified release runtime. The fixed trial's
+not a qualified release runtime. The original unpatched trial's
 [LLGuidance sampler](https://github.com/ggml-org/llama.cpp/blob/80d2c0c2c56e4a1bbf74be98f64b99927bf230bc/common/llguidance.cpp#L46-L59)
 frees the grammar and returns after a mask-computation error without stopping
 generation. Its [documentation](https://github.com/ggml-org/llama.cpp/blob/80d2c0c2c56e4a1bbf74be98f64b99927bf230bc/docs/llguidance.md#error-handling)
-also describes continued generation after errors. The latest trial additionally
+also describes continued generation after errors. The original trial additionally
 reproduced HTTP 200 and valid JSON after an invalid LLGuidance grammar triggered
 an engine error. Real Metal inference and CLI E2E passed in a separate cycle.
 
+The [fixed patch](../../tools/llamacpp-trial/patches/0001-llguidance-fail-closed.patch)
+now stops the owned server with exit 1 on LLGuidance compile, mask, consume,
+reset, clone or existing matcher errors, and checks tokenizer initialization.
+It never removes a failed grammar and resumes sampling. In this non-streaming,
+one-slot, one-cycle process, the host discards the failed HTTP response and reaps
+the child. This trades server availability for fail-closed behavior. It is not
+a general-purpose streaming or shared-server recovery patch. Normal terminal
+EOS handling is checked separately from actual constraint failures.
+
+The recipe verifies the upstream SHA, patch SHA-256 and sole modified source
+blob, while leaving the LLGuidance Rust source unchanged. `TrialBackend` requires
+the exact patched `/props` build identity, so the previous unpatched server does
+not satisfy its identity check. This marker is a trial identity check, not a
+signature or cryptographic attestation of an arbitrary executable.
+
 No release build is qualified or bundled, no production GGUF profile is
 registered, and no public activation override is exposed. Logs or valid schema
-validation cannot establish that LLGuidance enforced constraints throughout
-generation. The production `Backend` refuses activation even when called
+validation alone cannot establish that LLGuidance enforced constraints throughout
+generation. Native adapter failure regressions and real-server rejection now
+provide separate evidence for this repair. The production `Backend` refuses activation even when called
 directly; only an explicit internal `TrialBackend` executes the native trial.
 
 ## Implemented components and verification
@@ -130,9 +149,11 @@ telemetry are reported by the gated adapter.
 
 ## Remaining work before activation and distribution
 
-1. Qualify an unmodified upstream SHA that fails closed on LLGuidance compile and
-   runtime errors. Freeze native API fixtures, BOS/EOS behavior, template/thinking
-   control and observable constraint-engine status.
+1. Maintain the fixed SHA and reviewed local patch as one build input. The
+   observed compile/runtime failure paths now fail closed in regression tests;
+   broader API, grammar and model coverage remains part of release qualification.
+   Freeze native API fixtures, BOS/EOS behavior, template/thinking control and
+   observable constraint-engine status.
 2. Connect the experimentally verified supervisor/API to a trusted release
    bundle only after qualification. The trial covers one model load/cycle, one
    slot, independent prefill, Metal/context checks, bounded logs, environment

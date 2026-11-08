@@ -202,9 +202,9 @@ commiter config show --effective
 
 検証処理の設定はリポジトリ固有のスコープに限定します。グローバル設定には記述できません。
 
-`--runtime`、`--model`、`--model-path` でランタイム、モデル名、ローカルパスを指定できます。上位設定でモデルまたはランタイムを変更すると、継承したローカルパスを解除します。MLX のローカル試用には既存の検証済み profile が必要で、管理モデルとは取得元を区別します。`llamacpp` は上流適合確認待ちのため利用できません。通常実行と setup は停止し、doctor は各機能を未確認と表示します。[実装状況と残る条件](docs/runtime/llamacpp.md)を参照してください。
+`--runtime`、`--model`、`--model-path` でランタイム、モデル名、ローカルパスを指定できます。上位設定でモデルまたはランタイムを変更すると、継承したローカルパスを解除します。MLX のローカル試用には既存の検証済み profile が必要で、管理モデルとは取得元を区別します。`llamacpp` は配布版の適合確認待ちのため利用できません。通常実行と setup は停止し、doctor は各機能を未確認と表示します。[実装状況と残る条件](docs/runtime/llamacpp.md)を参照してください。
 
-[Qwen3.5-4B Q4_K_M の実機試験](docs/runtime/llamacpp-trial-2026-11-07.md)では、実験用 backend を注入した CLI dry-run の三フェーズと Metal 使用を確認しました。別の不正 grammar 試験では LLGuidance のエラー後も生成が続くことを再現したため、配布版の有効化条件は未達です。
+[Qwen3.5-4B Q4_K_M の実機試験](docs/runtime/llamacpp-trial-2026-11-07.md)では、実験用 backend を注入した CLI dry-run の三フェーズと Metal 使用を確認しました。当初は不正 grammar によるエラー後の生成継続を再現しましたが、許可された[固定SHAへのローカルパッチ](docs/runtime/llamacpp-fail-closed-2026-11-08.md)により、制約処理の失敗時に専用serverを停止し、実機負例とCLI E2Eを再検証しました。残る適合条件が未完了のため、配布版は引き続き無効です。
 
 通常の計画生成をHarness 004の3フェーズへ統一します。最大4ファイル、完全なGit差分、生成サイクル120秒、全フェーズ65,536 tokens、出力各4,096 tokens、summary48文字、scope16文字を維持します。対応するGemma/Qwenの固定4bitモデルと旧設定の変更方法は[移行手順](docs/migrations/harness004.md)を参照してください。single-passとOllamaへの暗黙復帰は廃止します。履歴は現在worktreeから取得し、編集内容と差分ブロックを照合したうえで、安全な非空の最終応答だけを渡します。欠落・危険・予算超過では記録全体を省きます。通常生成中のモデル取得は行いません。
 
