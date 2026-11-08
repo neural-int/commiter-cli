@@ -12,7 +12,7 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/llm"
 )
 
-const QualificationMessage = "llamacpp is not enabled: no unmodified pinned llama.cpp build has passed LLGuidance fail-closed, UDS peer identity, parent-death cleanup, Metal and three-phase qualification (see docs/runtime/llamacpp.md)"
+const QualificationMessage = "llamacpp is not enabled: the pinned locally patched llama.cpp build has not completed release qualification, including parent-death cleanup and model profiles (see docs/runtime/llamacpp.md)"
 
 var ErrUnqualifiedRuntime = errors.New(QualificationMessage)
 

@@ -18,10 +18,11 @@ import (
 	"github.com/natsuki0413/commiter-cli/internal/llm"
 )
 
-// Trial revisions are fixed for the user-requested native experiment. They do
-// not certify upstream's known LLGuidance runtime-error handling.
+// Trial revisions and the approved local patch are fixed for the native trial.
+// Their identity does not certify the remaining release qualification gates.
 const TrialLlamaCommit = "80d2c0c2c56e4a1bbf74be98f64b99927bf230bc"
 const TrialLLGuidanceCommit = "d795912fedc7d393de740177ea9ea761e7905774"
+const TrialLlamaBuild = "b1-" + TrialLlamaCommit + "+commiter-llg-fail-closed-v1"
 const TrialModelID = "unsloth/Qwen3.5-4B-GGUF"
 const TrialModelRevision = "e87f176479d0855a907a41277aca2f8ee7a09523"
 const TrialModelSHA256 = "00fe7986ff5f6b463e62455821146049db6f9313603938a70800d1fb69ef11a4"
@@ -30,7 +31,7 @@ const TrialModelBytes int64 = 2740937888
 var errTrial = errors.New("llamacpp: experimental native cycle failed")
 
 // TrialBackend is an explicit internal integration-test entry point. Normal CLI
-// factories never construct it: upstream failure handling remains unqualified.
+// factories never construct it: release qualification remains incomplete.
 type TrialBackend struct {
 	Executable, ModelPath string
 	Observe               func(TrialObservation)
@@ -43,6 +44,7 @@ type TrialObservation struct {
 	ModelLoads                   int
 	MetalDevice                  bool
 	OffloadedLayers, TotalLayers int
+	ConstraintFailure            string
 }
 
 var _ llm.CycleBackend = (*TrialBackend)(nil)
@@ -79,7 +81,7 @@ func (b *TrialBackend) BeginCycle(ctx context.Context) (llm.OptionsBackend, func
 	if err == nil {
 		err = json.Unmarshal(data, &props)
 	}
-	if err != nil || props.Settings.Context != ContextTokens || props.Slots != 1 || props.ModelPath != b.ModelPath || !strings.Contains(props.Build, TrialLlamaCommit[:7]) {
+	if err != nil || props.Settings.Context != ContextTokens || props.Slots != 1 || props.ModelPath != b.ModelPath || props.Build != TrialLlamaBuild {
 		return nil, nil, errors.Join(errors.New("llamacpp: loaded model, context or build identity mismatch"), process.close())
 	}
 	observation := process.logs.observation()
@@ -212,7 +214,8 @@ func (c *trialCycle) ChatWithOptions(ctx context.Context, messages []llm.Message
 		} `json:"timings"`
 	}
 	// A %llguidance grammar is rejected by builds without LLGuidance; it cannot
-	// silently become standard GBNF. The upstream runtime-error gap still exists.
+	// silently become standard GBNF. The fixed patch stops the owned process if
+	// LLGuidance fails, and the non-streaming response is then discarded.
 	grammar := "%llguidance {}\nstart: %json " + string(rawSchema)
 	request := map[string]any{"prompt": prepared.TokenIDs, "grammar": grammar, "n_predict": OutputTokens, "stream": false, "cache_prompt": false, "id_slot": 0, "seed": 144, "temperature": 0.6, "top_k": 20, "top_p": 0.95, "min_p": 0, "repeat_penalty": 1.0, "n_keep": -1, "return_tokens": true}
 	if err := c.process.call(ctx, "/completion", request, &native); err != nil {

@@ -29,19 +29,26 @@ func trialTestExecutable(t *testing.T) string {
 }
 
 func TestTrialLogKeepsFailureAfterBoundedBufferRotation(t *testing.T) {
-	log := &trialLog{}
-	_, _ = log.Write([]byte("llg err"))
-	_, _ = log.Write([]byte("or: synthetic\n"))
-	_, _ = log.Write([]byte(strings.Repeat("x", 128<<10)))
-	if !log.grammarFailed() {
-		t.Fatal("grammar failure was lost after log rotation")
-	}
-	if len(log.pending) > 64<<10 {
-		t.Fatal("unbounded diagnostic line")
-	}
-	_, _ = log.Write([]byte("\n"))
-	if len(log.pending) != 0 {
-		t.Fatal("raw completed log lines retained")
+	for _, marker := range []string{"llg error:", "commiter: LLGuidance mask failed; stopping server"} {
+		t.Run(marker, func(t *testing.T) {
+			log := &trialLog{}
+			_, _ = log.Write([]byte(marker[:5]))
+			_, _ = log.Write([]byte(marker[5:] + "\n"))
+			_, _ = log.Write([]byte(strings.Repeat("x", 128<<10)))
+			if !log.grammarFailed() {
+				t.Fatal("grammar failure was lost after log rotation")
+			}
+			if strings.HasPrefix(marker, "commiter:") && log.observation().ConstraintFailure != "mask" {
+				t.Fatal("classified failure operation was lost after log rotation")
+			}
+			if len(log.pending) > 64<<10 {
+				t.Fatal("unbounded diagnostic line")
+			}
+			_, _ = log.Write([]byte("\n"))
+			if len(log.pending) != 0 {
+				t.Fatal("raw completed log lines retained")
+			}
+		})
 	}
 }
 

@@ -80,6 +80,9 @@ func TestInstalledLlamaCPPCLIDryRun(t *testing.T) {
 	newLlamaCPPBackend = func(values config.Values) (llm.OptionsBackend, error) {
 		return observedLlamaTrial{backend: &llamacpp.TrialBackend{Executable: executable, ModelPath: values.ModelPath, Observe: func(observation llamacpp.TrialObservation) {
 			observations = append(observations, observation)
+			if observation.ConstraintFailure != "" {
+				t.Logf("native LLGuidance failure operation=%s", observation.ConstraintFailure)
+			}
 			if len(observations) == 1 {
 				command := exec.Command("/usr/sbin/lsof", "-nP", "-a", "-p", fmt.Sprint(observation.PID), "-iTCP")
 				data, err := command.CombinedOutput()

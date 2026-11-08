@@ -20,6 +20,7 @@ import (
 type trialLog struct {
 	mu                     sync.Mutex
 	failed                 bool
+	constraintFailure      string
 	pending                []byte
 	modelLoads             int
 	metal                  bool
@@ -33,7 +34,7 @@ func (l *trialLog) Write(data []byte) (int, error) {
 	l.pending = append(l.pending, data...)
 	// Classify before consuming complete lines or rotating an oversized partial
 	// line. Keep the failure sticky without retaining raw process history.
-	if strings.Contains(string(l.pending), "llg error:") || strings.Contains(string(l.pending), "llg tokenizer error:") {
+	if strings.Contains(string(l.pending), "llg error:") || strings.Contains(string(l.pending), "llg tokenizer error:") || strings.Contains(string(l.pending), "commiter: LLGuidance ") {
 		l.failed = true
 	}
 	for {
@@ -43,6 +44,11 @@ func (l *trialLog) Write(data []byte) (int, error) {
 		}
 		line := string(l.pending[:newline])
 		l.pending = l.pending[newline+1:]
+		for _, operation := range []string{"compile", "mask", "consume", "reset", "clone", "state", "tokenizer", "tokenizer clone"} {
+			if strings.Contains(line, "commiter: LLGuidance "+operation+" failed; stopping server") {
+				l.constraintFailure = operation
+			}
+		}
 		if strings.Contains(line, "loaded meta data with") {
 			l.modelLoads++
 		}
@@ -64,7 +70,7 @@ func (l *trialLog) grammarFailed() bool { l.mu.Lock(); defer l.mu.Unlock(); retu
 func (l *trialLog) observation() TrialObservation {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	return TrialObservation{ModelLoads: l.modelLoads, MetalDevice: l.metal, OffloadedLayers: l.offloaded, TotalLayers: l.totalLayers}
+	return TrialObservation{ModelLoads: l.modelLoads, MetalDevice: l.metal, OffloadedLayers: l.offloaded, TotalLayers: l.totalLayers, ConstraintFailure: l.constraintFailure}
 }
 
 type trialProcess struct {
