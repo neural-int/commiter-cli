@@ -1,0 +1,139 @@
+diff --git a/common/llguidance.cpp b/common/llguidance.cpp
+index 500bb0914..0c4ea1681 100644
+--- a/common/llguidance.cpp
++++ b/common/llguidance.cpp
+@@ -5,6 +5,18 @@
+
+ #    include "llguidance.h"
+ #    include <cmath>
++#    include <cstdio>
++#    include <cstdlib>
++
++// commiter owns one non-streaming server per planning cycle. The sampler API
++// cannot propagate failures to every caller, so stop the process before any
++// unconstrained token or successful completion can escape. Do not run teardown
++// handlers, a crash debugger or a core dump on this failure path.
++[[noreturn]] static void llama_sampler_llg_fail(const char * operation) {
++    std::fprintf(stderr, "commiter: LLGuidance %s failed; stopping server\n", operation);
++    std::fflush(stderr);
++    std::_Exit(EXIT_FAILURE);
++}
+
+ struct llama_sampler_llg {
+     const llama_vocab * vocab;
+@@ -23,10 +35,8 @@ static LlgMatcher * llama_sampler_llg_new(LlgTokenizer * tokenizer, const char *
+         cinit.log_stderr_level = atoi(log_level);
+     }
+     auto c = llg_new_matcher(&cinit, grammar_kind, grammar_data);
+-    if (llg_matcher_get_error(c)) {
+-        LOG_ERR("llg error: %s\n", llg_matcher_get_error(c));
+-        llg_free_matcher(c);
+-        return nullptr;
++    if (c == nullptr || llg_matcher_get_error(c)) {
++        llama_sampler_llg_fail("compile");
+     }
+
+     return c;
+@@ -36,27 +46,48 @@ static const char * llama_sampler_llg_name(const llama_sampler * /*smpl*/) {
+     return "llguidance";
+ }
+
++static const uint32_t * llama_sampler_llg_mask(llama_sampler_llg * ctx) {
++    if (llg_matcher_get_error(ctx->grammar)) {
++        llama_sampler_llg_fail("state");
++    }
++    const uint32_t * mask = llg_matcher_get_mask(ctx->grammar);
++    if (mask == nullptr) {
++        if (llg_matcher_compute_mask(ctx->grammar) != 0) {
++            llama_sampler_llg_fail("mask");
++        }
++        mask = llg_matcher_get_mask(ctx->grammar);
++    }
++    if (mask == nullptr || llg_matcher_get_error(ctx->grammar)) {
++        llama_sampler_llg_fail("mask");
++    }
++    return mask;
++}
++
+ static void llama_sampler_llg_accept_impl(llama_sampler * smpl, llama_token token) {
+     auto * ctx = (llama_sampler_llg *) smpl->ctx;
+     if (ctx->grammar) {
+-        llg_matcher_consume_token(ctx->grammar, token);
++        if (llg_matcher_is_stopped(ctx->grammar)) {
++            // A completed fixed grammar already stopped after its last byte.
++            // LLGuidance then forces EOS but rejects consuming it a second time.
++            // Accept only the terminal token allowed by its verified EOS mask.
++            const auto * mask = llama_sampler_llg_mask(ctx);
++            if (llg_matcher_is_accepting(ctx->grammar) && token >= 0 &&
++                (size_t) token < llg_matcher_get_mask_byte_size(ctx->grammar) * 8 &&
++                (mask[token / 32] & (1u << (token % 32))) != 0) {
++                return;
++            }
++            llama_sampler_llg_fail("consume");
++        }
++        if (llg_matcher_consume_token(ctx->grammar, token) != 0 || llg_matcher_get_error(ctx->grammar)) {
++            llama_sampler_llg_fail("consume");
++        }
+     }
+ }
+
+ static void llama_sampler_llg_apply(llama_sampler * smpl, llama_token_data_array * cur_p) {
+     auto * ctx = (llama_sampler_llg *) smpl->ctx;
+     if (ctx->grammar) {
+-        const uint32_t * mask = llg_matcher_get_mask(ctx->grammar);
+-        if (mask == nullptr) {
+-            if (llg_matcher_compute_mask(ctx->grammar) == 0) {
+-                mask = llg_matcher_get_mask(ctx->grammar);
+-            } else {
+-                LOG_ERR("llg error: %s\n", llg_matcher_get_error(ctx->grammar));
+-                llg_free_matcher(ctx->grammar);
+-                ctx->grammar = nullptr;
+-                return;
+-            }
+-        }
++        const auto * mask = llama_sampler_llg_mask(ctx);
+
+         for (size_t i = 0; i < cur_p->size; ++i) {
+             auto token = cur_p->data[i].id;
+@@ -70,7 +101,9 @@ static void llama_sampler_llg_apply(llama_sampler * smpl, llama_token_data_array
+ static void llama_sampler_llg_reset(llama_sampler * smpl) {
+     auto * ctx = (llama_sampler_llg *) smpl->ctx;
+     if (ctx->grammar) {
+-        llg_matcher_reset(ctx->grammar);
++        if (llg_matcher_reset(ctx->grammar) != 0 || llg_matcher_get_error(ctx->grammar)) {
++            llama_sampler_llg_fail("reset");
++        }
+     }
+ }
+
+@@ -88,6 +121,10 @@ static llama_sampler * llama_sampler_llg_clone(const llama_sampler * smpl) {
+             result_ctx->grammar_data = ctx->grammar_data;
+             result_ctx->grammar      = llg_clone_matcher(ctx->grammar);
+             result_ctx->tokenizer    = llg_clone_tokenizer(ctx->tokenizer);
++            if (result_ctx->grammar == nullptr || result_ctx->tokenizer == nullptr ||
++                llg_matcher_get_error(result_ctx->grammar)) {
++                llama_sampler_llg_fail("clone");
++            }
+         }
+     }
+
+@@ -205,8 +242,7 @@ static LlgTokenizer * llama_sampler_llg_new_tokenizer(const llama_vocab * vocab)
+     delete[] token_lens;
+
+     if (tokenizer == nullptr) {
+-        LOG_ERR("llg tokenizer error: %s\n", error_buffer);
+-        return tokenizer;
++        llama_sampler_llg_fail("tokenizer");
+     }
+
+     if (tokenizer_cache) {
+@@ -224,6 +260,9 @@ llama_sampler * llama_sampler_init_llg(const llama_vocab * vocab, const char * g
+
+     if (grammar_kind != nullptr && grammar_kind[0] != '\0') {
+         auto tokenizer = llama_sampler_llg_new_tokenizer(vocab);
++        if (tokenizer == nullptr) {
++            llama_sampler_llg_fail("tokenizer clone");
++        }
+         *ctx           = {
+             /* .vocab        = */ vocab,
+             /* .grammar_kind = */ grammar_kind,
