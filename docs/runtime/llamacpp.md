@@ -55,7 +55,7 @@ directly; only an explicit internal `TrialBackend` executes the native trial.
 | CLI gate | Execution/setup refuse llamacpp; doctor lists bundle/model/Metal/UDS/LLGuidance/three-phase checks as unperformed | CLI and adapter refusal tests |
 | GGUF storage | Canonical cache identity, trusted size/content digest, stable shared/exclusive flock, cancellation, staged install, explicit repair, recovery | Synthetic artifacts, concurrent setup subprocesses, killed writers, rename/restore/sync failure injection |
 | UDS transport | Fixed operation paths, Unix-only dialing, no proxy or redirect, owner/mode/inode and OS peer-PID checks before transmission, 1 MiB request/4 MiB response/32 KiB header limits | Local test server and real native E2E on macOS; Linux support is for CI |
-| Input admission | Exact retained native tokens, 65,536 context/4,096 output reservation, whole-record history selection, at most five preparations, validated mandatory-input fallback | Synthetic tokenizer callbacks and real native token counts |
+| Input admission | Exact retained native tokens, 65,536 context/4,096 output reservation, whole-record history selection, at most five preparations, individual-record measurement when byte estimates exclude candidates, optional-history shrinking on local request byte overflow | Synthetic tokenizer callbacks, UDS trial-cycle regressions and earlier real native token counts |
 | Schema validation | Closed object/string vocabulary, required/allowed fields, enum, Unicode lengths, unknown-keyword/duplicate-key/trailing-data rejection | Synthetic invalid responses and real three-phase schema validation |
 
 The GGUF store has no production model catalog or network fetcher. Setup does not
@@ -65,6 +65,47 @@ The internal test factory exercises the actual CLI dry-run path; the release
 factory remains closed. Nominal E2E success, semantic quality and production
 failure handling are reported separately. The existing 4-file and 120-second
 planner limits remain unchanged.
+
+### History admission review follow-up
+
+The PR #193 review identified two reproducible failures in input preparation:
+different token densities could make the byte shortlist empty even when a record
+fit, and an oversized all-history request ended preparation before mandatory-only
+input was checked. Regression tests reproduced both failures before the repair.
+
+All-history input is still prepared once when it fits. After token or local
+request-byte overflow, the adapter validates mandatory-only input first. Byte
+estimates shortlist candidates, but an empty shortlist now tries an unmeasured
+individual record in the original priority order. Failed singleton candidates
+are not repeated. Only a locally classified request-byte overflow permits further
+history shrinking; transport, process, cancellation and invalid-token errors
+still stop the cycle. Mandatory-input byte or token overflow remains fatal, and
+the Git diff is never truncated. The 1 MiB transport limit is unchanged, including
+for the final completion request; completion failures are not retried.
+
+The original design bound remains three candidate preparations, at most five
+total including all-history and mandatory-only input. This is a bounded search,
+not an exhaustive scan or a guarantee of maximum history retention. If those
+three candidates fail, already validated mandatory tokens are reused. Records
+outside the candidate limit can still be unmeasured. Changing that bound is a
+separate design decision.
+
+Verification covers mixed token densities, mandatory-input rejection, bounded
+fallback and immediate propagation of other errors. UDS trial-cycle tests cover
+both an oversized apply-template request and a template response whose escaped
+tokenize request exceeds the limit. They retain a smaller record, preserve the
+mandatory diff and send exactly the accepted token IDs to completion without
+tokenizing them again. Separate transport tests accept the exact 1 MiB request
+boundary and classify and reject one extra byte before transmission. These follow-up tests use
+synthetic tokenizers and a local test server, not a new GGUF inference run.
+
+```sh
+go test ./internal/llamacpp -run 'TestHistory|TestMandatoryByteOverflow|TestTrialShrinksHistory|TestUDSTransportClassifiesRequest' -count=1
+```
+
+Local MLX artifact/profile identity, parent-SIGKILL cleanup and release model
+qualification remain open. This history repair does not enable the production
+factory or change the native LLGuidance patch.
 
 ## Configuration
 
