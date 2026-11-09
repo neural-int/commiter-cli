@@ -5,6 +5,7 @@ package llamacpp
 import (
 	"context"
 	"errors"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -136,5 +137,25 @@ func TestUDSTransportCancellation(t *testing.T) {
 	defer cancel()
 	if _, err := transport.request(ctx, "GET", "/health", nil); !errors.Is(err, context.DeadlineExceeded) {
 		t.Fatalf("lost cancellation: %v", err)
+	}
+}
+
+func TestUDSTransportClassifiesRequestByteOverflowBeforeSending(t *testing.T) {
+	var requests atomic.Int32
+	_, transport := localTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		requests.Add(1)
+		_, _ = io.Copy(io.Discard, r.Body)
+		_, _ = w.Write([]byte(`{}`))
+	})
+	for _, path := range []string{"/apply-template", "/tokenize", "/completion"} {
+		if _, err := transport.request(context.Background(), "POST", path, make([]byte, MaxRequestBytes+1)); !errors.Is(err, errRequestTooLarge) {
+			t.Fatalf("path=%s err=%v", path, err)
+		}
+	}
+	if requests.Load() != 0 {
+		t.Fatal("oversized request reached the server")
+	}
+	if _, err := transport.request(context.Background(), "POST", "/apply-template", make([]byte, MaxRequestBytes)); err != nil || requests.Load() != 1 {
+		t.Fatalf("exact limit rejected: requests=%d err=%v", requests.Load(), err)
 	}
 }

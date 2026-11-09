@@ -23,6 +23,9 @@ type tokenizeSelection func(context.Context, []int) ([]int, error)
 
 // prepareInput mirrors bounded HistoryInputPreparation in the MLX helper. Byte
 // estimates shortlist whole records only; every admitted input is tokenized.
+// An empty estimate falls back to individual native measurements within the
+// same three-candidate bound. Byte overflow can shrink optional history too;
+// all other preparation errors end the cycle immediately.
 func prepareInput(ctx context.Context, byteCounts []int, prepare tokenizeSelection) (preparedInput, error) {
 	const limit = ContextTokens - OutputTokens
 	all := make([]int, len(byteCounts))
@@ -52,15 +55,19 @@ func prepareInput(ctx context.Context, byteCounts []int, prepare tokenizeSelecti
 		return preparedInput{TokenIDs: append([]int(nil), tokens...), SelectedHistoryIndices: append([]int{}, indices...), PreparationCalls: calls}, nil
 	}
 	full, err := run(all)
-	if err != nil {
+	if err != nil && !errors.Is(err, errRequestTooLarge) {
 		return preparedInput{}, err
 	}
-	if len(full.TokenIDs) <= limit {
+	if err == nil && len(full.TokenIDs) <= limit {
 		return full, nil
 	}
 	if len(all) == 0 {
+		if err != nil {
+			return preparedInput{}, err
+		}
 		return preparedInput{}, llm.ErrInputTooLarge
 	}
+	fullByteOverflow := errors.Is(err, errRequestTooLarge)
 	base, err := run([]int{})
 	if err != nil {
 		return preparedInput{}, err
@@ -75,7 +82,11 @@ func prepareInput(ctx context.Context, byteCounts []int, prepare tokenizeSelecti
 		q, _ := bits.Div64(hi, lo, uint64(observed))
 		return q
 	}
-	budget := estimate(totalBytes, len(full.TokenIDs)-len(base.TokenIDs))
+	budget := totalBytes / 2
+	if !fullByteOverflow {
+		budget = estimate(totalBytes, len(full.TokenIDs)-len(base.TokenIDs))
+	}
+	measuredSingles := make([]bool, len(all))
 	for attempt := 0; attempt < 3; attempt++ {
 		indices := []int{}
 		selectedBytes := uint64(0)
@@ -85,17 +96,35 @@ func prepareInput(ctx context.Context, byteCounts []int, prepare tokenizeSelecti
 				selectedBytes += uint64(count)
 			}
 		}
-		if len(indices) == 0 {
-			break
+		if len(indices) == 0 || len(indices) == 1 && measuredSingles[indices[0]] {
+			// Bytes cannot prove that a record does not fit in tokens. Try
+			// the next unmeasured whole record in the original priority order.
+			indices = nil
+			for i, measured := range measuredSingles {
+				if !measured {
+					indices = []int{i}
+					selectedBytes = uint64(byteCounts[i])
+					break
+				}
+			}
+			if len(indices) == 0 {
+				break
+			}
+		}
+		if len(indices) == 1 {
+			measuredSingles[indices[0]] = true
 		}
 		candidate, err := run(indices)
-		if err != nil {
+		if err != nil && !errors.Is(err, errRequestTooLarge) {
 			return preparedInput{}, err
 		}
-		if len(candidate.TokenIDs) <= limit {
+		if err == nil && len(candidate.TokenIDs) <= limit {
 			return candidate, nil
 		}
-		budget = min(selectedBytes/2, estimate(selectedBytes, len(candidate.TokenIDs)-len(base.TokenIDs)))
+		budget = selectedBytes / 2
+		if err == nil {
+			budget = min(budget, estimate(selectedBytes, len(candidate.TokenIDs)-len(base.TokenIDs)))
+		}
 	}
 	base.PreparationCalls = calls
 	return base, nil

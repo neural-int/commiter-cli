@@ -13,6 +13,7 @@ import (
 )
 
 var errTransport = errors.New("llamacpp: local transport validation failed")
+var errRequestTooLarge = errors.New("llamacpp: local request exceeds byte limit")
 
 // localTransport is an internal building block, unreachable through Backend
 // until an upstream revision has passed qualification. Each connection checks
@@ -69,8 +70,11 @@ func (t *localTransport) close() { t.transport.CloseIdleConnections() }
 
 func (t *localTransport) request(ctx context.Context, method, path string, body []byte) ([]byte, error) {
 	valid := method == http.MethodGet && (path == "/health" || path == "/props") || method == http.MethodPost && (path == "/apply-template" || path == "/tokenize" || path == "/completion")
-	if !valid || len(body) > MaxRequestBytes {
+	if !valid {
 		return nil, errTransport
+	}
+	if len(body) > MaxRequestBytes {
+		return nil, errRequestTooLarge
 	}
 	request, err := http.NewRequestWithContext(ctx, method, "http://commiter"+path, bytes.NewReader(body))
 	if err != nil {

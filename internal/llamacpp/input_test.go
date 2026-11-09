@@ -3,6 +3,7 @@ package llamacpp
 import (
 	"context"
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -56,6 +57,77 @@ func TestHistoryFallbackUsesAlreadyValidatedMandatoryTokens(t *testing.T) {
 	})
 	if err != nil || calls > 5 || len(p.SelectedHistoryIndices) != 0 || !reflect.DeepEqual(p.TokenIDs, []int{42}) || p.PreparationCalls != calls {
 		t.Fatalf("fallback=%+v calls=%d err=%v", p, calls, err)
+	}
+}
+
+func TestHistorySelectionMeasuresRecordsWithDifferentTokenDensities(t *testing.T) {
+	for _, counts := range [][]int{{2000, 1000}, {1, 1000}} {
+		t.Run(fmt.Sprint(counts), func(t *testing.T) {
+			calls := 0
+			p, err := prepareInput(context.Background(), counts, func(_ context.Context, indices []int) ([]int, error) {
+				calls++
+				n := ContextTokens - OutputTokens - 10
+				for _, index := range indices {
+					if index == 0 {
+						n += 1000
+					} else {
+						n += 5
+					}
+				}
+				return make([]int, n), nil
+			})
+			if err != nil || !reflect.DeepEqual(p.SelectedHistoryIndices, []int{1}) || calls > 5 || p.PreparationCalls != calls {
+				t.Fatalf("selected=%v calls=%d err=%v", p.SelectedHistoryIndices, calls, err)
+			}
+		})
+	}
+}
+
+func TestHistoryByteOverflowPreservesValidatedMandatoryTokens(t *testing.T) {
+	calls := 0
+	p, err := prepareInput(context.Background(), []int{1000, 1, 1, 1}, func(_ context.Context, indices []int) ([]int, error) {
+		calls++
+		if len(indices) == 0 {
+			return []int{42}, nil
+		}
+		return nil, errRequestTooLarge
+	})
+	if err != nil || calls != 5 || p.PreparationCalls != calls || len(p.SelectedHistoryIndices) != 0 || !reflect.DeepEqual(p.TokenIDs, []int{42}) {
+		t.Fatalf("selected=%v tokens=%v calls=%d err=%v", p.SelectedHistoryIndices, p.TokenIDs, calls, err)
+	}
+}
+
+func TestMandatoryByteOverflowStopsPreparation(t *testing.T) {
+	for _, counts := range [][]int{nil, {100}} {
+		calls := 0
+		_, err := prepareInput(context.Background(), counts, func(context.Context, []int) ([]int, error) {
+			calls++
+			return nil, errRequestTooLarge
+		})
+		if !errors.Is(err, errRequestTooLarge) || calls != min(2, len(counts)+1) {
+			t.Fatalf("calls=%d err=%v", calls, err)
+		}
+	}
+}
+
+func TestHistoryShrinkingDoesNotRetryOtherPreparationErrors(t *testing.T) {
+	for _, cause := range []error{errTransport, context.Canceled, context.DeadlineExceeded} {
+		for _, failAt := range []int{1, 2, 3} {
+			calls := 0
+			_, err := prepareInput(context.Background(), []int{100, 20}, func(_ context.Context, indices []int) ([]int, error) {
+				calls++
+				if calls == failAt {
+					return nil, cause
+				}
+				if len(indices) == 0 {
+					return []int{42}, nil
+				}
+				return make([]int, ContextTokens), nil
+			})
+			if !errors.Is(err, cause) || calls != failAt {
+				t.Fatalf("cause=%v failAt=%d calls=%d err=%v", cause, failAt, calls, err)
+			}
+		}
 	}
 }
 
