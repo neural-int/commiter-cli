@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 var errTransport = errors.New("llamacpp: local transport validation failed")
@@ -37,7 +36,9 @@ func newLocalTransport(socket string, pid int) (*localTransport, error) {
 	}
 	transport := &http.Transport{
 		Proxy: nil, DisableKeepAlives: true, MaxConnsPerHost: 1,
-		MaxResponseHeaderBytes: 32 << 10, ResponseHeaderTimeout: 10 * time.Second,
+		// Non-streaming completion sends headers only after generation. The
+		// request's cycle context bounds that wait, including prefill/decode.
+		MaxResponseHeaderBytes: 32 << 10,
 		DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
 			before, err := socketIdentity(socket)
 			if err != nil || !os.SameFile(identity, before) {

@@ -140,6 +140,63 @@ func TestUDSTransportCancellation(t *testing.T) {
 	}
 }
 
+func TestUDSTransportNonStreamingCompletionCanWaitBeyondTenSeconds(t *testing.T) {
+	_, transport := localTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		_, _ = io.Copy(io.Discard, r.Body)
+		timer := time.NewTimer(11 * time.Second)
+		defer timer.Stop()
+		select {
+		case <-timer.C:
+			_, _ = w.Write([]byte(`{"content":"ok"}`))
+		case <-r.Context().Done():
+		}
+	})
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	data, err := transport.request(ctx, http.MethodPost, "/completion", []byte(`{"stream":false}`))
+	if err != nil || string(data) != `{"content":"ok"}` {
+		t.Fatalf("completion within cycle deadline failed: data=%q err=%v", data, err)
+	}
+}
+
+func TestUDSTransportCompletionHonorsCycleDeadlineAndCancellation(t *testing.T) {
+	for _, mode := range []string{"deadline", "cancel"} {
+		t.Run(mode, func(t *testing.T) {
+			received := make(chan struct{})
+			_, transport := localTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+				_, _ = io.Copy(io.Discard, r.Body)
+				close(received)
+				<-r.Context().Done()
+			})
+			ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+			defer cancel()
+			result := make(chan error, 1)
+			go func() {
+				_, err := transport.request(ctx, http.MethodPost, "/completion", []byte(`{"stream":false}`))
+				result <- err
+			}()
+			select {
+			case <-received:
+			case <-ctx.Done():
+				t.Fatal("completion request was not received")
+			}
+			want := context.DeadlineExceeded
+			if mode == "cancel" {
+				cancel()
+				want = context.Canceled
+			}
+			select {
+			case err := <-result:
+				if !errors.Is(err, want) {
+					t.Fatalf("cycle error lost: want=%v err=%v", want, err)
+				}
+			case <-time.After(time.Second):
+				t.Fatal("completion survived cycle cancellation")
+			}
+		})
+	}
+}
+
 func TestUDSTransportClassifiesRequestByteOverflowBeforeSending(t *testing.T) {
 	var requests atomic.Int32
 	_, transport := localTestServer(t, func(w http.ResponseWriter, r *http.Request) {

@@ -54,7 +54,7 @@ directly; only an explicit internal `TrialBackend` executes the native trial.
 | Selection | `runtime`, legacy `backend` alias, explicit model path, global/repo/CLI precedence, inherited-path invalidation, local/managed origin | Config and CLI contract tests |
 | CLI gate | Execution/setup refuse llamacpp; doctor lists bundle/model/Metal/UDS/LLGuidance/three-phase checks as unperformed | CLI and adapter refusal tests |
 | GGUF storage | Canonical cache identity, trusted size/content digest, stable shared/exclusive flock, cancellation, staged install, explicit repair, recovery | Synthetic artifacts, concurrent setup subprocesses, killed writers, rename/restore/sync failure injection |
-| UDS transport | Fixed operation paths, Unix-only dialing, no proxy or redirect, owner/mode/inode and OS peer-PID checks before transmission, 1 MiB request/4 MiB response/32 KiB header limits | Local test server and real native E2E on macOS; Linux support is for CI |
+| UDS transport | Fixed operation paths, Unix-only dialing, no proxy or redirect, owner/mode/inode and OS peer-PID checks before transmission, 1 MiB request/4 MiB response/32 KiB header limits; request context bounds non-streaming response waits | Local test server and real native E2E on macOS; Linux support is for CI |
 | Input admission | Exact retained native tokens, 65,536 context/4,096 output reservation, whole-record history selection, at most five preparations, individual-record measurement when byte estimates exclude candidates, optional-history shrinking on local request byte overflow | Synthetic tokenizer callbacks, UDS trial-cycle regressions and earlier real native token counts |
 | Schema validation | Closed object/string vocabulary, required/allowed fields, enum, Unicode lengths, unknown-keyword/duplicate-key/trailing-data rejection | Synthetic invalid responses and real three-phase schema validation |
 
@@ -122,6 +122,24 @@ verify missing-log deadline propagation and process/socket cleanup, and reject
 cancelled, exited or contradictory startup states. These are controlled fake
 child tests; the review's timing risk has not been reproduced with a real GGUF
 server, and this follow-up does not add a new native E2E measurement.
+
+### Non-streaming response deadline review follow-up
+
+The pinned server [waits for all results before returning a non-streaming
+response](https://github.com/ggml-org/llama.cpp/blob/80d2c0c2c56e4a1bbf74be98f64b99927bf230bc/tools/server/server-context.cpp#L5423-L5427).
+The previous transport-wide 10-second response-header timeout could therefore
+interrupt prefill or decoding within the 120-second planning cycle. An 11-second
+local completion response reproduced failure at 10 seconds before the repair.
+
+The transport now uses the existing request context for the response wait,
+without an independent response-header timer or an extended cycle deadline.
+The readiness probe retains its 200 ms context, and connection ownership,
+request/response/header byte limits and redirect/proxy restrictions are unchanged.
+UDS regression tests verify successful response delivery after 11 seconds,
+deadline propagation and explicit cancellation while completion is pending.
+This is a local test-server reproduction, not a long-running GGUF generation
+measurement. Production activation and the remaining qualification gates are
+unchanged.
 
 ## Configuration
 
