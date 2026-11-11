@@ -5,6 +5,7 @@ package llamacpp
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"os"
@@ -82,9 +83,119 @@ func TestTrialServerHelper(t *testing.T) {
 			_, _ = w.Write([]byte(`{"status":"ok"}`))
 			return
 		}
+		if r.URL.Path == "/props" {
+			_, _ = fmt.Fprintf(w, `{"default_generation_settings":{"n_ctx":65536},"total_slots":1,"model_path":%q,"build_info":%q}`, model, TrialLlamaBuild)
+			return
+		}
 		http.Error(w, "not found", 404)
 	}), ReadHeaderTimeout: time.Second}
+	if strings.HasSuffix(model, "delayed.gguf") {
+		go func() {
+			for {
+				if _, err := os.Stat(filepath.Join(filepath.Dir(socket), "release-startup-log")); err == nil {
+					_, _ = fmt.Fprintln(os.Stderr, "loaded meta data with synthetic fields\nusing device MTL0\noffloaded 33/33 layers to GPU")
+					return
+				}
+				time.Sleep(5 * time.Millisecond)
+			}
+		}()
+	}
 	_ = server.Serve(listener)
+}
+
+func TestTrialStartupObservationWaitsForDelayedLogs(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	p, err := startTrialProcess(ctx, trialTestExecutable(t), "/synthetic/delayed.gguf")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer p.close()
+	if _, err := p.transport.request(ctx, http.MethodGet, "/props", nil); err != nil {
+		t.Fatal(err)
+	}
+	if p.logs.observation().ModelLoads != 0 {
+		t.Fatal("startup logs appeared before the explicit release")
+	}
+	result := make(chan error, 1)
+	go func() { result <- p.waitForStartupObservation(ctx) }()
+	if err := os.WriteFile(filepath.Join(p.directory, "release-startup-log"), nil, 0600); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case err := <-result:
+		if err != nil {
+			t.Fatal(err)
+		}
+	case <-ctx.Done():
+		t.Fatal("delayed startup logs were not observed")
+	}
+	observation := p.logs.observation()
+	if observation.ModelLoads != 1 || !observation.MetalDevice || observation.OffloadedLayers != 33 || observation.TotalLayers != 33 {
+		t.Fatalf("incomplete startup accepted: %+v", observation)
+	}
+}
+
+func TestTrialStartupObservationMissingLogsHonorsDeadlineAndReapsChild(t *testing.T) {
+	parent, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	p, err := startTrialProcess(parent, trialTestExecutable(t), "/synthetic/model.gguf")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer p.close()
+	ctx, stop := context.WithTimeout(parent, 50*time.Millisecond)
+	defer stop()
+	if err := p.waitForStartupObservation(ctx); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("missing logs did not preserve deadline: %v", err)
+	}
+	if err := p.close(); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-p.done:
+	default:
+		t.Fatal("child was not reaped after observation timeout")
+	}
+	if _, err := os.Lstat(p.directory); !errors.Is(err, os.ErrNotExist) {
+		t.Fatal("startup observation timeout left resources")
+	}
+}
+
+func TestTrialStartupObservationRejectsInvalidOrInterruptedStartup(t *testing.T) {
+	for _, mode := range []string{"cancel", "process cancel", "exit", "duplicate load", "partial offload", "constraint failure", "patched constraint failure"} {
+		t.Run(mode, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			defer cancel()
+			child, stop := context.WithCancel(ctx)
+			defer stop()
+			p := &trialProcess{ctx: child, done: make(chan struct{})}
+			_, _ = p.logs.Write([]byte("loaded meta data with synthetic fields\nusing device MTL0\noffloaded 33/33 layers to GPU\n"))
+			switch mode {
+			case "cancel":
+				cancel()
+			case "process cancel":
+				stop()
+			case "exit":
+				close(p.done)
+			case "duplicate load":
+				_, _ = p.logs.Write([]byte("loaded meta data with another model\n"))
+			case "partial offload":
+				_, _ = p.logs.Write([]byte("offloaded 32/33 layers to GPU\n"))
+			case "constraint failure":
+				_, _ = p.logs.Write([]byte("llg error: synthetic\n"))
+			case "patched constraint failure":
+				_, _ = p.logs.Write([]byte("commiter: LLGuidance mask failed; stopping server\n"))
+			}
+			err := p.waitForStartupObservation(ctx)
+			if err == nil || errors.Is(err, context.DeadlineExceeded) {
+				t.Fatalf("invalid startup was not rejected immediately: %v", err)
+			}
+			if (mode == "cancel" || mode == "process cancel") && !errors.Is(err, context.Canceled) {
+				t.Fatalf("cancellation cause lost: %v", err)
+			}
+		})
+	}
 }
 
 func TestTrialProcessReadyAndIdempotentCleanup(t *testing.T) {

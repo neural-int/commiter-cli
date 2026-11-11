@@ -84,9 +84,8 @@ func (b *TrialBackend) BeginCycle(ctx context.Context) (llm.OptionsBackend, func
 	if err != nil || props.Settings.Context != ContextTokens || props.Slots != 1 || props.ModelPath != b.ModelPath || props.Build != TrialLlamaBuild {
 		return nil, nil, errors.Join(errors.New("llamacpp: loaded model, context or build identity mismatch"), process.close())
 	}
-	observation := process.logs.observation()
-	if observation.ModelLoads != 1 || !observation.MetalDevice || observation.TotalLayers == 0 || observation.OffloadedLayers != observation.TotalLayers {
-		return nil, nil, errors.Join(errors.New("llamacpp: one model load and full Metal offload were not observed"), process.close())
+	if err := process.waitForStartupObservation(ctx); err != nil {
+		return nil, nil, errors.Join(err, process.close())
 	}
 	cycle := &trialCycle{process: process}
 	observe := func() {

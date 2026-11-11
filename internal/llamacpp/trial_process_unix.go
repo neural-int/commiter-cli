@@ -178,6 +178,40 @@ func startTrialProcess(ctx context.Context, executable, model string) (result *t
 	}
 }
 
+// HTTP readiness does not synchronize the command's asynchronous log copier.
+// Wait for the required observations within the original cycle deadline, while
+// still rejecting cancellation, child exit and contradictory startup evidence.
+func (p *trialProcess) waitForStartupObservation(ctx context.Context) error {
+	ticker := time.NewTicker(25 * time.Millisecond)
+	defer ticker.Stop()
+	for {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		if err := p.ctx.Err(); err != nil {
+			return err
+		}
+		select {
+		case <-p.done:
+			return errors.New("llamacpp: trial server exited before startup observations")
+		default:
+		}
+		observation := p.logs.observation()
+		if p.logs.grammarFailed() || observation.ModelLoads > 1 || observation.TotalLayers > 0 && observation.OffloadedLayers != observation.TotalLayers {
+			return errors.New("llamacpp: invalid model load or Metal offload observations")
+		}
+		if observation.ModelLoads == 1 && observation.MetalDevice && observation.TotalLayers > 0 && observation.OffloadedLayers == observation.TotalLayers {
+			return nil
+		}
+		select {
+		case <-ctx.Done():
+		case <-p.ctx.Done():
+		case <-p.done:
+		case <-ticker.C:
+		}
+	}
+}
+
 func (p *trialProcess) call(ctx context.Context, path string, request any, response any) error {
 	if err := p.ctx.Err(); err != nil {
 		return err
