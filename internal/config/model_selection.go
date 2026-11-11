@@ -48,6 +48,13 @@ func normalizeModelLayer(e *Effective, layer map[string]any, source Source) erro
 		return fmt.Errorf("llm.model_quantization must be none or a positive Nbit label for MLX")
 	}
 	model, hasModel := layer["llm.model"]
+	// A complete CLI runtime/model override replaces inherited MLX identity.
+	// Runtime-only overrides and explicit non-MLX/MLX-field conflicts remain
+	// invalid; lower layers have already passed their own value validation.
+	if source == SourceCLI && hasRuntime && hasModel && runtime != e.Values.Backend && e.Values.Backend == "mlx" {
+		e.Values.ModelRevision, e.Values.ModelQuantization = "", ""
+		e.Sources["llm.model_revision"], e.Sources["llm.model_quantization"] = SourceUnset, SourceUnset
+	}
 	if hasModel {
 		if revision := pinnedPlannerRevision(model.(string)); revision != "" && e.Sources["llm.model_revision"] == SourceDefault {
 			if _, explicit := layer["llm.model_revision"]; !explicit {
@@ -69,7 +76,7 @@ func validateModelSelection(e *Effective) error {
 	}
 	if v.Backend != "mlx" {
 		for _, key := range []string{"llm.model_revision", "llm.model_quantization"} {
-			if e.Sources[key] != SourceDefault {
+			if e.Sources[key] != SourceDefault && e.Sources[key] != SourceUnset {
 				return fmt.Errorf("%s is MLX-specific and conflicts with llm.runtime", key)
 			}
 		}

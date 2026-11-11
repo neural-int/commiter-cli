@@ -19,6 +19,27 @@ func TestLlamaCPPStopsBeforeModelStoreOrPrompt(t *testing.T) {
 	chdir(t, cliRepository(t))
 	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 	t.Setenv("XDG_STATE_HOME", t.TempDir())
+	for _, scope := range []string{"--global", "--repo"} {
+		var stdout, stderr bytes.Buffer
+		if code := Run([]string{"config", "init", scope}, &stdout, &stderr); code != 0 {
+			t.Fatalf("init %s: code=%d stderr=%s", scope, code, &stderr)
+		}
+	}
+	var configOut, configErr bytes.Buffer
+	if code := Run([]string{"--json", "--runtime=llamacpp", "--model=trial", "--model-path=/models/trial.gguf", "config", "show", "--effective"}, &configOut, &configErr); code != 0 {
+		t.Fatalf("initialized config switch: code=%d stderr=%s", code, &configErr)
+	}
+	var effective struct {
+		Config map[string]config.Entry `json:"config"`
+	}
+	if err := json.Unmarshal(configOut.Bytes(), &effective); err != nil {
+		t.Fatal(err)
+	}
+	for _, key := range []string{"llm.model_revision", "llm.model_quantization"} {
+		if entry := effective.Config[key]; entry.Value != "" || entry.Source != config.SourceUnset {
+			t.Fatalf("MLX field still active after CLI override: %s=%+v", key, entry)
+		}
+	}
 	oldStore, oldConfirm, oldHelper := newMLXModelStore, confirmFunc, mlxHelperPath
 	t.Cleanup(func() { newMLXModelStore, confirmFunc, mlxHelperPath = oldStore, oldConfirm, oldHelper })
 	newMLXModelStore = func() (mlxmodel.Store, error) { t.Fatal("opened MLX cache for llamacpp"); return mlxmodel.Store{}, nil }
