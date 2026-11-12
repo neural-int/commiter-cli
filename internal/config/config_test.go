@@ -401,7 +401,9 @@ func TestThreePhaseDefaultRequiresPinnedCandidateWithFixedContext(t *testing.T) 
 				changed.Context = "8k"
 				changed.MaxTokens = 8192
 			}
-			if err := validateValues(changed, t.TempDir()); err == nil {
+			effective := Defaults()
+			effective.Values = changed
+			if err := validateModelSelection(&effective); err == nil {
 				t.Fatal("unsupported candidate accepted")
 			}
 		})

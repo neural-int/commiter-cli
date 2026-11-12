@@ -104,9 +104,10 @@ type cycleCandidateClient struct {
 	cycle           *candidateClient
 	started, closed int
 	startErr        error
+	closeErr        error
 }
 
-func (c *cycleCandidateClient) BeginCycle(ctx context.Context) (llm.OptionsBackend, func(), error) {
+func (c *cycleCandidateClient) BeginCycle(ctx context.Context) (llm.OptionsBackend, func() error, error) {
 	c.started++
 	if _, ok := ctx.Deadline(); !ok {
 		return nil, nil, errors.New("missing cycle deadline")
@@ -114,7 +115,25 @@ func (c *cycleCandidateClient) BeginCycle(ctx context.Context) (llm.OptionsBacke
 	if c.startErr != nil {
 		return nil, nil, c.startErr
 	}
-	return c.cycle, func() { c.closed++ }, nil
+	return c.cycle, func() error { c.closed++; return c.closeErr }, nil
+}
+
+func TestThreePhaseRejectsPlanWhenCycleCleanupFails(t *testing.T) {
+	cleanup := errors.New("cycle cleanup failed")
+	for _, failGeneration := range []bool{false, true} {
+		responses := candidateResponses()
+		if failGeneration {
+			responses[0] = `{}`
+		}
+		client := &cycleCandidateClient{cycle: &candidateClient{responses: responses}, closeErr: cleanup}
+		result, err := (ThreePhaseGenerator{Client: client}).Generate(context.Background(), candidatePrepared(t), English, SensitiveValues{})
+		if err == nil || !strings.Contains(err.Error(), cleanup.Error()) || len(result.Plan.Commits) != 0 || client.closed != 1 {
+			t.Fatalf("cleanup failure accepted: result=%+v err=%v closed=%d", result, err, client.closed)
+		}
+		if failGeneration && err.Error() == cleanup.Error() {
+			t.Fatal("lost generation failure")
+		}
+	}
 }
 
 func TestThreePhaseScopesReusableBackendToOneValidatedInvocation(t *testing.T) {

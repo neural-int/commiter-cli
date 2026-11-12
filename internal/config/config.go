@@ -46,6 +46,8 @@ type Values struct {
 	Planner           string
 	Model             string
 	Backend           string
+	ModelPath         string
+	ModelSource       string
 	ModelRevision     string
 	ModelQuantization string
 	Context           string
@@ -77,6 +79,8 @@ type CLIOverrides struct {
 	PushEnabled    *bool
 	PushConfirm    *bool
 	Model          *string
+	Runtime        *string
+	ModelPath      *string
 	MetricsPersist *bool
 }
 
@@ -94,6 +98,8 @@ var schema = map[string]schemaEntry{
 	"llm.planner":                          {"string", allow(SourceGlobal, SourceRepo)},
 	"llm.model":                            {"string", allow(SourceGlobal, SourceRepo)},
 	"llm.backend":                          {"string", allow(SourceGlobal, SourceRepo)},
+	"llm.runtime":                          {"string", allow(SourceGlobal, SourceRepo)},
+	"llm.model_path":                       {"string", allow(SourceGlobal)},
 	"llm.model_revision":                   {"string", allow(SourceGlobal, SourceRepo)},
 	"llm.model_quantization":               {"string", allow(SourceGlobal, SourceRepo)},
 	"llm.context":                          {"string", allow(SourceGlobal, SourceRepo)},
@@ -134,6 +140,7 @@ func Defaults() Effective {
 			ModelRevision:     CandidateRevision,
 			ModelQuantization: plannerModelQuantization,
 			Backend:           "mlx",
+			ModelSource:       "managed",
 			Context:           "64k",
 			MaxTokens:         65536,
 			Untracked:         "auto-safe",
@@ -168,6 +175,9 @@ func Resolve(globalPath, repoPath, repoRoot string, cli CLIOverrides) (Effective
 	if err := validateValues(effective.Values, repoRoot); err != nil {
 		return Effective{}, fmt.Errorf("invalid CLI configuration: %w", err)
 	}
+	if err := validateModelSelection(&effective); err != nil {
+		return Effective{}, err
+	}
 	return effective, nil
 }
 
@@ -201,10 +211,13 @@ func applyFile(effective *Effective, path string, source Source, repoRoot string
 	if _, exists := flat["llm.endpoint"]; exists {
 		return fmt.Errorf("remove llm.endpoint from %s configuration; Ollama settings are no longer supported (see docs/migrations/harness004.md)", source)
 	}
+	if err := normalizeModelLayer(effective, flat, source); err != nil {
+		return err
+	}
 	// Existing model/backend selections must opt into the new execution contract.
 	// Unrelated commit/verification settings can still use fresh defaults.
 	if _, explicit := flat["llm.planner"]; !explicit && effective.Sources["llm.planner"] == SourceDefault {
-		for _, key := range []string{"llm.model", "llm.backend", "llm.model_revision", "llm.model_quantization"} {
+		for _, key := range []string{"llm.model", "llm.runtime", "llm.model_path", "llm.backend", "llm.model_revision", "llm.model_quantization"} {
 			if _, exists := flat[key]; exists {
 				return fmt.Errorf("set llm.planner = \"three-phase\" explicitly when migrating model settings (see docs/migrations/harness004.md)")
 			}
@@ -302,8 +315,11 @@ func applyValue(e *Effective, key, kind string, raw any, source Source, repoRoot
 			e.Values.Planner = value
 		case "llm.model":
 			e.Values.Model = value
-		case "llm.backend":
+		case "llm.backend", "llm.runtime":
 			e.Values.Backend = value
+			e.Sources["llm.backend"], e.Sources["llm.runtime"] = source, source
+		case "llm.model_path":
+			e.Values.ModelPath = value
 		case "llm.model_revision":
 			e.Values.ModelRevision = value
 		case "llm.model_quantization":
@@ -363,14 +379,36 @@ func applyCLI(e *Effective, cli CLIOverrides) error {
 	if cli.PushConfirm != nil {
 		e.Values.PushConfirm, e.Sources["push.confirm"] = *cli.PushConfirm, SourceCLI
 	}
+	layer := map[string]any{}
+	if cli.Runtime != nil {
+		layer["llm.runtime"] = *cli.Runtime
+	}
+	if cli.Model != nil {
+		layer["llm.model"] = *cli.Model
+	}
+	if cli.ModelPath != nil {
+		layer["llm.model_path"] = *cli.ModelPath
+	}
+	if err := normalizeModelLayer(e, layer, SourceCLI); err != nil {
+		return err
+	}
+	if cli.Runtime != nil {
+		e.Values.Backend = *cli.Runtime
+		e.Sources["llm.runtime"], e.Sources["llm.backend"] = SourceCLI, SourceCLI
+	}
+	if cli.ModelPath != nil {
+		e.Values.ModelPath, e.Sources["llm.model_path"] = *cli.ModelPath, SourceCLI
+	}
 	if cli.Model != nil {
 		revision := pinnedPlannerRevision(*cli.Model)
-		if revision == "" {
+		if revision == "" && e.Values.Backend == "mlx" && e.Values.ModelPath == "" {
 			return fmt.Errorf("--model requires a supported pinned Gemma or Qwen MLX model (see docs/migrations/harness004.md)")
 		}
 		e.Values.Model, e.Sources["llm.model"] = *cli.Model, SourceCLI
-		e.Values.ModelRevision, e.Sources["llm.model_revision"] = revision, SourceCLI
-		e.Values.ModelQuantization, e.Sources["llm.model_quantization"] = plannerModelQuantization, SourceCLI
+		if e.Values.Backend == "mlx" && revision != "" {
+			e.Values.ModelRevision, e.Sources["llm.model_revision"] = revision, SourceCLI
+			e.Values.ModelQuantization, e.Sources["llm.model_quantization"] = plannerModelQuantization, SourceCLI
+		}
 	}
 	if cli.MetricsPersist != nil {
 		e.Values.MetricsPersist, e.Sources["metrics.persist"] = *cli.MetricsPersist, SourceCLI
@@ -399,23 +437,6 @@ func validateValues(v Values, repoRoot string) error {
 	}
 	if v.Model == "" {
 		return fmt.Errorf("llm.model must not be empty")
-	}
-	if v.Backend != "mlx" {
-		return fmt.Errorf("planning requires llm.backend = \"mlx\"; migrate legacy Ollama settings (see docs/migrations/harness004.md)")
-	}
-	if v.Backend == "mlx" {
-		if !validMLXModel(v.Model) {
-			return fmt.Errorf("llm.model must be a Hugging Face owner/repository for MLX")
-		}
-		if !validHexRevision(v.ModelRevision) {
-			return fmt.Errorf("llm.model_revision must be a 40-character commit hash for MLX")
-		}
-		if !validMLXQuantization(v.ModelQuantization) {
-			return fmt.Errorf("llm.model_quantization must be none or a positive Nbit label for MLX")
-		}
-	}
-	if !SupportedPlannerModel(v) {
-		return fmt.Errorf("three-phase planning requires a supported pinned Gemma or Qwen MLX 4bit model (see docs/migrations/harness004.md)")
 	}
 	if v.MaxTokens != 65536 || (v.Context != "auto" && v.Context != "64k") {
 		return fmt.Errorf("three-phase planning uses a fixed 64k window; set llm.context = \"64k\" and llm.max_context_tokens = 65536")
@@ -608,6 +629,8 @@ func (e Effective) Entries() map[string]Entry {
 		"llm.planner":                          v.Planner,
 		"llm.model":                            v.Model,
 		"llm.backend":                          v.Backend,
+		"llm.runtime":                          v.Backend,
+		"llm.model_path":                       v.ModelPath,
 		"llm.model_revision":                   v.ModelRevision,
 		"llm.model_quantization":               v.ModelQuantization,
 		"llm.context":                          v.Context,
